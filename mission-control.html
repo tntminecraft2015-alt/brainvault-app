@@ -180,6 +180,10 @@
 
     /* Quest / Claude panel */
     .quest-panel { width:210px; padding:8px; display:flex; flex-direction:column; min-height:0; }
+    /* Standalone Budget panel */
+    .budget-panel { width:205px; padding:8px; display:flex; flex-direction:column; min-height:0; }
+    /* Desktop stats scrollable area */
+    .desk-stats-scroll { flex:1; overflow-y:auto; min-height:0; }
     .tab-bar  { display:flex; gap:2px; margin-bottom:6px; flex-shrink:0; }
     .tab-btn  { flex:1; padding:4px 0; border:none; cursor:pointer; font-family:'Press Start 2P',monospace; font-size:6px; letter-spacing:1px; background:var(--bg); color:rgba(168,230,255,.45); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12); transition:all .12s; }
     .tab-btn.active { background:var(--darker); color:var(--fg); box-shadow:inset 0 0 0 1px rgba(168,230,255,.4); }
@@ -760,11 +764,16 @@
         </div>
       </div>
 
+      <div class="box-b budget-panel">
+        <div class="panel-hd"><span>💰 GIL TRACKER</span></div>
+        <div id="deskBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;"></div>
+      </div>
+
       <div class="box-b quest-panel">
         <div class="tab-bar">
           <button class="tab-btn active" id="tabQuestBtn" onclick="switchTab('quest')">QUEST</button>
           <button class="tab-btn" id="tabClaudeBtn" onclick="switchTab('claude')">▲ CLAUDE</button>
-          <button class="tab-btn" id="tabGilBtn" onclick="switchTab('gil')">💰 GIL</button>
+          <button class="tab-btn" id="tabStatsBtn" onclick="switchTab('stats')">STATS</button>
           <div style="display:flex;align-items:center;gap:4px;padding:0 6px;">
             <div class="server-dot" id="serverDot"></div>
           </div>
@@ -793,8 +802,9 @@
             <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:5px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;letter-spacing:1px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(168,230,255,.4)'">⚙ KEY</button>
           </div>
         </div>
-        <div class="tab-pane" id="tabGil" style="display:flex;flex-direction:column;">
-          <div id="deskBudgetView" style="display:flex;flex-direction:column;height:100%;"></div>
+        <div class="tab-pane" id="tabStats">
+          <div style="font-family:'Press Start 2P',monospace;font-size:6px;opacity:.65;margin-bottom:7px;flex-shrink:0;">QUEST STATS</div>
+          <div class="desk-stats-scroll" id="deskStatsSection"></div>
         </div>
       </div>
     </div>
@@ -1112,11 +1122,23 @@
       <div class="color-pick-row"><input type="color" id="cpGreen" oninput="previewColor('--green',this.value)"><div class="color-pick-label">SUCCESS</div></div>
       <div class="color-pick-row"><input type="color" id="cpBezel" oninput="previewColor('--bezel',this.value)"><div class="color-pick-label">BEZEL</div></div>
     </div>
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,230,255,.1);">
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,230,255,.1);" id="settingsKeySection">
       <div class="m-label" style="margin-bottom:6px;">API KEY</div>
-      <div style="display:flex;gap:6px;">
-        <input id="settingsKeyInp" class="m-inp" type="password" placeholder="sk-ant-..." style="flex:1;">
-        <button class="modal-btn sm ok" onclick="saveKeyFromSettings()">SAVE</button>
+      <div id="settingsKeyLocal">
+        <div style="display:flex;gap:6px;">
+          <input id="settingsKeyInp" class="m-inp" type="password" placeholder="sk-ant-..." style="flex:1;">
+          <button class="modal-btn sm ok" onclick="saveKeyFromSettings()">SAVE</button>
+        </div>
+      </div>
+      <div id="settingsKeyCloud" style="display:none;">
+        <div style="font-family:'Press Start 2P',monospace;font-size:5px;line-height:1.8;color:var(--accent);">CLOUD MODE — key must be set as env var:</div>
+        <div style="font-family:'VT323',monospace;font-size:16px;line-height:1.5;margin-top:4px;">
+          1. Go to render.com → your BrainVault service<br>
+          2. Click <b>Environment</b> tab<br>
+          3. Add variable: <b>ANTHROPIC_API_KEY</b><br>
+          4. Value: your key from console.anthropic.com<br>
+          5. Click Save → Render redeploys automatically
+        </div>
       </div>
       <div id="settingsKeyStatus" style="font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-top:4px;"></div>
     </div>
@@ -1340,11 +1362,13 @@ function renderAll(){
 
 // ── SERVER STATUS ──
 let serverOnline = false;
+let serverMode   = 'local';
 async function checkServer(){
   try {
     const r=await fetch(`${SERVER}/api/status`,{signal:AbortSignal.timeout(5000)});
     const d=await r.json();
     serverOnline=d.ok;
+    serverMode=d.mode||'local';
     ['serverDot','mobServerDot'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='server-dot '+(d.ok?'online':'offline');});
   } catch {
     serverOnline=false;
@@ -1689,16 +1713,19 @@ function toggleTask(i){
 }
 function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderTasks(); renderMobTasks(); }
 
-// Stats rendering for HOME tab
-function renderStats(){
-  const el=document.getElementById('mobStatsSection'); if(!el)return;
-  const stats=APP.taskStats||{};
-  const sorted=Object.entries(stats).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count).slice(0,8);
-  if(!sorted.length){ el.innerHTML='<div class="empty" style="font-size:14px;">Complete quests to earn stats</div>'; return; }
-  const max=sorted[0][1].count;
-  el.innerHTML=sorted.map(([name,{count}])=>{
+// Stats rendering — mobile HOME card + desktop STATS tab
+function buildStatsHTML(sorted, max, compact){
+  if(!sorted.length) return `<div class="${compact?'':'empty'}" style="font-size:${compact?'11px':'14px'};color:var(--fg-dim);">Complete quests to earn stats</div>`;
+  return sorted.map(([name,{count}])=>{
     const task=(APP.tasks||[]).find(t=>t.text===name);
     const rank=task?.rank||'B';
+    if(compact){
+      return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(168,230,255,.06);">
+        <span style="font-family:'VT323',monospace;font-size:22px;color:var(--accent);min-width:34px;text-align:center;">${count}×</span>
+        <span style="font-family:'VT323',monospace;font-size:16px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(name)}</span>
+        <span style="font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 4px;color:#fff;background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</span>
+      </div>`;
+    }
     return`<div class="mob-stats-row">
       <div class="mob-stats-count">${count}×</div>
       <div style="flex:1;min-width:0;">
@@ -1708,6 +1735,18 @@ function renderStats(){
       <div class="mob-stats-badge" style="background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</div>
     </div>`;
   }).join('');
+}
+
+function renderStats(){
+  const stats=APP.taskStats||{};
+  const sorted=Object.entries(stats).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count);
+  const max=sorted.length?sorted[0][1].count:1;
+  // Mobile HOME card (up to 8)
+  const mob=document.getElementById('mobStatsSection');
+  if(mob) mob.innerHTML=buildStatsHTML(sorted.slice(0,8),max,false);
+  // Desktop STATS tab (all, compact layout)
+  const desk=document.getElementById('deskStatsSection');
+  if(desk) desk.innerHTML=buildStatsHTML(sorted,max,true);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1917,11 +1956,12 @@ function showXpPop(amount,color){
 // TABS + MOBILE NAV
 // ══════════════════════════════════════════════════════════════
 function switchTab(tab){
-  ['quest','claude','gil'].forEach(t=>{
+  ['quest','claude','stats'].forEach(t=>{
     document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.toggle('active',tab===t);
     document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)+'Btn')?.classList.toggle('active',tab===t);
   });
   if(tab==='claude')setTimeout(()=>document.getElementById('chatInp')?.focus(),50);
+  if(tab==='stats')renderStats();
 }
 
 function switchMobTab(tab, btn){
@@ -2037,6 +2077,12 @@ function openSettingsModal(){
   [['cpAccent','--accent'],['cpBg','--bg'],['cpSurface','--surface'],['cpFg','--fg'],['cpGreen','--green'],['cpBezel','--bezel']].forEach(([id,k])=>{
     const el=document.getElementById(id); if(el) el.value=t[k]||base[k]||'#000000';
   });
+  // Show appropriate key UI based on cloud vs local mode
+  const isCloud = serverMode === 'cloud';
+  const localEl = document.getElementById('settingsKeyLocal');
+  const cloudEl = document.getElementById('settingsKeyCloud');
+  if(localEl) localEl.style.display = isCloud ? 'none' : '';
+  if(cloudEl) cloudEl.style.display = isCloud ? '' : 'none';
   openModal('settingsModal');
 }
 
@@ -2060,6 +2106,7 @@ function saveTheme(){
 }
 
 async function saveKeyFromSettings(){
+  if(serverMode==='cloud'){document.getElementById('settingsKeyStatus').textContent='Cloud mode: use Render env var (see instructions above).';return;}
   const key=document.getElementById('settingsKeyInp').value.trim();
   if(!key){document.getElementById('settingsKeyStatus').textContent='Enter a key first.';return;}
   try{
