@@ -257,6 +257,8 @@ app.post('/api/data', (req, res) => {
     if (patch.taskStats      !== undefined) data.taskStats      = patch.taskStats;
     if (patch.budget         !== undefined) data.budget         = patch.budget;
     if (patch.questXp        !== undefined) data.questXp        = patch.questXp;
+    if (patch.caughtPoke     !== undefined) data.caughtPoke     = patch.caughtPoke;
+    if (patch.savings        !== undefined) data.savings        = patch.savings;
     recalcStreak(data);
     saveAppData(data);
     const date = req.body._date || today();
