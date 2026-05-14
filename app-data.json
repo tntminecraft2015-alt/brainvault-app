@@ -116,12 +116,12 @@
     "transactions": []
   },
   "theme": {
-    "preset": "Purple",
-    "--accent": "#e040fb",
-    "--bg": "#0e0a1a",
-    "--surface": "#1a1030",
-    "--fg": "#e1bee7",
-    "--green": "#ce93d8",
-    "--bezel": "#1a1030"
+    "preset": "Green",
+    "--accent": "#7ec87a",
+    "--bg": "#0d1a10",
+    "--surface": "#172b1c",
+    "--fg": "#b8d4b0",
+    "--green": "#9dc89a",
+    "--bezel": "#111f15"
   }
 }
