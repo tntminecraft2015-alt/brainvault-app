@@ -127,16 +127,7 @@
   "taskStats": {},
   "budget": {
     "monthlyLimit": 300,
-    "transactions": [
-      {
-        "id": 1778800152822,
-        "date": "2026-05-14",
-        "amount": 173.35,
-        "category": "food",
-        "note": "PROVISIONS",
-        "type": "income"
-      }
-    ]
+    "transactions": []
   },
   "theme": {
     "preset": "Green",
