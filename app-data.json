@@ -162,7 +162,7 @@
         "type": "income"
       }
     ],
-    "mode": "monthly"
+    "mode": "weekly"
   },
   "theme": {
     "preset": "Green",
