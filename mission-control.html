@@ -356,9 +356,12 @@
         opacity:.55; text-align:center; margin-bottom:18px; flex-shrink:0;
       }
       .mob-home-card {
-        background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.18);
-        padding:14px 16px; margin-bottom:12px; flex-shrink:0;
+        background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
+        padding:14px 16px; margin-bottom:10px; flex-shrink:0;
+        border-left:3px solid var(--accent); border-radius:1px;
+        transition:box-shadow .15s;
       }
+      .mob-home-card:active { box-shadow:inset 0 0 0 1px rgba(168,230,255,.28); }
       .mob-home-card-label {
         font-family:'Press Start 2P',monospace; font-size:6px;
         opacity:.5; margin-bottom:8px; letter-spacing:1px;
@@ -462,12 +465,13 @@
       .mob-nav-btn {
         flex:1; padding:9px 2px 7px; border:none; background:none; cursor:pointer;
         display:flex; flex-direction:column; align-items:center; gap:3px;
-        color:rgba(168,230,255,.38); transition:color .12s;
+        color:rgba(168,230,255,.35); transition:color .12s, box-shadow .12s;
         font-family:'Press Start 2P',monospace; font-size:4px; letter-spacing:.3px;
+        border-top:2px solid transparent;
       }
-      .mob-nav-btn .nav-icon { font-size:17px; line-height:1; }
-      .mob-nav-btn.active    { color:var(--fg); }
-      .mob-nav-btn.active .nav-icon { filter:drop-shadow(0 0 4px rgba(168,230,255,.5)); }
+      .mob-nav-btn .nav-icon { font-size:17px; line-height:1; transition:transform .15s; }
+      .mob-nav-btn.active    { color:var(--fg); border-top-color:var(--accent); }
+      .mob-nav-btn.active .nav-icon { filter:drop-shadow(0 0 5px var(--accent)); transform:scale(1.08); }
 
       .empty { font-size:14px; color:rgba(168,230,255,.3); font-style:italic; text-align:center; padding:10px 0; }
     }
@@ -581,7 +585,10 @@
     .mob-home-poke-img {
       width:140px; height:140px; image-rendering:pixelated;
       animation:pokeBounce 2.6s ease-in-out infinite;
+      filter:drop-shadow(0 0 10px var(--accent)) drop-shadow(0 8px 16px rgba(0,0,0,.5));
+      cursor:pointer; transition:filter .2s;
     }
+    .mob-home-poke-img:active { filter:drop-shadow(0 0 20px var(--accent)) drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
     .mob-home-poke-shadow {
       width:70px; height:12px;
       background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%);
@@ -596,6 +603,14 @@
     .mob-home-poke-num {
       font-family:'Press Start 2P',monospace; font-size:5px;
       opacity:.45; margin-top:3px;
+    }
+
+    /* Pokeball catch animation */
+    @keyframes pokeballThrow {
+      0%  { transform:scale(0) rotate(-30deg); opacity:1; }
+      40% { transform:scale(1.3) rotate(360deg); opacity:1; }
+      70% { transform:scale(0.9) rotate(400deg); opacity:.8; }
+      100%{ transform:scale(0) rotate(440deg); opacity:0; }
     }
 
     /* Task completion poke flash */
@@ -1180,7 +1195,17 @@ const MONTHS_FULL = ['January','February','March','April','May','June','July','A
 const MONTHS_S    = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-const POKE_IDS = [1,4,7,25,39,52,54,56,58,63,66,74,79,81,83,84,88,90,92,93,94,95,96,98,100,104,109,113,116,118,120,122,124,125,126,127,129,130,131,132,133,134,135,136,137,143,144,145,146,147,148,149,150,151,152,155,158,175,179,183,187,191,193,196,197,202,206,213,216,220,225,226,228,231,233,235,238,239,240,241,242,243,244,245,246,248,249,250,251];
+const POKE_IDS = [1,4,7,25,39,52,54,56,58,63,66,74,79,81,83,84,88,90,92,93,94,95,96,98,100,104,109,113,116,118,120,122,124,125,126,127,129,130,131,132,133,134,135,136,137,143,144,145,146,147,148,149,150,151,152,155,158,175,179,183,187,191,193,196,197,202,206,213,216,220,225,226,228,231,233,235,238,239,240,241,242,243,244,245,246,248,249,250,251,
+  // Gen 3
+  252,255,258,282,302,303,330,334,351,359,374,376,380,381,384,385,386,
+  // Gen 4
+  390,393,399,405,425,426,429,445,448,461,471,479,487,491,492,493,
+  // Gen 5
+  495,498,501,571,572,636,643,644,646,649,
+  // Gen 6
+  650,653,656,676,700,706,716,717,718,719,720,721,
+  // Gen 7
+  722,725,728,745,746,778,785,786,787,788,800,801,802];
 
 // ── APP STATE (mirrored from server) ──
 let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[]} };
@@ -1252,26 +1277,51 @@ function renderHomePokemon(){
 }
 
 // ── WANDERING POKEMON ──
-const WANDER_POOL=[25,39,52,54,56,74,79,81,92,113,120,122,129,132,133,143,147,175,196,202,213,225,238,239,240,241,242,246];
+const WANDER_POOL=[25,39,52,54,56,74,79,81,92,113,120,122,129,132,133,143,147,175,196,202,213,225,238,239,240,241,242,246,252,255,258,282,330,359,390,393,448,495,498,571,650,653,722,725];
 let wanderActive=0;
-function spawnWanderPoke(){
-  if(wanderActive>=3)return;
+function spawnWanderPoke(forceId, forceSize){
+  if(wanderActive>=3&&!forceId)return;
   wanderActive++;
-  const id=WANDER_POOL[Math.floor(Math.random()*WANDER_POOL.length)];
-  const size=50+Math.floor(Math.random()*30);
+  const id=forceId||WANDER_POOL[Math.floor(Math.random()*WANDER_POOL.length)];
+  const size=forceSize||(50+Math.floor(Math.random()*30));
   const goRight=Math.random()<0.5;
+  const isShiny=!forceId&&Math.random()<0.05;
   const el=document.createElement('img');
   el.className='wander-poke';
-  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-  el.style.cssText=`width:${size}px;height:${size}px;top:${40+Math.floor(Math.random()*(window.innerHeight-120))}px;left:0;`;
+  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${isShiny?'shiny/':''}${id}.png`;
+  el.style.cssText=`width:${size}px;height:${size}px;top:${40+Math.floor(Math.random()*(window.innerHeight-120))}px;left:0;pointer-events:auto;cursor:pointer;`;
+  if(isShiny) el.style.filter='drop-shadow(0 0 6px gold) drop-shadow(0 0 12px gold)';
   const dur=9+Math.random()*9;
   el.style.animation=`${goRight?'wanderRight':'wanderLeft'} ${dur}s linear forwards`;
+  let caught=false;
+  el.addEventListener('click',ev=>{
+    if(caught)return; caught=true;
+    ev.stopPropagation();
+    const ball=document.createElement('div');
+    ball.style.cssText=`position:fixed;z-index:500;pointer-events:none;font-size:52px;line-height:1;left:${ev.clientX-26}px;top:${ev.clientY-26}px;animation:pokeballThrow .8s ease-out forwards;`;
+    ball.textContent='⚾';
+    document.body.appendChild(ball);
+    el.remove(); wanderActive--;
+    setTimeout(()=>{ball.remove();showToast(isShiny?`✨ Shiny #${id} caught!`:`Gotcha! #${id} caught!`);},900);
+  });
   document.body.appendChild(el);
-  setTimeout(()=>{el.remove();wanderActive--;},dur*1000+400);
+  setTimeout(()=>{if(!caught){el.remove();wanderActive--;}},dur*1000+400);
 }
 // Spawn wanderers periodically
 setTimeout(spawnWanderPoke,4000);
 setInterval(()=>{if(Math.random()<0.65)spawnWanderPoke();},14000);
+
+// ── KONAMI CODE → LEGENDARY SWARM ──
+const KONAMI_CODE=[38,38,40,40,37,39,37,39,66,65];
+let konamiIdx=0;
+document.addEventListener('keydown',e=>{
+  if(e.keyCode===KONAMI_CODE[konamiIdx]){konamiIdx++;if(konamiIdx===KONAMI_CODE.length){konamiIdx=0;triggerKonamiEgg();}}else{konamiIdx=0;}
+});
+function triggerKonamiEgg(){
+  const legs=[150,151,249,250,384,385,386,487,491,493,716,717,800,802];
+  for(let i=0;i<7;i++) setTimeout(()=>spawnWanderPoke(legs[Math.floor(Math.random()*legs.length)],70+Math.random()*50),i*350);
+  showToast('✨ LEGENDARY ENCOUNTER!');
+}
 
 // ── CLOCK ──
 function updateClock(){
@@ -1658,17 +1708,16 @@ function renderTasksInto(el, tasks, isMob){
   if(!tasks.length){el.innerHTML='<div class="empty">No quests — add one below</div>';return;}
   el.innerHTML=tasks.map((t,i)=>{
     const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
-    const lockIcon=rank==='S'&&t.done?'<span style="font-size:9px;opacity:.5;margin-left:2px;">🔒</span>':'';
     if(isMob) return`<div class="mob-task-row${t.done?' done':''}">
       <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
       <div class="mob-rank-badge" style="background:${col};">${rank}</div>
-      <div class="mob-task-label">${esc(t.text)}${lockIcon}</div>
+      <div class="mob-task-label">${esc(t.text)}</div>
       <button class="mob-task-del" onclick="deleteTask(${i})">✕</button>
     </div>`;
     return`<div class="task-row${t.done?' done':''}">
       <button class="pix-check" onclick="toggleTask(${i})"><div class="pix-x"></div></button>
       <div class="rank-badge" style="background:${col};">${rank}</div>
-      <div class="task-label">${esc(t.text)}${lockIcon}</div>
+      <div class="task-label">${esc(t.text)}</div>
       <button class="task-del" onclick="deleteTask(${i})">✕</button>
     </div>`;
   }).join('');
@@ -1695,7 +1744,6 @@ function addMobTask(){
 }
 function toggleTask(i){
   const tasks=APP.tasks||[]; const t=tasks[i]; if(!t)return;
-  if(t.rank==='S' && t.done) return; // S-tier locked once done
   t.done=!t.done;
   t.doneDate=t.done?TODAY():null;
   if(t.done){
@@ -2007,7 +2055,7 @@ async function sendChatCommon(msg, scrollId, btnId){
     const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
     const d=await r.json(); hideTyping(scrollId);
     if(d.error==='NO_KEY'){ appendChatMsg('sys','No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
-    else if(d.error==='RATE_LIMIT'){ appendChatMsg('sys','⚠ Rate limit reached on shared OAuth token. Set your own API key in ⚙ Settings → API Key for unlimited access.',scrollId); }
+    else if(d.error==='RATE_LIMIT'){ appendChatMsg('sys','⚠ Rate limited — paste your Anthropic API key in Settings → API Key for unlimited access.',scrollId); openModal('settingsModal'); }
     else if(d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ Authentication failed — API key may be expired. Open ⚙ Settings → API Key to update it.',scrollId); openModal('settingsModal'); }
     else if(d.error){ appendChatMsg('sys','Error: '+d.error,scrollId); }
     else { appendChatMsg('claude',d.response,scrollId); chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response}); if(chatHistory.length>20)chatHistory=chatHistory.slice(-20); }
@@ -2037,7 +2085,7 @@ async function saveKey(){ const key=document.getElementById('keyInp').value.trim
 const THEMES = {
   Cyan:   { '--accent':'#ff7a59','--bg':'#0a1929','--surface':'#11243a','--darker':'#1e3a5f','--fg':'#a8e6ff','--green':'#7fffb0','--bezel':'#1a2533','--bezel-dark':'#070b14','--bezel-mid':'#0c1422' },
   Red:    { '--accent':'#ff4040','--bg':'#1a0808','--surface':'#2d1010','--darker':'#4a1818','--fg':'#ffcdd2','--green':'#ff8a80','--bezel':'#2d1010','--bezel-dark':'#0d0303','--bezel-mid':'#1a0808' },
-  Green:  { '--accent':'#39ff14','--bg':'#010d01','--surface':'#031503','--darker':'#062806','--fg':'#80ff80','--green':'#ccff90','--bezel':'#031503','--bezel-dark':'#000500','--bezel-mid':'#010d01' },
+  Green:  { '--accent':'#7EC87A','--bg':'#0D1A10','--surface':'#172B1C','--darker':'#1F3D26','--fg':'#B8D4B0','--green':'#9DC89A','--bezel':'#111F15','--bezel-dark':'#070F09','--bezel-mid':'#0D1A10' },
   Purple: { '--accent':'#e040fb','--bg':'#0e0a1a','--surface':'#1a1030','--darker':'#2d1a50','--fg':'#e1bee7','--green':'#ce93d8','--bezel':'#1a1030','--bezel-dark':'#05020d','--bezel-mid':'#0e0a1a' },
   Gold:   { '--accent':'#ffd740','--bg':'#1a1200','--surface':'#2d2000','--darker':'#4a3600','--fg':'#fff8e1','--green':'#ffe082','--bezel':'#2d2000','--bezel-dark':'#0a0800','--bezel-mid':'#1a1200' },
 };

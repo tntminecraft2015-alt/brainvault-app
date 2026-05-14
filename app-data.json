@@ -112,11 +112,11 @@
   },
   "theme": {
     "preset": "Green",
-    "--accent": "#39ff14",
-    "--bg": "#010d01",
-    "--surface": "#031503",
-    "--fg": "#80ff80",
-    "--green": "#ccff90",
-    "--bezel": "#031503"
+    "--accent": "#7EC87A",
+    "--bg": "#0D1A10",
+    "--surface": "#172B1C",
+    "--fg": "#B8D4B0",
+    "--green": "#9DC89A",
+    "--bezel": "#111F15"
   }
 }
