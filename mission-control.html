@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>BrainVault — Mission Control</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1a2533">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BrainVault">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+    :root {
+      --bezel:      #1a2533;
+      --bezel-dark: #070b14;
+      --bezel-mid:  #0c1422;
+      --bezel-fg:   #8fd6ff;
+      --bg:         #0a1929;
+      --surface:    #11243a;
+      --darker:     #1e3a5f;
+      --fg:         #a8e6ff;
+      --accent:     #ff7a59;
+      --green:      #7fffb0;
+      --red:        #ff7070;
+      --fg-dim:     rgba(168,230,255,.45);
+      --fg-faint:   rgba(168,230,255,.12);
+    }
+
+    html, body { width:100%; height:100%; background:#000; overflow:hidden; image-rendering:pixelated; }
+    .px { font-family:'Press Start 2P',ui-monospace,monospace; letter-spacing:1px; }
+
+    @keyframes blink      { 50%{ opacity:0; } }
+    @keyframes march      { to { transform:translateX(-50%); } }
+    @keyframes xppop      { from{transform:translate(-50%,0);opacity:1;} to{transform:translate(-50%,-28px);opacity:0;} }
+    @keyframes hingeShine { 0%,100%{opacity:.25;} 50%{opacity:.55;} }
+    @keyframes bootblock  { from{opacity:.12;} to{opacity:1;} }
+
+    /* ── BOOT ── */
+    #bootOverlay {
+      position:fixed; inset:0; z-index:999; background:var(--bg);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+      transition:opacity .4s;
+    }
+    #bootOverlay.fade { opacity:0; pointer-events:none; }
+    .boot-title  { font-family:'Press Start 2P',monospace; font-size:16px; letter-spacing:4px; color:var(--fg); animation:blink .7s steps(2) infinite; }
+    .boot-sub    { font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:2px; color:var(--fg-dim); }
+    .boot-blocks { display:flex; gap:4px; margin-top:4px; }
+    .boot-block  { width:10px; height:10px; background:var(--fg); opacity:.12; }
+
+    /* ══════════════════════════════════════
+       DESKTOP LAYOUT (≥769px)
+    ══════════════════════════════════════ */
+
+    .console {
+      width:100%; height:100%;
+      background:var(--bezel);
+      display:flex; flex-direction:column;
+      padding:12px;
+      box-shadow:inset 0 0 0 3px rgba(0,0,0,.2);
+      font-family:'VT323',ui-monospace,monospace;
+      color:var(--fg); position:relative; overflow:hidden;
+    }
+    .console-label {
+      font-family:'Press Start 2P',monospace; font-size:7px; color:var(--bezel-fg); opacity:.65;
+      margin-bottom:5px; padding:0 6px;
+      display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
+    }
+    .poke-strip {
+      flex-shrink:0; height:52px; overflow:hidden;
+      background:var(--bezel-dark); border:2px solid var(--bezel-mid);
+      display:flex; align-items:center; position:relative; margin-bottom:5px;
+    }
+    .poke-strip::before,.poke-strip::after {
+      content:''; position:absolute; top:0; bottom:0; width:40px; z-index:3; pointer-events:none;
+    }
+    .poke-strip::before { left:0;  background:linear-gradient(to right,var(--bezel-dark),transparent); }
+    .poke-strip::after  { right:0; background:linear-gradient(to left, var(--bezel-dark),transparent); }
+    .poke-track { display:flex; gap:4px; padding:0 4px; animation:march 120s linear infinite; }
+    .poke-track img { width:44px; height:44px; image-rendering:pixelated; opacity:.55; flex-shrink:0; transition:opacity .15s,transform .15s; cursor:pointer; }
+    .poke-track img:hover { opacity:1; transform:scale(1.3) translateY(-3px); }
+
+    .screen { position:relative; background:var(--bg); padding:10px; box-shadow:inset 0 0 0 2px var(--bezel-dark),inset 0 0 0 5px var(--bezel-mid); overflow:hidden; min-height:0; }
+    .screen-top    { flex:1.1; }
+    .screen-bottom { flex:1.3; }
+    .screen::after  { content:''; position:absolute; inset:0; background:repeating-linear-gradient(to bottom,rgba(0,0,0,.08) 0 1px,transparent 1px 3px); pointer-events:none; z-index:10; }
+    .screen::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 50% 40%,rgba(168,230,255,.04) 0%,transparent 70%); pointer-events:none; z-index:9; }
+
+    .hinge { height:14px; margin:5px 0; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .hinge-bar    { flex:1; height:4px; background:var(--bezel-dark); box-shadow:inset 0 1px 0 rgba(255,255,255,.1); }
+    .hinge-center { width:56px; height:12px; background:var(--bezel-dark); box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -1px 0 rgba(0,0,0,.4); display:flex; align-items:center; justify-content:center; gap:5px; }
+    .hinge-led    { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:hingeShine 1.5s ease-in-out infinite; }
+    .hinge-dot    { width:4px; height:4px; border-radius:50%; background:var(--fg); }
+
+    .box-b { background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.18),0 0 0 1px var(--darker); color:var(--fg); }
+
+    .console-controls { display:flex; justify-content:space-between; align-items:center; margin-top:7px; padding:0 6px; flex-shrink:0; }
+    .ctrl-dpad { width:28px; height:28px; background:var(--bezel-dark); border-radius:14px; box-shadow:inset 0 0 0 2px rgba(143,214,255,.2); }
+    .ctrl-label { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--bezel-fg); opacity:.55; }
+    .ctrl-btns  { display:grid; grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(2,1fr); gap:3px; width:32px; height:32px; }
+    .ctrl-btn   { background:var(--bezel-dark); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P',monospace; font-size:5px; color:var(--bezel-fg); opacity:.65; }
+
+    /* Top screen */
+    .top-inner  { display:flex; flex-direction:column; height:100%; gap:7px; position:relative; z-index:1; }
+    .status-row { display:flex; gap:7px; flex-shrink:0; }
+    .stat-box-time   { flex:1; padding:7px; }
+    .stat-box-streak { width:110px; padding:7px; }
+    .stat-label  { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.65; margin-bottom:3px; }
+    .stat-time   { font-size:28px; line-height:1; }
+    .stat-date   { font-family:'Press Start 2P',monospace; font-size:6px; margin-top:2px; opacity:.7; }
+    .stat-streak { font-size:20px; line-height:1; }
+    .stat-lv     { font-family:'Press Start 2P',monospace; font-size:5px; opacity:.7; margin-top:3px; }
+    .pixel-bar   { height:4px; background:var(--darker); margin-top:4px; }
+    .pixel-bar-fill { height:100%; background:var(--accent); transition:width .4s; }
+
+    /* Month grid */
+    .cal-section  { flex:1; min-height:0; padding:8px; display:flex; flex-direction:column; }
+    .cal-sec-hd   { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.65; margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+    .cal-nav-btn  { background:none; border:none; color:inherit; cursor:pointer; font-family:'Press Start 2P',monospace; font-size:7px; opacity:.7; padding:0 3px; transition:opacity .1s; }
+    .cal-nav-btn:hover { opacity:1; color:var(--accent); }
+    .region-btn   { font-family:'Press Start 2P',monospace; font-size:6px; background:var(--darker); border:none; color:var(--fg-dim); padding:3px 6px; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); transition:color .1s; }
+    .region-btn:hover { color:var(--accent); }
+    .dow-row      { display:grid; grid-template-columns:repeat(7,1fr); font-family:'Press Start 2P',monospace; font-size:5px; opacity:.5; gap:2px; margin-bottom:3px; flex-shrink:0; }
+    .dow-row span { text-align:center; }
+    .month-grid   { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; flex:1; }
+    .day-cell     { border:none; padding:2px 3px; cursor:pointer; background:var(--darker); color:var(--fg); font-family:'VT323',monospace; font-size:13px; display:flex; flex-direction:column; align-items:flex-start; min-height:0; transition:background .1s; }
+    .day-cell:hover  { background:var(--surface); }
+    .day-cell.today  { box-shadow:inset 0 0 0 1px var(--accent); }
+    .day-cell.sel    { background:var(--fg); color:var(--bg); }
+    .day-cell .dn    { line-height:1; }
+    .day-dots        { display:flex; gap:1px; flex-wrap:wrap; margin-top:auto; }
+    .dot-sq          { width:3px; height:3px; }
+    .day-summary     { margin-top:5px; padding-top:5px; flex-shrink:0; border-top:1px dashed rgba(168,230,255,.2); display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+    .day-chip        { font-family:'Press Start 2P',monospace; font-size:8px; padding:1px 4px; color:#fff; letter-spacing:1px; }
+
+    /* Bottom screen */
+    .bottom-inner   { display:flex; gap:7px; height:100%; position:relative; z-index:1; }
+    .timeline-panel { flex:1.1; padding:8px; display:flex; flex-direction:column; min-height:0; }
+    .panel-hd       { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.65; margin-bottom:7px; flex-shrink:0; display:flex; justify-content:space-between; align-items:center; }
+    .blink          { animation:blink 1s steps(2) infinite; }
+    .timeline-scroll { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:3px; }
+    .timeline-scroll::-webkit-scrollbar { width:3px; }
+    .timeline-scroll::-webkit-scrollbar-thumb { background:var(--fg); opacity:.3; }
+
+    /* Timeline items with checkbox */
+    .sched-row   { display:flex; gap:5px; align-items:stretch; }
+    .sched-row.past { opacity:.35; }
+    .sched-bar   { width:3px; flex-shrink:0; background:var(--fg); }
+    .sched-bar.next { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+    .sched-body  { flex:1; padding:3px 5px; display:flex; align-items:center; gap:6px; }
+    .sched-body.next { background:var(--darker); box-shadow:inset 0 0 0 1px var(--accent); }
+    .sched-t     { font-family:'Press Start 2P',monospace; font-size:6px; width:30px; flex-shrink:0; }
+    .sched-ttl   { flex:1; font-size:13px; line-height:1; }
+    .sched-chk   { width:11px; height:11px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+    .sched-chk:active { transform:scale(1.3); }
+    .sched-chk.done   { background:var(--accent); }
+    .sched-chk-x      { width:6px; height:6px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+    .sched-chk.done .sched-chk-x { display:block; }
+    .sched-del   { opacity:0; background:none; border:none; color:rgba(168,230,255,.5); font-size:10px; cursor:pointer; padding:0 2px; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
+    .sched-row:hover .sched-del { opacity:1; }
+    .sched-del:hover { color:var(--red); }
+
+    /* Streak progress bar in timeline footer */
+    .timeline-footer { margin-top:6px; padding-top:5px; border-top:1px dashed rgba(168,230,255,.18); flex-shrink:0; }
+    .streak-prog-label { font-family:'Press Start 2P',monospace; font-size:5px; opacity:.6; margin-bottom:3px; display:flex; justify-content:space-between; }
+    .streak-prog-bar  { height:6px; background:var(--darker); position:relative; }
+    .streak-prog-fill { height:100%; background:var(--accent); transition:width .4s; }
+    .streak-thresh    { position:absolute; top:0; bottom:0; width:2px; background:var(--green); opacity:.7; }
+
+    .sched-add { margin-top:5px; display:flex; gap:3px; flex-shrink:0; }
+    .mini-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:14px; padding:4px 7px; outline:none; }
+    .mini-inp::placeholder { color:rgba(168,230,255,.25); }
+    .mini-inp-time { width:68px; color-scheme:dark; cursor:pointer; }
+    .mini-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:9px; padding:0 8px; cursor:pointer; transition:background .1s; }
+    .mini-btn:hover { background:var(--bg); }
+
+    /* Quest / Claude panel */
+    .quest-panel { width:210px; padding:8px; display:flex; flex-direction:column; min-height:0; }
+    .tab-bar  { display:flex; gap:2px; margin-bottom:6px; flex-shrink:0; }
+    .tab-btn  { flex:1; padding:4px 0; border:none; cursor:pointer; font-family:'Press Start 2P',monospace; font-size:6px; letter-spacing:1px; background:var(--bg); color:rgba(168,230,255,.45); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12); transition:all .12s; }
+    .tab-btn.active { background:var(--darker); color:var(--fg); box-shadow:inset 0 0 0 1px rgba(168,230,255,.4); }
+    .tab-btn:hover:not(.active) { color:var(--fg-dim); }
+    .tab-pane { display:none; flex-direction:column; flex:1; min-height:0; }
+    .tab-pane.active { display:flex; }
+    .server-dot { width:6px; height:6px; border-radius:50%; background:#555; flex-shrink:0; transition:background .3s; }
+    .server-dot.online  { background:var(--green); box-shadow:0 0 4px var(--green); }
+    .server-dot.offline { background:var(--red); }
+
+    .quest-scroll { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; position:relative; }
+    .quest-scroll::-webkit-scrollbar { width:3px; }
+    .quest-scroll::-webkit-scrollbar-thumb { background:var(--fg); opacity:.3; }
+    .task-row   { display:flex; align-items:center; gap:5px; padding:2px 0; }
+    .task-row.done { opacity:.4; }
+    .pix-check  { width:12px; height:12px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+    .pix-check:active { transform:scale(1.3); }
+    .task-row.done .pix-check { background:var(--accent); }
+    .pix-x      { width:7px; height:7px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+    .task-row.done .pix-x { display:block; }
+    .rank-badge { font-family:'Press Start 2P',monospace; font-size:6px; width:13px; text-align:center; padding:2px 0; color:#fff; flex-shrink:0; line-height:1; }
+    .task-label { flex:1; font-size:12px; line-height:1.1; }
+    .task-row.done .task-label { text-decoration:line-through; }
+    .task-del   { opacity:0; background:none; border:none; color:rgba(168,230,255,.5); font-size:10px; cursor:pointer; padding:0 2px; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
+    .task-row:hover .task-del { opacity:1; }
+    .task-del:hover { color:var(--red); }
+    .xp-pop     { position:absolute; top:0; left:50%; font-family:'Press Start 2P',monospace; font-size:8px; pointer-events:none; white-space:nowrap; z-index:5; animation:xppop 900ms ease-out forwards; }
+    .task-add   { margin-top:5px; display:flex; gap:3px; flex-shrink:0; }
+    .rank-sel   { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); font-family:'Press Start 2P',monospace; font-size:7px; padding:0 4px; cursor:pointer; width:34px; appearance:none; text-align:center; }
+
+    /* Chat */
+    .chat-scroll { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding:4px 0; }
+    .chat-scroll::-webkit-scrollbar { width:3px; }
+    .chat-scroll::-webkit-scrollbar-thumb { background:var(--fg); opacity:.3; }
+    .chat-msg     { display:flex; flex-direction:column; gap:2px; }
+    .chat-msg-who { font-family:'Press Start 2P',monospace; font-size:5px; opacity:.55; padding:0 4px; }
+    .chat-msg-who.you    { color:var(--accent); align-self:flex-end; }
+    .chat-msg-who.claude { color:var(--fg); }
+    .chat-msg-who.sys    { color:rgba(168,230,255,.35); }
+    .chat-bubble { padding:5px 7px; font-size:13px; line-height:1.45; max-width:100%; word-break:break-word; }
+    .chat-bubble.you    { background:var(--darker); box-shadow:inset 0 0 0 1px rgba(255,122,89,.3); align-self:flex-end; }
+    .chat-bubble.claude { background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); }
+    .chat-bubble.sys    { background:var(--bg); color:rgba(168,230,255,.4); font-size:11px; font-style:italic; box-shadow:inset 0 0 0 1px rgba(168,230,255,.08); }
+    .chat-bubble pre    { background:var(--bg); padding:6px 8px; margin:4px 0; font-size:11px; white-space:pre-wrap; word-break:break-all; box-shadow:inset 0 0 0 1px rgba(168,230,255,.1); }
+    .typing-indicator   { display:flex; gap:3px; padding:5px 7px; align-items:center; }
+    .typing-dot         { width:4px; height:4px; background:var(--fg); border-radius:50%; opacity:.5; }
+    .typing-dot:nth-child(1){ animation:blink .8s .0s steps(2) infinite; }
+    .typing-dot:nth-child(2){ animation:blink .8s .2s steps(2) infinite; }
+    .typing-dot:nth-child(3){ animation:blink .8s .4s steps(2) infinite; }
+    .chat-input-row { display:flex; gap:3px; margin-top:5px; flex-shrink:0; }
+    .chat-inp   { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:14px; padding:5px 7px; outline:none; resize:none; min-height:32px; max-height:80px; }
+    .chat-inp::placeholder { color:rgba(168,230,255,.25); }
+    .chat-inp:focus { box-shadow:inset 0 0 0 1px rgba(168,230,255,.45); }
+    .chat-send  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.2); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:7px; padding:0 8px; cursor:pointer; transition:background .1s; white-space:nowrap; }
+    .chat-send:hover { background:var(--bg); }
+    .chat-send:disabled { opacity:.4; cursor:default; }
+
+    /* Modals */
+    .overlay   { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+    .overlay.active { display:flex; }
+    .modal { background:var(--surface); box-shadow:inset 0 0 0 3px rgba(168,230,255,.4),inset 0 0 0 5px var(--surface),inset 0 0 0 7px rgba(168,230,255,.1); padding:22px 20px; width:460px; max-width:94vw; }
+    .modal-title { font-family:'Press Start 2P',monospace; font-size:8px; letter-spacing:2px; color:var(--fg); margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid rgba(168,230,255,.1); }
+    .m-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.55; margin-bottom:3px; text-transform:uppercase; }
+    .m-field { margin-bottom:6px; }
+    .m-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:6px 9px; outline:none; }
+    .m-inp::placeholder { color:rgba(168,230,255,.25); }
+    .m-inp:focus { box-shadow:inset 0 0 0 1px rgba(168,230,255,.45); }
+    .m-sel   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:6px 9px; cursor:pointer; color-scheme:dark; }
+    .m-2col  { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+    .modal-btns { display:flex; gap:7px; margin-top:12px; }
+    .modal-btn  { flex:1; padding:9px 10px; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:1px; cursor:pointer; transition:all .12s; position:relative; }
+    .modal-btn::before { content:'▶'; position:absolute; left:7px; font-size:6px; opacity:0; color:var(--accent); transition:opacity .1s; }
+    .modal-btn:hover::before { opacity:1; }
+    .modal-btn:hover { background:var(--darker); }
+    .modal-btn.ok { box-shadow:inset 0 0 0 1px rgba(127,255,176,.3); color:var(--green); }
+    .modal-btn.ok::before { color:var(--green); }
+    .modal-btn.ok:hover { background:rgba(127,255,176,.06); }
+    .modal-btn.sm { flex:0; padding:6px 14px; }
+    .dev-list  { max-height:160px; overflow-y:auto; margin-bottom:10px; }
+    .dev-item  { display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid rgba(168,230,255,.07); font-size:14px; }
+    .dev-item:last-child { border-bottom:none; }
+    .dev-dot   { width:6px; height:6px; flex-shrink:0; }
+    .dev-time  { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); min-width:46px; }
+    .dev-del   { opacity:0; background:none; border:none; color:rgba(168,230,255,.5); font-size:11px; cursor:pointer; margin-left:auto; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
+    .dev-item:hover .dev-del { opacity:1; }
+    .dev-del:hover { color:var(--red); }
+    .dev-empty { font-size:13px; color:rgba(168,230,255,.3); font-style:italic; padding:6px 0; }
+    .region-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+    .reg-cell  { min-height:56px; padding:4px; cursor:pointer; background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.08); transition:background .1s; }
+    .reg-cell:hover { background:var(--darker); }
+    .reg-cell.today { box-shadow:inset 0 0 0 2px var(--accent); }
+    .reg-cell.other { opacity:.35; background:var(--bg); }
+    .reg-num   { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(168,230,255,.5); margin-bottom:3px; }
+    .reg-cell.today .reg-num { color:var(--accent); }
+    .reg-chip  { font-size:10px; padding:1px 3px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1px; }
+    .key-form  { display:flex; flex-direction:column; gap:8px; }
+    .key-info  { font-size:14px; color:var(--fg-dim); line-height:1.5; }
+    .key-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.2); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:7px 10px; outline:none; }
+    .key-inp:focus { box-shadow:inset 0 0 0 1px rgba(168,230,255,.5); }
+
+    .toast { position:fixed; bottom:36px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface); box-shadow:inset 0 0 0 2px rgba(168,230,255,.4),inset 0 0 0 4px var(--surface),inset 0 0 0 6px rgba(168,230,255,.1); color:var(--fg); font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:1px; padding:9px 18px; transition:transform .22s; z-index:998; pointer-events:none; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .empty { font-size:12px; color:rgba(168,230,255,.3); font-style:italic; text-align:center; padding:8px 0; }
+    input[type="date"],input[type="time"] { color-scheme:dark; }
+
+    /* ══════════════════════════════════════
+       MOBILE LAYOUT (≤768px) — iPhone/Android
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      html, body { overflow:hidden; }
+
+      .console {
+        padding:0; background:var(--bg); box-shadow:none;
+        display:flex; flex-direction:column; height:100%;
+        padding-bottom:env(safe-area-inset-bottom);
+      }
+      .console-label, .hinge, .console-controls { display:none !important; }
+      .poke-strip, .screen { display:none !important; }
+      .desktop-only { display:none !important; }
+
+      /* ── Pokémon strips (top + bottom) ── */
+      .mob-poke-strip {
+        flex-shrink:0; height:36px; overflow:hidden;
+        background:var(--bezel-dark);
+        display:flex; align-items:center; position:relative;
+      }
+      .mob-poke-strip.top    { border-bottom:1px solid rgba(168,230,255,.1); padding-top:env(safe-area-inset-top); }
+      .mob-poke-strip.bottom { border-top:1px solid rgba(168,230,255,.1); border-bottom:1px solid rgba(168,230,255,.1); }
+      .mob-poke-strip::before,.mob-poke-strip::after {
+        content:''; position:absolute; top:0; bottom:0; width:28px; z-index:3; pointer-events:none;
+      }
+      .mob-poke-strip::before { left:0;  background:linear-gradient(to right,var(--bezel-dark),transparent); }
+      .mob-poke-strip::after  { right:0; background:linear-gradient(to left, var(--bezel-dark),transparent); }
+      .mob-poke-track     { display:flex; gap:3px; padding:0 3px; animation:march 90s linear infinite; }
+      .mob-poke-track-rev { animation-direction:reverse; }
+      .mob-poke-track img { width:32px; height:32px; image-rendering:pixelated; opacity:.5; flex-shrink:0; }
+
+      /* ── Tab content area ── */
+      .mob-tab-content {
+        flex:1; overflow:hidden; min-height:0;
+        display:flex; flex-direction:column;
+      }
+
+      /* ── Tab panes ── */
+      .mob-tab-pane {
+        display:none; flex-direction:column;
+        height:100%; overflow-y:auto; overflow-x:hidden;
+        -webkit-overflow-scrolling:touch;
+        padding:14px 14px 10px;
+      }
+      .mob-tab-pane.active { display:flex; }
+      .mob-tab-pane::-webkit-scrollbar { width:0; }
+
+      /* Tab section header */
+      .mob-tab-hd {
+        font-family:'Press Start 2P',monospace; font-size:7px; opacity:.65;
+        padding-bottom:10px; margin-bottom:12px;
+        border-bottom:1px solid rgba(168,230,255,.12);
+        display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
+      }
+
+      /* ── HOME tab ── */
+      .mob-home-clock {
+        font-family:'VT323',monospace; font-size:80px; line-height:1;
+        text-align:center; letter-spacing:3px; color:var(--fg);
+        margin-bottom:2px; flex-shrink:0;
+      }
+      .mob-home-date {
+        font-family:'Press Start 2P',monospace; font-size:7px;
+        opacity:.55; text-align:center; margin-bottom:18px; flex-shrink:0;
+      }
+      .mob-home-card {
+        background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.18);
+        padding:14px 16px; margin-bottom:12px; flex-shrink:0;
+      }
+      .mob-home-card-label {
+        font-family:'Press Start 2P',monospace; font-size:6px;
+        opacity:.5; margin-bottom:8px; letter-spacing:1px;
+      }
+      .mob-home-streak-num {
+        font-family:'VT323',monospace; font-size:42px; line-height:1; color:var(--fg);
+      }
+      .mob-home-lv {
+        font-family:'Press Start 2P',monospace; font-size:7px;
+        opacity:.6; margin-top:4px; margin-bottom:8px;
+      }
+      .mob-home-next-time  { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--accent); margin-bottom:5px; }
+      .mob-home-next-title { font-family:'VT323',monospace; font-size:26px; line-height:1.2; }
+
+      /* ── Calendar tab ── */
+      .mob-cal-nav { display:flex; align-items:center; gap:10px; }
+      .mob-month-grid {
+        display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-top:6px; flex-shrink:0;
+      }
+      .mob-dow-row {
+        display:grid; grid-template-columns:repeat(7,1fr);
+        font-family:'Press Start 2P',monospace; font-size:6px; opacity:.5;
+        margin-bottom:4px; flex-shrink:0;
+      }
+      .mob-dow-row span { text-align:center; }
+      .mob-day-cell {
+        background:var(--darker); padding:5px 2px; text-align:center;
+        font-size:15px; cursor:pointer; min-height:36px;
+        display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+        border:none; color:var(--fg); font-family:'VT323',monospace; transition:background .1s;
+      }
+      .mob-day-cell:active { background:var(--surface); }
+      .mob-day-cell.today  { box-shadow:inset 0 0 0 2px var(--accent); }
+      .mob-day-cell.sel    { background:var(--fg); color:var(--bg); }
+      .mob-day-dots { display:flex; gap:2px; justify-content:center; margin-top:2px; flex-wrap:wrap; }
+      .mob-dot-sq   { width:4px; height:4px; }
+      .mob-day-summary {
+        margin-top:10px; padding-top:10px;
+        border-top:1px dashed rgba(168,230,255,.2);
+        display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex-shrink:0;
+      }
+
+      /* ── Timeline tab ── */
+      .mob-tl-list { flex:1; overflow-y:auto; min-height:0; }
+      .mob-tl-row  { display:flex; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(168,230,255,.07); }
+      .mob-tl-row:last-child { border-bottom:none; }
+      .mob-tl-bar  { width:3px; align-self:stretch; flex-shrink:0; background:var(--fg-faint); }
+      .mob-tl-bar.next { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+      .mob-tl-chk  { width:26px; height:26px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+      .mob-tl-chk:active { transform:scale(1.2); }
+      .mob-tl-chk.done   { background:var(--accent); }
+      .mob-tl-chk-x      { width:12px; height:12px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+      .mob-tl-chk.done .mob-tl-chk-x { display:block; }
+      .mob-tl-info { flex:1; }
+      .mob-tl-time  { font-family:'Press Start 2P',monospace; font-size:7px; opacity:.6; margin-bottom:3px; }
+      .mob-tl-title { font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
+      .mob-tl-next  { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent); animation:blink 1s steps(2) infinite; margin-top:2px; }
+      .mob-tl-prog  { flex-shrink:0; padding-top:10px; border-top:1px solid rgba(168,230,255,.1); margin-top:6px; }
+      .mob-sp-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.6; margin-bottom:5px; display:flex; justify-content:space-between; }
+      .mob-sp-bar   { height:8px; background:var(--darker); position:relative; }
+      .mob-sp-fill  { height:100%; background:var(--accent); transition:width .4s; }
+      .mob-sp-thresh { position:absolute; top:0; bottom:0; width:2px; background:var(--green); left:75%; }
+
+      /* ── Tasks tab ── */
+      .mob-task-list { flex:1; overflow-y:auto; min-height:0; position:relative; }
+      .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(168,230,255,.07); }
+      .mob-task-row:last-child { border-bottom:none; }
+      .mob-task-row.done { opacity:.4; }
+      .mob-pix-check { width:26px; height:26px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+      .mob-pix-check:active { transform:scale(1.2); }
+      .mob-task-row.done .mob-pix-check { background:var(--accent); }
+      .mob-pix-x  { width:13px; height:13px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+      .mob-task-row.done .mob-pix-x { display:block; }
+      .mob-rank-badge { font-family:'Press Start 2P',monospace; font-size:8px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; }
+      .mob-task-label { flex:1; font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
+      .mob-task-row.done .mob-task-label { text-decoration:line-through; }
+      .mob-task-del  { background:none; border:none; color:rgba(168,230,255,.45); font-size:18px; cursor:pointer; padding:6px; flex-shrink:0; }
+      .mob-task-del:active { color:var(--red); }
+
+      /* Shared add-row */
+      .mob-add-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
+      .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; outline:none; }
+      .mob-inp::placeholder { color:rgba(168,230,255,.25); }
+      .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; appearance:none; text-align:center; }
+      .mob-add-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:11px; padding:0 16px; cursor:pointer; flex-shrink:0; }
+
+      /* ── Claude tab ── */
+      .mob-chat-msgs { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; -webkit-overflow-scrolling:touch; min-height:0; }
+      .mob-chat-inp-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
+      .mob-chat-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; outline:none; resize:none; min-height:50px; }
+      .mob-chat-inp::placeholder { color:rgba(168,230,255,.25); }
+      .mob-send-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.2); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:9px; padding:0 16px; cursor:pointer; flex-shrink:0; }
+      .mob-send-btn:disabled { opacity:.4; }
+
+      /* ── Bottom nav (5 tabs) ── */
+      .mob-nav {
+        display:flex; flex-shrink:0;
+        background:var(--surface);
+        border-top:2px solid rgba(168,230,255,.15);
+      }
+      .mob-nav-btn {
+        flex:1; padding:9px 2px 7px; border:none; background:none; cursor:pointer;
+        display:flex; flex-direction:column; align-items:center; gap:3px;
+        color:rgba(168,230,255,.38); transition:color .12s;
+        font-family:'Press Start 2P',monospace; font-size:4px; letter-spacing:.3px;
+      }
+      .mob-nav-btn .nav-icon { font-size:17px; line-height:1; }
+      .mob-nav-btn.active    { color:var(--fg); }
+      .mob-nav-btn.active .nav-icon { filter:drop-shadow(0 0 4px rgba(168,230,255,.5)); }
+
+      .empty { font-size:14px; color:rgba(168,230,255,.3); font-style:italic; text-align:center; padding:10px 0; }
+    }
+
+    /* Hide all mobile elements on desktop */
+    .mob-poke-strip, .mob-tab-content, .mob-tab-pane, .mob-nav { display:none; }
+    @media (max-width: 768px) {
+      .mob-poke-strip  { display:flex; }
+      .mob-tab-content { display:flex; }
+      .mob-nav         { display:flex; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="bootOverlay">
+  <div class="boot-title">BRAINVAULT</div>
+  <div class="boot-sub">LOADING SAVE · FILE 01</div>
+  <div class="boot-blocks" id="bootBlocks"></div>
+</div>
+
+<!-- ══════════════ DESKTOP LAYOUT ══════════════ -->
+<div class="console" id="consoleRoot">
+
+  <div class="console-label desktop-only">
+    <span>FIELD CONSOLE · DS</span>
+    <button onclick="openSettingsModal()" style="background:none;border:none;color:var(--bezel-fg);font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;opacity:.7;letter-spacing:1px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'">⚙ SETTINGS</button>
+    <span>SAVE FILE 01</span>
+  </div>
+
+  <div class="poke-strip">
+    <div class="poke-track" id="pokeTrack"></div>
+  </div>
+
+  <!-- TOP SCREEN (desktop) -->
+  <div class="screen screen-top desktop-only">
+    <div class="top-inner">
+      <div class="status-row">
+        <div class="box-b stat-box-time">
+          <div class="stat-label px">TIME</div>
+          <div class="stat-time" id="clockDisp">00:00</div>
+          <div class="stat-date px" id="dateDisp">—</div>
+        </div>
+        <div class="box-b stat-box-streak">
+          <div class="stat-label px">STREAK</div>
+          <div class="stat-streak" id="streakVal">0 <span style="font-size:10px;opacity:.7;">DAYS</span></div>
+          <div class="stat-lv px" id="streakLv">LV.1</div>
+          <div class="pixel-bar"><div class="pixel-bar-fill" id="xpBar" style="width:0%;"></div></div>
+        </div>
+      </div>
+      <div class="box-b cal-section">
+        <div class="cal-sec-hd">
+          <span>
+            <button class="cal-nav-btn" onclick="changeCalMonth(-1)">◀</button>
+            <span id="calMonthLabel">MAY</span>
+            <button class="cal-nav-btn" onclick="changeCalMonth(1)">▶</button>
+          </span>
+          <span id="calDayLabel" style="opacity:.5;">DAY —</span>
+          <button class="region-btn" onclick="openRegionMap()">REGION MAP ▸</button>
+        </div>
+        <div class="dow-row px"><span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span></div>
+        <div class="month-grid" id="monthGrid"></div>
+        <div class="day-summary" id="daySummary"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hinge desktop-only">
+    <div class="hinge-bar"></div>
+    <div class="hinge-center"><div class="hinge-led"></div><div class="hinge-dot" style="opacity:.5;"></div><div class="hinge-dot" style="opacity:.3;"></div></div>
+    <div class="hinge-bar"></div>
+  </div>
+
+  <!-- BOTTOM SCREEN (desktop) -->
+  <div class="screen screen-bottom desktop-only">
+    <div class="bottom-inner">
+      <div class="box-b timeline-panel">
+        <div class="panel-hd">
+          <span>MISSION TIMELINE</span>
+          <span class="blink" style="color:var(--accent);">● LIVE</span>
+        </div>
+        <div class="timeline-scroll" id="timelineScroll"></div>
+        <div class="timeline-footer">
+          <div class="streak-prog-label">
+            <span id="tlProgLabel">DAILY COMPLETION</span>
+            <span id="tlProgPct">0%</span>
+          </div>
+          <div class="streak-prog-bar">
+            <div class="streak-prog-fill" id="tlProgFill" style="width:0%;"></div>
+            <div class="streak-thresh"></div>
+          </div>
+        </div>
+        <div class="sched-add">
+          <input type="time" class="mini-inp mini-inp-time" id="schedTime">
+          <input type="text" class="mini-inp" id="schedTitle" placeholder="Add mission...">
+          <button class="mini-btn" onclick="addSchedItem()">+</button>
+        </div>
+      </div>
+
+      <div class="box-b quest-panel">
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tabQuestBtn" onclick="switchTab('quest')">QUEST</button>
+          <button class="tab-btn" id="tabClaudeBtn" onclick="switchTab('claude')">▲ CLAUDE</button>
+          <div style="display:flex;align-items:center;gap:4px;padding:0 6px;">
+            <div class="server-dot" id="serverDot"></div>
+          </div>
+        </div>
+        <div class="tab-pane active" id="tabQuest">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;flex-shrink:0;">
+            <span style="font-family:'Press Start 2P',monospace;font-size:6px;opacity:.65;">QUEST LOG</span>
+            <span id="taskCountDisp" style="font-family:'Press Start 2P',monospace;font-size:6px;opacity:.5;">0/0</span>
+          </div>
+          <div class="quest-scroll" id="questScroll"></div>
+          <div class="task-add">
+            <select id="rankSel" class="rank-sel"><option value="S">S</option><option value="B" selected>B</option></select>
+            <input type="text" class="mini-inp" id="taskInp" placeholder="New quest...">
+            <button class="mini-btn" onclick="addTask()">+</button>
+          </div>
+        </div>
+        <div class="tab-pane" id="tabClaude">
+          <div class="chat-scroll" id="chatScroll"></div>
+          <div class="chat-input-row">
+            <textarea class="chat-inp" id="chatInp" placeholder="Ask Claude about your vault..." rows="2"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+            <button class="chat-send" id="chatSendBtn" onclick="sendChat()">SEND ▶</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;flex-shrink:0;">
+            <span style="font-family:'Press Start 2P',monospace;font-size:5px;opacity:.4;">SHIFT+ENTER for newline</span>
+            <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:5px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;letter-spacing:1px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(168,230,255,.4)'">⚙ KEY</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="console-controls desktop-only">
+    <div class="ctrl-dpad"></div>
+    <div class="ctrl-label">A · B · X · Y &nbsp; START · SELECT</div>
+    <div class="ctrl-btns"><div class="ctrl-btn">Y</div><div class="ctrl-btn">A</div><div class="ctrl-btn">B</div><div class="ctrl-btn">X</div></div>
+  </div>
+
+  <!-- ══════════════ MOBILE LAYOUT ══════════════ -->
+
+  <!-- Top Pokémon strip -->
+  <div class="mob-poke-strip top" id="mobPokeTop">
+    <div class="mob-poke-track" id="mobPokeTopTrack"></div>
+  </div>
+
+  <!-- Tab content -->
+  <div class="mob-tab-content" id="mobTabContent">
+
+    <!-- HOME tab -->
+    <div class="mob-tab-pane active" id="mobTabHome">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:4px;flex-shrink:0;">
+        <button onclick="openSettingsModal()" style="background:none;border:none;color:rgba(168,230,255,.5);font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;padding:4px 6px;">⚙</button>
+      </div>
+      <div class="mob-home-clock" id="mobClock">00:00</div>
+      <div class="mob-home-date" id="mobDate">—</div>
+      <div class="mob-home-card">
+        <div class="mob-home-card-label">STREAK</div>
+        <div class="mob-home-streak-num" id="mobStreakVal">0 <span style="font-size:18px;opacity:.7;">DAYS</span></div>
+        <div class="mob-home-lv" id="mobStreakLv">LV.1</div>
+        <div class="pixel-bar" style="height:6px;"><div class="pixel-bar-fill" id="mobXpBar" style="width:0%;"></div></div>
+      </div>
+      <div class="mob-home-card">
+        <div class="mob-home-card-label">NEXT MISSION</div>
+        <div class="mob-home-next-time" id="mobHomeNextTime">—</div>
+        <div class="mob-home-next-title" id="mobHomeNextTitle">—</div>
+      </div>
+    </div>
+
+    <!-- CAL tab -->
+    <div class="mob-tab-pane" id="mobTabCal">
+      <div class="mob-tab-hd">
+        <span>📅 CALENDAR</span>
+        <div class="mob-cal-nav">
+          <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
+          <span id="mobCalLabel" style="font-family:'Press Start 2P',monospace;font-size:7px;">—</span>
+          <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
+        </div>
+      </div>
+      <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="mob-month-grid" id="mobMonthGrid"></div>
+      <div class="mob-day-summary" id="mobDaySummary"></div>
+    </div>
+
+    <!-- TIMELINE tab -->
+    <div class="mob-tab-pane" id="mobTabTimeline">
+      <div class="mob-tab-hd">
+        <span>⏰ TIMELINE</span>
+        <span class="blink" style="color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;">● LIVE</span>
+      </div>
+      <div class="mob-tl-list" id="mobTimelineList"></div>
+      <div class="mob-tl-prog">
+        <div class="mob-sp-label">
+          <span>DAILY COMPLETION</span>
+          <span id="mobTlPct">0%</span>
+        </div>
+        <div class="mob-sp-bar">
+          <div class="mob-sp-fill" id="mobTlFill" style="width:0%;"></div>
+          <div class="mob-sp-thresh"></div>
+        </div>
+      </div>
+      <div class="mob-add-row">
+        <input type="time" class="mob-inp" id="mobSchedTime" style="width:100px;color-scheme:dark;flex:none;">
+        <input type="text" class="mob-inp" id="mobSchedTitle" placeholder="Add mission...">
+        <button class="mob-add-btn" onclick="addSchedItem()">+</button>
+      </div>
+    </div>
+
+    <!-- TASKS tab -->
+    <div class="mob-tab-pane" id="mobTabTasks">
+      <div class="mob-tab-hd">
+        <span>✅ QUESTS</span>
+        <span id="mobTaskCount" style="font-family:'Press Start 2P',monospace;font-size:7px;opacity:.5;">0/0</span>
+      </div>
+      <div class="mob-task-list" id="mobTaskList"></div>
+      <div class="mob-add-row">
+        <select id="mobRankSel" class="mob-rank-sel"><option value="S">S</option><option value="B" selected>B</option></select>
+        <input type="text" class="mob-inp" id="mobTaskInp" placeholder="New quest...">
+        <button class="mob-add-btn" onclick="addMobTask()">+</button>
+      </div>
+    </div>
+
+    <!-- CLAUDE tab -->
+    <div class="mob-tab-pane" id="mobTabClaude">
+      <div class="mob-tab-hd">
+        <span>🧠 CLAUDE</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="server-dot" id="mobServerDot"></div>
+          <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;">⚙</button>
+        </div>
+      </div>
+      <div class="mob-chat-msgs" id="mobChatMsgs"></div>
+      <div class="mob-chat-inp-row">
+        <textarea class="mob-chat-inp" id="mobChatInp" placeholder="Ask Claude..." rows="2"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
+        <button class="mob-send-btn" id="mobSendBtn" onclick="sendMobChat()">▶</button>
+      </div>
+    </div>
+
+  </div><!-- /mob-tab-content -->
+
+  <!-- Bottom Pokémon strip (reverse) -->
+  <div class="mob-poke-strip bottom" id="mobPokeBottom">
+    <div class="mob-poke-track mob-poke-track-rev" id="mobPokeBottomTrack"></div>
+  </div>
+
+  <!-- 5-tab bottom nav -->
+  <nav class="mob-nav" id="mobNav">
+    <button class="mob-nav-btn active" onclick="switchMobTab('home',this)">
+      <span class="nav-icon">🏠</span><span>HOME</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('cal',this)">
+      <span class="nav-icon">📅</span><span>CAL</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('timeline',this)">
+      <span class="nav-icon">⏰</span><span>TIME</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('tasks',this)">
+      <span class="nav-icon">✅</span><span>TASKS</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('claude',this)">
+      <span class="nav-icon">🧠</span><span>AI</span>
+    </button>
+  </nav>
+
+</div><!-- /console -->
+
+<!-- REGION MAP MODAL -->
+<div class="overlay" id="regionModal">
+  <div class="modal" style="width:600px;">
+    <div class="modal-title">◆ REGION MAP</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <button class="modal-btn sm" onclick="changeRegionMonth(-1)">◀</button>
+      <div style="font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:2px;" id="regionTitle"></div>
+      <button class="modal-btn sm" onclick="changeRegionMonth(1)">▶</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:3px;">
+      <div class="m-label" style="text-align:center;">MON</div><div class="m-label" style="text-align:center;">TUE</div><div class="m-label" style="text-align:center;">WED</div><div class="m-label" style="text-align:center;">THU</div><div class="m-label" style="text-align:center;">FRI</div><div class="m-label" style="text-align:center;">SAT</div><div class="m-label" style="text-align:center;">SUN</div>
+    </div>
+    <div class="region-grid" id="regionGrid" style="max-height:300px;overflow-y:auto;"></div>
+    <div class="modal-btns"><button class="modal-btn" onclick="closeModal('regionModal')">CLOSE</button></div>
+  </div>
+</div>
+
+<!-- DAY EVENTS MODAL — POKÉDEX STYLE -->
+<style>
+  .pdx-modal { background:var(--bezel-dark); box-shadow:inset 0 0 0 3px var(--accent),inset 0 0 0 5px var(--bezel-dark),inset 0 0 0 7px rgba(168,230,255,.2); padding:0; width:480px; max-width:95vw; overflow:hidden; border-radius:4px; }
+  .pdx-header { background:var(--accent); padding:10px 16px; display:flex; align-items:center; gap:10px; }
+  .pdx-led { width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.8); flex-shrink:0; }
+  .pdx-led-sm { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .pdx-title-bar { font-family:'Press Start 2P',monospace; font-size:9px; color:#fff; letter-spacing:2px; flex:1; }
+  .pdx-body { display:flex; gap:0; min-height:220px; }
+  .pdx-left { width:140px; flex-shrink:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px 10px; border-right:2px solid rgba(168,230,255,.15); position:relative; overflow:hidden; }
+  .pdx-scan { position:absolute; inset:0; background:linear-gradient(to bottom,transparent 0%,rgba(168,230,255,.12) 50%,transparent 100%); animation:pdxScan .8s ease-out forwards; pointer-events:none; z-index:5; }
+  @keyframes pdxScan { from{transform:translateY(-100%);} to{transform:translateY(100%);} }
+  .pdx-poke-img { width:96px; height:96px; image-rendering:pixelated; }
+  .pdx-poke-num { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent); margin-top:6px; opacity:.8; }
+  .pdx-poke-name { font-family:'Press Start 2P',monospace; font-size:8px; color:var(--fg); margin-top:3px; text-transform:uppercase; }
+  .pdx-right { flex:1; padding:12px 14px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:320px; }
+  .pdx-date-label { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); margin-bottom:2px; }
+  .pdx-section-hd { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.5; margin-bottom:4px; letter-spacing:1px; }
+  .pdx-add-form { border-top:1px solid rgba(168,230,255,.1); padding-top:10px; display:flex; flex-direction:column; gap:5px; }
+  .pdx-footer { background:var(--surface); padding:8px 14px; display:flex; gap:6px; border-top:2px solid rgba(168,230,255,.1); }
+</style>
+<div class="overlay" id="dayModal">
+  <div class="modal pdx-modal">
+    <div class="pdx-header">
+      <div class="pdx-led"></div>
+      <div class="pdx-led-sm" style="background:#f0c419;"></div>
+      <div class="pdx-led-sm" style="background:#7fffb0;"></div>
+      <div class="pdx-title-bar" id="dayModalTitle">POKÉDEX</div>
+    </div>
+    <div class="pdx-body">
+      <div class="pdx-left">
+        <div class="pdx-scan" id="pdxScan"></div>
+        <img class="pdx-poke-img" id="pdxPokeImg" src="" alt="">
+        <div class="pdx-poke-num" id="pdxPokeNum">#000</div>
+        <div class="pdx-poke-name" id="pdxPokeName">———</div>
+      </div>
+      <div class="pdx-right">
+        <div class="pdx-date-label" id="pdxDateLabel">—</div>
+        <div>
+          <div class="pdx-section-hd">ENCOUNTERS</div>
+          <div class="dev-list" id="devList"></div>
+        </div>
+        <div class="pdx-add-form">
+          <div class="pdx-section-hd">NEW ENCOUNTER</div>
+          <input id="devTitle" class="m-inp" type="text" placeholder="Event name...">
+          <div class="m-2col">
+            <input id="devTime" class="m-inp" type="time">
+            <input id="devLoc" class="m-inp" type="text" placeholder="Location">
+          </div>
+          <select id="devKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="pdx-footer">
+      <button class="modal-btn ok" style="flex:1;" onclick="addDayEvent()">▶ ADD</button>
+      <button class="modal-btn" style="flex:1;" onclick="closeModal('dayModal')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MISSION MODAL -->
+<div class="overlay" id="editMissionModal">
+  <div class="modal">
+    <div class="modal-title">✎ EDIT MISSION</div>
+    <div class="m-field"><div class="m-label">Time</div><input id="editMissTime" class="m-inp" type="time"></div>
+    <div class="m-field"><div class="m-label">Title</div><input id="editMissTitle" class="m-inp" type="text" placeholder="Mission name..."></div>
+    <div class="m-field"><div class="m-label">Type</div>
+      <select id="editMissKind" class="m-sel"><option value="focus">Focus</option><option value="training">Training</option><option value="routine">Routine</option><option value="errand">Errand</option><option value="meeting">Meeting</option><option value="social">Social</option></select>
+    </div>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="saveEditMission()">Save</button><button class="modal-btn" onclick="closeModal('editMissionModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- EDIT EVENT MODAL -->
+<div class="overlay" id="editEventModal">
+  <div class="modal">
+    <div class="modal-title">✎ EDIT EVENT</div>
+    <div class="m-field"><div class="m-label">Title</div><input id="editEvTitle" class="m-inp" type="text"></div>
+    <div class="m-2col m-field">
+      <div><div class="m-label">Time</div><input id="editEvTime" class="m-inp" type="time"></div>
+      <div><div class="m-label">Location</div><input id="editEvLoc" class="m-inp" type="text"></div>
+    </div>
+    <div class="m-field"><div class="m-label">Type</div>
+      <select id="editEvKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
+    </div>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="saveEditEvent()">Save</button><button class="modal-btn" onclick="closeModal('editEventModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- INGEST MODAL -->
+<div class="overlay" id="ingestModal">
+  <div class="modal">
+    <div class="modal-title">✨ QUICK INGEST</div>
+    <p style="font-size:14px;color:var(--fg-dim);margin-bottom:8px;">Enter filename from your <strong style="color:var(--accent);">raw/</strong> folder:</p>
+    <input id="ingestFile" class="m-inp" type="text" placeholder="e.g. karpathy-llm-wiki.md" style="margin:6px 0;" onkeydown="if(event.key==='Enter')doIngest()">
+    <p style="font-size:13px;color:var(--fg-dim);">Copies a prompt — paste into Claude CLI or Claude.ai.</p>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="doIngest()">Copy Prompt</button><button class="modal-btn" onclick="closeModal('ingestModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div class="overlay" id="keyModal">
+  <div class="modal">
+    <div class="modal-title">⚙ API KEY SETUP</div>
+    <div class="key-form">
+      <p class="key-info">Enter your Anthropic API key to enable Claude chat.<br>Get one at <strong style="color:var(--accent);">console.anthropic.com</strong></p>
+      <input id="keyInp" class="key-inp" type="password" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveKey()">
+      <p class="key-info" id="keyStatus" style="color:rgba(168,230,255,.35);font-size:11px;"></p>
+    </div>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="saveKey()">Save Key</button><button class="modal-btn" onclick="closeModal('keyModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<style>
+  .theme-presets { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
+  .theme-preset-btn { border:none; cursor:pointer; padding:10px 4px 7px; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Press Start 2P',monospace; font-size:5px; color:#fff; letter-spacing:.5px; box-shadow:inset 0 0 0 2px rgba(255,255,255,.15); transition:transform .1s,box-shadow .1s; }
+  .theme-preset-btn:hover { transform:scale(1.06); }
+  .theme-preset-btn.active { box-shadow:inset 0 0 0 2px #fff; }
+  .theme-swatch { width:22px; height:22px; border-radius:50%; border:2px solid rgba(255,255,255,.3); }
+  .color-pickers { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .color-pick-row { display:flex; align-items:center; gap:8px; }
+  .color-pick-row input[type=color] { width:36px; height:28px; border:none; background:none; cursor:pointer; padding:0; }
+  .color-pick-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.65; flex:1; }
+</style>
+<div class="overlay" id="settingsModal">
+  <div class="modal" style="width:500px;">
+    <div class="modal-title">⚙ SETTINGS</div>
+    <div class="m-label" style="margin-bottom:8px;">THEME PRESET</div>
+    <div class="theme-presets" id="themePresets"></div>
+    <div class="m-label" style="margin-bottom:8px;">CUSTOM COLORS</div>
+    <div class="color-pickers">
+      <div class="color-pick-row"><input type="color" id="cpAccent" oninput="previewColor('--accent',this.value)"><div class="color-pick-label">ACCENT</div></div>
+      <div class="color-pick-row"><input type="color" id="cpBg" oninput="previewColor('--bg',this.value)"><div class="color-pick-label">BACKGROUND</div></div>
+      <div class="color-pick-row"><input type="color" id="cpSurface" oninput="previewColor('--surface',this.value)"><div class="color-pick-label">SURFACE</div></div>
+      <div class="color-pick-row"><input type="color" id="cpFg" oninput="previewColor('--fg',this.value)"><div class="color-pick-label">TEXT</div></div>
+      <div class="color-pick-row"><input type="color" id="cpGreen" oninput="previewColor('--green',this.value)"><div class="color-pick-label">SUCCESS</div></div>
+      <div class="color-pick-row"><input type="color" id="cpBezel" oninput="previewColor('--bezel',this.value)"><div class="color-pick-label">BEZEL</div></div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,230,255,.1);">
+      <div class="m-label" style="margin-bottom:6px;">API KEY</div>
+      <div style="display:flex;gap:6px;">
+        <input id="settingsKeyInp" class="m-inp" type="password" placeholder="sk-ant-..." style="flex:1;">
+        <button class="modal-btn sm ok" onclick="saveKeyFromSettings()">SAVE</button>
+      </div>
+      <div id="settingsKeyStatus" style="font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-top:4px;"></div>
+    </div>
+    <div class="modal-btns" style="margin-top:14px;">
+      <button class="modal-btn ok" onclick="saveTheme()">APPLY THEME</button>
+      <button class="modal-btn" onclick="closeModal('settingsModal')">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════════════
+const SERVER      = window.location.origin;   // auto-resolve for phone vs desktop
+const RANK_COLORS = { S:'#e85d3a', B:'#4a90d9' };
+const RANK_XP     = { S:50, B:15 };
+const KIND_COLORS = { training:'#e85d3a', meeting:'#4a90d9', focus:'#9b59b6', social:'#f0c419', errand:'#5cab4f', routine:'#7a8a78' };
+const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTHS_S    = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+const POKE_IDS = [1,4,7,25,39,52,54,56,58,63,66,74,79,81,83,84,88,90,92,93,94,95,96,98,100,104,109,113,116,118,120,122,124,125,126,127,129,130,131,132,133,134,135,136,137,143,144,145,146,147,148,149,150,151,152,155,158,175,179,183,187,191,193,196,197,202,206,213,216,220,225,226,228,231,233,235,238,239,240,241,242,243,244,245,246,248,249,250,251];
+
+// ── APP STATE (mirrored from server) ──
+let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{} };
+
+// ── UTILS ──
+const pad     = n => String(n).padStart(2,'0');
+const dateKey = d => d.toISOString().split('T')[0];
+const esc     = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const parseHM = s => { const [h,m]=s.split(':').map(Number); return h*60+m; };
+const nowMins = () => { const n=new Date(); return n.getHours()*60+n.getMinutes(); };
+const TODAY   = () => dateKey(new Date());
+function fmtTime(t) { if(!t)return''; const[h,m]=t.split(':').map(Number); return`${h%12||12}:${pad(m)} ${h>=12?'PM':'AM'}`; }
+
+const isMobile = () => window.innerWidth <= 768;
+
+// ── BOOT ──
+(function(){
+  const c=document.getElementById('bootBlocks');
+  for(let i=0;i<12;i++){const b=document.createElement('div');b.className='boot-block';b.style.cssText=`animation:bootblock 1.4s ${i*.07}s forwards;`;c.appendChild(b);}
+  const o=document.getElementById('bootOverlay');
+  setTimeout(()=>{o.classList.add('fade');setTimeout(()=>o.remove(),500);},1800);
+})();
+
+// ── POKEMON MARQUEE ──
+(function(){
+  const t=document.getElementById('pokeTrack');
+  [...POKE_IDS,...POKE_IDS].forEach(id=>{const img=document.createElement('img');img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;img.alt=`#${id}`;img.loading='lazy';t.appendChild(img);});
+})();
+// Mobile poke strips
+(function(){
+  ['mobPokeTopTrack','mobPokeBottomTrack'].forEach(trackId=>{
+    const t=document.getElementById(trackId); if(!t)return;
+    [...POKE_IDS,...POKE_IDS].forEach(id=>{const img=document.createElement('img');img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;img.alt=`#${id}`;img.loading='lazy';t.appendChild(img);});
+  });
+})();
+
+// Seeded week pokemon
+function seededRng(seed){let s=seed|0;return()=>{s=Math.imul(s^(s>>>16),0x45d9f3b);s=Math.imul(s^(s>>>16),0x45d9f3b);s^=(s>>>16);return(s>>>0)/0x100000000;};}
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const j=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil((((t-j)/86400000)+1)/7);}
+function getWeekPoke(){const now=new Date();const rng=seededRng(now.getFullYear()*1000+isoWeek(now));const pool=[...POKE_IDS],out=[];for(let i=0;i<7&&pool.length;i++){const idx=Math.floor(rng()*pool.length);out.push(pool.splice(idx,1)[0]);}return out;}
+const WEEK_POKE = getWeekPoke();
+
+// ── CLOCK ──
+function updateClock(){
+  const n=new Date();
+  const t=`${pad(n.getHours())}:${pad(n.getMinutes())}`;
+  const d=`${DAY_NAMES[n.getDay()].slice(0,3).toUpperCase()} · ${MONTHS_S[n.getMonth()]} ${n.getDate()}`;
+  const cl=document.getElementById('clockDisp'); if(cl)cl.textContent=t;
+  const dd=document.getElementById('dateDisp');  if(dd)dd.textContent=d;
+  const mc=document.getElementById('mobClock');  if(mc)mc.textContent=t;
+  const md=document.getElementById('mobDate');   if(md)md.textContent=d;
+  renderTimeline(); renderMobTimeline();
+  renderMobHomeNext();
+}
+updateClock(); setInterval(updateClock,10000);
+
+// ── STREAK DISPLAY ──
+function updateStreakDisplay(){
+  const s=APP.currentStreak||0;
+  const lv=Math.floor(s/3)+1;
+  const xp=(s%3)/3*100;
+  [['streakVal','streakLv','xpBar'],['mobStreakVal','mobStreakLv','mobXpBar']].forEach(([sv,sl,xb])=>{
+    const el=document.getElementById(sv); if(el)el.innerHTML=`${s} <span style="font-size:10px;opacity:.7;">DAYS</span>`;
+    const ll=document.getElementById(sl); if(ll)ll.textContent=`LV.${lv}`;
+    const xel=document.getElementById(xb); if(xel)xel.style.width=xp+'%';
+  });
+}
+
+// ── LOAD DATA FROM SERVER ──
+async function loadData(){
+  try {
+    const r = await fetch(`${SERVER}/api/data`);
+    const d = await r.json();
+    APP = d;
+    if(!Array.isArray(APP.tasks)) APP.tasks=[];
+    APP.events         = APP.events         || {};
+    APP.schedule       = APP.schedule       || [];
+    APP.timelineChecks = APP.timelineChecks || {};
+    APP.streakDays     = APP.streakDays     || [];
+    APP.currentStreak  = APP.currentStreak  || 0;
+    APP.theme          = APP.theme          || {};
+    applyTheme(APP.theme);
+    renderAll();
+  } catch(e) {
+    console.warn('Server offline, using empty state');
+    renderAll();
+  }
+}
+
+// PATCH data back to server
+let patchDebounce = null;
+function patchData(fields){
+  Object.assign(APP, fields);
+  clearTimeout(patchDebounce);
+  patchDebounce = setTimeout(async ()=>{
+    try {
+      const r = await fetch(`${SERVER}/api/data`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...fields,_date:TODAY()})});
+      const d = await r.json();
+      if(d.currentStreak !== undefined){
+        APP.currentStreak = d.currentStreak;
+        APP.streakDays    = d.streakDays;
+        updateStreakDisplay();
+      }
+    } catch {}
+  }, 600);
+}
+
+function renderMobHomeNext(){
+  const sched=(APP.schedule||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+  const nm=nowMins();
+  let next=null; for(const s of sched){if(parseHM(s.time)>nm){next=s;break;}}
+  const te=document.getElementById('mobHomeNextTime'); const tl=document.getElementById('mobHomeNextTitle');
+  if(te)te.textContent=next?fmtTime(next.time):'—';
+  if(tl)tl.textContent=next?next.title:(sched.length?'All missions complete':'No missions yet');
+}
+
+function renderAll(){
+  updateStreakDisplay();
+  renderMonthGrid(); renderMobMonthGrid();
+  renderTimeline();  renderMobTimeline();
+  renderTasks();     renderMobTasks();
+  renderMobHomeNext();
+}
+
+// ── SERVER STATUS ──
+let serverOnline = false;
+async function checkServer(){
+  try {
+    const r=await fetch(`${SERVER}/api/status`,{signal:AbortSignal.timeout(2000)});
+    const d=await r.json();
+    serverOnline=d.ok;
+    ['serverDot','mobServerDot'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='server-dot '+(d.ok?'online':'offline');});
+  } catch {
+    serverOnline=false;
+    ['serverDot','mobServerDot'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='server-dot offline';});
+  }
+}
+checkServer(); setInterval(checkServer,15000);
+
+// ══════════════════════════════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════════════════════════════
+let calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+let selectedKey=TODAY();
+let dayModalDate=null, regYear=calYear, regMonth=calMonth;
+let mobCalYear=new Date().getFullYear(), mobCalMonth=new Date().getMonth();
+
+function changeCalMonth(d){ calMonth+=d; if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;} renderMonthGrid(); }
+function changeMobCalMonth(d){ mobCalMonth+=d; if(mobCalMonth>11){mobCalMonth=0;mobCalYear++;}if(mobCalMonth<0){mobCalMonth=11;mobCalYear--;} renderMobMonthGrid(); }
+
+function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
+  if(labelEl) labelEl.textContent = MONTHS_S[month];
+  const todayK=TODAY();
+  const firstDow=new Date(year,month,1).getDay();
+  const lastDate=new Date(year,month+1,0).getDate();
+  const cells=[];
+  for(let i=0;i<firstDow;i++) cells.push(null);
+  for(let d=1;d<=lastDate;d++) cells.push(d);
+  while(cells.length%7!==0) cells.push(null);
+  gridEl.innerHTML='';
+  cells.forEach(d=>{
+    if(d===null){gridEl.appendChild(document.createElement('div'));return;}
+    const dt=new Date(year,month,d); const key=dateKey(dt);
+    const evs=(APP.events||{})[key]||[];
+    const isToday=key===todayK, isSel=key===selKey;
+    const btn=document.createElement('button');
+    btn.className=(isMob?'mob-day-cell':'day-cell')+(isToday?' today':'')+(isSel?' sel':'');
+    const dots=evs.slice(0,4).map(e=>`<div class="${isMob?'mob-dot-sq':'dot-sq'}" style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'};"></div>`).join('');
+    btn.innerHTML=`<span class="dn">${d}</span><div class="${isMob?'mob-day-dots':'day-dots'}">${dots}</div>`;
+    btn.onclick=()=>{ selectedKey=key; renderMonthGrid(); renderMobMonthGrid(); renderDaySummary(); renderMobDaySummary(); openDayModal(key,dt); };
+    gridEl.appendChild(btn);
+  });
+  renderDaySummaryInto(selKey, summaryEl, isMob);
+}
+
+function renderMonthGrid(){
+  const gl=document.getElementById('monthGrid'); if(!gl)return;
+  const dl=document.getElementById('calDayLabel');
+  if(dl){ const d=new Date(selectedKey+'T00:00:00'); dl.textContent=(d.getMonth()===calMonth&&d.getFullYear()===calYear)?`DAY ${d.getDate()}`:'—'; }
+  buildCalGrid(calYear,calMonth,selectedKey,gl,document.getElementById('daySummary'),document.getElementById('calMonthLabel'),false);
+}
+function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); }
+function renderDaySummary(){ renderDaySummaryInto(selectedKey,document.getElementById('daySummary'),false); }
+function renderMobDaySummary(){ renderDaySummaryInto(selectedKey,document.getElementById('mobDaySummary'),true); }
+
+function renderDaySummaryInto(key,el,isMob){
+  if(!el)return;
+  const d=new Date(key+'T00:00:00');
+  const evs=(APP.events||{})[key]||[];
+  const chip = (e)=>`<span class="${isMob?'':'day-'}chip" style="font-family:'Press Start 2P',monospace;font-size:${isMob?'9':'8'}px;padding:${isMob?'2px 6px':'1px 4px'};color:#fff;letter-spacing:1px;background:${KIND_COLORS[e.kind||'focus']||'#666'};">${(e.kind||'').toUpperCase()}</span>`;
+  el.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:${isMob?'6':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
+    + (evs.length ? evs.map(chip).join('') : `<span style="font-size:${isMob?'14':'12'}px;opacity:.45;">nothing scheduled</span>`);
+}
+
+function openRegionMap(){ regYear=calYear; regMonth=calMonth; renderRegionGrid(); openModal('regionModal'); }
+function changeRegionMonth(d){ regMonth+=d; if(regMonth>11){regMonth=0;regYear++;}if(regMonth<0){regMonth=11;regYear--;} renderRegionGrid(); }
+function renderRegionGrid(){
+  document.getElementById('regionTitle').textContent=`${MONTHS_FULL[regMonth].toUpperCase()}  ${regYear}`;
+  const grid=document.getElementById('regionGrid');
+  const todayK=TODAY();
+  const firstDow=((new Date(regYear,regMonth,1).getDay()+6)%7);
+  const lastDate=new Date(regYear,regMonth+1,0).getDate();
+  const cells=[];
+  for(let i=0;i<firstDow;i++) cells.push({dt:new Date(regYear,regMonth,1-(firstDow-i)),other:true});
+  for(let d=1;d<=lastDate;d++) cells.push({dt:new Date(regYear,regMonth,d),other:false});
+  const tail=cells.length%7===0?0:7-(cells.length%7);
+  for(let i=1;i<=tail;i++) cells.push({dt:new Date(regYear,regMonth+1,i),other:true});
+  grid.innerHTML=cells.map(({dt,other})=>{
+    const key=dateKey(dt); const evs=(APP.events||{})[key]||[];
+    const isT=key===todayK;
+    const chips=evs.slice(0,2).map(e=>`<div class="reg-chip" style="background:${KIND_COLORS[e.kind||'focus']};">${esc(e.title)}</div>`).join('');
+    return `<div class="reg-cell${isT?' today':''}${other?' other':''}" onclick="openRegionDay('${key}',${dt.getTime()})"><div class="reg-num">${dt.getDate()}</div>${chips}${evs.length>2?`<div style="font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(168,230,255,.4);">+${evs.length-2}</div>`:''}</div>`;
+  }).join('');
+}
+function openRegionDay(key,ts){ const d=new Date(ts); dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); closeModal('regionModal'); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+
+function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+function renderDevList(key){ const evs=(APP.events||{})[key]||[]; const el=document.getElementById('devList'); if(!evs.length){el.innerHTML='<div class="dev-empty">No encounters yet</div>';return;} el.innerHTML=evs.map((e,i)=>`<div class="dev-item"><div class="dev-dot" style="background:${KIND_COLORS[e.kind||'focus']};"></div><span class="dev-time">${e.time?fmtTime(e.time):'—'}</span><span style="flex:1;">${esc(e.title)}</span><button class="dev-del" onclick="openEditEvent('${key}',${i})" title="Edit" style="font-size:11px;">✎</button><button class="dev-del" onclick="deleteDayEv('${key}',${i})">✕</button></div>`).join(''); }
+function addDayEvent(){ const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;} if(!APP.events[dayModalDate])APP.events[dayModalDate]=[]; APP.events[dayModalDate].push({title,time:document.getElementById('devTime').value,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value}); patchData({events:APP.events}); renderDevList(dayModalDate); renderMonthGrid(); renderMobMonthGrid(); if(document.getElementById('regionModal').classList.contains('active'))renderRegionGrid(); ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); showToast('Event added ◆'); }
+function deleteDayEv(key,idx){ if(APP.events[key]){APP.events[key].splice(idx,1);if(!APP.events[key].length)delete APP.events[key];} patchData({events:APP.events}); renderDevList(key); renderMonthGrid(); renderMobMonthGrid(); }
+
+// ══════════════════════════════════════════════════════════════
+// TIMELINE + STREAK
+// ══════════════════════════════════════════════════════════════
+function getChecks(date){ return (APP.timelineChecks||{})[date] || {}; }
+
+function toggleTimelineCheck(idx, date){
+  if(!APP.timelineChecks) APP.timelineChecks={};
+  if(!APP.timelineChecks[date]) APP.timelineChecks[date]={};
+  APP.timelineChecks[date][idx] = !APP.timelineChecks[date][idx];
+  patchData({timelineChecks: APP.timelineChecks});
+  renderTimeline(); renderMobTimeline();
+  updateTimelineProgress(date);
+}
+
+function updateTimelineProgress(date){
+  const sched=APP.schedule||[];
+  const checks=getChecks(date);
+  const checked=Object.values(checks).filter(Boolean).length;
+  const total=sched.length;
+  const pct=total>0?Math.round(checked/total*100):0;
+  const fill=document.getElementById('tlProgFill'); if(fill)fill.style.width=pct+'%';
+  const lbl=document.getElementById('tlProgPct'); if(lbl)lbl.textContent=pct+'%';
+  const mf=document.getElementById('mobTlFill'); if(mf)mf.style.width=pct+'%';
+  const mp=document.getElementById('mobTlPct'); if(mp)mp.textContent=pct+'%';
+}
+
+function renderTimelineItems(items, containerEl, isMob){
+  const sched=(APP.schedule||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+  const nm=nowMins(); const date=TODAY();
+  const checks=getChecks(date);
+  let nextIdx=-1; for(let i=0;i<sched.length;i++){if(parseHM(sched[i].time)>nm){nextIdx=i;break;}}
+  if(!sched.length){containerEl.innerHTML=`<div class="empty">No missions — add one</div>`;return;}
+  if(isMob){
+    containerEl.innerHTML=sched.map((s,i)=>{
+      const m=parseHM(s.time); const past=m<=nm&&i!==nextIdx; const next=i===nextIdx;
+      const kc=KIND_COLORS[s.kind||'focus']||'var(--fg)'; const done=!!checks[i];
+      return`<div class="mob-tl-row" style="opacity:${past&&!done?.4:1};">
+        <div class="mob-tl-bar${next?' next':''}"></div>
+        <button class="mob-tl-chk${done?' done':''}" onclick="toggleTimelineCheck(${i},'${date}')">
+          <div class="mob-tl-chk-x"></div>
+        </button>
+        <div class="mob-tl-info">
+          <div class="mob-tl-time">${s.time}</div>
+          <div class="mob-tl-title">${esc(s.title)}</div>
+          ${next?'<div class="mob-tl-next">▶ NEXT</div>':''}
+        </div>
+        <button onclick="deleteMobSchedItem(${i})" style="opacity:0;background:none;border:none;color:rgba(168,230,255,.5);font-size:14px;cursor:pointer;padding:6px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">✕</button>
+      </div>`;
+    }).join('');
+  } else {
+    containerEl.innerHTML=sched.map((s,i)=>{
+      const m=parseHM(s.time); const past=m<=nm&&i!==nextIdx; const next=i===nextIdx;
+      const kc=KIND_COLORS[s.kind||'focus']||'var(--fg)'; const done=!!checks[i];
+      return`<div class="sched-row${past&&!done?' past':''}">
+        <div class="sched-bar${next?' next':''}" style="${next?'':'background:'+kc+';'}"></div>
+        <div class="sched-body${next?' next':''}">
+          <span class="sched-t">${s.time}</span>
+          <span class="sched-ttl">${esc(s.title)}</span>
+          ${next?'<span class="blink" style="font-family:\'Press Start 2P\',monospace;font-size:5px;color:var(--accent);">▶</span>':''}
+          <button class="sched-chk${done?' done':''}" onclick="toggleTimelineCheck(${i},'${date}')">
+            <div class="sched-chk-x"></div>
+          </button>
+          <button class="sched-del" onclick="openEditMission(${i})" style="opacity:0;font-size:9px;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'" title="Edit">✎</button>
+          <button class="sched-del" onclick="deleteSchedItem(${i})">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  updateTimelineProgress(date);
+}
+
+function renderTimeline(){ const el=document.getElementById('timelineScroll');if(el)renderTimelineItems(APP.schedule||[],el,false); }
+function renderMobTimeline(){ const el=document.getElementById('mobTimelineList');if(el)renderTimelineItems(APP.schedule||[],el,true); }
+
+function addSchedItem(){
+  const titleEl=document.getElementById('schedTitle')||document.getElementById('mobSchedTitle');
+  const timeEl =document.getElementById('schedTime') ||document.getElementById('mobSchedTime');
+  const title=titleEl?.value.trim(); const time=timeEl?.value;
+  if(!title||!time){showToast('Enter time and title');return;}
+  if(!APP.schedule) APP.schedule=[];
+  APP.schedule.push({time,title,kind:'focus'});
+  patchData({schedule:APP.schedule});
+  if(titleEl)titleEl.value=''; if(timeEl)timeEl.value='';
+  renderTimeline(); renderMobTimeline(); renderMobHomeNext(); showToast('Mission added ◆');
+}
+function deleteSchedItem(idx){ APP.schedule.splice(idx,1); patchData({schedule:APP.schedule}); renderTimeline(); renderMobTimeline(); renderMobHomeNext(); }
+function deleteMobSchedItem(idx){ deleteSchedItem(idx); }
+
+// Edit mission modal
+let editSchedIdx=-1;
+function openEditMission(idx){
+  editSchedIdx=idx; const s=APP.schedule[idx]; if(!s)return;
+  document.getElementById('editMissTime').value=s.time||'';
+  document.getElementById('editMissTitle').value=s.title||'';
+  document.getElementById('editMissKind').value=s.kind||'focus';
+  openModal('editMissionModal');
+}
+function saveEditMission(){
+  const t=document.getElementById('editMissTime').value;
+  const ti=document.getElementById('editMissTitle').value.trim();
+  const k=document.getElementById('editMissKind').value;
+  if(!t||!ti){showToast('Fill in time and title');return;}
+  APP.schedule[editSchedIdx]={time:t,title:ti,kind:k};
+  patchData({schedule:APP.schedule});
+  renderTimeline(); renderMobTimeline(); renderMobHomeNext();
+  closeModal('editMissionModal'); showToast('Mission updated ◆');
+}
+
+// Edit event in calendar
+let editEvKey='', editEvIdx=-1;
+function openEditEvent(key,idx){
+  editEvKey=key; editEvIdx=idx;
+  const ev=(APP.events[key]||[])[idx]; if(!ev)return;
+  document.getElementById('editEvTitle').value=ev.title||'';
+  document.getElementById('editEvTime').value=ev.time||'';
+  document.getElementById('editEvLoc').value=ev.location||'';
+  document.getElementById('editEvKind').value=ev.kind||'focus';
+  openModal('editEventModal');
+}
+function saveEditEvent(){
+  const title=document.getElementById('editEvTitle').value.trim();
+  if(!title){showToast('Enter event title');return;}
+  APP.events[editEvKey][editEvIdx]={title,time:document.getElementById('editEvTime').value,location:document.getElementById('editEvLoc').value.trim(),kind:document.getElementById('editEvKind').value};
+  patchData({events:APP.events});
+  renderDevList(editEvKey); renderMonthGrid(); renderMobMonthGrid();
+  closeModal('editEventModal'); showToast('Event updated ◆');
+}
+
+// ══════════════════════════════════════════════════════════════
+// TASKS  (flat array, persist until deleted)
+// S = permanent done; B = resets each day
+// ══════════════════════════════════════════════════════════════
+function migrateTasks(){
+  // Convert old per-day object format to flat array
+  if(Array.isArray(APP.tasks)) return;
+  const flat=[];
+  for(const [date, arr] of Object.entries(APP.tasks||{})){
+    (arr||[]).forEach(t=>flat.push({...t,rank:t.rank==='S'?'S':'B',doneDate:t.done?date:null}));
+  }
+  APP.tasks=flat;
+}
+
+function getTasks(){
+  migrateTasks();
+  const today=TODAY();
+  // Reset B-tier done if doneDate isn't today
+  let changed=false;
+  (APP.tasks||[]).forEach(t=>{
+    if(t.rank==='B' && t.done && t.doneDate!==today){ t.done=false; t.doneDate=null; changed=true; }
+  });
+  if(changed) patchData({tasks:APP.tasks});
+  return APP.tasks||[];
+}
+
+function saveTasks(){ patchData({tasks:APP.tasks}); }
+
+function renderTasksInto(el, tasks, isMob){
+  if(!el)return;
+  const done=tasks.filter(t=>t.done).length;
+  const countId=isMob?'mobTaskCount':'taskCountDisp';
+  const ce=document.getElementById(countId); if(ce)ce.textContent=`${done}/${tasks.length}`;
+  if(!tasks.length){el.innerHTML='<div class="empty">No quests — add one below</div>';return;}
+  el.innerHTML=tasks.map((t,i)=>{
+    const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
+    const lockIcon=rank==='S'&&t.done?'<span style="font-size:9px;opacity:.5;margin-left:2px;">🔒</span>':'';
+    if(isMob) return`<div class="mob-task-row${t.done?' done':''}">
+      <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
+      <div class="mob-rank-badge" style="background:${col};">${rank}</div>
+      <div class="mob-task-label">${esc(t.text)}${lockIcon}</div>
+      <button class="mob-task-del" onclick="deleteTask(${i})">✕</button>
+    </div>`;
+    return`<div class="task-row${t.done?' done':''}">
+      <button class="pix-check" onclick="toggleTask(${i})"><div class="pix-x"></div></button>
+      <div class="rank-badge" style="background:${col};">${rank}</div>
+      <div class="task-label">${esc(t.text)}${lockIcon}</div>
+      <button class="task-del" onclick="deleteTask(${i})">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function renderTasks(){ const tasks=getTasks(); renderTasksInto(document.getElementById('questScroll'),tasks,false); }
+function renderMobTasks(){ const tasks=getTasks(); renderTasksInto(document.getElementById('mobTaskList'),tasks,true); }
+
+function addTaskCommon(text, rank){
+  if(!Array.isArray(APP.tasks)) APP.tasks=[];
+  APP.tasks.push({text,done:false,rank,doneDate:null});
+  saveTasks(); renderTasks(); renderMobTasks();
+  showXpPop(RANK_XP[rank]||15, RANK_COLORS[rank]||RANK_COLORS.B);
+}
+function addTask(){
+  const inp=document.getElementById('taskInp'); const rank=document.getElementById('rankSel').value;
+  const txt=inp?.value.trim(); if(!txt)return; inp.value='';
+  addTaskCommon(txt,rank);
+}
+function addMobTask(){
+  const inp=document.getElementById('mobTaskInp'); const rank=document.getElementById('mobRankSel').value;
+  const txt=inp?.value.trim(); if(!txt)return; inp.value='';
+  addTaskCommon(txt,rank);
+}
+function toggleTask(i){
+  const tasks=APP.tasks||[]; const t=tasks[i]; if(!t)return;
+  if(t.rank==='S' && t.done) return; // S-tier locked once done
+  t.done=!t.done;
+  t.doneDate=t.done?TODAY():null;
+  if(t.done) showXpPop(RANK_XP[t.rank||'B'],RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
+  saveTasks(); renderTasks(); renderMobTasks();
+}
+function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderTasks(); renderMobTasks(); }
+function showXpPop(amount,color){
+  ['questScroll','mobTaskList'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    const p=document.createElement('div'); p.className='xp-pop'; p.textContent=`+${amount} XP`; p.style.color=color;
+    el.style.position='relative'; el.appendChild(p); setTimeout(()=>p.remove(),900);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// TABS + MOBILE NAV
+// ══════════════════════════════════════════════════════════════
+function switchTab(tab){
+  document.getElementById('tabQuest').classList.toggle('active',tab==='quest');
+  document.getElementById('tabClaude').classList.toggle('active',tab==='claude');
+  document.getElementById('tabQuestBtn').classList.toggle('active',tab==='quest');
+  document.getElementById('tabClaudeBtn').classList.toggle('active',tab==='claude');
+  if(tab==='claude')setTimeout(()=>document.getElementById('chatInp')?.focus(),50);
+}
+
+function switchMobTab(tab, btn){
+  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',claude:'mobTabClaude'};
+  document.querySelectorAll('.mob-tab-pane').forEach(p=>p.classList.remove('active'));
+  const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  if(tab==='claude')setTimeout(()=>document.getElementById('mobChatInp')?.focus(),60);
+  if(tab==='timeline'){ renderMobTimeline(); }
+  if(tab==='tasks')   { renderMobTasks(); }
+  if(tab==='cal')     { renderMobMonthGrid(); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════════════════════════
+let chatHistory=[];
+
+function appendChatMsg(role,text,elId){
+  const scrollId = elId||'chatScroll';
+  const scroll=document.getElementById(scrollId); if(!scroll)return;
+  const who=role==='user'?'you':role==='claude'?'claude':'sys';
+  const lbl=role==='user'?'YOU':role==='claude'?'CLAUDE':'SYSTEM';
+  const div=document.createElement('div'); div.className='chat-msg';
+  div.innerHTML=`<span class="chat-msg-who ${who}">${lbl}</span><div class="chat-bubble ${who}">${formatChatText(text)}</div>`;
+  scroll.appendChild(div); scroll.scrollTop=scroll.scrollHeight;
+}
+function formatChatText(text){
+  return esc(text).replace(/```([\s\S]*?)```/g,'<pre>$1</pre>').replace(/`([^`]+)`/g,'<code style="background:var(--bg);padding:1px 4px;font-size:11px;">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+let typingEls={};
+function showTyping(elId){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML='<span class="chat-msg-who claude">CLAUDE</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
+function hideTyping(elId){ const t=typingEls[elId||'chatScroll'];if(t){t.remove();delete typingEls[elId||'chatScroll'];} }
+
+async function sendChatCommon(msg, scrollId, btnId){
+  if(!msg.trim())return;
+  if(!serverOnline){ appendChatMsg('sys','Server offline — start the server to use Claude chat.',scrollId); return; }
+  appendChatMsg('user',msg,scrollId);
+  document.getElementById(btnId)?.setAttribute('disabled','1');
+  showTyping(scrollId);
+  try {
+    const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
+    const d=await r.json(); hideTyping(scrollId);
+    if(d.error==='NO_KEY'){ appendChatMsg('sys','No API key. Click ⚙ KEY to set one.',scrollId); openModal('keyModal'); }
+    else if(d.error){ appendChatMsg('sys','Error: '+d.error,scrollId); }
+    else { appendChatMsg('claude',d.response,scrollId); chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response}); if(chatHistory.length>20)chatHistory=chatHistory.slice(-20); }
+  } catch(e){ hideTyping(scrollId); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),scrollId); }
+  document.getElementById(btnId)?.removeAttribute('disabled');
+}
+
+function sendChat(){ const inp=document.getElementById('chatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'chatScroll','chatSendBtn'); switchTab('claude'); }
+function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
+
+// ── VAULT ──
+function doSearch(){ const q=document.getElementById('searchInp')?.value.trim(); if(!q)return; window.open('obsidian://search?vault=BrainVault&query='+encodeURIComponent(q),'_blank'); }
+function launchCLI(){ window.location.href='wt:-d C:\\Users\\thoma\\OneDrive\\Desktop\\BrainVault'; }
+function doIngest(){ const f=document.getElementById('ingestFile')?.value.trim(); if(!f){showToast('Enter a filename first');return;} navigator.clipboard.writeText('ingest '+f).then(()=>{ closeModal('ingestModal'); showToast('Prompt copied — paste into Claude ◆'); }); }
+
+// ── MODALS ──
+function openModal(id)  { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o)o.classList.remove('active'); }));
+
+// ── API KEY ──
+async function saveKey(){ const key=document.getElementById('keyInp').value.trim(); if(!key){document.getElementById('keyStatus').textContent='Enter a key first.';return;} try{ const r=await fetch(`${SERVER}/api/set-key`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key}),signal:AbortSignal.timeout(3000)}); const d=await r.json(); if(d.ok){document.getElementById('keyInp').value='';closeModal('keyModal');showToast('API key saved ◆');checkServer();}else{document.getElementById('keyStatus').textContent=d.error||'Save failed';} }catch{ document.getElementById('keyStatus').textContent='Server offline.'; } }
+
+// ══════════════════════════════════════════════════════════════
+// THEME SYSTEM
+// ══════════════════════════════════════════════════════════════
+const THEMES = {
+  Cyan:   { '--accent':'#ff7a59','--bg':'#0a1929','--surface':'#11243a','--darker':'#1e3a5f','--fg':'#a8e6ff','--green':'#7fffb0','--bezel':'#1a2533','--bezel-dark':'#070b14','--bezel-mid':'#0c1422' },
+  Red:    { '--accent':'#ff4040','--bg':'#1a0808','--surface':'#2d1010','--darker':'#4a1818','--fg':'#ffcdd2','--green':'#ff8a80','--bezel':'#2d1010','--bezel-dark':'#0d0303','--bezel-mid':'#1a0808' },
+  Green:  { '--accent':'#39ff14','--bg':'#010d01','--surface':'#031503','--darker':'#062806','--fg':'#80ff80','--green':'#ccff90','--bezel':'#031503','--bezel-dark':'#000500','--bezel-mid':'#010d01' },
+  Purple: { '--accent':'#e040fb','--bg':'#0e0a1a','--surface':'#1a1030','--darker':'#2d1a50','--fg':'#e1bee7','--green':'#ce93d8','--bezel':'#1a1030','--bezel-dark':'#05020d','--bezel-mid':'#0e0a1a' },
+  Gold:   { '--accent':'#ffd740','--bg':'#1a1200','--surface':'#2d2000','--darker':'#4a3600','--fg':'#fff8e1','--green':'#ffe082','--bezel':'#2d2000','--bezel-dark':'#0a0800','--bezel-mid':'#1a1200' },
+};
+
+function applyTheme(t){
+  if(!t) return;
+  const r=document.documentElement.style;
+  const base=THEMES[t.preset]||THEMES.Cyan;
+  for(const [k,v] of Object.entries(base)) r.setProperty(k,v);
+  // Custom overrides
+  const overrides=['--accent','--bg','--surface','--fg','--green','--bezel'];
+  overrides.forEach(k=>{ if(t[k]) r.setProperty(k,t[k]); });
+  // Derived vars
+  const bg=t['--bg']||base['--bg'];
+  r.setProperty('--fg-dim',hexAlpha(t['--fg']||base['--fg'],.45));
+  r.setProperty('--fg-faint',hexAlpha(t['--fg']||base['--fg'],.12));
+}
+
+function hexAlpha(hex,a){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+function previewColor(varName,val){ document.documentElement.style.setProperty(varName,val); }
+
+function openSettingsModal(){
+  const t=APP.theme||{}; const preset=t.preset||'Cyan';
+  // Build preset buttons
+  const container=document.getElementById('themePresets');
+  container.innerHTML=Object.entries(THEMES).map(([name,vals])=>`
+    <button class="theme-preset-btn${preset===name?' active':''}" style="background:${vals['--bezel']};" onclick="selectPreset('${name}',this)">
+      <div class="theme-swatch" style="background:${vals['--accent']};"></div>
+      ${name.toUpperCase()}
+    </button>`).join('');
+  // Set color pickers
+  const base=THEMES[preset]||THEMES.Cyan;
+  [['cpAccent','--accent'],['cpBg','--bg'],['cpSurface','--surface'],['cpFg','--fg'],['cpGreen','--green'],['cpBezel','--bezel']].forEach(([id,k])=>{
+    const el=document.getElementById(id); if(el) el.value=t[k]||base[k]||'#000000';
+  });
+  openModal('settingsModal');
+}
+
+function selectPreset(name, btn){
+  APP.theme={...APP.theme, preset:name};
+  applyTheme(APP.theme);
+  document.querySelectorAll('.theme-preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const base=THEMES[name]||THEMES.Cyan;
+  [['cpAccent','--accent'],['cpBg','--bg'],['cpSurface','--surface'],['cpFg','--fg'],['cpGreen','--green'],['cpBezel','--bezel']].forEach(([id,k])=>{
+    const el=document.getElementById(id); if(el) el.value=base[k]||'#000000';
+  });
+}
+
+function saveTheme(){
+  const picks=[['cpAccent','--accent'],['cpBg','--bg'],['cpSurface','--surface'],['cpFg','--fg'],['cpGreen','--green'],['cpBezel','--bezel']];
+  picks.forEach(([id,k])=>{ const el=document.getElementById(id); if(el) APP.theme[k]=el.value; });
+  applyTheme(APP.theme);
+  patchData({theme:APP.theme});
+  closeModal('settingsModal'); showToast('Theme saved ◆');
+}
+
+async function saveKeyFromSettings(){
+  const key=document.getElementById('settingsKeyInp').value.trim();
+  if(!key){document.getElementById('settingsKeyStatus').textContent='Enter a key first.';return;}
+  try{
+    const r=await fetch(`${SERVER}/api/set-key`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key}),signal:AbortSignal.timeout(3000)});
+    const d=await r.json();
+    if(d.ok){document.getElementById('settingsKeyInp').value='';document.getElementById('settingsKeyStatus').textContent='Key saved!';checkServer();}
+    else{document.getElementById('settingsKeyStatus').textContent=d.error||'Failed';}
+  }catch{document.getElementById('settingsKeyStatus').textContent='Server offline.';}
+}
+
+// ══════════════════════════════════════════════════════════════
+// POKÉDEX DAY POPUP
+// ══════════════════════════════════════════════════════════════
+const POKE_NAMES = {};  // filled lazily from PokeAPI
+async function getPokeName(id){
+  if(POKE_NAMES[id]) return POKE_NAMES[id];
+  try{ const r=await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`); const d=await r.json(); const name=d.names.find(n=>n.language.name==='en')?.name||d.name; POKE_NAMES[id]=name; return name; }
+  catch{ return `#${id}`; }
+}
+
+function dateSeedPoke(dateStr){
+  let h=0; for(let i=0;i<dateStr.length;i++) h=Math.imul(31,h)+dateStr.charCodeAt(i)|0;
+  return POKE_IDS[Math.abs(h)%POKE_IDS.length];
+}
+
+function openDayModal(key,date){
+  dayModalDate=key;
+  const mon=MONTHS_S[date.getMonth()]; const d=date.getDate(); const yr=date.getFullYear();
+  document.getElementById('dayModalTitle').textContent=`${mon} ${d}, ${yr}`;
+  document.getElementById('pdxDateLabel').textContent=`${mon} ${String(d).padStart(2,'0')} ${yr}`;
+  ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('devKind').value='focus';
+  renderDevList(key);
+
+  // Pokédex pokemon for this date
+  const pokeId=dateSeedPoke(key);
+  const img=document.getElementById('pdxPokeImg');
+  img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokeId}.png`;
+  document.getElementById('pdxPokeNum').textContent=`#${String(pokeId).padStart(3,'0')}`;
+  document.getElementById('pdxPokeName').textContent='———';
+  getPokeName(pokeId).then(name=>{ const el=document.getElementById('pdxPokeName'); if(el)el.textContent=name.toUpperCase(); });
+
+  // Restart scan animation
+  const scan=document.getElementById('pdxScan');
+  if(scan){ scan.style.animation='none'; scan.offsetHeight; scan.style.animation='pdxScan .8s ease-out forwards'; }
+
+  openModal('dayModal');
+  setTimeout(()=>document.getElementById('devTitle').focus(),60);
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2600); }
+
+// ── INPUT HANDLERS ──
+document.getElementById('taskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
+document.getElementById('mobTaskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addMobTask();});
+document.getElementById('schedTitle')?.addEventListener('keydown',e=>{if(e.key==='Enter')addSchedItem();});
+document.getElementById('mobSchedTitle')?.addEventListener('keydown',e=>{if(e.key==='Enter')addSchedItem();});
+
+// ── SEED WELCOME CHAT ──
+appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.','chatScroll');
+appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.','mobChatMsgs');
+
+// ── INIT ──
+loadData();
+</script>
+</body>
+</html>

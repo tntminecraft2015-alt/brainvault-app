@@ -1,0 +1,10 @@
+node_modules/
+config.json
+.env
+
+# Vault data — lives in brainvault-vault repo, not here
+wiki/
+raw/
+app-data.json
+CLAUDE.md
+templates/
