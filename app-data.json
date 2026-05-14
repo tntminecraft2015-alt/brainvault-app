@@ -123,9 +123,13 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 15,
+  "questXp": 65,
   "taskStats": {
     "Clean Room": {
+      "count": 1,
+      "lastDone": "2026-05-14"
+    },
+    "add budget to mission control": {
       "count": 1,
       "lastDone": "2026-05-14"
     }
