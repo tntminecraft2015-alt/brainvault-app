@@ -123,8 +123,13 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 0,
-  "taskStats": {},
+  "questXp": 15,
+  "taskStats": {
+    "Clean Room": {
+      "count": 1,
+      "lastDone": "2026-05-14"
+    }
+  },
   "budget": {
     "monthlyLimit": 300,
     "transactions": [
