@@ -75,6 +75,14 @@
         "location": "",
         "kind": "social"
       }
+    ],
+    "2026-05-18": [
+      {
+        "title": "Mow Lawn",
+        "time": "14:00",
+        "location": "",
+        "kind": "errand"
+      }
     ]
   },
   "tasks": [
