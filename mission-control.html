@@ -691,6 +691,33 @@
     .budget-limit-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-shrink:0; }
     .budget-limit-inp { font-family:'Press Start 2P',monospace; font-size:7px; width:80px; background:var(--surface); border:1px solid rgba(168,230,255,.15); color:var(--accent); padding:4px 6px; }
     .budget-empty { font-family:'VT323',monospace; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
+
+    /* ── LEVEL UP FLASH ── */
+    @keyframes lvFlashBg  { 0%,100%{opacity:0;} 15%,45%{opacity:1;} 30%{opacity:0;} }
+    @keyframes lvFlashTxt { 0%{transform:scale(.5);opacity:0;} 35%{transform:scale(1.15);opacity:1;} 65%{transform:scale(1);} 100%{opacity:0;transform:translateY(-24px);} }
+    .lv-up-overlay { position:fixed;inset:0;z-index:600;pointer-events:none;background:rgba(255,255,255,.82);animation:lvFlashBg 1.1s ease-out forwards;display:flex;align-items:center;justify-content:center; }
+    .lv-up-text    { font-family:'Press Start 2P',monospace;font-size:18px;color:#0D1A10;text-align:center;line-height:2.2;animation:lvFlashTxt 1.1s ease-out forwards; }
+
+    /* ── POKÉDEX BOTTOM SHEET ── */
+    @keyframes pdxUp   { from{transform:translateY(100%);} to{transform:translateY(0);} }
+    .pdx-sheet-bg  { position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.65);backdrop-filter:blur(5px); }
+    .pdx-sheet     { position:fixed;bottom:0;left:0;right:0;z-index:201;background:var(--surface);padding:20px 18px 36px;animation:pdxUp .26s cubic-bezier(.22,.61,.36,1);max-height:65vh;overflow-y:auto;box-shadow:0 -3px 0 var(--accent),0 -5px 0 var(--surface),0 -8px 0 rgba(168,230,255,.12); }
+    .pdx-sh-header { display:flex;align-items:flex-start;gap:14px;margin-bottom:14px; }
+    .pdx-sh-sprite { width:88px;height:88px;image-rendering:pixelated;filter:drop-shadow(0 0 8px var(--accent)); }
+    .pdx-sh-meta   { flex:1; }
+    .pdx-sh-name   { font-family:'Press Start 2P',monospace;font-size:10px;color:var(--fg);letter-spacing:1px;margin-bottom:4px; }
+    .pdx-sh-num    { font-family:'Press Start 2P',monospace;font-size:7px;color:var(--accent);margin-bottom:8px; }
+    .pdx-sh-types  { display:flex;gap:4px;flex-wrap:wrap; }
+    .pdx-type-pip  { font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 6px;color:#fff;letter-spacing:.5px; }
+    .pdx-sh-grid   { display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px; }
+    .pdx-sh-stat   { background:var(--darker);padding:7px 5px;text-align:center; }
+    .pdx-sh-sl     { font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-bottom:3px; }
+    .pdx-sh-sv     { font-family:'VT323',monospace;font-size:22px;color:var(--fg); }
+    .pdx-sh-close  { margin-top:14px;width:100%;background:var(--darker);border:none;box-shadow:inset 0 0 0 1px rgba(168,230,255,.2);color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;padding:10px;cursor:pointer; }
+
+    /* ── MISSINGNO GLITCH ── */
+    @keyframes glitch { 0%,100%{transform:none;} 20%{transform:skewX(-4deg) translateX(3px);} 40%{transform:skewX(3deg) translateX(-3px);} 60%{transform:none;} 80%{transform:skewY(2deg);} }
+    .missingno-wrap { animation:glitch .25s steps(2) infinite; }
   </style>
 </head>
 <body>
@@ -927,7 +954,7 @@
     </div>
 
     <!-- BUDGET tab -->
-    <div class="mob-tab-pane" id="mobTabGil" style="display:flex;flex-direction:column;">
+    <div class="mob-tab-pane" id="mobTabGil">
       <div class="mob-tab-hd">
         <span>💰 GIL TRACKER</span>
       </div>
@@ -1207,8 +1234,42 @@ const POKE_IDS = [1,4,7,25,39,52,54,56,58,63,66,74,79,81,83,84,88,90,92,93,94,95
   // Gen 7
   722,725,728,745,746,778,785,786,787,788,800,801,802];
 
+// ── 8-BIT SOUND ENGINE ──
+let _audioCtx=null;
+function _ctx(){ if(!_audioCtx){try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch{}} return _audioCtx; }
+function playBeep(freq=440,type='square',dur=0.12,vol=0.22){
+  const c=_ctx();if(!c)return;
+  try{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(vol,c.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+dur);o.start();o.stop(c.currentTime+dur);}catch{}
+}
+function playSfx(n){
+  const b=(f,t,d,v)=>playBeep(f,t,d,v);
+  if(n==='check')    {b(523);setTimeout(()=>b(659),100);}
+  else if(n==='uncheck')  {b(330,'square',.08,.18);}
+  else if(n==='levelup')  {[523,659,784,1047].forEach((f,i)=>setTimeout(()=>b(f,'square',.2,.35),i*130));}
+  else if(n==='catch')    {b(440,'square',.08);setTimeout(()=>b(330,'square',.1),90);setTimeout(()=>b(220,'square',.18),200);}
+  else if(n==='shiny')    {[1047,988,880,784].forEach((f,i)=>setTimeout(()=>b(f,'sine',.07,.2),i*55));}
+  else if(n==='missingno'){[120,80,160,60,200,40].forEach((f,i)=>setTimeout(()=>b(f,'sawtooth',.08,.15),i*60));}
+  else if(n==='xp')       {b(880,'sine',.06,.1);}
+}
+
+// ── XP / LEVEL ──
+function calcTotalXp(){ return (APP.currentStreak||0)*33+(APP.questXp||0); }
+function calcLevel()  { return Math.floor(calcTotalXp()/100)+1; }
+let _prevLevel=1;
+function triggerLevelUp(lv){
+  playSfx('levelup');
+  const el=document.createElement('div');el.className='lv-up-overlay';
+  el.innerHTML=`<div class="lv-up-text">✦ LEVEL UP! ✦<br><span style="font-size:11px;color:var(--accent);">▶ LV.${lv}</span></div>`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
+}
+
+// ── POKÉDEX TYPE COLORS ──
+const TYPE_COLORS={normal:'#9199a1',fire:'#ff9c54',water:'#4d90d5',electric:'#f4d23c',grass:'#63bb5b',ice:'#74cec0',fighting:'#ce4069',poison:'#ab6ac8',ground:'#d97746',flying:'#89aae3',psychic:'#f97176',bug:'#90c12c',rock:'#c7b78b',ghost:'#5269ac',dragon:'#0a6dc4',dark:'#5a5366',steel:'#5a8ea1',fairy:'#ec8fe6'};
+
 // ── APP STATE (mirrored from server) ──
-let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[]} };
+let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[]}, questXp:0 };
 
 // ── UTILS ──
 const pad     = n => String(n).padStart(2,'0');
@@ -1268,7 +1329,7 @@ function renderHomePokemon(){
   el.innerHTML=`
     <img class="mob-home-poke-img"
          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png"
-         alt="#${id}" loading="lazy">
+         alt="#${id}" loading="lazy" onclick="openPokedexSheet(${id})">
     <div class="mob-home-poke-shadow"></div>
     <div class="mob-home-poke-name" id="homePokeNameEl">LOADING...</div>
     <div class="mob-home-poke-num">#${String(id).padStart(3,'0')}</div>
@@ -1276,11 +1337,77 @@ function renderHomePokemon(){
   getPokeName(id).then(name=>{const ne=document.getElementById('homePokeNameEl');if(ne)ne.textContent=name.toUpperCase();});
 }
 
+// ── POKÉDEX BOTTOM SHEET ──
+async function openPokedexSheet(id){
+  playSfx('xp');
+  const bg=document.createElement('div');bg.className='pdx-sheet-bg';
+  const sheet=document.createElement('div');sheet.className='pdx-sheet';
+  sheet.innerHTML=`
+    <div class="pdx-sh-header">
+      <img class="pdx-sh-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png" alt="">
+      <div class="pdx-sh-meta">
+        <div class="pdx-sh-name" id="_pdxName">LOADING...</div>
+        <div class="pdx-sh-num">#${String(id).padStart(3,'0')}</div>
+        <div class="pdx-sh-types" id="_pdxTypes"></div>
+      </div>
+    </div>
+    <div class="pdx-sh-grid" id="_pdxGrid"></div>
+    <button class="pdx-sh-close" onclick="this.closest('.pdx-sheet-bg').remove()">◀ CLOSE</button>
+  `;
+  bg.appendChild(sheet);
+  bg.addEventListener('click',e=>{if(e.target===bg)bg.remove();});
+  document.body.appendChild(bg);
+  try{
+    const r=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const d=await r.json();
+    const name=d.name.toUpperCase().replace(/-/g,' ');
+    const types=d.types.map(t=>t.type.name);
+    const height=(d.height/10).toFixed(1);
+    const weight=(d.weight/10).toFixed(1);
+    const hp =d.stats.find(s=>s.stat.name==='hp')?.base_stat||'—';
+    const atk=d.stats.find(s=>s.stat.name==='attack')?.base_stat||'—';
+    const spd=d.stats.find(s=>s.stat.name==='speed')?.base_stat||'—';
+    const def=d.stats.find(s=>s.stat.name==='defense')?.base_stat||'—';
+    const n=document.getElementById('_pdxName');if(n)n.textContent=name;
+    const ty=document.getElementById('_pdxTypes');
+    if(ty)ty.innerHTML=types.map(t=>`<span class="pdx-type-pip" style="background:${TYPE_COLORS[t]||'#777'};">${t.toUpperCase()}</span>`).join('');
+    const gr=document.getElementById('_pdxGrid');
+    if(gr)gr.innerHTML=[['HP',hp],['ATK',atk],['DEF',def],['SPD',spd],['HEIGHT',height+'m'],['WEIGHT',weight+'kg'],['#',String(id).padStart(3,'0')],['GEN',id<=151?'I':id<=251?'II':id<=386?'III':id<=493?'IV':id<=649?'V':id<=721?'VI':id<=809?'VII':'VIII+']].map(([l,v])=>`<div class="pdx-sh-stat"><div class="pdx-sh-sl">${l}</div><div class="pdx-sh-sv">${v}</div></div>`).join('');
+  }catch{}
+}
+
+// ── MISSINGNO ──
+function spawnMissingNo(){
+  wanderActive++;
+  const goRight=Math.random()<0.5;
+  const el=document.createElement('div');el.className='missingno-wrap';
+  const cols=['#7EC87A','#B8D4B0','#172B1C','#fff','#9DC89A','#0D1A10'];
+  let html='';
+  for(let i=0;i<28;i++){
+    const w=3+Math.floor(Math.random()*16),h=2+Math.floor(Math.random()*14);
+    const x=Math.floor(Math.random()*54),y=Math.floor(Math.random()*54);
+    const c=cols[Math.floor(Math.random()*cols.length)];
+    html+=`<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;height:${h}px;background:${c};"></div>`;
+  }
+  el.innerHTML=html;
+  const dur=10+Math.random()*6;
+  el.style.cssText=`position:fixed;z-index:49;pointer-events:auto;cursor:pointer;width:64px;height:64px;top:${40+Math.floor(Math.random()*(window.innerHeight-120))}px;left:0;overflow:hidden;image-rendering:pixelated;animation:${goRight?'wanderRight':'wanderLeft'} ${dur}s linear forwards;`;
+  let caught=false;
+  el.addEventListener('click',ev=>{
+    if(caught)return;caught=true;ev.stopPropagation();
+    playSfx('missingno');el.remove();wanderActive--;
+    showToast('M̴İ̷S̸S̶I̵N̷G̴N̶O̸ encountered!');
+  });
+  document.body.appendChild(el);
+  setTimeout(()=>{if(!caught){el.remove();wanderActive--;}},dur*1000+400);
+}
+
 // ── WANDERING POKEMON ──
 const WANDER_POOL=[25,39,52,54,56,74,79,81,92,113,120,122,129,132,133,143,147,175,196,202,213,225,238,239,240,241,242,246,252,255,258,282,330,359,390,393,448,495,498,571,650,653,722,725];
 let wanderActive=0;
 function spawnWanderPoke(forceId, forceSize){
   if(wanderActive>=3&&!forceId)return;
+  if(!forceId&&Math.random()<1/150){spawnMissingNo();return;}
   wanderActive++;
   const id=forceId||WANDER_POOL[Math.floor(Math.random()*WANDER_POOL.length)];
   const size=forceSize||(50+Math.floor(Math.random()*30));
@@ -1297,12 +1424,13 @@ function spawnWanderPoke(forceId, forceSize){
   el.addEventListener('click',ev=>{
     if(caught)return; caught=true;
     ev.stopPropagation();
+    playSfx(isShiny?'shiny':'catch');
     const ball=document.createElement('div');
     ball.style.cssText=`position:fixed;z-index:500;pointer-events:none;font-size:52px;line-height:1;left:${ev.clientX-26}px;top:${ev.clientY-26}px;animation:pokeballThrow .8s ease-out forwards;`;
     ball.textContent='⚾';
     document.body.appendChild(ball);
     el.remove(); wanderActive--;
-    setTimeout(()=>{ball.remove();showToast(isShiny?`✨ Shiny #${id} caught!`:`Gotcha! #${id} caught!`);},900);
+    setTimeout(()=>{ball.remove();showToast(isShiny?`✨ SHINY #${id} caught!`:`Gotcha! #${id} caught!`);},900);
   });
   document.body.appendChild(el);
   setTimeout(()=>{if(!caught){el.remove();wanderActive--;}},dur*1000+400);
@@ -1318,6 +1446,7 @@ document.addEventListener('keydown',e=>{
   if(e.keyCode===KONAMI_CODE[konamiIdx]){konamiIdx++;if(konamiIdx===KONAMI_CODE.length){konamiIdx=0;triggerKonamiEgg();}}else{konamiIdx=0;}
 });
 function triggerKonamiEgg(){
+  playSfx('levelup');
   const legs=[150,151,249,250,384,385,386,487,491,493,716,717,800,802];
   for(let i=0;i<7;i++) setTimeout(()=>spawnWanderPoke(legs[Math.floor(Math.random()*legs.length)],70+Math.random()*50),i*350);
   showToast('✨ LEGENDARY ENCOUNTER!');
@@ -1340,8 +1469,9 @@ updateClock(); setInterval(updateClock,10000);
 // ── STREAK DISPLAY ──
 function updateStreakDisplay(){
   const s=APP.currentStreak||0;
-  const lv=Math.floor(s/3)+1;
-  const xp=(s%3)/3*100;
+  const totalXp=calcTotalXp();
+  const lv=Math.floor(totalXp/100)+1;
+  const xp=totalXp%100;
   [['streakVal','streakLv','xpBar'],['mobStreakVal','mobStreakLv','mobXpBar']].forEach(([sv,sl,xb])=>{
     const el=document.getElementById(sv); if(el)el.innerHTML=`${s} <span style="font-size:10px;opacity:.7;">DAYS</span>`;
     const ll=document.getElementById(sl); if(ll)ll.textContent=`LV.${lv}`;
@@ -1364,7 +1494,9 @@ async function loadData(){
     APP.theme          = APP.theme          || {};
     APP.taskStats      = APP.taskStats      || {};
     APP.budget         = APP.budget         || {monthlyLimit:2000,transactions:[]};
+    APP.questXp        = APP.questXp        || 0;
     applyTheme(APP.theme);
+    _prevLevel = calcLevel();
     renderAll();
   } catch(e) {
     console.warn('Server offline, using empty state');
@@ -1744,20 +1876,30 @@ function addMobTask(){
 }
 function toggleTask(i){
   const tasks=APP.tasks||[]; const t=tasks[i]; if(!t)return;
+  if(!APP.questXp) APP.questXp=0;
+  const xpAmt=RANK_XP[t.rank||'B']||15;
   t.done=!t.done;
   t.doneDate=t.done?TODAY():null;
   if(t.done){
-    showXpPop(RANK_XP[t.rank||'B'],RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
+    APP.questXp+=xpAmt;
+    playSfx('check');
+    showXpPop(xpAmt,RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
     showCompletePoke(t.rank||'B');
-    // Track completion stats
     if(!APP.taskStats) APP.taskStats={};
     if(!APP.taskStats[t.text]) APP.taskStats[t.text]={count:0,lastDone:null};
     APP.taskStats[t.text].count++;
     APP.taskStats[t.text].lastDone=TODAY();
     patchData({taskStats:APP.taskStats});
     renderStats();
+  } else {
+    APP.questXp=Math.max(0,APP.questXp-xpAmt);
+    playSfx('uncheck');
   }
+  patchData({questXp:APP.questXp});
   saveTasks(); renderTasks(); renderMobTasks();
+  updateStreakDisplay();
+  const newLv=calcLevel();
+  if(newLv>_prevLevel){_prevLevel=newLv;triggerLevelUp(newLv);}else{_prevLevel=newLv;}
 }
 function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderTasks(); renderMobTasks(); }
 

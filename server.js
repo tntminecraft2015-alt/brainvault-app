@@ -256,6 +256,7 @@ app.post('/api/data', (req, res) => {
     if (patch.theme          !== undefined) data.theme          = patch.theme;
     if (patch.taskStats      !== undefined) data.taskStats      = patch.taskStats;
     if (patch.budget         !== undefined) data.budget         = patch.budget;
+    if (patch.questXp        !== undefined) data.questXp        = patch.questXp;
     recalcStreak(data);
     saveAppData(data);
     const date = req.body._date || today();
