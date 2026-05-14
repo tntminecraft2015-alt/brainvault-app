@@ -177,5 +177,12 @@
     "name": "Apartment Downpayment",
     "target": 2000,
     "current": 40
+  },
+  "caughtPoke": {
+    "242": {
+      "count": 1,
+      "firstCaught": "2026-05-14",
+      "shiny": false
+    }
   }
 }
