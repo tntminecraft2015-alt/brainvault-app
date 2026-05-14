@@ -123,6 +123,8 @@
     }
   },
   "currentStreak": 0,
+  "questXp": 0,
+  "taskStats": {},
   "budget": {
     "monthlyLimit": 300,
     "transactions": []

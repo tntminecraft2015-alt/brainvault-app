@@ -1504,14 +1504,18 @@ async function loadData(){
   }
 }
 
-// PATCH data back to server
+// PATCH data back to server — accumulates all fields across debounce window
 let patchDebounce = null;
+let patchPending  = {};
 function patchData(fields){
   Object.assign(APP, fields);
+  Object.assign(patchPending, fields);
   clearTimeout(patchDebounce);
   patchDebounce = setTimeout(async ()=>{
+    const payload = {...patchPending, _date:TODAY()};
+    patchPending = {};
     try {
-      const r = await fetch(`${SERVER}/api/data`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...fields,_date:TODAY()})});
+      const r = await fetch(`${SERVER}/api/data`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const d = await r.json();
       if(d.currentStreak !== undefined){
         APP.currentStreak = d.currentStreak;
