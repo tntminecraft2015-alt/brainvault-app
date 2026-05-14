@@ -97,9 +97,7 @@
       "doneDate": "2026-05-14"
     }
   ],
-  "streakDays": [
-    "2026-05-14"
-  ],
+  "streakDays": [],
   "timelineChecks": {
     "2026-05-14": {
       "0": true,
@@ -109,10 +107,10 @@
       "6": true,
       "7": true,
       "8": true,
-      "9": true
+      "9": false
     }
   },
-  "currentStreak": 1,
+  "currentStreak": 0,
   "budget": {
     "monthlyLimit": 2000,
     "transactions": []
