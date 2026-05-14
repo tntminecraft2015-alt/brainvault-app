@@ -144,7 +144,16 @@
   },
   "budget": {
     "monthlyLimit": 300,
-    "transactions": []
+    "transactions": [
+      {
+        "id": 1778800733416,
+        "date": "2026-05-14",
+        "amount": 173.35,
+        "category": "income",
+        "note": "GIL IN",
+        "type": "income"
+      }
+    ]
   },
   "theme": {
     "preset": "Green",
