@@ -172,5 +172,10 @@
     "--fg": "#b8d4b0",
     "--green": "#9dc89a",
     "--bezel": "#111f15"
+  },
+  "savings": {
+    "name": "Apartment Downpayment",
+    "target": 0,
+    "current": 0
   }
 }
