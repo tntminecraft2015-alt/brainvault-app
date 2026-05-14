@@ -126,7 +126,7 @@
   "questXp": 0,
   "taskStats": {},
   "budget": {
-    "monthlyLimit": 2000,
+    "monthlyLimit": 300,
     "transactions": []
   },
   "theme": {
