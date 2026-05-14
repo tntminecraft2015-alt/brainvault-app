@@ -1,0 +1,118 @@
+{
+  "schedule": [
+    {
+      "time": "23:59",
+      "title": "Bedtime",
+      "kind": "focus"
+    },
+    {
+      "time": "09:00",
+      "title": "Wake Up",
+      "kind": "focus"
+    },
+    {
+      "time": "09:30",
+      "title": "Breakfast",
+      "kind": "focus"
+    },
+    {
+      "time": "10:00",
+      "title": "Grind Time",
+      "kind": "focus"
+    },
+    {
+      "time": "12:00",
+      "title": "Lunch",
+      "kind": "focus"
+    },
+    {
+      "time": "12:30",
+      "title": "Walk/Gym",
+      "kind": "focus"
+    },
+    {
+      "time": "13:30",
+      "title": "Guitar",
+      "kind": "focus"
+    },
+    {
+      "time": "15:00",
+      "title": "Grind 2 Electric Boogaloo",
+      "kind": "focus"
+    },
+    {
+      "time": "18:00",
+      "title": "Dinner",
+      "kind": "focus"
+    },
+    {
+      "time": "19:00",
+      "title": "Enjoy",
+      "kind": "focus"
+    }
+  ],
+  "events": {
+    "2026-05-19": [
+      {
+        "title": "Apartment Tour",
+        "time": "14:00",
+        "location": "",
+        "kind": "errand"
+      }
+    ],
+    "2026-05-20": [
+      {
+        "title": "Apartment Tour 2",
+        "time": "14:00",
+        "location": "",
+        "kind": "errand"
+      }
+    ],
+    "2026-05-15": [
+      {
+        "title": "Alexa Graduation",
+        "time": "12:00",
+        "location": "",
+        "kind": "social"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "text": "Fix Claude in MS",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
+    },
+    {
+      "text": "Fix color of text in calander",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
+    },
+    {
+      "text": "add budget to mission control",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
+    }
+  ],
+  "streakDays": [],
+  "timelineChecks": {
+    "2026-05-14": {
+      "0": true,
+      "2": true,
+      "3": true
+    }
+  },
+  "currentStreak": 0,
+  "theme": {
+    "preset": "Green",
+    "--accent": "#39ff14",
+    "--bg": "#010d01",
+    "--surface": "#031503",
+    "--fg": "#80ff80",
+    "--green": "#ccff90",
+    "--bezel": "#031503"
+  }
+}
