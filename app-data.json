@@ -75,6 +75,14 @@
         "location": "",
         "kind": "social"
       }
+    ],
+    "2026-05-18": [
+      {
+        "title": "Mow Lawn",
+        "time": "14:00",
+        "location": "",
+        "kind": "errand"
+      }
     ]
   },
   "tasks": [
@@ -179,6 +187,21 @@
     "current": 40
   },
   "caughtPoke": {
+    "79": {
+      "count": 1,
+      "firstCaught": "2026-05-14",
+      "shiny": true
+    },
+    "133": {
+      "count": 1,
+      "firstCaught": "2026-05-14",
+      "shiny": false
+    },
+    "238": {
+      "count": 1,
+      "firstCaught": "2026-05-14",
+      "shiny": true
+    },
     "242": {
       "count": 1,
       "firstCaught": "2026-05-14",
