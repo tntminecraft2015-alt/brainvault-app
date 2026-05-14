@@ -129,11 +129,11 @@
     "monthlyLimit": 300,
     "transactions": [
       {
-        "id": 1778800227454,
+        "id": 1778800238040,
         "date": "2026-05-14",
-        "amount": 173.35,
-        "category": "income",
-        "note": "GIL IN",
+        "amount": 7.79,
+        "category": "food",
+        "note": "PROVISIONS",
         "type": "income"
       },
       {
