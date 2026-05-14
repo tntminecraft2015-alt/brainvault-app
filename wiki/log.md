@@ -1,5 +1,13 @@
 # Log
 
+## [2026-05-14] note | Cloud Deployment Setup
+
+**Operation:** note
+**Pages created:** [[2026-05-14-cloud-deployment-setup]]
+**Pages updated:** [[index]]
+
+Fixed the desktop shortcut (launch.vbs), refactored server.js for dual local/cloud mode, created two GitHub repos (brainvault-vault + brainvault-app), deployed to Render at https://brainvault-app.onrender.com, updated both PC and iPhone shortcuts to use the cloud URL. Ingest workflow now includes a git push step so PC ingests sync to the phone automatically.
+
 *Append-only record of all wiki operations. Each entry starts with `## [YYYY-MM-DD]` for greppability.*
 
 *To get the last 5 entries: `grep "^## \[" wiki/log.md | tail -5`*

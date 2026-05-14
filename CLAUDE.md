@@ -123,6 +123,12 @@ When the human drops a new file in `raw/` and says "ingest":
 6. **Update** `wiki/overview.md` if the source shifts the synthesis
 7. **Update** `wiki/index.md` — add new pages, update summaries of changed pages
 8. **Append** an entry to `wiki/log.md` (see Log Format below)
+9. **Push to GitHub** so the cloud site updates — run this in the BrainVault directory:
+   ```
+   git add -f wiki/ CLAUDE.md app-data.json templates/
+   git commit -m "ingest: <source-title>"
+   git push vault master
+   ```
 
 A single source typically touches 5–15 wiki pages. Bias toward updating existing pages over creating new stubs.
 
