@@ -2164,11 +2164,12 @@ function buildBudgetGilHTML(){
 }
 
 function buildSavingsHTML(){
-  const sv=APP.savings||{name:'',target:0,current:0};
-  const tgt=sv.target||0,cur=sv.current||0;
+  const sv=APP.savings||{name:'',target:0};
+  const tgt=sv.target||0;
+  const cur=budgetAllBalance();
   const pct=tgt>0?Math.min(100,Math.round(cur/tgt*100)):0;
   return`
-    <div class="save-label" style="font-size:7px;color:var(--accent);margin-bottom:12px;">SAVINGS GOAL</div>
+    <div class="save-label" style="font-size:7px;color:var(--accent);margin-bottom:10px;">SAVINGS GOAL</div>
     <div class="save-field">
       <div class="save-label">GOAL NAME</div>
       <input class="save-inp" id="saveNameInp" value="${esc(sv.name||'')}" placeholder="e.g. New PC" onchange="saveSavingsGoal()">
@@ -2177,19 +2178,11 @@ function buildSavingsHTML(){
       <div class="save-label">TARGET ($)</div>
       <input type="number" class="save-inp" id="saveTgtInp" value="${tgt||''}" placeholder="0.00" min="0" step="0.01" onchange="saveSavingsGoal()">
     </div>
-    <div class="save-field">
-      <div class="save-label">SAVED SO FAR</div>
-      <div class="save-adj-row">
-        <button class="save-adj-btn" onclick="adjustSavings(-10)">-10</button>
-        <button class="save-adj-btn" onclick="adjustSavings(-1)">-1</button>
-        <input type="number" class="save-inp" id="saveCurInp" value="${cur||''}" placeholder="0.00" min="0" step="0.01" style="flex:1;" onchange="saveSavingsGoal()">
-        <button class="save-adj-btn" onclick="adjustSavings(1)">+1</button>
-        <button class="save-adj-btn" onclick="adjustSavings(10)">+10</button>
-      </div>
-    </div>
-    <div class="budget-bar-wrap" style="margin:10px 0 4px;"><div class="budget-bar" style="width:${pct}%;${pct>=100?'background:var(--green);':''}"></div></div>
+    <div class="save-label" style="margin-bottom:2px;">SAVED (BALANCE)</div>
+    <div class="budget-big-num" style="font-size:32px;color:${cur>=0?'var(--green)':'var(--red)'};">${cur>=0?'+':'-'}$${Math.abs(cur).toFixed(0)}</div>
+    <div class="budget-bar-wrap" style="margin:8px 0 4px;"><div class="budget-bar" style="width:${Math.max(0,pct)}%;${pct>=100?'background:var(--green);':''}"></div></div>
     <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);">${pct}% SAVED</span>
+      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);">${Math.max(0,pct)}% SAVED</span>
       <span style="font-family:'VT323',monospace;font-size:16px;color:var(--fg-dim);">$${Math.max(0,tgt-cur).toFixed(0)} to go</span>
     </div>
     ${pct>=100?`<div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--green);text-align:center;padding:6px;">✓ GOAL REACHED!</div>`:''}`;
@@ -2264,8 +2257,9 @@ function buildMobBudgetGilHTML(){
 }
 
 function buildMobSavingsHTML(){
-  const sv=APP.savings||{name:'',target:0,current:0};
-  const tgt=sv.target||0,cur=sv.current||0;
+  const sv=APP.savings||{name:'',target:0};
+  const tgt=sv.target||0;
+  const cur=budgetAllBalance();
   const pct=tgt>0?Math.min(100,Math.round(cur/tgt*100)):0;
   return`
     <div class="save-label" style="font-size:8px;color:var(--accent);margin-bottom:14px;">SAVINGS GOAL</div>
@@ -2277,19 +2271,11 @@ function buildMobSavingsHTML(){
       <div class="save-label" style="font-size:7px;">TARGET ($)</div>
       <input type="number" class="save-inp mob-inp" id="mobSaveTgtInp" value="${tgt||''}" placeholder="0.00" min="0" step="0.01" style="font-size:18px;" onchange="saveSavingsGoal()">
     </div>
-    <div class="save-field">
-      <div class="save-label" style="font-size:7px;">SAVED SO FAR</div>
-      <div class="save-adj-row">
-        <button class="save-adj-btn" style="font-size:20px;" onclick="adjustSavings(-10)">-10</button>
-        <button class="save-adj-btn" style="font-size:20px;" onclick="adjustSavings(-1)">-1</button>
-        <input type="number" class="save-inp mob-inp" id="mobSaveCurInp" value="${cur||''}" placeholder="0.00" min="0" step="0.01" style="flex:1;font-size:18px;" onchange="saveSavingsGoal()">
-        <button class="save-adj-btn" style="font-size:20px;" onclick="adjustSavings(1)">+1</button>
-        <button class="save-adj-btn" style="font-size:20px;" onclick="adjustSavings(10)">+10</button>
-      </div>
-    </div>
-    <div class="budget-bar-wrap" style="height:8px;margin:14px 0 6px;"><div class="budget-bar" style="width:${pct}%;${pct>=100?'background:var(--green);':''}"></div></div>
+    <div class="save-label" style="font-size:6px;margin-bottom:2px;">SAVED (BALANCE)</div>
+    <div class="budget-big-num" style="font-size:52px;color:${cur>=0?'var(--green)':'var(--red)'};">${cur>=0?'+':'-'}$${Math.abs(cur).toFixed(0)}</div>
+    <div class="budget-bar-wrap" style="height:8px;margin:14px 0 6px;"><div class="budget-bar" style="width:${Math.max(0,pct)}%;${pct>=100?'background:var(--green);':''}"></div></div>
     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
-      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--fg-dim);">${pct}% SAVED</span>
+      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--fg-dim);">${Math.max(0,pct)}% SAVED</span>
       <span style="font-family:'VT323',monospace;font-size:20px;color:var(--fg-dim);">$${Math.max(0,tgt-cur).toFixed(0)} to go</span>
     </div>
     ${pct>=100?`<div style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--green);text-align:center;padding:10px;">✓ GOAL REACHED!</div>`:''}`;
@@ -2319,15 +2305,7 @@ function saveSavingsGoal(){
   const isMob=window.innerWidth<=768;
   const name=(document.getElementById(isMob?'mobSaveNameInp':'saveNameInp')?.value||'').trim();
   const target=parseFloat(document.getElementById(isMob?'mobSaveTgtInp':'saveTgtInp')?.value)||0;
-  const current=parseFloat(document.getElementById(isMob?'mobSaveCurInp':'saveCurInp')?.value)||0;
-  APP.savings={name,target,current};
-  patchData({savings:APP.savings});
-  renderBudget();
-}
-
-function adjustSavings(delta){
-  if(!APP.savings) APP.savings={name:'',target:0,current:0};
-  APP.savings.current=Math.max(0,(APP.savings.current||0)+delta);
+  APP.savings={...APP.savings, name, target};
   patchData({savings:APP.savings});
   renderBudget();
 }
