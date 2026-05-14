@@ -92,9 +92,9 @@
     },
     {
       "text": "add budget to mission control",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-14"
     },
     {
       "text": "Laundry",
@@ -123,9 +123,13 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 15,
+  "questXp": 65,
   "taskStats": {
     "Clean Room": {
+      "count": 1,
+      "lastDone": "2026-05-14"
+    },
+    "add budget to mission control": {
       "count": 1,
       "lastDone": "2026-05-14"
     }
