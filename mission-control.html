@@ -817,7 +817,7 @@
       <div class="box-b quest-panel">
         <div class="tab-bar">
           <button class="tab-btn active" id="tabQuestBtn" onclick="switchTab('quest')">QUEST</button>
-          <button class="tab-btn" id="tabClaudeBtn" onclick="switchTab('claude')">▲ CLAUDE</button>
+          <button class="tab-btn" id="tabClaudeBtn" onclick="switchTab('claude')">▲ ED</button>
           <button class="tab-btn" id="tabStatsBtn" onclick="switchTab('stats')">STATS</button>
           <div style="display:flex;align-items:center;gap:4px;padding:0 6px;">
             <div class="server-dot" id="serverDot"></div>
@@ -968,7 +968,7 @@
     <!-- CLAUDE tab -->
     <div class="mob-tab-pane" id="mobTabClaude">
       <div class="mob-tab-hd">
-        <span>🧠 CLAUDE</span>
+        <span>🧠 ED</span>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="server-dot" id="mobServerDot"></div>
           <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;">⚙</button>
@@ -2374,7 +2374,7 @@ function appendChatMsg(role,text,elId){
   const scrollId = elId||'chatScroll';
   const scroll=document.getElementById(scrollId); if(!scroll)return;
   const who=role==='user'?'you':role==='claude'?'claude':'sys';
-  const lbl=role==='user'?'YOU':role==='claude'?'CLAUDE':'SYSTEM';
+  const lbl=role==='user'?'YOU':role==='claude'?'ED':'SYSTEM';
   const div=document.createElement('div'); div.className='chat-msg';
   div.innerHTML=`<span class="chat-msg-who ${who}">${lbl}</span><div class="chat-bubble ${who}">${formatChatText(text)}</div>`;
   scroll.appendChild(div); scroll.scrollTop=scroll.scrollHeight;
@@ -2383,7 +2383,7 @@ function formatChatText(text){
   return esc(text).replace(/```([\s\S]*?)```/g,'<pre>$1</pre>').replace(/`([^`]+)`/g,'<code style="background:var(--bg);padding:1px 4px;font-size:11px;">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
 }
 let typingEls={};
-function showTyping(elId){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML='<span class="chat-msg-who claude">CLAUDE</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
+function showTyping(elId){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML='<span class="chat-msg-who claude">ED</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
 function hideTyping(elId){ const t=typingEls[elId||'chatScroll'];if(t){t.remove();delete typingEls[elId||'chatScroll'];} }
 
 async function sendChatCommon(msg, scrollId, btnId){
