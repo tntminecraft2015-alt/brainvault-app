@@ -125,7 +125,16 @@
   "currentStreak": 0,
   "budget": {
     "monthlyLimit": 300,
-    "transactions": []
+    "transactions": [
+      {
+        "id": 1778800082103,
+        "date": "2026-05-14",
+        "amount": 7.79,
+        "category": "food",
+        "note": "PROVISIONS",
+        "type": "income"
+      }
+    ]
   },
   "theme": {
     "preset": "Green",
