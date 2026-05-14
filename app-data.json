@@ -92,9 +92,9 @@
     },
     {
       "text": "add budget to mission control",
-      "done": true,
+      "done": false,
       "rank": "S",
-      "doneDate": "2026-05-14"
+      "doneDate": null
     }
   ],
   "streakDays": [],
