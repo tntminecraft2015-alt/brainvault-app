@@ -124,7 +124,7 @@
   },
   "currentStreak": 0,
   "budget": {
-    "monthlyLimit": 2000,
+    "monthlyLimit": 300,
     "transactions": []
   },
   "theme": {
