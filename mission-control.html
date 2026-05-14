@@ -71,7 +71,7 @@
       display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
     }
     .poke-strip {
-      flex-shrink:0; height:52px; overflow:hidden;
+      flex-shrink:0; height:64px; overflow:hidden;
       background:var(--bezel-dark); border:2px solid var(--bezel-mid);
       display:flex; align-items:center; position:relative; margin-bottom:5px;
     }
@@ -81,8 +81,8 @@
     .poke-strip::before { left:0;  background:linear-gradient(to right,var(--bezel-dark),transparent); }
     .poke-strip::after  { right:0; background:linear-gradient(to left, var(--bezel-dark),transparent); }
     .poke-track { display:flex; gap:4px; padding:0 4px; animation:march 120s linear infinite; }
-    .poke-track img { width:44px; height:44px; image-rendering:pixelated; opacity:.55; flex-shrink:0; transition:opacity .15s,transform .15s; cursor:pointer; }
-    .poke-track img:hover { opacity:1; transform:scale(1.3) translateY(-3px); }
+    .poke-track img { width:56px; height:56px; image-rendering:pixelated; opacity:.6; flex-shrink:0; transition:opacity .15s,transform .2s; cursor:pointer; }
+    .poke-track img:hover { opacity:1; transform:scale(1.4) translateY(-5px) rotate(-5deg); }
 
     .screen { position:relative; background:var(--bg); padding:10px; box-shadow:inset 0 0 0 2px var(--bezel-dark),inset 0 0 0 5px var(--bezel-mid); overflow:hidden; min-height:0; }
     .screen-top    { flex:1.1; }
@@ -475,6 +475,203 @@
       .mob-tab-content { display:flex; }
       .mob-nav         { display:flex; }
     }
+
+    /* ══════════════════════════════════════
+       BIGGER MOBILE UI — OVERRIDES
+    ══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .mob-poke-strip { height:52px; }
+      .mob-poke-track img { width:44px; height:44px; }
+      .mob-home-clock { font-size:90px; }
+      .mob-day-cell   { min-height:50px; font-size:17px; }
+      .mob-dot-sq     { width:5px; height:5px; }
+      .mob-tl-title   { font-size:25px; }
+      .mob-task-label { font-size:24px; }
+      .mob-nav-btn .nav-icon { font-size:22px; }
+      .mob-nav-btn    { font-size:5px; padding:10px 2px 8px; }
+      .mob-home-card  { padding:16px 18px; margin-bottom:14px; }
+      .mob-home-streak-num { font-size:48px; }
+      .mob-home-next-title { font-size:30px; }
+      .mob-home-next-time  { font-size:11px; }
+      .mob-chat-msgs .chat-bubble { font-size:17px; padding:8px 10px; }
+      .mob-chat-msgs .chat-msg-who { font-size:7px; }
+      .mob-inp  { font-size:22px; padding:10px 12px; }
+      .mob-task-row { padding:12px 0; }
+      .mob-tl-row   { padding:12px 0; }
+      .mob-tl-chk   { width:30px; height:30px; }
+      .mob-tl-chk-x { width:14px; height:14px; }
+      .mob-pix-check { width:30px; height:30px; }
+      .mob-pix-x     { width:15px; height:15px; }
+      .mob-rank-badge { font-size:9px; width:24px; padding:4px 2px; }
+      .day-chip       { font-size:10px; padding:2px 6px; }
+    }
+
+    /* ══════════════════════════════════════
+       CALENDAR POPUP TEXT FIX
+    ══════════════════════════════════════ */
+    .dev-time  { font-family:'Press Start 2P',monospace; font-size:8px !important; color:var(--accent) !important; min-width:54px; }
+    .dev-item  { font-size:16px; color:var(--fg); gap:8px; padding:8px 0; }
+    .dev-empty { font-size:16px; }
+    .pdx-right { font-size:15px; }
+    .pdx-date-label  { font-size:9px; }
+    .pdx-section-hd  { font-size:7px; }
+    .pdx-poke-name   { font-size:9px; }
+    .pdx-poke-num    { font-size:7px; }
+    .day-chip, .mob-day-chip { font-size:10px !important; padding:3px 7px !important; }
+
+    /* ══════════════════════════════════════
+       MOBILE DAY EVENT LIST
+    ══════════════════════════════════════ */
+    .mob-day-event-list {
+      display:flex; flex-direction:column; gap:6px;
+      margin-top:10px; padding-top:10px;
+      border-top:1px dashed rgba(168,230,255,.2);
+    }
+    .mob-day-event-row {
+      display:flex; align-items:center; gap:10px; padding:3px 0;
+    }
+    .mob-day-event-dot { width:8px; height:8px; flex-shrink:0; }
+    .mob-day-event-time {
+      font-family:'Press Start 2P',monospace; font-size:7px;
+      color:var(--accent); min-width:60px; flex-shrink:0;
+    }
+    .mob-day-event-name {
+      font-family:'VT323',monospace; font-size:21px; line-height:1.1; flex:1;
+    }
+    .mob-no-events {
+      font-size:16px; opacity:.4; font-style:italic; padding:4px 0;
+    }
+
+    /* ══════════════════════════════════════
+       POKEMON EASTER EGGS
+    ══════════════════════════════════════ */
+
+    /* Wandering pokemon across screen */
+    @keyframes wanderRight {
+      from { transform:translateX(-80px) scaleX(1); }
+      to   { transform:translateX(calc(100vw + 80px)) scaleX(1); }
+    }
+    @keyframes wanderLeft {
+      from { transform:translateX(calc(100vw + 80px)) scaleX(-1); }
+      to   { transform:translateX(-80px) scaleX(-1); }
+    }
+    .wander-poke {
+      position:fixed; z-index:49; pointer-events:none;
+      image-rendering:pixelated;
+      filter:drop-shadow(0 4px 8px rgba(0,0,0,.55));
+    }
+
+    /* Home screen floating pokemon */
+    @keyframes pokeBounce {
+      0%,100% { transform:translateY(0) scaleX(1); }
+      50%     { transform:translateY(-12px) scaleX(1); }
+    }
+    @keyframes pokeShadow {
+      0%,100% { transform:scaleX(1);   opacity:.38; }
+      50%     { transform:scaleX(.6);  opacity:.18; }
+    }
+    .mob-home-poke-wrap {
+      display:flex; flex-direction:column; align-items:center;
+      padding:6px 0 2px; flex-shrink:0;
+    }
+    .mob-home-poke-img {
+      width:140px; height:140px; image-rendering:pixelated;
+      animation:pokeBounce 2.6s ease-in-out infinite;
+    }
+    .mob-home-poke-shadow {
+      width:70px; height:12px;
+      background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%);
+      border-radius:50%; margin-top:-8px;
+      animation:pokeShadow 2.6s ease-in-out infinite;
+    }
+    .mob-home-poke-name {
+      font-family:'Press Start 2P',monospace; font-size:8px;
+      color:var(--accent); letter-spacing:2px; margin-top:7px;
+      text-shadow:0 0 12px var(--accent);
+    }
+    .mob-home-poke-num {
+      font-family:'Press Start 2P',monospace; font-size:5px;
+      opacity:.45; margin-top:3px;
+    }
+
+    /* Task completion poke flash */
+    @keyframes pokeFlash {
+      0%   { opacity:0; transform:scale(.3) rotate(-20deg); }
+      20%  { opacity:1; transform:scale(1.4) rotate(10deg); }
+      60%  { opacity:1; transform:scale(1)   rotate(0deg);  }
+      100% { opacity:0; transform:scale(1.6) rotate(15deg) translateY(-40px); }
+    }
+    .task-poke-flash {
+      position:fixed; z-index:300; pointer-events:none;
+      image-rendering:pixelated; width:80px; height:80px;
+      animation:pokeFlash 1.2s ease-out forwards;
+    }
+
+    /* Stats section in home tab */
+    .mob-stats-row {
+      display:flex; align-items:center; gap:12px;
+      padding:9px 0; border-bottom:1px solid rgba(168,230,255,.07);
+    }
+    .mob-stats-row:last-child { border-bottom:none; }
+    .mob-stats-count {
+      font-family:'VT323',monospace; font-size:34px;
+      color:var(--accent); min-width:46px; text-align:center; line-height:1;
+    }
+    .mob-stats-name {
+      font-family:'VT323',monospace; font-size:21px;
+      flex:1; line-height:1.2;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .mob-stats-badge {
+      font-family:'Press Start 2P',monospace; font-size:7px;
+      padding:3px 5px; color:#fff; flex-shrink:0;
+    }
+    .mob-stats-bar {
+      height:3px; background:var(--accent); margin-top:3px; transition:width .4s;
+    }
+
+    /* Pokemon type chip on calendar events */
+    .kind-type-chip {
+      display:inline-flex; align-items:center; gap:2px;
+      font-family:'Press Start 2P',monospace; font-size:7px;
+      padding:2px 6px; color:#fff; letter-spacing:.5px;
+    }
+
+    /* ══════════════════════════════════════
+       BUDGET / GIL TRACKER
+    ══════════════════════════════════════ */
+    .budget-header  { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; flex-shrink:0; }
+    .budget-month   { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); }
+    .budget-spent   { font-family:'VT323',monospace; font-size:46px; color:var(--accent); line-height:1; }
+    .budget-limit   { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
+    .budget-bar-wrap{ height:5px; background:var(--fg-faint); margin:5px 0 3px; }
+    .budget-bar     { height:100%; background:var(--accent); transition:width .4s; max-width:100%; }
+    .budget-bar.over{ background:var(--red); }
+    .budget-summary-row { display:flex; gap:14px; margin-bottom:10px; flex-shrink:0; }
+    .budget-summary-box { display:flex; flex-direction:column; gap:2px; }
+    .budget-sum-label   { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
+    .budget-sum-val     { font-family:'VT323',monospace; font-size:22px; line-height:1; }
+    .budget-sum-val.income { color:var(--green); }
+    .budget-sum-val.expense{ color:var(--red); }
+    .budget-txn-list{ flex:1; overflow-y:auto; min-height:0; margin-bottom:6px; }
+    .budget-txn     { display:flex; align-items:center; gap:6px; padding:5px 0; border-bottom:1px solid rgba(168,230,255,.06); }
+    .budget-txn:last-child{ border-bottom:none; }
+    .budget-txn-icon{ font-size:15px; flex-shrink:0; }
+    .budget-txn-note{ font-family:'VT323',monospace; font-size:18px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .budget-txn-date{ font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); flex-shrink:0; }
+    .budget-txn-amt { font-family:'VT323',monospace; font-size:19px; flex-shrink:0; min-width:54px; text-align:right; }
+    .budget-txn-del { opacity:0; background:none; border:none; color:rgba(168,230,255,.5); font-size:11px; cursor:pointer; margin-left:2px; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
+    .budget-txn:hover .budget-txn-del{ opacity:1; }
+    .budget-txn-del:hover{ color:var(--red); }
+    .budget-add-row { display:flex; gap:4px; flex-shrink:0; flex-wrap:wrap; }
+    .budget-cat-sel { font-family:'Press Start 2P',monospace; font-size:6px; background:var(--surface); border:1px solid rgba(168,230,255,.15); color:var(--fg); padding:5px 4px; cursor:pointer; flex-shrink:0; }
+    .budget-type-toggle { display:flex; gap:3px; flex-shrink:0; }
+    .budget-type-btn { font-family:'Press Start 2P',monospace; font-size:6px; padding:5px 7px; background:var(--surface); border:1px solid rgba(168,230,255,.15); color:var(--fg-dim); cursor:pointer; }
+    .budget-type-btn.active.expense { color:#fff; background:var(--red); border-color:var(--red); }
+    .budget-type-btn.active.income  { color:#000; background:var(--green); border-color:var(--green); }
+    .budget-limit-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-shrink:0; }
+    .budget-limit-inp { font-family:'Press Start 2P',monospace; font-size:7px; width:80px; background:var(--surface); border:1px solid rgba(168,230,255,.15); color:var(--accent); padding:4px 6px; }
+    .budget-empty { font-family:'VT323',monospace; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
   </style>
 </head>
 <body>
@@ -567,6 +764,7 @@
         <div class="tab-bar">
           <button class="tab-btn active" id="tabQuestBtn" onclick="switchTab('quest')">QUEST</button>
           <button class="tab-btn" id="tabClaudeBtn" onclick="switchTab('claude')">▲ CLAUDE</button>
+          <button class="tab-btn" id="tabGilBtn" onclick="switchTab('gil')">💰 GIL</button>
           <div style="display:flex;align-items:center;gap:4px;padding:0 6px;">
             <div class="server-dot" id="serverDot"></div>
           </div>
@@ -595,6 +793,9 @@
             <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:5px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;letter-spacing:1px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='rgba(168,230,255,.4)'">⚙ KEY</button>
           </div>
         </div>
+        <div class="tab-pane" id="tabGil" style="display:flex;flex-direction:column;">
+          <div id="deskBudgetView" style="display:flex;flex-direction:column;height:100%;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -617,21 +818,32 @@
 
     <!-- HOME tab -->
     <div class="mob-tab-pane active" id="mobTabHome">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:4px;flex-shrink:0;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:2px;flex-shrink:0;">
         <button onclick="openSettingsModal()" style="background:none;border:none;color:rgba(168,230,255,.5);font-family:'Press Start 2P',monospace;font-size:8px;cursor:pointer;padding:4px 6px;">⚙</button>
       </div>
+
+      <!-- Pokemon of the day -->
+      <div class="mob-home-poke-wrap" id="mobHomePoke"></div>
+
       <div class="mob-home-clock" id="mobClock">00:00</div>
       <div class="mob-home-date" id="mobDate">—</div>
+
       <div class="mob-home-card">
         <div class="mob-home-card-label">STREAK</div>
         <div class="mob-home-streak-num" id="mobStreakVal">0 <span style="font-size:18px;opacity:.7;">DAYS</span></div>
         <div class="mob-home-lv" id="mobStreakLv">LV.1</div>
         <div class="pixel-bar" style="height:6px;"><div class="pixel-bar-fill" id="mobXpBar" style="width:0%;"></div></div>
       </div>
+
       <div class="mob-home-card">
         <div class="mob-home-card-label">NEXT MISSION</div>
         <div class="mob-home-next-time" id="mobHomeNextTime">—</div>
         <div class="mob-home-next-title" id="mobHomeNextTitle">—</div>
+      </div>
+
+      <div class="mob-home-card">
+        <div class="mob-home-card-label">QUEST STATS</div>
+        <div id="mobStatsSection"><div class="empty" style="font-size:14px;">Complete quests to earn stats</div></div>
       </div>
     </div>
 
@@ -648,6 +860,7 @@
       <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
       <div class="mob-month-grid" id="mobMonthGrid"></div>
       <div class="mob-day-summary" id="mobDaySummary"></div>
+      <div class="mob-day-event-list" id="mobDayEventList"></div>
     </div>
 
     <!-- TIMELINE tab -->
@@ -688,6 +901,14 @@
       </div>
     </div>
 
+    <!-- BUDGET tab -->
+    <div class="mob-tab-pane" id="mobTabGil" style="display:flex;flex-direction:column;">
+      <div class="mob-tab-hd">
+        <span>💰 GIL TRACKER</span>
+      </div>
+      <div id="mobBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;"></div>
+    </div>
+
     <!-- CLAUDE tab -->
     <div class="mob-tab-pane" id="mobTabClaude">
       <div class="mob-tab-hd">
@@ -725,6 +946,9 @@
     </button>
     <button class="mob-nav-btn" onclick="switchMobTab('tasks',this)">
       <span class="nav-icon">✅</span><span>TASKS</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('gil',this)">
+      <span class="nav-icon">💰</span><span>GIL</span>
     </button>
     <button class="mob-nav-btn" onclick="switchMobTab('claude',this)">
       <span class="nav-icon">🧠</span><span>AI</span>
@@ -912,7 +1136,24 @@
 const SERVER      = window.location.origin;   // auto-resolve for phone vs desktop
 const RANK_COLORS = { S:'#e85d3a', B:'#4a90d9' };
 const RANK_XP     = { S:50, B:15 };
-const KIND_COLORS = { training:'#e85d3a', meeting:'#4a90d9', focus:'#9b59b6', social:'#f0c419', errand:'#5cab4f', routine:'#7a8a78' };
+const KIND_COLORS    = { training:'#e85d3a', meeting:'#4a90d9', focus:'#9b59b6', social:'#f0c419', errand:'#5cab4f', routine:'#7a8a78' };
+const KIND_POKE_TYPE = {
+  training:{ label:'FIRE',    icon:'🔥' },
+  meeting: { label:'WATER',   icon:'💧' },
+  focus:   { label:'PSYCHIC', icon:'🔮' },
+  social:  { label:'FAIRY',   icon:'✨' },
+  errand:  { label:'GROUND',  icon:'⛰' },
+  routine: { label:'NORMAL',  icon:'⭐' },
+};
+const BUDGET_CATS = {
+  food:      { icon:'🍖', label:'PROVISIONS' },
+  rent:      { icon:'🏠', label:'SHELTER'    },
+  transport: { icon:'⚡', label:'TRAVEL'     },
+  fun:       { icon:'🎮', label:'RECREATION' },
+  health:    { icon:'💊', label:'RECOVERY'   },
+  income:    { icon:'💰', label:'GIL IN'     },
+  other:     { icon:'⭐', label:'MISC'       },
+};
 const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTHS_S    = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -920,7 +1161,7 @@ const DAY_NAMES   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'
 const POKE_IDS = [1,4,7,25,39,52,54,56,58,63,66,74,79,81,83,84,88,90,92,93,94,95,96,98,100,104,109,113,116,118,120,122,124,125,126,127,129,130,131,132,133,134,135,136,137,143,144,145,146,147,148,149,150,151,152,155,158,175,179,183,187,191,193,196,197,202,206,213,216,220,225,226,228,231,233,235,238,239,240,241,242,243,244,245,246,248,249,250,251];
 
 // ── APP STATE (mirrored from server) ──
-let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{} };
+let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[]} };
 
 // ── UTILS ──
 const pad     = n => String(n).padStart(2,'0');
@@ -959,6 +1200,56 @@ function seededRng(seed){let s=seed|0;return()=>{s=Math.imul(s^(s>>>16),0x45d9f3
 function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const j=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil((((t-j)/86400000)+1)/7);}
 function getWeekPoke(){const now=new Date();const rng=seededRng(now.getFullYear()*1000+isoWeek(now));const pool=[...POKE_IDS],out=[];for(let i=0;i<7&&pool.length;i++){const idx=Math.floor(rng()*pool.length);out.push(pool.splice(idx,1)[0]);}return out;}
 const WEEK_POKE = getWeekPoke();
+
+// ── HOME SCREEN POKEMON (Pokemon of the Day) ──
+const POKE_NAMES = {};
+async function getPokeName(id){
+  if(POKE_NAMES[id]) return POKE_NAMES[id];
+  try{ const r=await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+       const d=await r.json();
+       const name=d.names?.find(n=>n.language.name==='en')?.name||d.name;
+       POKE_NAMES[id]=name; return name; }
+  catch{ return '#'+id; }
+}
+
+function renderHomePokemon(){
+  const el=document.getElementById('mobHomePoke'); if(!el)return;
+  const now=new Date();
+  let seed=now.getFullYear()*10000+(now.getMonth()+1)*100+now.getDate();
+  seed=Math.abs(Math.imul(seed^(seed>>>16),0x45d9f3b));
+  const id=POKE_IDS[seed%POKE_IDS.length];
+  el.innerHTML=`
+    <img class="mob-home-poke-img"
+         src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png"
+         alt="#${id}" loading="lazy">
+    <div class="mob-home-poke-shadow"></div>
+    <div class="mob-home-poke-name" id="homePokeNameEl">LOADING...</div>
+    <div class="mob-home-poke-num">#${String(id).padStart(3,'0')}</div>
+  `;
+  getPokeName(id).then(name=>{const ne=document.getElementById('homePokeNameEl');if(ne)ne.textContent=name.toUpperCase();});
+}
+
+// ── WANDERING POKEMON ──
+const WANDER_POOL=[25,39,52,54,56,74,79,81,92,113,120,122,129,132,133,143,147,175,196,202,213,225,238,239,240,241,242,246];
+let wanderActive=0;
+function spawnWanderPoke(){
+  if(wanderActive>=3)return;
+  wanderActive++;
+  const id=WANDER_POOL[Math.floor(Math.random()*WANDER_POOL.length)];
+  const size=50+Math.floor(Math.random()*30);
+  const goRight=Math.random()<0.5;
+  const el=document.createElement('img');
+  el.className='wander-poke';
+  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+  el.style.cssText=`width:${size}px;height:${size}px;top:${40+Math.floor(Math.random()*(window.innerHeight-120))}px;left:0;`;
+  const dur=9+Math.random()*9;
+  el.style.animation=`${goRight?'wanderRight':'wanderLeft'} ${dur}s linear forwards`;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.remove();wanderActive--;},dur*1000+400);
+}
+// Spawn wanderers periodically
+setTimeout(spawnWanderPoke,4000);
+setInterval(()=>{if(Math.random()<0.65)spawnWanderPoke();},14000);
 
 // ── CLOCK ──
 function updateClock(){
@@ -999,6 +1290,8 @@ async function loadData(){
     APP.streakDays     = APP.streakDays     || [];
     APP.currentStreak  = APP.currentStreak  || 0;
     APP.theme          = APP.theme          || {};
+    APP.taskStats      = APP.taskStats      || {};
+    APP.budget         = APP.budget         || {monthlyLimit:2000,transactions:[]};
     applyTheme(APP.theme);
     renderAll();
   } catch(e) {
@@ -1040,13 +1333,16 @@ function renderAll(){
   renderTimeline();  renderMobTimeline();
   renderTasks();     renderMobTasks();
   renderMobHomeNext();
+  renderStats();
+  renderHomePokemon();
+  renderBudget();
 }
 
 // ── SERVER STATUS ──
 let serverOnline = false;
 async function checkServer(){
   try {
-    const r=await fetch(`${SERVER}/api/status`,{signal:AbortSignal.timeout(2000)});
+    const r=await fetch(`${SERVER}/api/status`,{signal:AbortSignal.timeout(5000)});
     const d=await r.json();
     serverOnline=d.ok;
     ['serverDot','mobServerDot'].forEach(id=>{const el=document.getElementById(id);if(el)el.className='server-dot '+(d.ok?'online':'offline');});
@@ -1101,15 +1397,34 @@ function renderMonthGrid(){
 }
 function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); }
 function renderDaySummary(){ renderDaySummaryInto(selectedKey,document.getElementById('daySummary'),false); }
-function renderMobDaySummary(){ renderDaySummaryInto(selectedKey,document.getElementById('mobDaySummary'),true); }
+function renderMobDaySummary(){
+  renderDaySummaryInto(selectedKey,document.getElementById('mobDaySummary'),true);
+}
 
 function renderDaySummaryInto(key,el,isMob){
   if(!el)return;
   const d=new Date(key+'T00:00:00');
   const evs=(APP.events||{})[key]||[];
-  const chip = (e)=>`<span class="${isMob?'':'day-'}chip" style="font-family:'Press Start 2P',monospace;font-size:${isMob?'9':'8'}px;padding:${isMob?'2px 6px':'1px 4px'};color:#fff;letter-spacing:1px;background:${KIND_COLORS[e.kind||'focus']||'#666'};">${(e.kind||'').toUpperCase()}</span>`;
-  el.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:${isMob?'6':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
-    + (evs.length ? evs.map(chip).join('') : `<span style="font-size:${isMob?'14':'12'}px;opacity:.45;">nothing scheduled</span>`);
+  const pt = k => KIND_POKE_TYPE[k]||KIND_POKE_TYPE.routine;
+  const chip = (e)=>`<span class="kind-type-chip" style="background:${KIND_COLORS[e.kind||'focus']||'#666'};">${pt(e.kind||'focus').icon} ${(e.kind||'').toUpperCase()}</span>`;
+  el.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:${isMob?'7':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
+    + (evs.length ? evs.map(chip).join('') : `<span style="font-size:${isMob?'15':'12'}px;opacity:.45;">nothing scheduled</span>`);
+
+  // On mobile also populate the event detail list below the grid
+  if(isMob){
+    const listEl=document.getElementById('mobDayEventList'); if(!listEl)return;
+    if(!evs.length){
+      listEl.innerHTML='<div class="mob-no-events">No encounters this day.</div>';
+    } else {
+      listEl.innerHTML=evs.map(e=>`
+        <div class="mob-day-event-row">
+          <div class="mob-day-event-dot" style="background:${KIND_COLORS[e.kind||'focus']};"></div>
+          <div class="mob-day-event-time">${e.time?fmtTime(e.time):'—'}</div>
+          <div class="mob-day-event-name">${esc(e.title)}</div>
+        </div>
+      `).join('');
+    }
+  }
 }
 
 function openRegionMap(){ regYear=calYear; regMonth=calMonth; renderRegionGrid(); openModal('regionModal'); }
@@ -1135,7 +1450,23 @@ function renderRegionGrid(){
 function openRegionDay(key,ts){ const d=new Date(ts); dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); closeModal('regionModal'); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 
 function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
-function renderDevList(key){ const evs=(APP.events||{})[key]||[]; const el=document.getElementById('devList'); if(!evs.length){el.innerHTML='<div class="dev-empty">No encounters yet</div>';return;} el.innerHTML=evs.map((e,i)=>`<div class="dev-item"><div class="dev-dot" style="background:${KIND_COLORS[e.kind||'focus']};"></div><span class="dev-time">${e.time?fmtTime(e.time):'—'}</span><span style="flex:1;">${esc(e.title)}</span><button class="dev-del" onclick="openEditEvent('${key}',${i})" title="Edit" style="font-size:11px;">✎</button><button class="dev-del" onclick="deleteDayEv('${key}',${i})">✕</button></div>`).join(''); }
+function renderDevList(key){
+  const evs=(APP.events||{})[key]||[];
+  const el=document.getElementById('devList'); if(!el)return;
+  if(!evs.length){el.innerHTML='<div class="dev-empty" style="font-size:16px;color:var(--fg);opacity:.55;">No encounters yet</div>';return;}
+  el.innerHTML=evs.map((e,i)=>{
+    const kc=KIND_COLORS[e.kind||'focus']||'var(--fg)';
+    const pt=KIND_POKE_TYPE[e.kind||'focus']||KIND_POKE_TYPE.routine;
+    return`<div class="dev-item">
+      <div class="dev-dot" style="background:${kc};width:8px;height:8px;flex-shrink:0;"></div>
+      <span class="dev-time">${e.time?fmtTime(e.time):'—'}</span>
+      <span style="flex:1;font-size:16px;color:var(--fg);font-family:'VT323',monospace;">${esc(e.title)}</span>
+      <span style="font-family:'Press Start 2P',monospace;font-size:6px;background:${kc};color:#fff;padding:2px 4px;flex-shrink:0;">${pt.icon} ${(e.kind||'').toUpperCase()}</span>
+      <button class="dev-del" onclick="openEditEvent('${key}',${i})" title="Edit" style="font-size:13px;">✎</button>
+      <button class="dev-del" onclick="deleteDayEv('${key}',${i})" style="font-size:13px;">✕</button>
+    </div>`;
+  }).join('');
+}
 function addDayEvent(){ const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;} if(!APP.events[dayModalDate])APP.events[dayModalDate]=[]; APP.events[dayModalDate].push({title,time:document.getElementById('devTime').value,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value}); patchData({events:APP.events}); renderDevList(dayModalDate); renderMonthGrid(); renderMobMonthGrid(); if(document.getElementById('regionModal').classList.contains('active'))renderRegionGrid(); ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); showToast('Event added ◆'); }
 function deleteDayEv(key,idx){ if(APP.events[key]){APP.events[key].splice(idx,1);if(!APP.events[key].length)delete APP.events[key];} patchData({events:APP.events}); renderDevList(key); renderMonthGrid(); renderMobMonthGrid(); }
 
@@ -1343,10 +1674,237 @@ function toggleTask(i){
   if(t.rank==='S' && t.done) return; // S-tier locked once done
   t.done=!t.done;
   t.doneDate=t.done?TODAY():null;
-  if(t.done) showXpPop(RANK_XP[t.rank||'B'],RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
+  if(t.done){
+    showXpPop(RANK_XP[t.rank||'B'],RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
+    showCompletePoke(t.rank||'B');
+    // Track completion stats
+    if(!APP.taskStats) APP.taskStats={};
+    if(!APP.taskStats[t.text]) APP.taskStats[t.text]={count:0,lastDone:null};
+    APP.taskStats[t.text].count++;
+    APP.taskStats[t.text].lastDone=TODAY();
+    patchData({taskStats:APP.taskStats});
+    renderStats();
+  }
   saveTasks(); renderTasks(); renderMobTasks();
 }
 function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderTasks(); renderMobTasks(); }
+
+// Stats rendering for HOME tab
+function renderStats(){
+  const el=document.getElementById('mobStatsSection'); if(!el)return;
+  const stats=APP.taskStats||{};
+  const sorted=Object.entries(stats).filter(([,v])=>v.count>0).sort((a,b)=>b[1].count-a[1].count).slice(0,8);
+  if(!sorted.length){ el.innerHTML='<div class="empty" style="font-size:14px;">Complete quests to earn stats</div>'; return; }
+  const max=sorted[0][1].count;
+  el.innerHTML=sorted.map(([name,{count}])=>{
+    const task=(APP.tasks||[]).find(t=>t.text===name);
+    const rank=task?.rank||'B';
+    return`<div class="mob-stats-row">
+      <div class="mob-stats-count">${count}×</div>
+      <div style="flex:1;min-width:0;">
+        <div class="mob-stats-name">${esc(name)}</div>
+        <div class="mob-stats-bar" style="width:${Math.round(count/max*100)}%;"></div>
+      </div>
+      <div class="mob-stats-badge" style="background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// BUDGET / GIL TRACKER
+// ══════════════════════════════════════════════════════════════
+let _budgetType = 'expense'; // current toggle state for add form
+
+function budgetMonthKey(){ const n=new Date(); return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
+
+function budgetMonthTotals(monthKey){
+  const txns=(APP.budget?.transactions||[]).filter(t=>t.date.startsWith(monthKey));
+  let income=0,expense=0;
+  txns.forEach(t=>{ if(t.type==='income') income+=t.amount; else expense+=t.amount; });
+  return {income,expense,net:income-expense};
+}
+
+function addTransaction(){
+  const amtEl=document.getElementById('budgetAmtInp')||document.getElementById('mobBudgetAmtInp');
+  const noteEl=document.getElementById('budgetNoteInp')||document.getElementById('mobBudgetNoteInp');
+  const catEl =document.getElementById('budgetCatSel')||document.getElementById('mobBudgetCatSel');
+  // Prefer the populated one
+  const amtElD=document.getElementById('budgetAmtInp');
+  const amtElM=document.getElementById('mobBudgetAmtInp');
+  const amt=parseFloat((amtElD?.value||amtElM?.value||'').trim());
+  if(isNaN(amt)||amt<=0){showToast('Enter a valid amount');return;}
+  const note=(document.getElementById('budgetNoteInp')?.value||document.getElementById('mobBudgetNoteInp')?.value||'').trim();
+  const cat =(document.getElementById('budgetCatSel')?.value||document.getElementById('mobBudgetCatSel')?.value||'other');
+  const type=_budgetType;
+  const txn={id:Date.now(),date:TODAY(),amount:amt,category:cat,note:note||BUDGET_CATS[cat]?.label||cat,type};
+  if(!APP.budget) APP.budget={monthlyLimit:2000,transactions:[]};
+  APP.budget.transactions.unshift(txn);
+  patchData({budget:APP.budget});
+  [amtElD,amtElM].forEach(el=>{if(el)el.value='';});
+  [document.getElementById('budgetNoteInp'),document.getElementById('mobBudgetNoteInp')].forEach(el=>{if(el)el.value='';});
+  renderBudget();
+  showToast(type==='income'?'+GIL received':'-GIL spent');
+}
+
+function deleteTxn(id){
+  if(!APP.budget?.transactions)return;
+  APP.budget.transactions=APP.budget.transactions.filter(t=>t.id!==id);
+  patchData({budget:APP.budget});
+  renderBudget();
+}
+
+function setBudgetLimit(val){
+  const n=parseFloat(val);
+  if(isNaN(n)||n<=0)return;
+  APP.budget.monthlyLimit=n;
+  patchData({budget:APP.budget});
+  renderBudget();
+}
+
+function setTxnType(type,clickedBtn){
+  _budgetType=type;
+  document.querySelectorAll('.budget-type-btn').forEach(b=>{
+    b.classList.remove('active');
+    b.classList.toggle('active',b.dataset.type===type);
+  });
+}
+
+function buildBudgetHTML(monthKey){
+  const {income,expense}=budgetMonthTotals(monthKey);
+  const limit=APP.budget?.monthlyLimit||2000;
+  const pct=Math.min(100,Math.round(expense/limit*100));
+  const over=expense>limit;
+  const monthLabel=new Date(monthKey+'-01').toLocaleString('default',{month:'long',year:'numeric'}).toUpperCase();
+  const txns=(APP.budget?.transactions||[]).filter(t=>t.date.startsWith(monthKey));
+  const catOptions=Object.entries(BUDGET_CATS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('');
+  const txnRows=txns.length?txns.map(t=>{
+    const cat=BUDGET_CATS[t.category]||BUDGET_CATS.other;
+    const color=t.type==='income'?'var(--green)':'var(--red)';
+    const sign=t.type==='income'?'+':'-';
+    const shortDate=t.date.slice(5);
+    return`<div class="budget-txn">
+      <span class="budget-txn-icon">${cat.icon}</span>
+      <span class="budget-txn-note">${esc(t.note)}</span>
+      <span class="budget-txn-date">${shortDate}</span>
+      <span class="budget-txn-amt" style="color:${color};">${sign}$${t.amount.toFixed(2)}</span>
+      <button class="budget-txn-del" onclick="deleteTxn(${t.id})" title="Delete">✕</button>
+    </div>`;
+  }).join(''):`<div class="budget-empty">No transactions this month.</div>`;
+  return`
+    <div class="budget-header">
+      <div>
+        <div class="budget-month">${monthLabel}</div>
+        <div class="budget-spent">$${expense.toFixed(0)}</div>
+        <div class="budget-limit">/ $${limit.toFixed(0)} BUDGET</div>
+      </div>
+      <div class="budget-summary-row" style="flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="budget-summary-box" style="align-items:flex-end;">
+          <span class="budget-sum-label">INCOME</span>
+          <span class="budget-sum-val income">+$${income.toFixed(2)}</span>
+        </div>
+        <div class="budget-summary-box" style="align-items:flex-end;">
+          <span class="budget-sum-label">BALANCE</span>
+          <span class="budget-sum-val ${income-expense>=0?'income':'expense'}">${income-expense>=0?'+':''} $${(income-expense).toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+    <div class="budget-bar-wrap"><div class="budget-bar${over?' over':''}" style="width:${pct}%;"></div></div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);margin-bottom:8px;text-align:right;">${pct}% of budget used</div>
+    <div class="budget-txn-list">${txnRows}</div>
+    <div class="budget-add-row" style="margin-top:8px;">
+      <div class="budget-type-toggle">
+        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)">-EXP</button>
+        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)">+GIL</button>
+      </div>
+      <input type="number" class="mini-inp budget-limit-inp" id="budgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:70px;">
+      <select class="budget-cat-sel" id="budgetCatSel">${catOptions}</select>
+      <input type="text" class="mini-inp" id="budgetNoteInp" placeholder="Note..." style="flex:1;min-width:60px;">
+      <button class="mini-btn" onclick="addTransaction()">+</button>
+    </div>
+    <div class="budget-limit-row" style="margin-top:8px;">
+      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);">MONTHLY LIMIT:</span>
+      <input type="number" class="budget-limit-inp" id="budgetLimitInp" value="${limit}" min="1" style="width:80px;" onchange="setBudgetLimit(this.value)">
+    </div>`;
+}
+
+function buildMobBudgetHTML(monthKey){
+  const {income,expense}=budgetMonthTotals(monthKey);
+  const limit=APP.budget?.monthlyLimit||2000;
+  const pct=Math.min(100,Math.round(expense/limit*100));
+  const over=expense>limit;
+  const monthLabel=new Date(monthKey+'-01').toLocaleString('default',{month:'long',year:'numeric'}).toUpperCase();
+  const txns=(APP.budget?.transactions||[]).filter(t=>t.date.startsWith(monthKey));
+  const catOptions=Object.entries(BUDGET_CATS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('');
+  const txnRows=txns.length?txns.map(t=>{
+    const cat=BUDGET_CATS[t.category]||BUDGET_CATS.other;
+    const color=t.type==='income'?'var(--green)':'var(--red)';
+    const sign=t.type==='income'?'+':'-';
+    return`<div class="budget-txn">
+      <span class="budget-txn-icon">${cat.icon}</span>
+      <span class="budget-txn-note">${esc(t.note)}</span>
+      <span class="budget-txn-amt" style="color:${color};font-size:22px;">${sign}$${t.amount.toFixed(2)}</span>
+      <button class="budget-txn-del" onclick="deleteTxn(${t.id})" title="Delete" style="font-size:16px;opacity:1;">✕</button>
+    </div>`;
+  }).join(''):`<div class="budget-empty">No transactions this month.</div>`;
+  return`
+    <div style="margin-bottom:6px;">
+      <div class="budget-month" style="font-size:7px;">${monthLabel}</div>
+      <div class="budget-spent" style="font-size:52px;">$${expense.toFixed(0)}</div>
+      <div class="budget-limit" style="font-size:6px;">/ $${limit.toFixed(0)} BUDGET</div>
+    </div>
+    <div class="budget-bar-wrap"><div class="budget-bar${over?' over':''}" style="width:${pct}%;"></div></div>
+    <div style="display:flex;gap:16px;margin-bottom:10px;">
+      <div class="budget-summary-box">
+        <span class="budget-sum-label" style="font-size:6px;">INCOME</span>
+        <span class="budget-sum-val income" style="font-size:26px;">+$${income.toFixed(2)}</span>
+      </div>
+      <div class="budget-summary-box">
+        <span class="budget-sum-label" style="font-size:6px;">BALANCE</span>
+        <span class="budget-sum-val ${income-expense>=0?'income':'expense'}" style="font-size:26px;">${income-expense>=0?'+':''} $${(income-expense).toFixed(2)}</span>
+      </div>
+    </div>
+    <div class="budget-txn-list" style="flex:1;overflow-y:auto;">${txnRows}</div>
+    <div class="budget-add-row" style="margin-top:8px;flex-wrap:wrap;gap:5px;">
+      <div class="budget-type-toggle">
+        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)" style="font-size:8px;padding:8px 10px;">-EXP</button>
+        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)" style="font-size:8px;padding:8px 10px;">+GIL</button>
+      </div>
+      <input type="number" class="mob-inp budget-limit-inp" id="mobBudgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:90px;font-size:13px;">
+      <select class="mob-inp budget-cat-sel" id="mobBudgetCatSel" style="font-size:12px;">${catOptions}</select>
+      <input type="text" class="mob-inp" id="mobBudgetNoteInp" placeholder="Note..." style="flex:1;min-width:80px;">
+      <button class="mob-add-btn" onclick="addTransaction()" style="flex-shrink:0;">+</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-shrink:0;">
+      <span style="font-family:'Press Start 2P',monospace;font-size:6px;color:var(--fg-dim);">LIMIT:</span>
+      <input type="number" class="mob-inp budget-limit-inp" id="mobBudgetLimitInp" value="${limit}" min="1" style="width:90px;font-size:13px;" onchange="setBudgetLimit(this.value)">
+    </div>`;
+}
+
+function renderBudget(){
+  const mk=budgetMonthKey();
+  const desk=document.getElementById('deskBudgetView');
+  const mob=document.getElementById('mobBudgetView');
+  if(desk) desk.innerHTML=buildBudgetHTML(mk);
+  if(mob)  mob.innerHTML=buildMobBudgetHTML(mk);
+  // Re-apply toggle state after re-render
+  document.querySelectorAll('.budget-type-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.type===_budgetType);
+  });
+}
+
+// Pokemon flash on task completion
+function showCompletePoke(rank){
+  const pool={S:[6,9,38,59,149,150,151,248,249,250],B:[25,35,39,113,133,175,196,242]}[rank]||[25,39,133];
+  const id=pool[Math.floor(Math.random()*pool.length)];
+  const el=document.createElement('img');
+  el.className='task-poke-flash';
+  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  el.style.left=(window.innerWidth/2-40)+'px';
+  el.style.top =(window.innerHeight/2-60)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
 function showXpPop(amount,color){
   ['questScroll','mobTaskList'].forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
@@ -1359,15 +1917,15 @@ function showXpPop(amount,color){
 // TABS + MOBILE NAV
 // ══════════════════════════════════════════════════════════════
 function switchTab(tab){
-  document.getElementById('tabQuest').classList.toggle('active',tab==='quest');
-  document.getElementById('tabClaude').classList.toggle('active',tab==='claude');
-  document.getElementById('tabQuestBtn').classList.toggle('active',tab==='quest');
-  document.getElementById('tabClaudeBtn').classList.toggle('active',tab==='claude');
+  ['quest','claude','gil'].forEach(t=>{
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1))?.classList.toggle('active',tab===t);
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)+'Btn')?.classList.toggle('active',tab===t);
+  });
   if(tab==='claude')setTimeout(()=>document.getElementById('chatInp')?.focus(),50);
 }
 
 function switchMobTab(tab, btn){
-  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',claude:'mobTabClaude'};
+  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude'};
   document.querySelectorAll('.mob-tab-pane').forEach(p=>p.classList.remove('active'));
   const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
@@ -1408,7 +1966,9 @@ async function sendChatCommon(msg, scrollId, btnId){
   try {
     const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
     const d=await r.json(); hideTyping(scrollId);
-    if(d.error==='NO_KEY'){ appendChatMsg('sys','No API key. Click ⚙ KEY to set one.',scrollId); openModal('keyModal'); }
+    if(d.error==='NO_KEY'){ appendChatMsg('sys','No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
+    else if(d.error==='RATE_LIMIT'){ appendChatMsg('sys','⚠ Rate limit reached on shared OAuth token. Set your own API key in ⚙ Settings → API Key for unlimited access.',scrollId); }
+    else if(d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ Authentication failed — API key may be expired. Open ⚙ Settings → API Key to update it.',scrollId); openModal('settingsModal'); }
     else if(d.error){ appendChatMsg('sys','Error: '+d.error,scrollId); }
     else { appendChatMsg('claude',d.response,scrollId); chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response}); if(chatHistory.length>20)chatHistory=chatHistory.slice(-20); }
   } catch(e){ hideTyping(scrollId); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),scrollId); }
@@ -1513,12 +2073,7 @@ async function saveKeyFromSettings(){
 // ══════════════════════════════════════════════════════════════
 // POKÉDEX DAY POPUP
 // ══════════════════════════════════════════════════════════════
-const POKE_NAMES = {};  // filled lazily from PokeAPI
-async function getPokeName(id){
-  if(POKE_NAMES[id]) return POKE_NAMES[id];
-  try{ const r=await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`); const d=await r.json(); const name=d.names.find(n=>n.language.name==='en')?.name||d.name; POKE_NAMES[id]=name; return name; }
-  catch{ return `#${id}`; }
-}
+// (POKE_NAMES + getPokeName defined above with home pokemon section)
 
 function dateSeedPoke(dateStr){
   let h=0; for(let i=0;i<dateStr.length;i++) h=Math.imul(31,h)+dateStr.charCodeAt(i)|0;
@@ -1565,6 +2120,7 @@ appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.',
 appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.','mobChatMsgs');
 
 // ── INIT ──
+renderHomePokemon();
 loadData();
 </script>
 </body>

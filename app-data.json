@@ -80,21 +80,21 @@
   "tasks": [
     {
       "text": "Fix Claude in MS",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-14"
     },
     {
       "text": "Fix color of text in calander",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-14"
     },
     {
       "text": "add budget to mission control",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-14"
     }
   ],
   "streakDays": [],
@@ -106,6 +106,10 @@
     }
   },
   "currentStreak": 0,
+  "budget": {
+    "monthlyLimit": 2000,
+    "transactions": []
+  },
   "theme": {
     "preset": "Green",
     "--accent": "#39ff14",

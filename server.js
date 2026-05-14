@@ -254,6 +254,8 @@ app.post('/api/data', (req, res) => {
     if (patch.tasks          !== undefined) data.tasks          = patch.tasks;
     if (patch.timelineChecks !== undefined) data.timelineChecks = patch.timelineChecks;
     if (patch.theme          !== undefined) data.theme          = patch.theme;
+    if (patch.taskStats      !== undefined) data.taskStats      = patch.taskStats;
+    if (patch.budget         !== undefined) data.budget         = patch.budget;
     recalcStreak(data);
     saveAppData(data);
     const date = req.body._date || today();
@@ -286,6 +288,20 @@ app.post('/api/chat', async (req, res) => {
     res.json({ response: responseText, tokens: resp.usage });
   } catch (err) {
     console.error('Claude API error:', err.message);
+    const isRateLimit = err.status === 429 || String(err.message).includes('rate_limit') || String(err.message).includes('429');
+    const isAuth      = err.status === 401 || String(err.message).includes('authentication');
+    if (isRateLimit) {
+      return res.status(429).json({
+        error: 'RATE_LIMIT',
+        message: 'Rate limit reached on the shared OAuth token. Go to ⚙ Settings → API Key and paste a key from console.anthropic.com for unlimited access.',
+      });
+    }
+    if (isAuth) {
+      return res.status(401).json({
+        error: 'AUTH_ERROR',
+        message: 'Authentication failed. Your API key may be expired. Set a new one in ⚙ Settings.',
+      });
+    }
     res.status(500).json({ error: err.message });
   }
 });
