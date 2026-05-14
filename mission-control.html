@@ -1958,23 +1958,21 @@ function budgetMonthTotals(monthKey){
 }
 
 function addTransaction(){
-  const amtEl=document.getElementById('budgetAmtInp')||document.getElementById('mobBudgetAmtInp');
-  const noteEl=document.getElementById('budgetNoteInp')||document.getElementById('mobBudgetNoteInp');
-  const catEl =document.getElementById('budgetCatSel')||document.getElementById('mobBudgetCatSel');
-  // Prefer the populated one
-  const amtElD=document.getElementById('budgetAmtInp');
-  const amtElM=document.getElementById('mobBudgetAmtInp');
-  const amt=parseFloat((amtElD?.value||amtElM?.value||'').trim());
+  const isMob = window.innerWidth <= 768;
+  const amtEl  = document.getElementById(isMob ? 'mobBudgetAmtInp'  : 'budgetAmtInp');
+  const noteEl = document.getElementById(isMob ? 'mobBudgetNoteInp' : 'budgetNoteInp');
+  const catEl  = document.getElementById(isMob ? 'mobBudgetCatSel'  : 'budgetCatSel');
+  const amt = parseFloat((amtEl?.value||'').trim());
   if(isNaN(amt)||amt<=0){showToast('Enter a valid amount');return;}
-  const note=(document.getElementById('budgetNoteInp')?.value||document.getElementById('mobBudgetNoteInp')?.value||'').trim();
-  const cat =(document.getElementById('budgetCatSel')?.value||document.getElementById('mobBudgetCatSel')?.value||'other');
-  const type=_budgetType;
+  const note = (noteEl?.value||'').trim();
+  const cat  = catEl?.value||'other';
+  const type = _budgetType;
   const txn={id:Date.now(),date:TODAY(),amount:amt,category:cat,note:note||BUDGET_CATS[cat]?.label||cat,type};
   if(!APP.budget) APP.budget={monthlyLimit:2000,transactions:[]};
   APP.budget.transactions.unshift(txn);
   patchData({budget:APP.budget});
-  [amtElD,amtElM].forEach(el=>{if(el)el.value='';});
-  [document.getElementById('budgetNoteInp'),document.getElementById('mobBudgetNoteInp')].forEach(el=>{if(el)el.value='';});
+  if(amtEl)  amtEl.value  = '';
+  if(noteEl) noteEl.value = '';
   renderBudget();
   showToast(type==='income'?'+GIL received':'-GIL spent');
 }
@@ -2044,17 +2042,17 @@ function buildBudgetHTML(monthKey){
     <div class="budget-bar-wrap"><div class="budget-bar${over?' over':''}" style="width:${pct}%;"></div></div>
     <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);margin-bottom:8px;text-align:right;">${pct}% of budget used</div>
     <div class="budget-txn-list">${txnRows}</div>
-    <div class="budget-add-row" style="margin-top:8px;">
-      <div class="budget-type-toggle">
-        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)">-EXP</button>
-        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)">+GIL</button>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;flex-shrink:0;">
+      <div class="budget-type-toggle" style="display:flex;gap:4px;">
+        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)" style="flex:1;text-align:center;">-EXP</button>
+        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)" style="flex:1;text-align:center;">+GIL</button>
       </div>
-      <input type="number" class="mini-inp budget-limit-inp" id="budgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:70px;">
-      <select class="budget-cat-sel" id="budgetCatSel">${catOptions}</select>
-      <input type="text" class="mini-inp" id="budgetNoteInp" placeholder="Note..." style="flex:1;min-width:60px;">
-      <button class="mini-btn" onclick="addTransaction()">+</button>
+      <input type="number" class="mini-inp budget-limit-inp" id="budgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:100%;box-sizing:border-box;">
+      <select class="budget-cat-sel" id="budgetCatSel" style="width:100%;box-sizing:border-box;">${catOptions}</select>
+      <input type="text" class="mini-inp" id="budgetNoteInp" placeholder="Note..." style="width:100%;box-sizing:border-box;">
+      <button class="mini-btn" onclick="addTransaction()" style="align-self:flex-end;padding:5px 14px;">ADD +</button>
     </div>
-    <div class="budget-limit-row" style="margin-top:8px;">
+    <div class="budget-limit-row" style="margin-top:10px;">
       <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);">MONTHLY LIMIT:</span>
       <input type="number" class="budget-limit-inp" id="budgetLimitInp" value="${limit}" min="1" style="width:80px;" onchange="setBudgetLimit(this.value)">
     </div>`;
