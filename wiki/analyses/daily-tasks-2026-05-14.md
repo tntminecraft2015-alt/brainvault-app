@@ -10,11 +10,11 @@ tags: [tasks, daily-log]
 | Rank | Task | Status |
 |------|------|--------|
 | S | Fix Claude in MS | ⬜ Pending | Permanent |
-| S | Fix color of text in calander | ⬜ Pending | Permanent |
-| S | add budget to mission control | ⬜ Pending | Permanent |
+| S | Fix color of text in calander | ✅ Done | Permanent |
+| S | add budget to mission control | ✅ Done | Permanent |
 | B | Laundry | ⬜ Pending | Daily |
-| B | Clean Room | ⬜ Pending | Daily |
+| B | Clean Room | ✅ Done | Daily |
 
-**Completion:** 0/5 (0%)
+**Completion:** 3/5 (60%)
 
-_Last synced: 5/14/2026, 11:05:06 PM_
+_Last synced: 5/14/2026, 11:13:32 PM_
