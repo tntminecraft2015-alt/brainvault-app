@@ -95,6 +95,18 @@
       "done": true,
       "rank": "S",
       "doneDate": "2026-05-14"
+    },
+    {
+      "text": "Laundry",
+      "done": false,
+      "rank": "B",
+      "doneDate": null
+    },
+    {
+      "text": "Clean Room",
+      "done": false,
+      "rank": "B",
+      "doneDate": null
     }
   ],
   "streakDays": [],
