@@ -9,10 +9,10 @@ tags: [tasks, daily-log]
 
 | Rank | Task | Status |
 |------|------|--------|
-| S | Fix Claude in MS | ⬜ Pending | Permanent |
+| S | Fix Claude in MS | ✅ Done | Permanent |
 | S | Fix color of text in calander | ⬜ Pending | Permanent |
 | S | add budget to mission control | ⬜ Pending | Permanent |
 
-**Completion:** 0/3 (0%)
+**Completion:** 1/3 (33%)
 
-_Last synced: 5/14/2026, 10:36:48 PM_
+_Last synced: 5/14/2026, 10:44:30 PM_
