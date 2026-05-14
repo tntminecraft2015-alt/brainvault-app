@@ -2127,39 +2127,39 @@ function buildBudgetGilHTML(){
     </div>`;
   }).join(''):`<div class="budget-empty">No transactions this ${mode==='weekly'?'week':'month'}.</div>`;
   return`
-    <div style="display:flex;gap:4px;margin-bottom:8px;flex-shrink:0;">
+    <div style="display:flex;gap:4px;margin-bottom:5px;flex-shrink:0;">
       <button class="budget-mode-btn${mode==='monthly'?' active':''}" onclick="switchBudgetMode('monthly')">MONTHLY</button>
       <button class="budget-mode-btn${mode==='weekly'?' active':''}" onclick="switchBudgetMode('weekly')">WEEKLY</button>
     </div>
-    <div class="budget-month" style="margin-bottom:2px;">${periodLabel()}</div>
-    <div class="save-label" style="margin-bottom:1px;">BALANCE</div>
-    <div class="budget-big-num" style="color:${balance>=0?'var(--green)':'var(--red)'};">${balance>=0?'+':'-'}$${Math.abs(balance).toFixed(0)}</div>
-    <div style="display:flex;gap:14px;margin:6px 0 8px;flex-shrink:0;">
+    <div class="budget-month" style="margin-bottom:1px;">${periodLabel()}</div>
+    <div class="save-label" style="margin-bottom:0;">BALANCE</div>
+    <div class="budget-big-num" style="font-size:36px;color:${balance>=0?'var(--green)':'var(--red)'};">${balance>=0?'+':'-'}$${Math.abs(balance).toFixed(0)}</div>
+    <div style="display:flex;gap:10px;margin:3px 0 5px;flex-shrink:0;">
       <div class="budget-summary-box">
         <span class="budget-sum-label">${mode==='weekly'?'WEEK':'MONTH'} SPENT</span>
-        <span class="budget-sum-val expense">-$${expense.toFixed(2)}</span>
+        <span class="budget-sum-val expense" style="font-size:16px;">-$${expense.toFixed(2)}</span>
       </div>
       <div class="budget-summary-box">
         <span class="budget-sum-label">REMAINING</span>
-        <span class="budget-sum-val ${remaining>=0?'income':'expense'}">${remaining>=0?'+':'-'}$${Math.abs(remaining).toFixed(2)}</span>
+        <span class="budget-sum-val ${remaining>=0?'income':'expense'}" style="font-size:16px;">${remaining>=0?'+':'-'}$${Math.abs(remaining).toFixed(2)}</span>
       </div>
     </div>
-    <div class="budget-bar-wrap"><div class="budget-bar${over?' over':''}" style="width:${pct}%;"></div></div>
-    <div style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);margin-bottom:8px;text-align:right;">${pct}% of ${mode} budget</div>
+    <div class="budget-bar-wrap" style="margin:3px 0 2px;"><div class="budget-bar${over?' over':''}" style="width:${pct}%;"></div></div>
+    <div style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--fg-dim);margin-bottom:5px;text-align:right;">${pct}% of ${mode} budget</div>
     <div class="budget-txn-list">${txnRows}</div>
-    <div style="display:flex;flex-direction:column;gap:5px;margin-top:10px;flex-shrink:0;">
-      <div class="budget-type-toggle" style="display:flex;gap:4px;">
-        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)" style="flex:1;text-align:center;">-EXP</button>
-        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)" style="flex:1;text-align:center;">+GIL</button>
+    <div style="display:flex;flex-direction:column;gap:3px;margin-top:7px;flex-shrink:0;">
+      <div class="budget-type-toggle" style="display:flex;gap:3px;">
+        <button class="budget-type-btn expense active" data-type="expense" onclick="setTxnType('expense',this)" style="flex:1;text-align:center;padding:3px 0;">-EXP</button>
+        <button class="budget-type-btn income" data-type="income" onclick="setTxnType('income',this)" style="flex:1;text-align:center;padding:3px 0;">+GIL</button>
       </div>
-      <input type="number" class="mini-inp budget-limit-inp" id="budgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:100%;box-sizing:border-box;">
-      <select class="budget-cat-sel" id="budgetCatSel" style="width:100%;box-sizing:border-box;">${catOptions}</select>
-      <input type="text" class="mini-inp" id="budgetNoteInp" placeholder="Note..." style="width:100%;box-sizing:border-box;">
-      <button class="mini-btn" onclick="addTransaction()" style="align-self:flex-end;padding:5px 14px;">ADD +</button>
+      <input type="number" class="mini-inp budget-limit-inp" id="budgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:100%;box-sizing:border-box;padding:2px 4px;">
+      <select class="budget-cat-sel" id="budgetCatSel" style="width:100%;box-sizing:border-box;padding:2px 4px;">${catOptions}</select>
+      <input type="text" class="mini-inp" id="budgetNoteInp" placeholder="Note..." style="width:100%;box-sizing:border-box;padding:2px 4px;">
+      <button class="mini-btn" onclick="addTransaction()" style="align-self:flex-end;padding:3px 10px;">ADD +</button>
     </div>
-    <div class="budget-limit-row" style="margin-top:10px;">
-      <span style="font-family:'Press Start 2P',monospace;font-size:5px;color:var(--fg-dim);">${mode==='weekly'?'WEEKLY':'MONTHLY'} LIMIT:</span>
-      <input type="number" class="budget-limit-inp" id="budgetLimitInp" value="${limit}" min="1" style="width:80px;" onchange="setBudgetLimit(this.value)">
+    <div class="budget-limit-row" style="margin-top:6px;margin-bottom:0;">
+      <span style="font-family:'Press Start 2P',monospace;font-size:4px;color:var(--fg-dim);">${mode==='weekly'?'WEEKLY':'MONTHLY'} LIMIT:</span>
+      <input type="number" class="budget-limit-inp" id="budgetLimitInp" value="${limit}" min="1" style="width:70px;padding:2px 4px;" onchange="setBudgetLimit(this.value)">
     </div>`;
 }
 
@@ -2198,7 +2198,7 @@ function buildSavingsHTML(){
 function buildBudgetHTML(){
   const tab=_budgetTab;
   return`
-    <div class="budget-tabs">
+    <div class="budget-tabs" style="margin-bottom:5px;">
       <button class="budget-tab${tab==='gil'?' active':''}" onclick="switchBudgetTab('gil')">💰 GIL</button>
       <button class="budget-tab${tab==='save'?' active':''}" onclick="switchBudgetTab('save')">🎯 SAVE</button>
     </div>
