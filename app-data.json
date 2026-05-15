@@ -183,6 +183,14 @@
     "monthlyLimit": 50,
     "transactions": [
       {
+        "id": 1778805221466,
+        "date": "2026-05-15",
+        "amount": 30,
+        "category": "fun",
+        "note": "Subnautica 2",
+        "type": "expense"
+      },
+      {
         "id": 1778800743218,
         "date": "2026-05-14",
         "amount": 7.79,
