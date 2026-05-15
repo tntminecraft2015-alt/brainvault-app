@@ -118,9 +118,9 @@
     },
     {
       "text": "Pack",
-      "done": true,
+      "done": false,
       "rank": "S",
-      "doneDate": "2026-05-15"
+      "doneDate": null
     }
   ],
   "streakDays": [],
@@ -137,7 +137,7 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 215,
+  "questXp": 165,
   "taskStats": {
     "Clean Room": {
       "count": 1,
