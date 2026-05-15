@@ -112,9 +112,15 @@
     },
     {
       "text": "Clean Room",
-      "done": true,
+      "done": false,
       "rank": "B",
-      "doneDate": "2026-05-14"
+      "doneDate": null
+    },
+    {
+      "text": "Pack",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
     }
   ],
   "streakDays": [],
@@ -148,6 +154,10 @@
     "Fix Claude in MS": {
       "count": 1,
       "lastDone": "2026-05-14"
+    },
+    "Pack": {
+      "count": 1,
+      "lastDone": "2026-05-15"
     }
   },
   "budget": {
@@ -202,6 +212,11 @@
       "firstCaught": "2026-05-14",
       "shiny": false
     },
+    "175": {
+      "count": 1,
+      "firstCaught": "2026-05-15",
+      "shiny": false
+    },
     "238": {
       "count": 1,
       "firstCaught": "2026-05-14",
@@ -210,6 +225,16 @@
     "242": {
       "count": 1,
       "firstCaught": "2026-05-14",
+      "shiny": false
+    },
+    "282": {
+      "count": 1,
+      "firstCaught": "2026-05-15",
+      "shiny": true
+    },
+    "495": {
+      "count": 1,
+      "firstCaught": "2026-05-15",
       "shiny": false
     }
   }

@@ -39,6 +39,8 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[chat-2026-05-15]] — Claude conversation log for 2026-05-15
+- [[chat-2026-05-14]] — Claude conversation log for 2026-05-14
 - [[2026-05-14-cloud-deployment-setup]] — Full record of cloud deployment: shortcut fix, GitHub repos, Render setup, sync workflow
 - [[daily-tasks-2026-05-14]] — Quest log for 2026-05-14
 - [[mission-schedule]] — Daily mission timeline from Mission Control
