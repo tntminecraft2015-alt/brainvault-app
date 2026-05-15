@@ -112,9 +112,9 @@
     },
     {
       "text": "Clean Room",
-      "done": true,
+      "done": false,
       "rank": "B",
-      "doneDate": "2026-05-14"
+      "doneDate": null
     }
   ],
   "streakDays": [],
