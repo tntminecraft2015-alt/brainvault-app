@@ -118,9 +118,9 @@
     },
     {
       "text": "Pack",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-15"
     },
     {
       "text": "figure out how to do speech to speech on phone",
@@ -155,7 +155,7 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 165,
+  "questXp": 215,
   "taskStats": {
     "Clean Room": {
       "count": 1,
@@ -174,7 +174,7 @@
       "lastDone": "2026-05-14"
     },
     "Pack": {
-      "count": 1,
+      "count": 2,
       "lastDone": "2026-05-15"
     }
   },
