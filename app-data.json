@@ -129,7 +129,9 @@
       "doneDate": null
     }
   ],
-  "streakDays": [],
+  "streakDays": [
+    "2026-05-15"
+  ],
   "timelineChecks": {
     "2026-05-14": {
       "0": true,
@@ -149,10 +151,11 @@
       "4": true,
       "5": false,
       "6": true,
-      "7": true
+      "7": true,
+      "8": true
     }
   },
-  "currentStreak": 0,
+  "currentStreak": 1,
   "questXp": 165,
   "taskStats": {
     "Clean Room": {
