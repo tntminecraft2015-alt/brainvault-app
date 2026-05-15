@@ -162,7 +162,7 @@ function saveAppData(data) {
   }
 }
 
-function recalcStreak(data) {
+function recalcStreak(data, clientDate) {
   const checks   = data.timelineChecks || {};
   const schedLen = (data.schedule || []).length;
   const days     = new Set();
@@ -171,7 +171,7 @@ function recalcStreak(data) {
     if (schedLen > 0 && checked / schedLen >= 0.75) days.add(date);
   }
   data.streakDays = [...days].sort();
-  let streak = 0, cur = today();
+  let streak = 0, cur = clientDate || today();
   while (days.has(cur)) {
     streak++;
     const dt = new Date(cur + 'T00:00:00Z');
@@ -259,9 +259,9 @@ app.post('/api/data', (req, res) => {
     if (patch.questXp        !== undefined) data.questXp        = patch.questXp;
     if (patch.caughtPoke     !== undefined) data.caughtPoke     = patch.caughtPoke;
     if (patch.savings        !== undefined) data.savings        = patch.savings;
-    recalcStreak(data);
-    saveAppData(data);
     const date = req.body._date || today();
+    recalcStreak(data, date);
+    saveAppData(data);
     if (patch.tasks && Array.isArray(patch.tasks)) syncTasks(patch.tasks, date);
     if (patch.events   !== undefined) syncEvents(data.events);
     if (patch.schedule !== undefined) syncSchedule(data.schedule);

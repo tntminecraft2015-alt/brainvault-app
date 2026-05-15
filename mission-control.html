@@ -1306,7 +1306,7 @@ let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, 
 
 // ── UTILS ──
 const pad     = n => String(n).padStart(2,'0');
-const dateKey = d => d.toISOString().split('T')[0];
+const dateKey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const esc     = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const parseHM = s => { const [h,m]=s.split(':').map(Number); return h*60+m; };
 const nowMins = () => { const n=new Date(); return n.getHours()*60+n.getMinutes(); };
@@ -2562,6 +2562,18 @@ appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.',
 // ── INIT ──
 renderHomePokemon();
 loadData();
+
+// Auto-refresh timeline when local date changes (midnight reset)
+let _tlDate = TODAY();
+setInterval(() => {
+  const now = TODAY();
+  if (now !== _tlDate) {
+    _tlDate = now;
+    renderTimeline();
+    renderMobTimeline();
+    updateTimelineProgress(now);
+  }
+}, 30000);
 </script>
 </body>
 </html>
