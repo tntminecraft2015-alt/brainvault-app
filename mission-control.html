@@ -1888,7 +1888,7 @@ function saveEditEvent(){
 
 // ══════════════════════════════════════════════════════════════
 // TASKS  (flat array, persist until deleted)
-// S = permanent done; B = resets each day
+// S = removed from log the day after completion; B = resets each day
 // ══════════════════════════════════════════════════════════════
 function migrateTasks(){
   // Convert old per-day object format to flat array
@@ -1903,8 +1903,12 @@ function migrateTasks(){
 function getTasks(){
   migrateTasks();
   const today=TODAY();
-  // Reset B-tier done if doneDate isn't today
   let changed=false;
+  // Remove S-tier quests completed on a previous day
+  const before=(APP.tasks||[]).length;
+  APP.tasks=(APP.tasks||[]).filter(t=>!(t.rank==='S' && t.done && t.doneDate && t.doneDate!==today));
+  if(APP.tasks.length!==before) changed=true;
+  // Reset B-tier done if doneDate isn't today
   (APP.tasks||[]).forEach(t=>{
     if(t.rank==='B' && t.done && t.doneDate!==today){ t.done=false; t.doneDate=null; changed=true; }
   });
