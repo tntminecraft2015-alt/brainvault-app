@@ -121,6 +121,12 @@
       "done": false,
       "rank": "S",
       "doneDate": null
+    },
+    {
+      "text": "figure out how to do speech to speech on phone",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
     }
   ],
   "streakDays": [],
@@ -134,6 +140,10 @@
       "7": true,
       "8": true,
       "9": false
+    },
+    "2026-05-15": {
+      "0": false,
+      "1": false
     }
   },
   "currentStreak": 0,
@@ -208,7 +218,7 @@
       "shiny": false
     },
     "133": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-05-14",
       "shiny": false
     },
