@@ -115,6 +115,12 @@
       "done": false,
       "rank": "B",
       "doneDate": null
+    },
+    {
+      "text": "Pack",
+      "done": false,
+      "rank": "S",
+      "doneDate": null
     }
   ],
   "streakDays": [],
