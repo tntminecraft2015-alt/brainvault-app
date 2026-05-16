@@ -130,9 +130,9 @@
     },
     {
       "text": "Ask cam about investment guy",
-      "done": false,
+      "done": true,
       "rank": "S",
-      "doneDate": null
+      "doneDate": "2026-05-16"
     }
   ],
   "streakDays": [],
@@ -161,7 +161,7 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 215,
+  "questXp": 265,
   "taskStats": {
     "Clean Room": {
       "count": 1,
@@ -182,6 +182,10 @@
     "Pack": {
       "count": 2,
       "lastDone": "2026-05-15"
+    },
+    "Ask cam about investment guy": {
+      "count": 1,
+      "lastDone": "2026-05-16"
     }
   },
   "budget": {
