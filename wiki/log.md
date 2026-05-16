@@ -385,3 +385,10 @@ Tasks synced for 2026-05-14: 4/5 complete
 **Pages created:** [[chat-2026-05-14]]
 
 Chat session on 2026-05-14
+
+## [2026-05-16] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[calendar-events]]
+
+Calendar events synced
