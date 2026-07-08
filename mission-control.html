@@ -356,13 +356,18 @@
         font-family:'Press Start 2P',monospace; font-size:7px;
         opacity:.55; text-align:center; margin-bottom:18px; flex-shrink:0;
       }
-      .mob-home-card {
-        background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
-        padding:14px 16px; margin-bottom:10px; flex-shrink:0;
-        border-left:3px solid var(--accent); border-radius:1px;
-        transition:box-shadow .15s;
+      .mob-home-card, .mc-card {
+        background:var(--surface);
+        box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(168,230,255,.14);
+        padding:14px 16px; margin-bottom:12px; flex-shrink:0;
+        border-radius:2px;
+        transition:box-shadow .15s, transform .1s;
       }
-      .mob-home-card:active { box-shadow:inset 0 0 0 1px rgba(168,230,255,.28); }
+      .mob-home-card:active, .mc-card:active { transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(168,230,255,.14); }
+      .mob-bento { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+      .mob-bento > * { min-width:0; }
+      .mob-bento .mob-home-card, .mob-bento .mc-card { margin-bottom:0; }
+      .mob-bento .span-2 { grid-column:span 2; }
       .mob-home-card-label {
         font-family:'Press Start 2P',monospace; font-size:6px;
         opacity:.5; margin-bottom:8px; letter-spacing:1px;
@@ -407,8 +412,8 @@
 
       /* ── Timeline tab ── */
       .mob-tl-list { flex:1; overflow-y:auto; min-height:0; }
-      .mob-tl-row  { display:flex; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(168,230,255,.07); }
-      .mob-tl-row:last-child { border-bottom:none; }
+      .mob-tl-row  { display:flex; gap:8px; align-items:center; padding:10px 8px; margin-bottom:3px; background:rgba(168,230,255,.035); border-radius:2px; }
+      .mob-tl-row:last-child { margin-bottom:0; }
       .mob-tl-bar  { width:3px; align-self:stretch; flex-shrink:0; background:var(--fg-faint); }
       .mob-tl-bar.next { background:var(--accent); box-shadow:0 0 5px var(--accent); }
       .mob-tl-chk  { width:40px; height:40px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
@@ -428,8 +433,8 @@
 
       /* ── Tasks tab ── */
       .mob-task-list { flex:1; overflow-y:auto; min-height:0; position:relative; }
-      .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(168,230,255,.07); }
-      .mob-task-row:last-child { border-bottom:none; }
+      .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 8px; margin-bottom:3px; background:rgba(168,230,255,.035); border-radius:2px; }
+      .mob-task-row:last-child { margin-bottom:0; }
       .mob-task-row.done { opacity:.4; }
       .mob-pix-check { width:40px; height:40px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
       .mob-pix-check:active { transform:scale(1.15); }
@@ -444,17 +449,27 @@
 
       /* Shared add-row */
       .mob-add-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
-      .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; outline:none; }
+      .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; min-height:44px; outline:none; }
       .mob-inp::placeholder { color:rgba(168,230,255,.25); }
-      .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; appearance:none; text-align:center; }
-      .mob-add-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:11px; padding:0 16px; cursor:pointer; flex-shrink:0; }
+      .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; min-height:44px; appearance:none; text-align:center; }
+      .mob-add-btn  {
+        background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
+        font-family:'Press Start 2P',monospace; font-size:11px; padding:0 18px; min-height:44px; min-width:44px;
+        cursor:pointer; flex-shrink:0; transition:box-shadow .15s, transform .1s;
+      }
+      .mob-add-btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 rgba(0,0,0,.4); }
 
       /* ── Claude tab ── */
       .mob-chat-msgs { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; -webkit-overflow-scrolling:touch; min-height:0; }
       .mob-chat-inp-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
       .mob-chat-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; outline:none; resize:none; min-height:50px; }
       .mob-chat-inp::placeholder { color:rgba(168,230,255,.25); }
-      .mob-send-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(168,230,255,.2); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:9px; padding:0 16px; cursor:pointer; flex-shrink:0; }
+      .mob-send-btn  {
+        background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
+        font-family:'Press Start 2P',monospace; font-size:9px; padding:0 18px; min-width:44px;
+        cursor:pointer; flex-shrink:0; transition:box-shadow .15s, transform .1s;
+      }
+      .mob-send-btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 rgba(0,0,0,.4); }
       .mob-send-btn:disabled { opacity:.4; }
 
       /* ── Bottom nav (5 tabs) ── */
@@ -540,7 +555,8 @@
       border-top:1px dashed rgba(168,230,255,.2);
     }
     .mob-day-event-row {
-      display:flex; align-items:center; gap:10px; padding:3px 0;
+      display:flex; align-items:center; gap:10px; padding:8px 8px;
+      background:rgba(168,230,255,.035); border-radius:2px; margin-bottom:3px;
     }
     .mob-day-event-dot { width:8px; height:8px; flex-shrink:0; }
     .mob-day-event-time {
@@ -559,18 +575,20 @@
     ══════════════════════════════════════ */
     .mob-cal-toggle {
       display:flex; align-items:center; justify-content:space-between; width:100%;
-      background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
-      border:none; border-left:3px solid var(--accent); border-radius:1px;
+      background:var(--surface); box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(168,230,255,.14);
+      border:none; border-radius:2px;
       color:var(--fg); font-family:'Press Start 2P',monospace; font-size:8px;
-      padding:13px 14px; margin-bottom:8px; cursor:pointer; min-height:44px; flex-shrink:0;
+      padding:13px 14px; margin-bottom:10px; cursor:pointer; min-height:44px; flex-shrink:0;
+      transition:box-shadow .15s, transform .1s;
     }
+    .mob-cal-toggle:active { transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(168,230,255,.14); }
     .mob-cal-toggle-arrow { opacity:.6; transition:transform .2s; }
     .mob-cal-toggle.open .mob-cal-toggle-arrow { transform:rotate(180deg); }
     .mob-cal-grid-wrap { overflow:hidden; max-height:0; transition:max-height .25s ease; flex-shrink:0; }
-    .mob-cal-grid-wrap.open { max-height:420px; margin-bottom:10px; }
+    .mob-cal-grid-wrap.open { max-height:420px; margin-bottom:12px; }
     .mob-cal-card {
-      background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
-      padding:12px; border-left:3px solid var(--accent); border-radius:1px;
+      background:var(--surface); box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(168,230,255,.14);
+      padding:12px; border-radius:2px;
     }
     .mob-tl-section-hd {
       font-family:'Press Start 2P',monospace; font-size:7px; opacity:.65;
@@ -927,22 +945,24 @@
       <div class="mob-home-clock" id="mobClock">00:00</div>
       <div class="mob-home-date" id="mobDate">—</div>
 
-      <div class="mob-home-card">
-        <div class="mob-home-card-label">STREAK</div>
-        <div class="mob-home-streak-num" id="mobStreakVal">0 <span style="font-size:18px;opacity:.7;">DAYS</span></div>
-        <div class="mob-home-lv" id="mobStreakLv">LV.1</div>
-        <div class="pixel-bar" style="height:6px;"><div class="pixel-bar-fill" id="mobXpBar" style="width:0%;"></div></div>
-      </div>
+      <div class="mob-bento">
+        <div class="mob-home-card">
+          <div class="mob-home-card-label">STREAK</div>
+          <div class="mob-home-streak-num" id="mobStreakVal">0 <span style="font-size:18px;opacity:.7;">DAYS</span></div>
+          <div class="mob-home-lv" id="mobStreakLv">LV.1</div>
+          <div class="pixel-bar" style="height:6px;"><div class="pixel-bar-fill" id="mobXpBar" style="width:0%;"></div></div>
+        </div>
 
-      <div class="mob-home-card">
-        <div class="mob-home-card-label">NEXT MISSION</div>
-        <div class="mob-home-next-time" id="mobHomeNextTime">—</div>
-        <div class="mob-home-next-title" id="mobHomeNextTitle">—</div>
-      </div>
+        <div class="mob-home-card">
+          <div class="mob-home-card-label">NEXT MISSION</div>
+          <div class="mob-home-next-time" id="mobHomeNextTime">—</div>
+          <div class="mob-home-next-title" id="mobHomeNextTitle">—</div>
+        </div>
 
-      <div class="mob-home-card">
-        <div class="mob-home-card-label">QUEST STATS</div>
-        <div id="mobStatsSection"><div class="empty" style="font-size:14px;">Complete quests to earn stats</div></div>
+        <div class="mob-home-card span-2">
+          <div class="mob-home-card-label">QUEST STATS</div>
+          <div id="mobStatsSection"><div class="empty" style="font-size:14px;">Complete quests to earn stats</div></div>
+        </div>
       </div>
     </div>
 
@@ -999,7 +1019,9 @@
         <span>✅ QUESTS</span>
         <span id="mobTaskCount" style="font-family:'Press Start 2P',monospace;font-size:7px;opacity:.5;">0/0</span>
       </div>
-      <div class="mob-task-list" id="mobTaskList"></div>
+      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 10px;">
+        <div class="mob-task-list" id="mobTaskList"></div>
+      </div>
       <div class="mob-add-row">
         <select id="mobRankSel" class="mob-rank-sel"><option value="S">S</option><option value="B" selected>B</option></select>
         <input type="text" class="mob-inp" id="mobTaskInp" placeholder="New quest...">
@@ -1012,7 +1034,9 @@
       <div class="mob-tab-hd">
         <span>💰 GIL TRACKER</span>
       </div>
-      <div id="mobBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;"></div>
+      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
+        <div id="mobBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;"></div>
+      </div>
     </div>
 
     <!-- CLAUDE tab (merged: ED chat + Wiki drawer) -->
@@ -1025,11 +1049,13 @@
           <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;">⚙</button>
         </div>
       </div>
-      <div class="mob-chat-msgs" id="mobChatMsgs"></div>
-      <div class="mob-chat-inp-row">
-        <textarea class="mob-chat-inp" id="mobChatInp" placeholder="Ask Claude..." rows="2"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
-        <button class="mob-send-btn" id="mobSendBtn" onclick="sendMobChat()">▶</button>
+      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
+        <div class="mob-chat-msgs" id="mobChatMsgs"></div>
+        <div class="mob-chat-inp-row">
+          <textarea class="mob-chat-inp" id="mobChatInp" placeholder="Ask Claude..." rows="2"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
+          <button class="mob-send-btn" id="mobSendBtn" onclick="sendMobChat()">▶</button>
+        </div>
       </div>
 
       <div class="mob-wiki-drawer" id="mobWikiDrawer">
