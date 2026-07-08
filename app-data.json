@@ -194,13 +194,13 @@
     "mode": "weekly"
   },
   "theme": {
-    "preset": "Green",
-    "--accent": "#7ec87a",
-    "--bg": "#0d1a10",
-    "--surface": "#172b1c",
-    "--fg": "#b8d4b0",
-    "--green": "#9dc89a",
-    "--bezel": "#111f15"
+    "preset": "Cyan",
+    "--accent": "#ff8a63",
+    "--bg": "#0a1929",
+    "--surface": "#12253c",
+    "--fg": "#dfeeff",
+    "--green": "#7fffb0",
+    "--bezel": "#1a2533"
   },
   "savings": {
     "name": "Apartment Downpayment",
