@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chrono-node@2/dist/chrono.min.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 
@@ -512,6 +513,9 @@
       .mob-pix-x     { width:15px; height:15px; }
       .mob-rank-badge { font-size:9px; width:24px; padding:4px 2px; }
       .day-chip       { font-size:10px; padding:2px 6px; }
+      .pdx-add-form .m-inp, .pdx-add-form .m-sel { font-size:18px; padding:11px 12px; }
+      .pdx-add-form { gap:8px; }
+      .pdx-footer .modal-btn { padding:12px 8px; font-size:12px; }
     }
 
     /* ══════════════════════════════════════
@@ -982,6 +986,22 @@
       </div>
     </div>
 
+    <!-- WIKI tab -->
+    <div class="mob-tab-pane" id="mobTabWiki">
+      <div class="mob-tab-hd">
+        <span>📚 WIKI</span>
+        <span id="wikiBackBtn" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;opacity:.7;" onclick="showWikiList()">◀ BACK</span>
+      </div>
+      <div id="wikiListView">
+        <input type="text" class="mob-inp" id="wikiSearchInp" placeholder="Search wiki..." oninput="renderWikiList()" style="margin-bottom:8px;width:100%;">
+        <div id="wikiList" style="overflow-y:auto;flex:1;min-height:0;"></div>
+      </div>
+      <div id="wikiPageView" style="display:none;overflow-y:auto;flex:1;min-height:0;">
+        <div id="wikiPageTitle" style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
+        <div id="wikiPageBody" style="font-family:'VT323',monospace;font-size:17px;line-height:1.5;color:var(--fg);"></div>
+      </div>
+    </div>
+
   </div><!-- /mob-tab-content -->
 
   <!-- Bottom Pokémon strip (reverse) -->
@@ -1008,6 +1028,9 @@
     </button>
     <button class="mob-nav-btn" onclick="switchMobTab('claude',this)">
       <span class="nav-icon">🧠</span><span>AI</span>
+    </button>
+    <button class="mob-nav-btn" onclick="switchMobTab('wiki',this)">
+      <span class="nav-icon">📚</span><span>WIKI</span>
     </button>
   </nav>
 
@@ -1102,6 +1125,7 @@
         </div>
         <div class="pdx-add-form">
           <div class="pdx-section-hd">NEW ENCOUNTER</div>
+          <input id="devQuick" class="m-inp" type="text" placeholder="Quick add: 'lunch tomorrow 1pm'..." onkeydown="if(event.key==='Enter'){event.preventDefault();parseQuickAdd();}" style="border-color:var(--accent);">
           <input id="devTitle" class="m-inp" type="text" placeholder="Event name...">
           <div class="m-2col">
             <input id="devTime" class="m-inp" type="time">
@@ -1216,6 +1240,11 @@
         </div>
       </div>
       <div id="settingsKeyStatus" style="font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-top:4px;"></div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(168,230,255,.1);">
+      <div class="m-label" style="margin-bottom:6px;">EVENT NOTIFICATIONS</div>
+      <button class="modal-btn sm ok" id="pushToggleBtn" onclick="togglePushSubscription()" style="width:100%;">🔔 ENABLE NOTIFICATIONS</button>
+      <div id="pushStatus" style="font-family:'VT323',monospace;font-size:15px;opacity:.6;margin-top:6px;line-height:1.4;"></div>
     </div>
     <div class="modal-btns" style="margin-top:14px;">
       <button class="modal-btn ok" onclick="saveTheme()">APPLY THEME</button>
@@ -1641,6 +1670,63 @@ async function checkServer(){
 }
 checkServer(); setInterval(checkServer,15000);
 
+// ── PUSH NOTIFICATIONS ──
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(base64); const arr=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++) arr[i]=raw.charCodeAt(i);
+  return arr;
+}
+
+let swReg=null;
+async function initPush(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try { swReg = await navigator.serviceWorker.register('/sw.js'); }
+  catch(e){ console.error('SW registration failed:',e); return; }
+  refreshPushStatus();
+}
+
+async function refreshPushStatus(){
+  const el=document.getElementById('pushStatus'); const btn=document.getElementById('pushToggleBtn');
+  if(!el||!btn) return;
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)){
+    el.textContent='Push not supported in this browser. On iPhone: add this app to your Home Screen (Share → Add to Home Screen) and open it from there — push only works in the installed app, not a Safari tab.';
+    btn.disabled=true; btn.style.opacity='.4';
+    return;
+  }
+  const sub = swReg ? await swReg.pushManager.getSubscription() : null;
+  if(sub){
+    btn.textContent='🔕 DISABLE NOTIFICATIONS'; el.textContent='Notifications are ON — you\'ll get a push ~30 min before calendar events.';
+  } else {
+    btn.textContent='🔔 ENABLE NOTIFICATIONS'; el.textContent='Off. Tap to get reminders before calendar events.';
+  }
+}
+
+async function togglePushSubscription(){
+  if(!swReg){ showToast('Notifications unavailable on this browser'); return; }
+  const existing = await swReg.pushManager.getSubscription();
+  if(existing){
+    await fetch(`${SERVER}/api/push/unsubscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({endpoint:existing.endpoint})});
+    await existing.unsubscribe();
+    refreshPushStatus();
+    showToast('Notifications disabled');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if(perm!=='granted'){ showToast('Notification permission denied'); return; }
+  try {
+    const r=await fetch(`${SERVER}/api/push/vapid-public-key`);
+    const {key,enabled}=await r.json();
+    if(!enabled || !key){ showToast('Push not configured on server yet'); return; }
+    const sub=await swReg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlBase64ToUint8Array(key) });
+    await fetch(`${SERVER}/api/push/subscribe`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    refreshPushStatus();
+    showToast('Notifications enabled ◆');
+  } catch(e){ console.error(e); showToast('Failed to enable notifications'); }
+}
+initPush();
+
 // ══════════════════════════════════════════════════════════════
 // CALENDAR
 // ══════════════════════════════════════════════════════════════
@@ -1735,9 +1821,9 @@ function renderRegionGrid(){
     return `<div class="reg-cell${isT?' today':''}${other?' other':''}" onclick="openRegionDay('${key}',${dt.getTime()})"><div class="reg-num">${dt.getDate()}</div>${chips}${evs.length>2?`<div style="font-family:'Press Start 2P',monospace;font-size:5px;color:rgba(168,230,255,.4);">+${evs.length-2}</div>`:''}</div>`;
   }).join('');
 }
-function openRegionDay(key,ts){ const d=new Date(ts); dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); closeModal('regionModal'); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+function openRegionDay(key,ts){ const d=new Date(ts); dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); closeModal('regionModal'); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 
-function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 function renderDevList(key){
   const evs=(APP.events||{})[key]||[];
   const el=document.getElementById('devList'); if(!el)return;
@@ -1755,7 +1841,41 @@ function renderDevList(key){
     </div>`;
   }).join('');
 }
-function addDayEvent(){ const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;} if(!APP.events[dayModalDate])APP.events[dayModalDate]=[]; APP.events[dayModalDate].push({title,time:document.getElementById('devTime').value,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value}); patchData({events:APP.events}); renderDevList(dayModalDate); renderMonthGrid(); renderMobMonthGrid(); if(document.getElementById('regionModal').classList.contains('active'))renderRegionGrid(); ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); showToast('Event added ◆'); }
+function guessEventKind(text){
+  const t=text.toLowerCase();
+  if(/\b(meeting|call|sync|standup|1:1|zoom|interview)\b/.test(t)) return 'meeting';
+  if(/\b(gym|workout|run|training|lift|practice|game)\b/.test(t)) return 'training';
+  if(/\b(lunch|dinner|coffee|drinks|party|hangout|date|brunch)\b/.test(t)) return 'social';
+  if(/\b(study|work|focus|write|read|deep work|homework)\b/.test(t)) return 'focus';
+  if(/\b(errand|pickup|pick up|grocery|shopping|appointment|dentist|doctor|bank)\b/.test(t)) return 'errand';
+  return 'focus';
+}
+function parseQuickAdd(){
+  const inp=document.getElementById('devQuick');
+  const text=inp.value.trim();
+  if(!text) return;
+  if(typeof chrono==='undefined'){ showToast('Quick-add still loading — try again in a sec'); return; }
+  const results=chrono.parse(text, new Date());
+  if(!results.length){ showToast('No date/time found — fill fields manually'); return; }
+  const r=results[0];
+  const dt=r.start.date();
+  const hasTime=r.start.isCertain('hour');
+  let title=(text.slice(0,r.index)+text.slice(r.index+r.text.length)).replace(/\s+/g,' ').trim();
+  title=title.replace(/^(on|at|for|the)\s+/i,'').replace(/\s+(on|at|for|the)$/i,'').trim();
+  document.getElementById('devTitle').value=title||text;
+  if(hasTime) document.getElementById('devTime').value=`${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  document.getElementById('devKind').value=guessEventKind(text);
+  const parsedKey=dateKey(dt);
+  if(parsedKey!==dayModalDate){
+    dayModalDate=parsedKey;
+    document.getElementById('dayModalTitle').textContent=`${MONTHS_S[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+    renderDevList(dayModalDate);
+    showToast(`Targeting ${MONTHS_S[dt.getMonth()]} ${dt.getDate()} ◆`);
+  }
+  inp.value='';
+  document.getElementById('devTitle').focus();
+}
+function addDayEvent(){ const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;} if(!APP.events[dayModalDate])APP.events[dayModalDate]=[]; APP.events[dayModalDate].push({title,time:document.getElementById('devTime').value,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value}); patchData({events:APP.events}); renderDevList(dayModalDate); renderMonthGrid(); renderMobMonthGrid(); if(document.getElementById('regionModal').classList.contains('active'))renderRegionGrid(); ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); showToast('Event added ◆'); }
 function deleteDayEv(key,idx){ if(APP.events[key]){APP.events[key].splice(idx,1);if(!APP.events[key].length)delete APP.events[key];} patchData({events:APP.events}); renderDevList(key); renderMonthGrid(); renderMobMonthGrid(); }
 
 // ══════════════════════════════════════════════════════════════
@@ -2358,7 +2478,7 @@ function switchTab(tab){
 }
 
 function switchMobTab(tab, btn){
-  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude'};
+  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude',wiki:'mobTabWiki'};
   document.querySelectorAll('.mob-tab-pane').forEach(p=>p.classList.remove('active'));
   const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
@@ -2367,6 +2487,7 @@ function switchMobTab(tab, btn){
   if(tab==='timeline'){ renderMobTimeline(); }
   if(tab==='tasks')   { renderMobTasks(); }
   if(tab==='cal')     { renderMobMonthGrid(); }
+  if(tab==='wiki')    { showWikiList(); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2399,13 +2520,74 @@ async function sendChatCommon(msg, scrollId, btnId){
   try {
     const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
     const d=await r.json(); hideTyping(scrollId);
-    if(d.error==='NO_KEY'){ appendChatMsg('sys','No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
-    else if(d.error==='RATE_LIMIT'){ appendChatMsg('sys','⚠ Rate limited — paste your Anthropic API key in Settings → API Key for unlimited access.',scrollId); openModal('settingsModal'); }
-    else if(d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ Authentication failed — API key may be expired. Open ⚙ Settings → API Key to update it.',scrollId); openModal('settingsModal'); }
-    else if(d.error){ appendChatMsg('sys','Error: '+d.error,scrollId); }
+    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
+    else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,scrollId); openModal('settingsModal'); }
+    else if(d.error){ appendChatMsg('sys','⚠ '+(d.message||('Error: '+d.error)),scrollId); }
     else { appendChatMsg('claude',d.response,scrollId); chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response}); if(chatHistory.length>20)chatHistory=chatHistory.slice(-20); }
   } catch(e){ hideTyping(scrollId); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),scrollId); }
   document.getElementById(btnId)?.removeAttribute('disabled');
+}
+
+// ── WIKI BROWSE ──
+let wikiPagesCache=null;
+async function loadWikiList(){
+  if(wikiPagesCache) return wikiPagesCache;
+  try{
+    const r=await fetch(`${SERVER}/api/wiki/list`);
+    const d=await r.json();
+    wikiPagesCache=d.pages||[];
+  }catch(e){ wikiPagesCache=[]; }
+  return wikiPagesCache;
+}
+function showWikiList(){
+  document.getElementById('wikiListView').style.display='block';
+  document.getElementById('wikiPageView').style.display='none';
+  document.getElementById('wikiBackBtn').style.display='none';
+  renderWikiList();
+}
+async function renderWikiList(){
+  const pages=await loadWikiList();
+  const q=(document.getElementById('wikiSearchInp')?.value||'').toLowerCase();
+  const filtered=q?pages.filter(p=>p.slug.toLowerCase().includes(q)||p.summary.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)):pages;
+  const byCat={};
+  filtered.forEach(p=>{ (byCat[p.category]=byCat[p.category]||[]).push(p); });
+  const list=document.getElementById('wikiList');
+  if(!filtered.length){ list.innerHTML='<div class="empty">No pages found</div>'; return; }
+  list.innerHTML=Object.entries(byCat).map(([cat,pgs])=>`
+    <div style="font-family:'Press Start 2P',monospace;font-size:7px;opacity:.5;margin:10px 0 6px;">${esc(cat.toUpperCase())}</div>
+    ${pgs.map(p=>`<div onclick="openWikiPage('${p.dir}','${p.slug}')" style="padding:10px 8px;border-bottom:1px solid rgba(168,230,255,.08);cursor:pointer;">
+      <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${esc(p.slug)}</div>
+      <div style="font-family:'VT323',monospace;font-size:14px;opacity:.55;">${esc(p.summary)}</div>
+    </div>`).join('')}
+  `).join('');
+}
+async function openWikiPage(dir,slug){
+  document.getElementById('wikiListView').style.display='none';
+  document.getElementById('wikiPageView').style.display='block';
+  document.getElementById('wikiBackBtn').style.display='inline';
+  document.getElementById('wikiPageTitle').textContent=slug;
+  document.getElementById('wikiPageBody').innerHTML='Loading…';
+  try{
+    const r=await fetch(`${SERVER}/api/wiki/page/${dir}/${slug}`);
+    const d=await r.json();
+    document.getElementById('wikiPageBody').innerHTML = d.content?formatWikiMd(d.content):'Page not found';
+  }catch(e){ document.getElementById('wikiPageBody').textContent='Failed to load page.'; }
+}
+function formatWikiMd(md){
+  const body = md.replace(/^---\n[\s\S]*?\n---\n?/,'');
+  return esc(body)
+    .replace(/^### (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:9px;color:var(--accent);margin:12px 0 6px;">$1</div>')
+    .replace(/^## (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--accent);margin:14px 0 8px;">$1</div>')
+    .replace(/^# (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:11px;color:var(--fg);margin:14px 0 8px;">$1</div>')
+    .replace(/\[\[([^\]|]+)(\|[^\]]+)?\]\]/g,(m,slug,label)=>{
+      const disp=label?label.slice(1):slug;
+      const pg=(wikiPagesCache||[]).find(p=>p.slug===slug);
+      return pg?`<span onclick="openWikiPage('${pg.dir}','${pg.slug}')" style="color:var(--accent);text-decoration:underline;cursor:pointer;">${esc(disp)}</span>`:esc(disp);
+    })
+    .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+    .replace(/^- (.*)$/gm,'• $1<br>')
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>');
 }
 
 function sendChat(){ const inp=document.getElementById('chatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'chatScroll','chatSendBtn'); switchTab('claude'); }
@@ -2525,7 +2707,7 @@ function openDayModal(key,date){
   const mon=MONTHS_S[date.getMonth()]; const d=date.getDate(); const yr=date.getFullYear();
   document.getElementById('dayModalTitle').textContent=`${mon} ${d}, ${yr}`;
   document.getElementById('pdxDateLabel').textContent=`${mon} ${String(d).padStart(2,'0')} ${yr}`;
-  ['devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value='');
+  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('devKind').value='focus';
   renderDevList(key);
 

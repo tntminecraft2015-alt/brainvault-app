@@ -1,0 +1,18 @@
+{
+  "name": "BrainVault Mission Control",
+  "short_name": "BrainVault",
+  "description": "Personal LLM-powered wiki and daily dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1929",
+  "theme_color": "#1a2533",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a2533'/><text y='72' x='50' text-anchor='middle' font-size='60'>🧠</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

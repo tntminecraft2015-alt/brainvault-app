@@ -4,6 +4,7 @@ const path      = require('path');
 const fs        = require('fs');
 const os        = require('os');
 const Anthropic = require('@anthropic-ai/sdk');
+const webpush   = require('web-push');
 
 const app       = express();
 const PORT      = process.env.PORT || 3000;
@@ -133,6 +134,19 @@ function makeClient(key) {
   return new Anthropic({ apiKey: key });
 }
 
+// ── PUSH NOTIFICATIONS (VAPID / Web Push) ─────────────────────────────────────
+const VAPID_PUBLIC  = process.env.VAPID_PUBLIC_KEY  || '';
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_CONTACT = process.env.VAPID_CONTACT_EMAIL || 'mailto:admin@example.com';
+const PUSH_ENABLED  = !!(VAPID_PUBLIC && VAPID_PRIVATE);
+const REMINDER_LEAD_MIN = 30;
+
+if (PUSH_ENABLED) {
+  webpush.setVapidDetails(VAPID_CONTACT, VAPID_PUBLIC, VAPID_PRIVATE);
+} else {
+  console.log('  Push   : ⚠️  VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY not set — push notifications disabled');
+}
+
 // ── SHARED APP DATA ───────────────────────────────────────────────────────────
 const DEFAULT_SCHEDULE = [
   { time:'06:00', title:'Morning Routine',  kind:'routine'  },
@@ -150,7 +164,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {} };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {} };
 }
 
 function saveAppData(data) {
@@ -290,9 +304,14 @@ app.post('/api/chat', async (req, res) => {
     saveConversation(message, responseText);
     res.json({ response: responseText, tokens: resp.usage });
   } catch (err) {
-    console.error('Claude API error:', err.message);
-    const isRateLimit = err.status === 429 || String(err.message).includes('rate_limit') || String(err.message).includes('429');
-    const isAuth      = err.status === 401 || String(err.message).includes('authentication');
+    console.error('Claude API error:', err.status, err.message);
+    const msg = String(err.message || '');
+    const isRateLimit  = err.status === 429 || msg.includes('rate_limit');
+    const isAuth       = err.status === 401 || msg.includes('authentication');
+    const isTooLong     = err.status === 400 && (msg.includes('too long') || msg.includes('maximum context') || msg.includes('token'));
+    const isOverloaded = err.status === 529 || err.status === 503 || msg.includes('overloaded');
+    const isNetwork    = !err.status;
+
     if (isRateLimit) {
       return res.status(429).json({
         error: 'RATE_LIMIT',
@@ -305,7 +324,28 @@ app.post('/api/chat', async (req, res) => {
         message: 'Authentication failed. Your API key may be expired. Set a new one in ⚙ Settings.',
       });
     }
-    res.status(500).json({ error: err.message });
+    if (isTooLong) {
+      return res.status(400).json({
+        error: 'TOO_LONG',
+        message: 'Your question plus the wiki context ED pulled in was too large for one request. Try a shorter question, or ask about one specific page instead of a broad topic.',
+      });
+    }
+    if (isOverloaded) {
+      return res.status(503).json({
+        error: 'OVERLOADED',
+        message: "Claude's servers are overloaded right now — wait a minute and try again.",
+      });
+    }
+    if (isNetwork) {
+      return res.status(502).json({
+        error: 'NETWORK',
+        message: 'Could not reach the Claude API — check the server has internet access and try again.',
+      });
+    }
+    res.status(500).json({
+      error: 'UNKNOWN',
+      message: `Something went wrong (${err.status || 'no status'}): ${msg || 'unknown error'}`,
+    });
   }
 });
 
@@ -319,6 +359,70 @@ app.post('/api/sync', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── PUSH ROUTES ───────────────────────────────────────────────────────────────
+app.get('/api/push/vapid-public-key', (req, res) => {
+  res.json({ key: VAPID_PUBLIC, enabled: PUSH_ENABLED });
+});
+
+app.post('/api/push/subscribe', (req, res) => {
+  const sub = req.body;
+  if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Invalid subscription' });
+  const data = getAppData();
+  data.pushSubscriptions = data.pushSubscriptions || [];
+  if (!data.pushSubscriptions.some(s => s.endpoint === sub.endpoint)) {
+    data.pushSubscriptions.push(sub);
+    saveAppData(data);
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/push/unsubscribe', (req, res) => {
+  const { endpoint } = req.body;
+  const data = getAppData();
+  data.pushSubscriptions = (data.pushSubscriptions || []).filter(s => s.endpoint !== endpoint);
+  saveAppData(data);
+  res.json({ ok: true });
+});
+
+// ── WIKI BROWSE ROUTES ─────────────────────────────────────────────────────────
+function parseWikiIndex() {
+  const idx = readWiki('index.md');
+  const categoryDirs = {
+    'Overview & Navigation': 'root', 'Sources': 'sources', 'Concepts': 'concepts', 'Entities': 'entities',
+    'Projects & Tools': 'entities', 'Properties': 'entities', 'Analyses': 'analyses',
+  };
+  const pages = [];
+  let currentCategory = null;
+  for (const line of idx.split(/\r?\n/)) {
+    const h = line.match(/^##\s+(.+)$/);
+    if (h) { currentCategory = h[1].trim(); continue; }
+    const m = line.match(/^-\s*\[\[([^\]]+)\]\]\s*—\s*(.*)$/);
+    if (m && currentCategory) {
+      pages.push({
+        slug: m[1],
+        summary: m[2].trim(),
+        category: currentCategory,
+        dir: categoryDirs[currentCategory] || 'analyses',
+      });
+    }
+  }
+  return pages;
+}
+
+app.get('/api/wiki/list', (req, res) => {
+  try { res.json({ pages: parseWikiIndex() }); }
+  catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/wiki/page/:dir/:slug', (req, res) => {
+  const { dir, slug } = req.params;
+  if (!/^[a-z]+$/.test(dir) || !/^[a-z0-9-]+$/i.test(slug))
+    return res.status(400).json({ error: 'Invalid path' });
+  const content = readWiki(dir === 'root' ? `${slug}.md` : `${dir}/${slug}.md`);
+  if (!content) return res.status(404).json({ error: 'Page not found' });
+  res.json({ content });
 });
 
 // ── WIKI WRITERS ──────────────────────────────────────────────────────────────
@@ -441,6 +545,52 @@ function updateIndex() {
   if (changed) writeWiki('index.md', idx);
 }
 
+// ── REMINDER PUSH CHECK ────────────────────────────────────────────────────────
+async function checkReminders() {
+  if (!PUSH_ENABLED) return;
+  const data = getAppData();
+  const subs = data.pushSubscriptions || [];
+  if (!subs.length) return;
+  data.notifiedEvents = data.notifiedEvents || {};
+
+  const now = new Date();
+  let changed = false;
+  for (const [date, evs] of Object.entries(data.events || {})) {
+    for (const ev of evs) {
+      if (!ev.time) continue;
+      const evDt = new Date(`${date}T${ev.time}:00`);
+      const diffMin = (evDt - now) / 60000;
+      const key = `${date}|${ev.time}|${ev.title}`;
+      if (diffMin <= 0 || diffMin > REMINDER_LEAD_MIN || data.notifiedEvents[key]) continue;
+      data.notifiedEvents[key] = true;
+      changed = true;
+      const payload = JSON.stringify({
+        title: `📅 ${ev.title}`,
+        body:  `${ev.time}${ev.location ? ' · ' + ev.location : ''} — starting in ${Math.max(1, Math.round(diffMin))} min`,
+      });
+      for (const sub of subs) {
+        webpush.sendNotification(sub, payload).catch(err => {
+          if (err.statusCode === 404 || err.statusCode === 410) {
+            data.pushSubscriptions = data.pushSubscriptions.filter(s => s.endpoint !== sub.endpoint);
+            saveAppData(data);
+          } else {
+            console.error('Push send error:', err.message);
+          }
+        });
+      }
+    }
+  }
+
+  // Prune notified-event records older than 2 days so the map doesn't grow forever
+  const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 2);
+  for (const key of Object.keys(data.notifiedEvents)) {
+    const dateStr = key.split('|')[0];
+    if (new Date(dateStr + 'T00:00:00') < cutoff) { delete data.notifiedEvents[key]; changed = true; }
+  }
+
+  if (changed) saveAppData(data);
+}
+
 // ── START ─────────────────────────────────────────────────────────────────────
 async function main() {
   await initStore();
@@ -455,8 +605,14 @@ async function main() {
     console.log(`  Mode   : ${USE_GITHUB ? '☁️  Cloud (GitHub)' : '💻 Local'}`);
     console.log(`  URL    : http://localhost:${PORT}`);
     if (lan) console.log(`  Phone  : http://${lan.address}:${PORT}  (same WiFi)`);
-    console.log(`  API key: ${key ? '✅ loaded' : '❌ missing'}\n`);
+    console.log(`  API key: ${key ? '✅ loaded' : '❌ missing'}`);
+    console.log(`  Push   : ${PUSH_ENABLED ? '✅ enabled' : '❌ disabled (set VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY)'}\n`);
   });
+
+  if (PUSH_ENABLED) {
+    checkReminders().catch(console.error);
+    setInterval(() => checkReminders().catch(console.error), 5 * 60 * 1000);
+  }
 }
 
 main().catch(console.error);
