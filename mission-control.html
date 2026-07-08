@@ -97,7 +97,7 @@
     .hinge-led    { width:8px; height:8px; border-radius:50%; background:var(--accent); animation:hingeShine 1.5s ease-in-out infinite; }
     .hinge-dot    { width:4px; height:4px; border-radius:50%; background:var(--fg); }
 
-    .box-b { background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.18),0 0 0 1px var(--darker); color:var(--fg); }
+    .box-b { background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.18),0 0 0 1px var(--darker),3px 3px 0 rgba(0,0,0,.3); color:var(--fg); }
 
     .console-controls { display:flex; justify-content:space-between; align-items:center; margin-top:7px; padding:0 6px; flex-shrink:0; }
     .ctrl-dpad { width:28px; height:28px; background:var(--bezel-dark); border-radius:14px; box-shadow:inset 0 0 0 2px rgba(143,214,255,.2); }
@@ -411,10 +411,10 @@
       .mob-tl-row:last-child { border-bottom:none; }
       .mob-tl-bar  { width:3px; align-self:stretch; flex-shrink:0; background:var(--fg-faint); }
       .mob-tl-bar.next { background:var(--accent); box-shadow:0 0 5px var(--accent); }
-      .mob-tl-chk  { width:26px; height:26px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
-      .mob-tl-chk:active { transform:scale(1.2); }
+      .mob-tl-chk  { width:40px; height:40px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+      .mob-tl-chk:active { transform:scale(1.15); }
       .mob-tl-chk.done   { background:var(--accent); }
-      .mob-tl-chk-x      { width:12px; height:12px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+      .mob-tl-chk-x      { width:18px; height:18px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
       .mob-tl-chk.done .mob-tl-chk-x { display:block; }
       .mob-tl-info { flex:1; }
       .mob-tl-time  { font-family:'Press Start 2P',monospace; font-size:7px; opacity:.6; margin-bottom:3px; }
@@ -431,10 +431,10 @@
       .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(168,230,255,.07); }
       .mob-task-row:last-child { border-bottom:none; }
       .mob-task-row.done { opacity:.4; }
-      .mob-pix-check { width:26px; height:26px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
-      .mob-pix-check:active { transform:scale(1.2); }
+      .mob-pix-check { width:40px; height:40px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
+      .mob-pix-check:active { transform:scale(1.15); }
       .mob-task-row.done .mob-pix-check { background:var(--accent); }
-      .mob-pix-x  { width:13px; height:13px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
+      .mob-pix-x  { width:19px; height:19px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
       .mob-task-row.done .mob-pix-x { display:block; }
       .mob-rank-badge { font-family:'Press Start 2P',monospace; font-size:8px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; }
       .mob-task-label { flex:1; font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
@@ -507,10 +507,10 @@
       .mob-inp  { font-size:22px; padding:10px 12px; }
       .mob-task-row { padding:12px 0; }
       .mob-tl-row   { padding:12px 0; }
-      .mob-tl-chk   { width:30px; height:30px; }
-      .mob-tl-chk-x { width:14px; height:14px; }
-      .mob-pix-check { width:30px; height:30px; }
-      .mob-pix-x     { width:15px; height:15px; }
+      .mob-tl-chk   { width:44px; height:44px; }
+      .mob-tl-chk-x { width:20px; height:20px; }
+      .mob-pix-check { width:44px; height:44px; }
+      .mob-pix-x     { width:20px; height:20px; }
       .mob-rank-badge { font-size:9px; width:24px; padding:4px 2px; }
       .day-chip       { font-size:10px; padding:2px 6px; }
       .pdx-add-form .m-inp, .pdx-add-form .m-sel { font-size:18px; padding:11px 12px; }
@@ -552,6 +552,45 @@
     }
     .mob-no-events {
       font-size:16px; opacity:.4; font-style:italic; padding:4px 0;
+    }
+
+    /* ══════════════════════════════════════
+       MERGED CALENDAR (grid + timeline) / WIKI DRAWER
+    ══════════════════════════════════════ */
+    .mob-cal-toggle {
+      display:flex; align-items:center; justify-content:space-between; width:100%;
+      background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
+      border:none; border-left:3px solid var(--accent); border-radius:1px;
+      color:var(--fg); font-family:'Press Start 2P',monospace; font-size:8px;
+      padding:13px 14px; margin-bottom:8px; cursor:pointer; min-height:44px; flex-shrink:0;
+    }
+    .mob-cal-toggle-arrow { opacity:.6; transition:transform .2s; }
+    .mob-cal-toggle.open .mob-cal-toggle-arrow { transform:rotate(180deg); }
+    .mob-cal-grid-wrap { overflow:hidden; max-height:0; transition:max-height .25s ease; flex-shrink:0; }
+    .mob-cal-grid-wrap.open { max-height:420px; margin-bottom:10px; }
+    .mob-cal-card {
+      background:var(--surface); box-shadow:inset 0 0 0 1px rgba(168,230,255,.12);
+      padding:12px; border-left:3px solid var(--accent); border-radius:1px;
+    }
+    .mob-tl-section-hd {
+      font-family:'Press Start 2P',monospace; font-size:7px; opacity:.65;
+      padding:16px 0 10px; margin-top:8px; flex-shrink:0;
+      border-top:1px dashed rgba(168,230,255,.2);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .mob-wiki-drawer {
+      position:absolute; inset:0; z-index:20;
+      display:flex; flex-direction:column;
+      background:var(--bg);
+      padding:14px 14px 10px;
+      transform:translateX(100%); transition:transform .22s ease;
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
+    }
+    .mob-wiki-drawer.open { transform:translateX(0); }
+    .mob-wiki-btn {
+      font-family:'Press Start 2P',monospace; font-size:8px; background:none;
+      border:1px solid rgba(168,230,255,.25); color:rgba(168,230,255,.8);
+      cursor:pointer; padding:6px 9px; min-height:32px; border-radius:1px;
     }
 
     /* ══════════════════════════════════════
@@ -907,26 +946,33 @@
       </div>
     </div>
 
-    <!-- CAL tab -->
+    <!-- CAL tab (merged: Calendar + Timeline) -->
     <div class="mob-tab-pane" id="mobTabCal">
       <div class="mob-tab-hd">
         <span>📅 CALENDAR</span>
-        <div class="mob-cal-nav">
-          <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
-          <span id="mobCalLabel" style="font-family:'Press Start 2P',monospace;font-size:7px;">—</span>
-          <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
+      </div>
+
+      <button class="mob-cal-toggle" id="mobCalToggleBtn" onclick="toggleMobCalGrid()">
+        <span>📅 Browse dates</span>
+        <span class="mob-cal-toggle-arrow">▾</span>
+      </button>
+      <div class="mob-cal-grid-wrap" id="mobCalGridWrap">
+        <div class="mob-cal-card">
+          <div class="mob-cal-nav">
+            <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
+            <span id="mobCalLabel" style="font-family:'Press Start 2P',monospace;font-size:7px;">—</span>
+            <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
+          </div>
+          <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+          <div class="mob-month-grid" id="mobMonthGrid"></div>
         </div>
       </div>
-      <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-      <div class="mob-month-grid" id="mobMonthGrid"></div>
+
       <div class="mob-day-summary" id="mobDaySummary"></div>
       <div class="mob-day-event-list" id="mobDayEventList"></div>
-    </div>
 
-    <!-- TIMELINE tab -->
-    <div class="mob-tab-pane" id="mobTabTimeline">
-      <div class="mob-tab-hd">
-        <span>⏰ TIMELINE</span>
+      <div class="mob-tl-section-hd">
+        <span>⏰ TODAY'S TIMELINE</span>
         <span class="blink" style="color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;">● LIVE</span>
       </div>
       <div class="mob-tl-list" id="mobTimelineList"></div>
@@ -969,11 +1015,12 @@
       <div id="mobBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;"></div>
     </div>
 
-    <!-- CLAUDE tab -->
-    <div class="mob-tab-pane" id="mobTabClaude">
+    <!-- CLAUDE tab (merged: ED chat + Wiki drawer) -->
+    <div class="mob-tab-pane" id="mobTabClaude" style="position:relative;">
       <div class="mob-tab-hd">
         <span>🧠 ED</span>
         <div style="display:flex;align-items:center;gap:8px;">
+          <button class="mob-wiki-btn" onclick="openWikiDrawer()">📚 WIKI</button>
           <div class="server-dot" id="mobServerDot"></div>
           <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(168,230,255,.4);cursor:pointer;">⚙</button>
         </div>
@@ -984,21 +1031,23 @@
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
         <button class="mob-send-btn" id="mobSendBtn" onclick="sendMobChat()">▶</button>
       </div>
-    </div>
 
-    <!-- WIKI tab -->
-    <div class="mob-tab-pane" id="mobTabWiki">
-      <div class="mob-tab-hd">
-        <span>📚 WIKI</span>
-        <span id="wikiBackBtn" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;opacity:.7;" onclick="showWikiList()">◀ BACK</span>
-      </div>
-      <div id="wikiListView">
-        <input type="text" class="mob-inp" id="wikiSearchInp" placeholder="Search wiki..." oninput="renderWikiList()" style="margin-bottom:8px;width:100%;">
-        <div id="wikiList" style="overflow-y:auto;flex:1;min-height:0;"></div>
-      </div>
-      <div id="wikiPageView" style="display:none;overflow-y:auto;flex:1;min-height:0;">
-        <div id="wikiPageTitle" style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
-        <div id="wikiPageBody" style="font-family:'VT323',monospace;font-size:17px;line-height:1.5;color:var(--fg);"></div>
+      <div class="mob-wiki-drawer" id="mobWikiDrawer">
+        <div class="mob-tab-hd">
+          <span>📚 WIKI</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span id="wikiBackBtn" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;opacity:.7;" onclick="showWikiList()">◀ BACK</span>
+            <button onclick="closeWikiDrawer()" style="font-family:'Press Start 2P',monospace;font-size:11px;background:none;border:none;color:rgba(168,230,255,.6);cursor:pointer;padding:4px;">✕</button>
+          </div>
+        </div>
+        <div id="wikiListView">
+          <input type="text" class="mob-inp" id="wikiSearchInp" placeholder="Search wiki..." oninput="renderWikiList()" style="margin-bottom:8px;width:100%;">
+          <div id="wikiList" style="overflow-y:auto;flex:1;min-height:0;"></div>
+        </div>
+        <div id="wikiPageView" style="display:none;overflow-y:auto;flex:1;min-height:0;">
+          <div id="wikiPageTitle" style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
+          <div id="wikiPageBody" style="font-family:'VT323',monospace;font-size:17px;line-height:1.5;color:var(--fg);"></div>
+        </div>
       </div>
     </div>
 
@@ -1017,9 +1066,6 @@
     <button class="mob-nav-btn" onclick="switchMobTab('cal',this)">
       <span class="nav-icon">📅</span><span>CAL</span>
     </button>
-    <button class="mob-nav-btn" onclick="switchMobTab('timeline',this)">
-      <span class="nav-icon">⏰</span><span>TIME</span>
-    </button>
     <button class="mob-nav-btn" onclick="switchMobTab('tasks',this)">
       <span class="nav-icon">✅</span><span>TASKS</span>
     </button>
@@ -1027,10 +1073,7 @@
       <span class="nav-icon">💰</span><span>GIL</span>
     </button>
     <button class="mob-nav-btn" onclick="switchMobTab('claude',this)">
-      <span class="nav-icon">🧠</span><span>AI</span>
-    </button>
-    <button class="mob-nav-btn" onclick="switchMobTab('wiki',this)">
-      <span class="nav-icon">📚</span><span>WIKI</span>
+      <span class="nav-icon">🧠</span><span>ED</span>
     </button>
   </nav>
 
@@ -2478,16 +2521,30 @@ function switchTab(tab){
 }
 
 function switchMobTab(tab, btn){
-  const map={home:'mobTabHome',cal:'mobTabCal',timeline:'mobTabTimeline',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude',wiki:'mobTabWiki'};
+  const map={home:'mobTabHome',cal:'mobTabCal',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude'};
   document.querySelectorAll('.mob-tab-pane').forEach(p=>p.classList.remove('active'));
   const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(tab==='claude')setTimeout(()=>document.getElementById('mobChatInp')?.focus(),60);
-  if(tab==='timeline'){ renderMobTimeline(); }
   if(tab==='tasks')   { renderMobTasks(); }
-  if(tab==='cal')     { renderMobMonthGrid(); }
-  if(tab==='wiki')    { showWikiList(); }
+  if(tab==='cal')     { renderMobMonthGrid(); renderMobTimeline(); }
+}
+
+function toggleMobCalGrid(){
+  const wrap=document.getElementById('mobCalGridWrap');
+  const btn=document.getElementById('mobCalToggleBtn');
+  if(!wrap)return;
+  const open=wrap.classList.toggle('open');
+  if(btn)btn.classList.toggle('open',open);
+}
+
+function openWikiDrawer(){
+  document.getElementById('mobWikiDrawer')?.classList.add('open');
+  showWikiList();
+}
+function closeWikiDrawer(){
+  document.getElementById('mobWikiDrawer')?.classList.remove('open');
 }
 
 // ══════════════════════════════════════════════════════════════
