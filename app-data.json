@@ -167,6 +167,14 @@
     "monthlyLimit": 50,
     "transactions": [
       {
+        "id": 1783496189280,
+        "date": "2026-07-08",
+        "amount": 26,
+        "category": "food",
+        "note": "PROVISIONS",
+        "type": "income"
+      },
+      {
         "id": 1778805221466,
         "date": "2026-05-15",
         "amount": 30,
