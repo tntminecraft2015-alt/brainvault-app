@@ -167,6 +167,14 @@
     "monthlyLimit": 50,
     "transactions": [
       {
+        "id": 1783496214869,
+        "date": "2026-07-08",
+        "amount": 36,
+        "category": "income",
+        "note": "GIL IN",
+        "type": "income"
+      },
+      {
         "id": 1778805221466,
         "date": "2026-05-15",
         "amount": 30,
