@@ -95,24 +95,6 @@
   },
   "tasks": [
     {
-      "text": "Fix Claude in MS",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
-    {
-      "text": "Fix color of text in calander",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
-    {
-      "text": "add budget to mission control",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
-    {
       "text": "Laundry",
       "done": false,
       "rank": "B",
@@ -125,22 +107,10 @@
       "doneDate": null
     },
     {
-      "text": "Pack",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-15"
-    },
-    {
       "text": "figure out how to do speech to speech on phone",
       "done": false,
       "rank": "S",
       "doneDate": null
-    },
-    {
-      "text": "Ask cam about investment guy",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-16"
     }
   ],
   "streakDays": [],
