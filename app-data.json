@@ -271,5 +271,14 @@
       "firstCaught": "2026-05-15",
       "shiny": false
     }
-  }
+  },
+  "pushSubscriptions": [
+    {
+      "endpoint": "https://web.push.apple.com/QOnVhiXtL4Ygiv_jPj1LZ9Uv1q1b_ahYQkcPoaxs0UrRO8keztp4XMK4afFbPDjh_NinlHPo9qpA9wdlspxr2o5o9Fa3j1jEcRko-CaIA3b8iZHQi7LAE7nAIiXBGffblcRRyvL6xGjGHG2cgQzoWGiNcQwt1-tEWx_B2yjV6No",
+      "keys": {
+        "p256dh": "BL9bJ_gMQp5s4uj4euP8wgVdbokeM5ia6gbYOZa0nSfu_ss_sRtFasuVm6QzeS2ABO85kPf7AIsz93oI3uYVq7s",
+        "auth": "UAWZzE3S9evdPcuKk421BQ"
+      }
+    }
+  ]
 }
