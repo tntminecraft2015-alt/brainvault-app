@@ -392,3 +392,17 @@ Chat session on 2026-05-14
 **Pages created:** [[calendar-events]]
 
 Calendar events synced
+
+## [2026-08-10] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-10-design-research-weekly]]
+
+Design research: Mission Control General Improvements: Cognitive Load, White Hat Gamification, Responsive Bento Evolution (3 findings)
+
+## [2026-08-10] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-10]]
+
+Chat session on 2026-08-10
