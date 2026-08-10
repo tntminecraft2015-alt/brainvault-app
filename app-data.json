@@ -1,6 +1,11 @@
 {
   "schedule": [
     {
+      "time": "23:59",
+      "title": "Bedtime",
+      "kind": "focus"
+    },
+    {
       "time": "09:00",
       "title": "Wake Up",
       "kind": "focus"
@@ -36,18 +41,13 @@
       "kind": "focus"
     },
     {
-      "time": "16:00",
+      "time": "18:00",
       "title": "Dinner",
       "kind": "focus"
     },
     {
       "time": "19:00",
       "title": "Enjoy",
-      "kind": "focus"
-    },
-    {
-      "time": "23:59",
-      "title": "Bedtime",
       "kind": "focus"
     }
   ],
@@ -83,6 +83,14 @@
         "location": "",
         "kind": "errand"
       }
+    ],
+    "2026-05-27": [
+      {
+        "title": "Trey bday casino",
+        "time": "12:00",
+        "location": "",
+        "kind": "social"
+      }
     ]
   },
   "tasks": [
@@ -96,18 +104,6 @@
       "text": "Clean Room",
       "done": false,
       "rank": "B",
-      "doneDate": null
-    },
-    {
-      "text": "Pack",
-      "done": false,
-      "rank": "S",
-      "doneDate": null
-    },
-    {
-      "text": "figure out how to do speech to speech on phone",
-      "done": false,
-      "rank": "S",
       "doneDate": null
     }
   ],
@@ -124,12 +120,23 @@
       "9": false
     },
     "2026-05-15": {
-      "0": false,
-      "1": false
+      "0": true,
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": false,
+      "5": false,
+      "6": false,
+      "7": false,
+      "8": false,
+      "9": false
+    },
+    "2026-07-08": {
+      "9": false
     }
   },
   "currentStreak": 0,
-  "questXp": 165,
+  "questXp": 265,
   "taskStats": {
     "Clean Room": {
       "count": 1,
@@ -148,17 +155,33 @@
       "lastDone": "2026-05-14"
     },
     "Pack": {
-      "count": 1,
+      "count": 2,
       "lastDone": "2026-05-15"
     },
-    "Laundry": {
+    "Ask cam about investment guy": {
       "count": 1,
-      "lastDone": "2026-07-08"
+      "lastDone": "2026-05-16"
     }
   },
   "budget": {
     "monthlyLimit": 50,
     "transactions": [
+      {
+        "id": 1783496214869,
+        "date": "2026-07-08",
+        "amount": 36,
+        "category": "income",
+        "note": "GIL IN",
+        "type": "income"
+      },
+      {
+        "id": 1778805221466,
+        "date": "2026-05-15",
+        "amount": 30,
+        "category": "fun",
+        "note": "Subnautica 2",
+        "type": "expense"
+      },
       {
         "id": 1778800743218,
         "date": "2026-05-14",
@@ -179,13 +202,13 @@
     "mode": "weekly"
   },
   "theme": {
-    "preset": "Green",
-    "--accent": "#7ec87a",
-    "--bg": "#0d1a10",
-    "--surface": "#172b1c",
-    "--fg": "#b8d4b0",
-    "--green": "#9dc89a",
-    "--bezel": "#111f15"
+    "preset": "Cyan",
+    "--accent": "#ff8a63",
+    "--bg": "#0a1929",
+    "--surface": "#12253c",
+    "--fg": "#dfeeff",
+    "--green": "#7fffb0",
+    "--bezel": "#1a2533"
   },
   "savings": {
     "name": "Apartment Downpayment",
@@ -194,7 +217,7 @@
   },
   "caughtPoke": {
     "79": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-05-14",
       "shiny": true
     },
@@ -218,9 +241,19 @@
       "firstCaught": "2026-05-14",
       "shiny": true
     },
+    "240": {
+      "count": 1,
+      "firstCaught": "2026-05-17",
+      "shiny": false
+    },
     "242": {
       "count": 1,
       "firstCaught": "2026-05-14",
+      "shiny": false
+    },
+    "252": {
+      "count": 1,
+      "firstCaught": "2026-05-15",
       "shiny": false
     },
     "282": {
@@ -228,13 +261,36 @@
       "firstCaught": "2026-05-15",
       "shiny": true
     },
+    "359": {
+      "count": 1,
+      "firstCaught": "2026-07-08",
+      "shiny": false
+    },
     "495": {
+      "count": 1,
+      "firstCaught": "2026-05-15",
+      "shiny": false
+    },
+    "498": {
+      "count": 2,
+      "firstCaught": "2026-05-28",
+      "shiny": false
+    },
+    "725": {
       "count": 1,
       "firstCaught": "2026-05-15",
       "shiny": false
     }
   },
-  "pushSubscriptions": [],
+  "pushSubscriptions": [
+    {
+      "endpoint": "https://web.push.apple.com/QOnVhiXtL4Ygiv_jPj1LZ9Uv1q1b_ahYQkcPoaxs0UrRO8keztp4XMK4afFbPDjh_NinlHPo9qpA9wdlspxr2o5o9Fa3j1jEcRko-CaIA3b8iZHQi7LAE7nAIiXBGffblcRRyvL6xGjGHG2cgQzoWGiNcQwt1-tEWx_B2yjV6No",
+      "keys": {
+        "p256dh": "BL9bJ_gMQp5s4uj4euP8wgVdbokeM5ia6gbYOZa0nSfu_ss_sRtFasuVm6QzeS2ABO85kPf7AIsz93oI3uYVq7s",
+        "auth": "UAWZzE3S9evdPcuKk421BQ"
+      }
+    }
+  ],
   "designResearch": [
     {
       "id": "2026-08-10-design-research-mobile-home-tab-widgets",
