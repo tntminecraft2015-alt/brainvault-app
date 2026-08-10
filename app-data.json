@@ -108,9 +108,9 @@
     },
     {
       "text": "Data-Rich Calendar Heatmaps (Dual-View Pattern) — Calendar interfaces can overlay heatmaps showing financial or contextual performance along",
-      "done": false,
+      "done": true,
       "rank": "B",
-      "doneDate": null
+      "doneDate": "2026-08-10"
     }
   ],
   "streakDays": [],
@@ -142,7 +142,7 @@
     }
   },
   "currentStreak": 0,
-  "questXp": 265,
+  "questXp": 280,
   "taskStats": {
     "Clean Room": {
       "count": 1,
@@ -167,6 +167,10 @@
     "Ask cam about investment guy": {
       "count": 1,
       "lastDone": "2026-05-16"
+    },
+    "Data-Rich Calendar Heatmaps (Dual-View Pattern) — Calendar interfaces can overlay heatmaps showing financial or contextual performance along": {
+      "count": 1,
+      "lastDone": "2026-08-10"
     }
   },
   "budget": {
