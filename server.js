@@ -307,7 +307,7 @@ const QUEUE_CHANGE_TOOL = {
   },
 };
 
-function queueCodeChange({ title, description, details }) {
+function queueCodeChange({ title, description, details, source = 'ED chat' }) {
   const date  = today();
   const safeTitle = String(title || 'Untitled change').slice(0, 120);
   const id    = `${date}-${slugifyTopic(safeTitle) || 'change'}`;
@@ -315,7 +315,7 @@ function queueCodeChange({ title, description, details }) {
 status: pending
 title: "${safeTitle.replace(/"/g, '\\"')}"
 date: "${date}"
-requested_via: "ED chat"
+requested_via: "${source}"
 ---
 
 ## What the user asked for
@@ -328,10 +328,10 @@ ${details || ''}
 `);
   const data = getAppData();
   data.changeRequests = data.changeRequests || [];
-  data.changeRequests.unshift({ id, date, title: safeTitle, status: 'pending' });
+  data.changeRequests.unshift({ id, date, title: safeTitle, status: 'pending', source });
   data.changeRequests = data.changeRequests.slice(0, 50);
   saveAppData(data);
-  appendLog('note', `Mission Control change requested via ED: ${safeTitle}`, [], []);
+  appendLog('note', `Mission Control change requested via ${source}: ${safeTitle}`, [], []);
   return { id, title: safeTitle };
 }
 
@@ -701,7 +701,7 @@ function buildSlideshowHtml(topic, result) {
       body:   `<p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
                ${f.source_url ? `<p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="${escAttr(f.source_url)}" target="_blank" rel="noopener" style="color:#ff8a63;">${escHtml(f.source_title || f.source_url)}</a></p>` : ''}
                <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>
-               <button class="add-quest-btn" onclick="addToQuests(${i}, this)">+ ADD TO QUEST LOG</button>`,
+               <button class="queue-design-btn" onclick="queueDesign(${i}, this)">+ QUEUE THIS DESIGN</button>`,
     })),
   ];
 
@@ -734,9 +734,10 @@ function buildSlideshowHtml(topic, result) {
   .dots{display:flex;gap:6px;}
   .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
   .dot.active{background:var(--accent);}
-  .add-quest-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
-  .add-quest-btn:hover:not(:disabled){filter:brightness(1.08);}
-  .add-quest-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  .queue-design-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
+  .queue-design-btn:hover:not(:disabled){filter:brightness(1.08);}
+  .queue-design-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  .queue-design-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;}
   @media (max-width:600px){
     .slide{padding:20px 18px 16px;}
     .slide h1{font-size:21px;margin-bottom:12px;}
@@ -746,7 +747,7 @@ function buildSlideshowHtml(topic, result) {
     .mockup-frame{height:36vh;min-height:140px;}
     .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
     .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
-    .add-quest-btn{width:100%;padding:14px;font-size:14px;}
+    .queue-design-btn{width:100%;padding:14px;font-size:14px;}
   }
 </style></head>
 <body>
@@ -757,15 +758,35 @@ function buildSlideshowHtml(topic, result) {
     <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
   </div>
 <script>
-  const FINDINGS = ${JSON.stringify(result.findings.map(f => ({ title: f.title || '', description: f.description || '' })))};
-  function addToQuests(i, btn) {
+  const FINDINGS = ${JSON.stringify(result.findings.map(f => ({
+    title: f.title || '', description: f.description || '',
+    source_title: f.source_title || '', source_url: f.source_url || '',
+  })))};
+  async function queueDesign(i, btn) {
     const f = FINDINGS[i]; if (!f) return;
-    const text = (f.title + (f.description ? ' — ' + f.description : '')).slice(0, 140);
-    if (window.parent !== window) {
-      window.parent.postMessage({ type: 'mc-add-task', text }, window.location.origin);
-    }
-    btn.textContent = '✓ ADDED TO QUEST LOG';
     btn.disabled = true;
+    btn.classList.remove('failed');
+    btn.textContent = 'QUEUING…';
+    try {
+      const r = await fetch('/api/change-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: f.title, description: f.description,
+          source_title: f.source_title, source_url: f.source_url,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      btn.textContent = '✓ QUEUED FOR CLAUDE CODE';
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      }
+    } catch (e) {
+      btn.textContent = '⚠ FAILED — TAP TO RETRY';
+      btn.classList.add('failed');
+      btn.disabled = false;
+    }
   }
   const total = ${slides.length};
   let cur = 0;
@@ -880,6 +901,26 @@ app.get('/api/design-research', (req, res) => {
 app.get('/api/change-requests', (req, res) => {
   const data = getAppData();
   res.json({ requests: data.changeRequests || [] });
+});
+
+// Queues a Design Lab finding directly — no LLM call, the finding text IS the spec.
+app.post('/api/change-requests', (req, res) => {
+  try {
+    const { title, description, source_title, source_url } = req.body || {};
+    if (!title) return res.status(400).json({ error: 'Missing title' });
+    const details = source_url
+      ? `${description || ''}\n\nSource: [${source_title || source_url}](${source_url})`
+      : (description || '');
+    const result = queueCodeChange({
+      title,
+      description: 'Liked this Design Lab finding from Red and queued it for implementation.',
+      details,
+      source: 'Design Lab',
+    });
+    res.json({ ok: true, id: result.id, title: result.title });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/design-research/:id', (req, res) => {

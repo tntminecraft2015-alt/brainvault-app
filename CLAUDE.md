@@ -168,20 +168,24 @@ Produce a lint report. Fix obvious structural issues (orphans, missing links). F
 
 ## Workflow: Mission Control Change Requests
 
-Mission Control (`mission-control.html` + `server.js`) is a separate app living in this same repo, pushed to the `app` remote (see "Mission Control git remotes" — not the wiki). ED, the in-app chat assistant, can't edit code itself — when the human asks ED to change something about Mission Control, ED queues a spec file under `change-requests/*.md` (frontmatter `status: pending`) instead, and logs it as a `note` entry in `wiki/log.md`.
+Mission Control (`mission-control.html` + `server.js`) is a separate app living in this same repo, pushed to the `app` remote (see "Mission Control git remotes" — not the wiki). Neither ED (chat assistant) nor Red (design researcher) can edit code themselves, so both queue requests instead of acting on them directly, via `change-requests/*.md` (frontmatter `status: pending`, `requested_via: "ED chat"` or `"Design Lab"`):
+- **ED** writes a full spec (what was asked + implementation notes) when the human asks it for a Mission Control change mid-conversation.
+- **Red** — from the Design Lab slideshow, the human can hit "+ QUEUE THIS DESIGN" on any finding to queue that design idea as-is (title/description/source), no LLM spec-writing involved.
 
-**At the start of any session, check for pending requests:**
+Both log a `note` entry in `wiki/log.md` when queued.
+
+**This is a pull queue, not an auto-run one — do not implement pending requests just because a session started.** At the start of a session it's fine to check what's waiting and mention the count/titles to the human, but only implement when the human explicitly says to run the queue (e.g. "run the queue," "do the queued changes"):
 ```
 grep -l "status: pending" change-requests/*.md
 ```
 
-For each pending request:
-1. Read the file — it has a "What the user asked for" section (human's intent) and an "Implementation notes" section (ED's spec).
+When told to run the queue, for each pending request:
+1. Read the file — it has a "What the user asked for" section (intent) and an "Implementation notes" section (spec).
 2. Implement the change in `mission-control.html` / `server.js`.
 3. Flip the file's frontmatter to `status: done` (or delete it — either is fine, the file is disposable once implemented).
 4. Ask the human before pushing to the `app` remote (pushing deploys live to Render).
 
-Don't treat these specs as gospel — ED is a Haiku-model chat assistant improvising a spec from one conversation, not a design doc; use judgment same as any other feature request.
+Don't treat these specs as gospel — both ED and Red are Haiku-model agents improvising from one conversation or one finding, not a design doc; use judgment same as any other feature request.
 
 ---
 

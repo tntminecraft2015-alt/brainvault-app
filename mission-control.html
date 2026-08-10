@@ -1409,7 +1409,7 @@
 <div class="overlay" id="changeQueueModal">
   <div class="modal" style="width:520px;max-width:95vw;">
     <div class="modal-title">🛠 CHANGE QUEUE</div>
-    <p class="key-info" style="margin-bottom:10px;">Things you've asked ED to change about Mission Control. Each one is a file waiting for Claude Code to implement and push next time you're at your computer.</p>
+    <p class="key-info" style="margin-bottom:10px;">Mission Control changes waiting for Claude Code — things you asked ED for, or designs you queued from Red's Design Lab. Nothing implements until you tell Claude Code to run the queue.</p>
     <div id="cqList" style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
     <div class="modal-btns"><button class="modal-btn" onclick="closeModal('changeQueueModal')">CLOSE</button></div>
   </div>
@@ -2921,9 +2921,9 @@ function openSlideshow(id){
 }
 window.addEventListener('message', e=>{
   if(e.origin!==location.origin || !e.data) return;
-  if(e.data.type==='mc-add-task' && e.data.text){
-    addTaskCommon(e.data.text, 'B');
-    showToast('Added to quest log ◆');
+  if(e.data.type==='mc-queue-change' && e.data.title){
+    showToast(`Queued for Claude Code: "${e.data.title}" ◆`);
+    refreshChangeQueueBadge();
   }
 });
 
@@ -2942,11 +2942,11 @@ async function loadChangeQueueList(){
     const d=await r.json();
     const reqs=d.requests||[];
     updateCqBadge(reqs.filter(x=>x.status==='pending').length);
-    if(!reqs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No changes queued — ask ED to change something about Mission Control.</div>'; return; }
+    if(!reqs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No changes queued yet — ask ED, or hit "+ QUEUE THIS DESIGN" on a Design Lab finding.</div>'; return; }
     list.innerHTML=reqs.map(r=>`
       <div class="wiki-row">
-        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${esc(r.title)}</div>
-        <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)} · ${r.status==='pending'?'⏳ pending':'✓ '+esc(r.status)} · change-requests/${esc(r.id)}.md</div>
+        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${r.source==='Design Lab'?'🎨 ':'💬 '}${esc(r.title)}</div>
+        <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)} · ${r.status==='pending'?'⏳ pending':'✓ '+esc(r.status)} · ${esc(r.source||'ED chat')} · change-requests/${esc(r.id)}.md</div>
       </div>`).join('');
   }catch(e){ list.innerHTML='<div style="opacity:.5;">Failed to load.</div>'; }
 }
