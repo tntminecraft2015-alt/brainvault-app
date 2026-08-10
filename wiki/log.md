@@ -452,3 +452,10 @@ Design research: Mobile Widget Interaction & Retro Gamification in Personal Dash
 Retried the live test after the Haiku swap. The 429 cleared, but the first successful API response then failed to save: `writeVault()` (unlike `writeWiki()`) never created parent directories, so writing `design-research/<id>.html` threw `ENOENT` since that folder didn't exist yet. Confirmed via diff that this failure, too, left `app-data.json`/`log.md`/`index.md` untouched — the write ordering is safe. Fixed `writeVault` to `mkdirSync(..., {recursive:true})` first, matching `writeWiki`, and retried again: both the on-demand run above and the Monday auto-run (`[[2026-08-10-design-research-weekly]]`) completed cleanly end to end, findings and slideshows included. Design Lab is now confirmed working, not just built.
 
 One thing this surfaced: `design-research/*.html` lives outside the paths `.gitignore` currently routes to the `vault` remote (`wiki/`, `raw/`, `app-data.json`, `CLAUDE.md`, `templates/`), so as things stand these generated slideshow files would default into the `app` repo rather than `vault` if committed as-is. Flagged for the human to decide, not resolved.
+
+## [2026-08-10] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-10]]
+
+Chat session on 2026-08-10
