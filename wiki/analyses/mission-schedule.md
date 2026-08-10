@@ -1,7 +1,7 @@
 ---
 type: analysis
 title: "Mission Schedule"
-last_updated: "2026-05-14"
+last_updated: "2026-07-08"
 tags: [schedule, routine]
 ---
 
@@ -16,8 +16,8 @@ tags: [schedule, routine]
 | 12:30 | Walk/Gym | focus |
 | 13:30 | Guitar | focus |
 | 15:00 | Grind 2 Electric Boogaloo | focus |
-| 18:00 | Dinner | focus |
+| 16:00 | Dinner | focus |
 | 19:00 | Enjoy | focus |
 | 23:59 | Bedtime | focus |
 
-_Last synced: 5/13/2026, 8:47:22 PM_
+_Last synced: 7/8/2026, 3:10:27 AM_

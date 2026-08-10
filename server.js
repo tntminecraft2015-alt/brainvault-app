@@ -108,7 +108,9 @@ function writeVault(rel, content) {
   if (USE_GITHUB) {
     ghWrite(rel, content);
   } else {
-    fs.writeFileSync(path.join(VAULT, rel), content, 'utf8');
+    const full = path.join(VAULT, rel);
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, content, 'utf8');
   }
 }
 
@@ -164,7 +166,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {} };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null };
 }
 
 function saveAppData(data) {
@@ -294,7 +296,7 @@ app.post('/api/chat', async (req, res) => {
   const anthropic = makeClient(key);
   try {
     const resp = await anthropic.messages.create({
-      model:      'claude-sonnet-4-6',
+      model:      'claude-haiku-4-5-20251001',
       max_tokens: 2048,
       system:     buildSystemPrompt(message),
       messages:   [...history.map(m => ({ role: m.role, content: m.content })),
@@ -545,6 +547,225 @@ function updateIndex() {
   if (changed) writeWiki('index.md', idx);
 }
 
+// ── DESIGN RESEARCH LAB ───────────────────────────────────────────────────────
+function escHtml(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s) { return escHtml(s).replace(/"/g,'&quot;'); }
+function slugifyTopic(s) {
+  return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
+}
+
+async function runDesignResearch(topic) {
+  const key = getApiKey();
+  if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
+  const anthropic = makeClient(key);
+  const mcPage = readWiki('entities/mission-control.md');
+  const focus  = (topic || '').trim();
+
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). You are a separate persona from ED, the chat assistant elsewhere in the app: ED answers questions about the vault, Red's only job is running design research and reporting back findings. Its current design is documented below.
+
+# CURRENT MISSION CONTROL DESIGN
+${mcPage || '(no design doc on file)'}
+
+Use web search to find current, real UI/UX patterns and trends relevant to${focus ? ` "${focus}" in` : ''} personal dashboards, habit trackers, gamified productivity apps, and bento-grid/neumorphic design systems. Prioritize ideas that would make Mission Control more fun, easier to use, and better-looking WITHOUT abandoning its existing JRPG identity. Be economical with searches — a few well-chosen queries beat many broad ones.
+
+Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema:
+{
+  "title": "short title for this research run",
+  "summary": "2-3 sentence overview of what you found",
+  "findings": [
+    {
+      "title": "short name of the pattern/idea",
+      "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
+      "source_title": "name of the site/app it's drawn from",
+      "source_url": "https://...",
+      "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines and visually representative, not just a text description."
+    }
+  ]
+}
+Produce exactly 3 findings. Keep everything concise — this is a budget-conscious run.`;
+
+  const resp = await anthropic.messages.create({
+    model:      'claude-haiku-4-5-20251001',
+    max_tokens: 3000,
+    system,
+    tools:      [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+    messages:   [{ role: 'user', content: focus ? `Research focus: ${focus}` : 'Research general improvements.' }],
+  });
+
+  const textBlocks = resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const match = textBlocks.match(/```json\s*([\s\S]*?)```/) || textBlocks.match(/(\{[\s\S]*\})/);
+  if (!match) throw new Error('Could not parse research output from ED');
+  const parsed = JSON.parse(match[1]);
+  if (!Array.isArray(parsed.findings)) throw new Error('Research output missing findings array');
+  return parsed;
+}
+
+function buildSlideshowHtml(topic, result) {
+  const slides = [
+    {
+      kicker: 'DESIGN RESEARCH · BY RED',
+      title:  result.title || 'Design Research',
+      body:   `<p style="font-size:18px;line-height:1.6;">${escHtml(result.summary || '')}</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">${result.findings.length} findings${topic ? ' · focus: ' + escHtml(topic) : ''}</p>`,
+    },
+    ...result.findings.map((f, i) => ({
+      kicker: `FINDING ${i + 1} / ${result.findings.length}`,
+      title:  f.title || `Finding ${i + 1}`,
+      body:   `<p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
+               ${f.source_url ? `<p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="${escAttr(f.source_url)}" target="_blank" rel="noopener" style="color:#ff8a63;">${escHtml(f.source_title || f.source_url)}</a></p>` : ''}
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>`,
+    })),
+  ];
+
+  const slidesHtml = slides.map((s, i) => `
+    <section class="slide${i === 0 ? ' active' : ''}" data-i="${i}">
+      <div class="slide-kicker">${escHtml(s.kicker)}</div>
+      <h1>${escHtml(s.title)}</h1>
+      <div class="slide-body">${s.body}</div>
+    </section>`).join('\n');
+
+  return `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>${escHtml(result.title || 'Design Research')}</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+</style></head>
+<body>
+  <div class="slides" id="slides">${slidesHtml}</div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const total = ${slides.length};
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  render();
+</script>
+</body></html>`;
+}
+
+function saveDesignResearchWiki(id, date, topic, result) {
+  const findingsMd = result.findings.map((f, i) =>
+    `### ${i + 1}. ${f.title}\n\n${f.description || ''}\n\n${f.source_url ? `Source: [${f.source_title || f.source_url}](${f.source_url})` : ''}\n`
+  ).join('\n');
+  const title = (result.title || 'Design Research').replace(/"/g, '\\"');
+  writeWiki(`analyses/${id}.md`, `---
+type: analysis
+title: "${title}"
+date: "${date}"
+tags: [design, ui-ux, mission-control${topic ? ', ' + slugifyTopic(topic) : ''}]
+---
+
+## Design Research${topic ? ` — focus: ${topic}` : ''}
+
+${result.summary || ''}
+
+${findingsMd}
+_Researched by Red · slideshow: open the Design Lab in ED to view the interactive version._
+
+_Generated: ${new Date().toLocaleString()}_
+`);
+  appendLog('note', `Design research: ${result.title || topic || 'general'} (${result.findings.length} findings)`, [`[[${id}]]`], []);
+  let idx = readWiki('index.md');
+  if (idx && !idx.includes(`[[${id}]]`)) {
+    const entry = `- [[${id}]] — ${(result.summary || 'Design research run').slice(0, 140)}\n`;
+    idx = idx.includes('## Analyses') ? idx.replace('## Analyses\n', '## Analyses\n' + entry) : idx + '\n## Analyses\n' + entry;
+    writeWiki('index.md', idx);
+  }
+}
+
+async function runAndSaveDesignResearch(topic, idSuffix) {
+  const result = await runDesignResearch(topic);
+  const date   = today();
+  const id     = `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`;
+  const html   = buildSlideshowHtml(topic, result);
+  writeVault(`design-research/${id}.html`, html);
+  saveDesignResearchWiki(id, date, topic, result);
+  const data = getAppData();
+  data.designResearch = data.designResearch || [];
+  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix });
+  data.designResearch = data.designResearch.slice(0, 30);
+  saveAppData(data);
+  return { id, result };
+}
+
+async function maybeAutoRunDesignResearch() {
+  if (!getApiKey()) return;
+  if (new Date().getDay() !== 1) return; // Mondays only
+  const data = getAppData();
+  if (data.lastDesignResearchAutoRun === today()) return;
+  try {
+    const { id, result } = await runAndSaveDesignResearch('', 'weekly');
+    const fresh = getAppData();
+    fresh.lastDesignResearchAutoRun = today();
+    saveAppData(fresh);
+    if (PUSH_ENABLED) {
+      const subs    = fresh.pushSubscriptions || [];
+      const payload = JSON.stringify({
+        title: "🎨 Red's weekly design research is ready",
+        body:  `${result.title || 'New ideas for Mission Control'} — open ED to view.`,
+      });
+      for (const sub of subs) webpush.sendNotification(sub, payload).catch(() => {});
+    }
+    console.log('  Design Lab: weekly auto-research complete —', id);
+  } catch (err) {
+    console.error('Weekly design research failed:', err.message);
+  }
+}
+
+app.post('/api/design-research', async (req, res) => {
+  try {
+    const topic = String(req.body?.topic || '').slice(0, 200);
+    const { id, result } = await runAndSaveDesignResearch(topic, null);
+    res.json({ ok: true, id, title: result.title, findingsCount: result.findings.length });
+  } catch (err) {
+    console.error('Design research error:', err.message);
+    res.status(err.code === 'NO_KEY' ? 401 : 500).json({ error: err.code || 'RESEARCH_FAILED', message: err.message });
+  }
+});
+
+app.get('/api/design-research', (req, res) => {
+  const data = getAppData();
+  res.json({ runs: data.designResearch || [] });
+});
+
+app.get('/api/design-research/:id', (req, res) => {
+  const { id } = req.params;
+  if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).send('Invalid id');
+  const html = readVault(`design-research/${id}.html`);
+  if (!html) return res.status(404).send('Not found');
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
 // ── REMINDER PUSH CHECK ────────────────────────────────────────────────────────
 async function checkReminders() {
   if (!PUSH_ENABLED) return;
@@ -613,6 +834,9 @@ async function main() {
     checkReminders().catch(console.error);
     setInterval(() => checkReminders().catch(console.error), 5 * 60 * 1000);
   }
+
+  maybeAutoRunDesignResearch().catch(console.error);
+  setInterval(() => maybeAutoRunDesignResearch().catch(console.error), 6 * 60 * 60 * 1000);
 }
 
 main().catch(console.error);

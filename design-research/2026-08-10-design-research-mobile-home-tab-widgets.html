@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Mobile Widget Interaction &amp; Retro Gamification in Personal Dashboards</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Mobile Widget Interaction &amp; Retro Gamification in Personal Dashboards</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Research found three key patterns for Mission Control's mobile home tab: low-friction one-tap habit widgets inspired by Loop &amp; Productive apps, tactile neumorphic/claymorphism styling that pairs well with retro gaming aesthetics (Press Start microtrend), and asymmetric bento grid layouts that use spatial weight to signal priority without extra labels—ideal for organizing todos, reminders, and weekly schedule at a glance.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: mobile home tab widgets</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>One-Tap Habit Widget (Zero-Friction Completion)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habit trackers like Loop Habit Tracker and HabitHub succeed by letting users mark habits done directly from the home screen widget in one tap, saving 20–30 seconds per habit per day. Mission Control could surface today's highest-priority todos (rank S/A) as a dedicated widget card that toggles completion state without opening the full dashboard. Pairs with the existing rank/XP system and keeps the home tab focused on immediate action.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://habitbox.app/blog/habit-tracker-widget" target="_blank" rel="noopener" style="color:#ff8a63;">HabitBox Blog: Habit Tracker Widget</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:16px;font-family:&quot;VT323&quot;,monospace;border:2px solid #ff8a63;border-radius:4px;max-width:280px;'&gt;&lt;div style='color:#dfeeff;font-size:12px;margin-bottom:10px;font-family:&quot;Press Start 2P&quot;,cursive;'&gt;TODAY'S S-RANK&lt;/div&gt;&lt;div style='display:flex;gap:8px;flex-direction:column;'&gt;&lt;div style='background:#12253c;padding:8px;border-left:3px solid #e85d3a;display:flex;justify-content:space-between;align-items:center;'&gt;&lt;span style='color:#dfeeff;font-size:14px;'&gt;Fix critical bug&lt;/span&gt;&lt;input type='checkbox' style='width:20px;height:20px;cursor:pointer;'&gt;&lt;/div&gt;&lt;div style='background:#12253c;padding:8px;border-left:3px solid #e85d3a;display:flex;justify-content:space-between;align-items:center;'&gt;&lt;span style='color:#dfeeff;font-size:14px;'&gt;Review PR&lt;/span&gt;&lt;input type='checkbox' style='width:20px;height:20px;cursor:pointer;'&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style='margin-top:10px;text-align:center;color:#7fffb0;font-size:11px;'&gt;+50 XP per tick&lt;/div&gt;&lt;/div&gt;"></iframe></div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Claymorphism Touch on Retro Grid (Tactile Neumorphism for Gaming UI)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">2025–26 design trends show claymorphism (soft 3D, friendlier than neumorphism) pairs beautifully with retro gaming aesthetics—Press Start microtrend merges '70s–'80s pixel art with neon and tech-inspired visuals. Mission Control already uses inset shadows and bold colors; replacing hard shadows with softer, rounded 3D-effect tiles on the mobile home tab (todos, reminders, schedule widgets) would feel more tactile and 'playable' while honoring the JRPG identity.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.adobe.com/express/learn/blog/2025-microtrends-press-start" target="_blank" rel="noopener" style="color:#ff8a63;">Adobe Express: Press Start Microtrend</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:20px;font-family:&quot;VT323&quot;,monospace;display:grid;grid-template-columns:1fr 1fr;gap:12px;'&gt;&lt;div style='background:linear-gradient(135deg,#12253c 0%,#1e3a5f 100%);padding:16px;border-radius:8px;box-shadow:3px 3px 0 rgba(31,58,95,0.6),inset -2px -2px 4px rgba(0,0,0,0.4),inset 2px 2px 4px rgba(255,255,255,0.1);'&gt;&lt;div style='color:#dfeeff;font-size:11px;font-family:&quot;Press Start 2P&quot;,cursive;margin-bottom:8px;'&gt;FOCUS&lt;/div&gt;&lt;div style='color:#ff8a63;font-size:16px;'&gt;3 hours&lt;/div&gt;&lt;/div&gt;&lt;div style='background:linear-gradient(135deg,#12253c 0%,#1e3a5f 100%);padding:16px;border-radius:8px;box-shadow:3px 3px 0 rgba(31,58,95,0.6),inset -2px -2px 4px rgba(0,0,0,0.4),inset 2px 2px 4px rgba(255,255,255,0.1);'&gt;&lt;div style='color:#dfeeff;font-size:11px;font-family:&quot;Press Start 2P&quot;,cursive;margin-bottom:8px;'&gt;SOCIAL&lt;/div&gt;&lt;div style='color:#7fffb0;font-size:16px;'&gt;1 event&lt;/div&gt;&lt;/div&gt;&lt;div style='background:linear-gradient(135deg,#12253c 0%,#1e3a5f 100%);padding:16px;border-radius:8px;box-shadow:3px 3px 0 rgba(31,58,95,0.6),inset -2px -2px 4px rgba(0,0,0,0.4),inset 2px 2px 4px rgba(255,255,255,0.1);grid-column:1/-1;'&gt;&lt;div style='color:#dfeeff;font-size:11px;font-family:&quot;Press Start 2P&quot;,cursive;margin-bottom:8px;'&gt;WEEKLY&lt;/div&gt;&lt;div style='color:#dfeeff;font-size:13px;'&gt;Mon ▮ Tue ▯ Wed ▮ Thu ▯&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Asymmetric Bento Grid for Mobile (Spatial Priority Signaling)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Bento grids (variable-size tiles in CSS Grid) communicate data priority through spatial weight alone—larger tiles draw eyes first. Perfect for Mission Control's mobile home tab: make today's rank-S todos span 2 columns, reminders 1 column, and the weekly bar full-width below. No badge inflation needed; the grid layout does the hierarchy. Reduces cognitive load on small screens and scales cleanly across devices.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.saasframe.io/blog/designing-bento-grids-that-actually-work-a-2026-practical-guide" target="_blank" rel="noopener" style="color:#ff8a63;">SaaSFrame: Designing Bento Grids That Actually Work</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:16px;font-family:&quot;VT323&quot;,monospace;display:grid;grid-template-columns:1fr 1fr;gap:12px;'&gt;&lt;div style='background:#12253c;padding:12px;border:2px solid #ff8a63;grid-column:span 2;'&gt;&lt;div style='color:#dfeeff;font-size:10px;font-family:&quot;Press Start 2P&quot;,cursive;margin-bottom:6px;'&gt;S-RANK TODOS&lt;/div&gt;&lt;div style='color:#ff8a63;font-size:14px;'&gt;2 tasks&lt;/div&gt;&lt;/div&gt;&lt;div style='background:#12253c;padding:10px;border:2px solid #ff7a59;'&gt;&lt;div style='color:#dfeeff;font-size:9px;font-family:&quot;Press Start 2P&quot;,cursive;'&gt;REMINDERS&lt;/div&gt;&lt;div style='color:#dfeeff;font-size:12px;margin-top:6px;'&gt;4:30 PM&lt;/div&gt;&lt;/div&gt;&lt;div style='background:#12253c;padding:10px;border:2px solid #7fffb0;'&gt;&lt;div style='color:#dfeeff;font-size:9px;font-family:&quot;Press Start 2P&quot;,cursive;'&gt;SCHEDULE&lt;/div&gt;&lt;div style='color:#7fffb0;font-size:12px;margin-top:6px;'&gt;3 events&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  render();
+</script>
+</body></html>

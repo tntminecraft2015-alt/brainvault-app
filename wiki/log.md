@@ -385,3 +385,63 @@ Tasks synced for 2026-05-14: 4/5 complete
 **Pages created:** [[chat-2026-05-14]]
 
 Chat session on 2026-05-14
+
+## [2026-07-08] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[daily-tasks-2026-07-08]]
+
+Tasks synced for 2026-07-08: 0/4 complete
+
+## [2026-07-08] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[mission-schedule]]
+
+Schedule synced (10 missions)
+
+## [2026-08-10] note | Design Lab feature — ED research assistant
+
+**Operation:** note
+**Source:** N/A (feature build, not a raw ingest)
+**Pages updated:** [[mission-control]]
+
+Built the "Design Lab" feature the human asked for: a UI/UX research assistant living inside the ED tab. On-demand (button + optional topic focus) and automatic (weekly, Mondays, via a 6h server interval check) triggers both call `runDesignResearch()` in `server.js`, which asks Claude (with the `web_search_20250305` server tool) for 4–6 UI/UX findings grounded in Mission Control's actual design language, each with a Claude-drawn HTML mockup in the app's own palette. Output is dual per the human's choice: a self-contained click-through HTML slideshow (`design-research/<id>.html`, served via a new `/api/design-research/:id` route) and a wiki analysis page (written the same way the existing `syncTasks`/`syncSchedule` functions write theirs).
+
+Added to `server.js`: `runDesignResearch`, `buildSlideshowHtml`, `saveDesignResearchWiki`, `runAndSaveDesignResearch`, `maybeAutoRunDesignResearch`, plus three new routes. Added to `mission-control.html`: a 🎨 DESIGN LAB button in both the desktop and mobile ED tabs, a research/list modal, and a slideshow-viewer modal.
+
+**Not yet live-tested.** Syntax-checked (`node -c`, extracted `<script>` block parse) but never run against a real API key or the real `app-data.json` — per prior guidance about the local dev server writing real data, held off on a live trigger without checking in first. Also unverified: whether `web_search_20250305` is actually enabled on whatever key ends up configured (OAuth token vs. console API key may differ). Working tree changes from this session (including this log/index/entity update, plus stranded changes from earlier — 2026-07-08 sync and the 2026-08-10 career-leads analysis) are not yet committed or pushed to either remote.
+
+## [2026-08-10] note | Design Lab live test + Haiku model swap + "Red" persona
+
+**Operation:** note
+**Source:** N/A (feature follow-up, not a raw ingest)
+**Pages updated:** [[mission-control]]
+
+Ran the Design Lab live for the first time: started the local server, backed up `app-data.json`/`log.md`/`index.md` to a scratchpad first as a safety net, then POSTed `/api/design-research` twice. Both attempts (plus the Monday auto-run, which correctly self-triggered on server startup) hit a 429 rate limit on the shared Claude Code OAuth token — same failure mode `/api/chat` already handles with a friendly message. Confirmed via diff that the failed runs left zero trace in `app-data.json` or `log.md` — the write path only fires after a successful parse, so the failure mode is safe, just blocked. Root cause is probably OAuth-token contention with the concurrently-running CLI session, not the request itself.
+
+Separately, the human asked to swap Mission Control's model to something less complex/cheaper and to give the design-research agent its own name, "Red," distinct from ED (the existing chat assistant). Changed both `/api/chat` (ED) and `runDesignResearch` (Red) from `claude-sonnet-4-6` to `claude-haiku-4-5-20251001`, and trimmed Red's research footprint: 3 findings instead of 4–6, `max_tokens` 3000 instead of 8000, 3 web searches instead of 6. Renamed Red throughout — system prompt persona line, Design Lab modal copy, slideshow kicker, push notification title, and the wiki-page byline Red's runs generate. This was a cost change, not a fix for the 429 — the rate limit is still unresolved and needs either a retest without a concurrent CLI session, or a real `console.anthropic.com` API key.
+
+## [2026-08-10] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-10-design-research-weekly]]
+
+Design research: Dashboard Clarity & Gamification Engagement (3 findings)
+
+## [2026-08-10] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-10-design-research-mobile-home-tab-widgets]]
+
+Design research: Mobile Widget Interaction & Retro Gamification in Personal Dashboards (3 findings)
+
+## [2026-08-10] note | Design Lab retest — passed, one real bug found and fixed
+
+**Operation:** note
+**Source:** N/A (feature retest, not a raw ingest)
+**Pages updated:** [[mission-control]]
+
+Retried the live test after the Haiku swap. The 429 cleared, but the first successful API response then failed to save: `writeVault()` (unlike `writeWiki()`) never created parent directories, so writing `design-research/<id>.html` threw `ENOENT` since that folder didn't exist yet. Confirmed via diff that this failure, too, left `app-data.json`/`log.md`/`index.md` untouched — the write ordering is safe. Fixed `writeVault` to `mkdirSync(..., {recursive:true})` first, matching `writeWiki`, and retried again: both the on-demand run above and the Monday auto-run (`[[2026-08-10-design-research-weekly]]`) completed cleanly end to end, findings and slideshows included. Design Lab is now confirmed working, not just built.
+
+One thing this surfaced: `design-research/*.html` lives outside the paths `.gitignore` currently routes to the `vault` remote (`wiki/`, `raw/`, `app-data.json`, `CLAUDE.md`, `templates/`), so as things stand these generated slideshow files would default into the `app` repo rather than `vault` if committed as-is. Flagged for the human to decide, not resolved.

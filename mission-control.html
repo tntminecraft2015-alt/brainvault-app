@@ -949,6 +949,9 @@
           </div>
         </div>
         <div class="tab-pane" id="tabClaude">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:5px;flex-shrink:0;">
+            <button onclick="openDesignLab()" style="font-family:'Press Start 2P',monospace;font-size:5px;background:var(--surface);border:1px solid rgba(223,238,255,.15);color:var(--fg-dim);cursor:pointer;padding:5px 8px;letter-spacing:1px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='rgba(223,238,255,.15)';this.style.color='var(--fg-dim)'">🎨 DESIGN LAB</button>
+          </div>
           <div class="chat-scroll" id="chatScroll"></div>
           <div class="chat-input-row">
             <textarea class="chat-inp" id="chatInp" placeholder="Ask Claude about your vault..." rows="2"
@@ -1120,6 +1123,7 @@
       <div class="mob-tab-hd">
         <span>🧠 ED</span>
         <div style="display:flex;align-items:center;gap:8px;">
+          <button class="mob-wiki-btn" onclick="openDesignLab()">🎨 LAB</button>
           <button class="mob-wiki-btn" onclick="openWikiDrawer()">📚 WIKI</button>
           <div class="server-dot" id="mobServerDot"></div>
           <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(223,238,255,.4);cursor:pointer;">⚙</button>
@@ -1337,6 +1341,33 @@
       <p class="key-info" id="keyStatus" style="color:rgba(223,238,255,.35);font-size:11px;"></p>
     </div>
     <div class="modal-btns"><button class="modal-btn ok" onclick="saveKey()">Save Key</button><button class="modal-btn" onclick="closeModal('keyModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- DESIGN LAB MODAL -->
+<div class="overlay" id="designLabModal">
+  <div class="modal" style="width:560px;max-width:95vw;">
+    <div class="modal-title">🎨 DESIGN LAB</div>
+    <p class="key-info" style="margin-bottom:10px;">Send Red — ED's research counterpart — off to research UI/UX ideas for Mission Control. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs every Monday too.</p>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <input id="dlTopicInp" class="m-inp" type="text" placeholder="Optional focus (e.g. 'mobile nav', 'gamification')..." style="flex:1;" onkeydown="if(event.key==='Enter')runDesignResearch();">
+      <button class="modal-btn ok" id="dlRunBtn" onclick="runDesignResearch()">▶ RESEARCH</button>
+    </div>
+    <div id="dlStatus" style="font-family:'VT323',monospace;font-size:15px;opacity:.7;min-height:18px;margin-bottom:10px;"></div>
+    <div class="m-label" style="margin-bottom:8px;">PAST RESEARCH</div>
+    <div id="dlList" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    <div class="modal-btns"><button class="modal-btn" onclick="closeModal('designLabModal')">CLOSE</button></div>
+  </div>
+</div>
+
+<!-- DESIGN LAB SLIDESHOW MODAL -->
+<div class="overlay" id="dlSlideshowModal">
+  <div class="modal" style="width:min(96vw,900px);height:min(90vh,640px);padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="modal-title" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+      <span>◆ SLIDESHOW</span>
+      <button onclick="closeModal('dlSlideshowModal')" style="background:none;border:none;color:var(--fg-dim);font-size:16px;cursor:pointer;">✕</button>
+    </div>
+    <iframe id="dlSlideshowFrame" style="flex:1;border:none;width:100%;"></iframe>
   </div>
 </div>
 
@@ -2795,6 +2826,49 @@ function formatWikiMd(md){
 
 function sendChat(){ const inp=document.getElementById('chatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'chatScroll','chatSendBtn'); switchTab('claude'); }
 function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
+
+// ══════════════════════════════════════════════════════════════
+// DESIGN LAB
+// ══════════════════════════════════════════════════════════════
+async function openDesignLab(){
+  openModal('designLabModal');
+  await loadDesignResearchList();
+}
+async function loadDesignResearchList(){
+  const list=document.getElementById('dlList');
+  list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">Loading…</div>';
+  try{
+    const r=await fetch(`${SERVER}/api/design-research`,{signal:AbortSignal.timeout(8000)});
+    const d=await r.json();
+    const runs=d.runs||[];
+    if(!runs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No research yet — run one above.</div>'; return; }
+    list.innerHTML=runs.map(r=>`
+      <div class="wiki-row" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
+        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${esc(r.title)}${r.auto?' <span style="opacity:.5;font-size:13px;">(weekly)</span>':''}</div>
+        <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
+      </div>`).join('');
+  }catch(e){ list.innerHTML='<div style="opacity:.5;">Failed to load.</div>'; }
+}
+async function runDesignResearch(){
+  const inp=document.getElementById('dlTopicInp');
+  const topic=inp?.value.trim()||'';
+  const btn=document.getElementById('dlRunBtn');
+  const status=document.getElementById('dlStatus');
+  if(!serverOnline){ status.textContent='⚠ Server offline — start the server first.'; return; }
+  btn.setAttribute('disabled','1');
+  status.textContent='Red is researching… this can take up to a minute.';
+  try{
+    const r=await fetch(`${SERVER}/api/design-research`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic}),signal:AbortSignal.timeout(120000)});
+    const d=await r.json();
+    if(d.error){ status.textContent='⚠ '+(d.message||d.error); }
+    else{ status.textContent=`✓ Done — "${d.title}" (${d.findingsCount} findings)`; inp.value=''; await loadDesignResearchList(); }
+  }catch(e){ status.textContent='⚠ Request failed: '+(e.message||'timeout'); }
+  btn.removeAttribute('disabled');
+}
+function openSlideshow(id){
+  document.getElementById('dlSlideshowFrame').src=`${SERVER}/api/design-research/${id}`;
+  openModal('dlSlideshowModal');
+}
 
 // ── VAULT ──
 function doSearch(){ const q=document.getElementById('searchInp')?.value.trim(); if(!q)return; window.open('obsidian://search?vault=BrainVault&query='+encodeURIComponent(q),'_blank'); }

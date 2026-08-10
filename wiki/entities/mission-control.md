@@ -2,13 +2,16 @@
 type: entity
 entity_type: project
 title: "Mission Control Dashboard"
-last_updated: "2026-05-13"
+last_updated: "2026-08-10"
 tags: [dashboard, tools, obsidian, html, personal-ops]
 ---
 
 # Mission Control Dashboard
 
-A local single-file HTML dashboard (`mission-control.html`) living in the BrainVault root. Opened directly in the browser — no server, no build step. All state persists in **browser localStorage** only.
+A single-file HTML dashboard (`mission-control.html`) backed by an Express server (`server.js`). Runs locally (`start-server.bat` / `launch.vbs`) or deployed to Render (https://brainvault-app.onrender.com/) in "cloud mode," where all vault reads/writes go through the GitHub Contents API instead of local disk. Superseded the original localStorage-only version.
+
+> [!note] Page is stale in places
+> Most of this page (Layout, localStorage Keys section) still describes the original browser-only build from 2026-05-13. Sections below marked with a date have been updated since; the rest reflects the vault as of the 2026-05-13 build and hasn't been re-audited against the current `mission-control.html` (now containing a merged mobile 5-tab redesign, ED chat, push notifications, wiki browse, and the Design Lab below). Worth a full re-sync next session.
 
 ---
 
@@ -69,6 +72,23 @@ Each has a color chip rendered inline.
 - "Claude CLI" button opens Windows Terminal pointed at BrainVault via `wt:` URI scheme:
   `wt:-d C:\Users\thoma\OneDrive\Desktop\BrainVault`
 
+### Design Lab (added 2026-08-10)
+A research feature living inside the ED tab (🎨 DESIGN LAB button, desktop and mobile), run by **Red** — a separate agent persona from ED. ED answers questions about the vault in chat; Red's only job is design research. Two ways to trigger it:
+- **On-demand:** type an optional focus (e.g. "mobile nav", "gamification") and hit Research. Calls Claude with the server-side `web_search_20250305` tool (max 3 searches per run), grounded in this page's design-language section, and asks for exactly 3 UI/UX findings each with a Claude-drawn HTML/CSS mockup illustrating the idea in Mission Control's own palette.
+- **Automatic:** the server checks every 6h and auto-runs a general (no-focus) research pass every Monday if one hasn't run yet that day (`maybeAutoRunDesignResearch` in `server.js`), and push-notifies ("🎨 Red's weekly design research is ready") if push is enabled.
+
+**Model (updated 2026-08-10):** both ED's chat and Red's research run on `claude-haiku-4-5-20251001` (swapped from `claude-sonnet-4-6`) to keep token/cost usage low, since Red runs unattended on a schedule and ED runs on every chat turn. Research output was also trimmed — 3 findings instead of 4–6, `max_tokens` 3000 instead of 8000, 3 web searches instead of 6 — as part of the same cost-conscious pass. Worth revisiting if Haiku's mockups/finding quality turns out too shallow for the research use case.
+
+Each run produces two artifacts:
+- A self-contained HTML slideshow (`design-research/<id>.html`, served via `GET /api/design-research/:id`) — click-through cards with the finding, source link, and mockup in a sandboxed iframe. Opened in a modal from the DESIGN LAB panel's "past research" list.
+- A wiki analysis page (`wiki/analyses/<id>.md`) written the same way `syncTasks`/`syncSchedule` write theirs — via `saveDesignResearchWiki`, which also logs to `log.md` and links itself into `index.md`.
+
+Endpoints: `POST /api/design-research` (run), `GET /api/design-research` (list, backed by `app-data.json`'s `designResearch` array), `GET /api/design-research/:id` (serve the slideshow HTML).
+
+**Live-tested and working as of 2026-08-10.** First two attempts (pre-Haiku-swap) hit a 429 rate limit on the shared Claude Code OAuth token. After the model swap to Haiku, retried: the API call succeeded, but a real bug surfaced — `writeVault()` didn't create parent directories before writing (unlike `writeWiki()`, which does), so the first successful run failed at `writeVault('design-research/<id>.html', ...)` with `ENOENT` because `design-research/` didn't exist yet. Fixed by adding `fs.mkdirSync(path.dirname(full), { recursive: true })` to `writeVault`, matching `writeWiki`'s pattern. Retried again: both the on-demand run (topic: "mobile home tab widgets") and the Monday auto-run succeeded end to end — real findings with real sources, a real slideshow served correctly via `/api/design-research/:id`, and a real wiki analysis page written and logged. `app-data.json`'s `designResearch` list, `wiki/log.md`, and `wiki/index.md` all updated correctly.
+
+One open item: `design-research/*.html` files live outside `wiki/`, `raw/`, `app-data.json`, `CLAUDE.md`, `templates/` — the paths `.gitignore` currently routes to the vault remote — so as generated content they'd default to landing in the `app` repo instead unless `.gitignore`/the push workflow is adjusted. Not yet decided.
+
 ---
 
 ## localStorage Keys
@@ -84,7 +104,8 @@ Each has a color chip rendered inline.
 
 ## Pending Work
 
-- **Local sync server** (deferred): Small Python server at `localhost:8765` that serves `mission-control.html` and intercepts all data changes via a `/sync` POST endpoint, writing state to `wiki/mission-control-state.json`. Would allow Claude to auto-ingest dashboard state at session start.
+- ~~Local sync server~~ — done, differently than originally scoped: `server.js` (Node/Express, not Python) now serves the dashboard and syncs dashboard state into `wiki/analyses/` on every change via `/api/data` and `/api/sync`. See log entries throughout May–July 2026.
+- **Design Lab live test**: run a real research pass (costs an API call with web search) and confirm the slideshow/mockups render as intended, then decide if the weekly Monday auto-run cadence is the right one.
 
 ---
 

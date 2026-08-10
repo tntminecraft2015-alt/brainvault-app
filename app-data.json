@@ -1,11 +1,6 @@
 {
   "schedule": [
     {
-      "time": "23:59",
-      "title": "Bedtime",
-      "kind": "focus"
-    },
-    {
       "time": "09:00",
       "title": "Wake Up",
       "kind": "focus"
@@ -41,13 +36,18 @@
       "kind": "focus"
     },
     {
-      "time": "18:00",
+      "time": "16:00",
       "title": "Dinner",
       "kind": "focus"
     },
     {
       "time": "19:00",
       "title": "Enjoy",
+      "kind": "focus"
+    },
+    {
+      "time": "23:59",
+      "title": "Bedtime",
       "kind": "focus"
     }
   ],
@@ -86,24 +86,6 @@
     ]
   },
   "tasks": [
-    {
-      "text": "Fix Claude in MS",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
-    {
-      "text": "Fix color of text in calander",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
-    {
-      "text": "add budget to mission control",
-      "done": true,
-      "rank": "S",
-      "doneDate": "2026-05-14"
-    },
     {
       "text": "Laundry",
       "done": false,
@@ -168,6 +150,10 @@
     "Pack": {
       "count": 1,
       "lastDone": "2026-05-15"
+    },
+    "Laundry": {
+      "count": 1,
+      "lastDone": "2026-07-08"
     }
   },
   "budget": {
@@ -247,5 +233,25 @@
       "firstCaught": "2026-05-15",
       "shiny": false
     }
-  }
+  },
+  "pushSubscriptions": [],
+  "designResearch": [
+    {
+      "id": "2026-08-10-design-research-mobile-home-tab-widgets",
+      "date": "2026-08-10",
+      "topic": "mobile home tab widgets",
+      "title": "Mobile Widget Interaction & Retro Gamification in Personal Dashboards",
+      "findingsCount": 3,
+      "auto": false
+    },
+    {
+      "id": "2026-08-10-design-research-weekly",
+      "date": "2026-08-10",
+      "topic": "",
+      "title": "Dashboard Clarity & Gamification Engagement",
+      "findingsCount": 3,
+      "auto": true
+    }
+  ],
+  "lastDesignResearchAutoRun": "2026-08-10"
 }

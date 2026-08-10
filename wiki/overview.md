@@ -65,6 +65,12 @@ Current properties:
 
 ---
 
+## Career Search
+
+A third use of this vault: tracking music-career job leads around Columbus. Resume on file at `raw/thomas-terrell-resume.pdf`. See [[2026-08-10-columbus-music-career-job-leads]] for the current realistic lead list (venue bartending, church accompanist work, freelance arranging outreach, music retail, event staff, wedding gig work) with direct apply links.
+
+---
+
 ## How to Use This Wiki
 
 **To explore:** Start with [[index]] to see all pages. Use Obsidian's graph view to see the shape of the knowledge.
