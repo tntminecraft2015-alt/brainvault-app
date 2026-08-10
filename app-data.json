@@ -105,6 +105,12 @@
       "done": false,
       "rank": "B",
       "doneDate": null
+    },
+    {
+      "text": "Data-Rich Calendar Heatmaps (Dual-View Pattern) — Calendar interfaces can overlay heatmaps showing financial or contextual performance along",
+      "done": false,
+      "rank": "B",
+      "doneDate": null
     }
   ],
   "streakDays": [],
@@ -292,6 +298,14 @@
     }
   ],
   "designResearch": [
+    {
+      "id": "2026-08-10-design-research-calendar-upgrades-and-designs",
+      "date": "2026-08-10",
+      "topic": "Calendar upgrades and designs",
+      "title": "Calendar Upgrades & Gamification for Mission Control",
+      "findingsCount": 3,
+      "auto": false
+    },
     {
       "id": "2026-08-10-design-research-mobile-home-tab-widgets",
       "date": "2026-08-10",
