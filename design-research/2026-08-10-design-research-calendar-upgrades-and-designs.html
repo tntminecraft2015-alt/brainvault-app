@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Calendar Upgrades &amp; Gamification for Mission Control</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .add-quest-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
+  .add-quest-btn:hover:not(:disabled){filter:brightness(1.08);}
+  .add-quest-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .add-quest-btn{width:100%;padding:14px;font-size:14px;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Calendar Upgrades &amp; Gamification for Mission Control</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Found three high-impact calendar patterns from 2025–2026 design trends: heatmap overlays that turn calendar cells into data-rich insights, tile-based color-coding for visual streak motivation (vs. pure numerics), and adaptive event density via '+N more' popover patterns. All three fit Mission Control's existing bento-card JRPG aesthetic and can deepen the calendar's role as a visual feedback loop for habit/task progress.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: Calendar upgrades and designs</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Data-Rich Calendar Heatmaps (Dual-View Pattern)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Calendar interfaces can overlay heatmaps showing financial or contextual performance alongside event scheduling, giving users both scheduling and strategic overviews at a glance. For Mission Control, this means toggling between a standard monthly grid and a heatmap showing XP earned per day, task completion density, or event-kind frequency. Mission Control's rank colors (S/A/B/C) and event kind chips already support this visual layering. A heatmap toggle in the calendar modal lets players see patterns at a glance.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.eleken.co/blog-posts/calendar-ui" target="_blank" rel="noopener" style="color:#ff8a63;">Eleken Blog — Calendar UI Examples</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:16px;font-family:VT323;color:#dfeeff;border:2px solid #ff8a63'&gt;&lt;div style='font-size:14px;margin-bottom:12px;font-weight:bold'&gt;📊 CALENDAR VIEW&lt;/div&gt;&lt;div style='display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px'&gt;&lt;div style='aspect-ratio:1;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #12253c;opacity:0.6'&gt;1&lt;/div&gt;&lt;div style='aspect-ratio:1;background:rgba(127,255,176,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #7fffb0'&gt;2&lt;/div&gt;&lt;div style='aspect-ratio:1;background:rgba(255,138,99,0.4);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #ff8a63'&gt;3&lt;/div&gt;&lt;div style='aspect-ratio:1;background:rgba(232,93,58,0.5);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #e85d3a;color:#000'&gt;4&lt;/div&gt;&lt;div style='aspect-ratio:1;background:rgba(240,160,32,0.4);display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #f0a020'&gt;5&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #12253c;opacity:0.6'&gt;6&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#1e3a5f;display:flex;align-items:center;justify-content:center;font-size:11px;border:1px solid #12253c;opacity:0.6'&gt;7&lt;/div&gt;&lt;/div&gt;&lt;div style='font-size:10px;color:#7fffb0'&gt;Legend: Heatmap = XP Density | Toggle to Grid&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="add-quest-btn" onclick="addToQuests(0, this)">+ ADD TO QUEST LOG</button></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habit trackers using tile-based grids make tracking visually intuitive and satisfying, transforming habit tracking into an engaging experience. Apps like HabitBull visualize streaks by highlighting successful days in green and missed days in pink, acknowledging that life can interfere with streaks while still providing a positive overall view. Mission Control's event-kind chips (training/meeting/focus/social/errand/routine) could fill calendar cells with color blocks instead of text event titles, making a full month of colored tiles feel like filling a progress grid—pure visual satisfaction.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://habitrewards.me/" target="_blank" rel="noopener" style="color:#ff8a63;">Habit Rewards &amp; Gamification+ — Habit Tracker Design</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:16px;font-family:VT323;color:#dfeeff;border:2px solid #ff8a63'&gt;&lt;div style='font-size:14px;margin-bottom:12px;font-weight:bold'&gt;🎮 TILE STREAK GRID&lt;/div&gt;&lt;div style='display:grid;grid-template-columns:repeat(7,1fr);gap:3px'&gt;&lt;div style='aspect-ratio:1;background:#7fffb0;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#7fffb0;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#ff8a63;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#1e3a5f;border:1px dashed #12253c;border-radius:2px;opacity:0.5'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#7fffb0;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#7fffb0;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;div style='aspect-ratio:1;background:#dfeeff;border:1px inset #12253c;border-radius:2px'&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style='font-size:10px;margin-top:8px;color:#7fffb0'&gt;6/7 tiles filled = 86% week complete&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="add-quest-btn" onclick="addToQuests(1, this)">+ ADD TO QUEST LOG</button></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Overflow Management with '+N More' Popovers &amp; Expand Toggle</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">The standard calendar overflow approach shows 2–3 events with a '+N more' indicator—clicking it reveals a popover or expands the cell. Mission Control's current monthly grid already hints at event overflow; implementing a popover for dense days lets high-activity calendars remain scannable while hiding nothing. Event styling should communicate category and duration through color and icons, especially in high-density calendars where color-coding must include pattern or icon differentiation for color-blind users.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://muz.li/inspiration/calendar/" target="_blank" rel="noopener" style="color:#ff8a63;">Muzli — Calendar UI/UX Inspiration</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background:#0a1929;padding:16px;font-family:VT323;color:#dfeeff;border:2px solid #ff8a63'&gt;&lt;div style='font-size:14px;margin-bottom:12px;font-weight:bold'&gt;📅 DAY OVERFLOW&lt;/div&gt;&lt;div style='background:#12253c;padding:8px;border:1px inset #1e3a5f;margin-bottom:8px'&gt;&lt;div style='font-size:11px;margin-bottom:4px'&gt;MON 08.10&lt;/div&gt;&lt;div style='display:flex;gap:4px;margin-bottom:4px'&gt;&lt;span style='display:inline-block;width:20px;height:12px;background:#4a90d9;border-radius:1px'&gt;&lt;/span&gt;&lt;span style='font-size:9px'&gt;training&lt;/span&gt;&lt;/div&gt;&lt;div style='display:flex;gap:4px;margin-bottom:4px'&gt;&lt;span style='display:inline-block;width:20px;height:12px;background:#f0a020;border-radius:1px'&gt;&lt;/span&gt;&lt;span style='font-size:9px'&gt;meeting&lt;/span&gt;&lt;/div&gt;&lt;div style='color:#7fffb0;font-size:10px;font-weight:bold;cursor:pointer'&gt;+2 more »&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="add-quest-btn" onclick="addToQuests(2, this)">+ ADD TO QUEST LOG</button></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const FINDINGS = [{"title":"Data-Rich Calendar Heatmaps (Dual-View Pattern)","description":"Calendar interfaces can overlay heatmaps showing financial or contextual performance alongside event scheduling, giving users both scheduling and strategic overviews at a glance. For Mission Control, this means toggling between a standard monthly grid and a heatmap showing XP earned per day, task completion density, or event-kind frequency. Mission Control's rank colors (S/A/B/C) and event kind chips already support this visual layering. A heatmap toggle in the calendar modal lets players see patterns at a glance."},{"title":"Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)","description":"Habit trackers using tile-based grids make tracking visually intuitive and satisfying, transforming habit tracking into an engaging experience. Apps like HabitBull visualize streaks by highlighting successful days in green and missed days in pink, acknowledging that life can interfere with streaks while still providing a positive overall view. Mission Control's event-kind chips (training/meeting/focus/social/errand/routine) could fill calendar cells with color blocks instead of text event titles, making a full month of colored tiles feel like filling a progress grid—pure visual satisfaction."},{"title":"Overflow Management with '+N More' Popovers & Expand Toggle","description":"The standard calendar overflow approach shows 2–3 events with a '+N more' indicator—clicking it reveals a popover or expands the cell. Mission Control's current monthly grid already hints at event overflow; implementing a popover for dense days lets high-activity calendars remain scannable while hiding nothing. Event styling should communicate category and duration through color and icons, especially in high-density calendars where color-coding must include pattern or icon differentiation for color-blind users."}];
+  function addToQuests(i, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    const text = (f.title + (f.description ? ' — ' + f.description : '')).slice(0, 140);
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'mc-add-task', text }, window.location.origin);
+    }
+    btn.textContent = '✓ ADDED TO QUEST LOG';
+    btn.disabled = true;
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
