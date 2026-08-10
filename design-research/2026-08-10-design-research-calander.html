@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Calendar-Centric Design Patterns for Mission Control</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Calendar-Centric Design Patterns for Mission Control</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">&lt;cite index="22-1,22-2,22-3"&gt;Calendar heat maps are a dominant pattern in streak-focused apps, using color-coded calendar views to show at a glance which days you completed a habit, turning months of data into instantly readable patterns&lt;/cite&gt;. &lt;cite index="19-7"&gt;Pairing streak counters with monthly calendar heatmaps and triggering milestone celebrations builds durability in gamified productivity systems&lt;/cite&gt;. &lt;cite index="13-5,13-6"&gt;Bento grids have evolved from flashy Apple aesthetics to become the gold standard for information density, using rounded rectangles of varying sizes to group content into clean, modular layouts that feel both premium and scannable&lt;/cite&gt;.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: Calander</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Color-Coded Heatmap Calendar</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">&lt;cite index="22-1,22-2,22-3"&gt;Calendar heat maps for streak visualization use color-coded calendar views to show which days a habit was completed, with months of data becoming patterns readable instantly&lt;/cite&gt;. This fits Mission Control's JRPG aesthetic by replacing bland grid cells with saturated, emotion-driven colors tied to completion state — greens for success days, darker tones for breaks, creating visual feedback that rewards consistency. Could replace or supplement the current monthly calendar, turning it into a streaks heatmap that glows on completion.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://habi.app/insights/best-streak-tracker-apps/" target="_blank" rel="noopener" style="color:#ff8a63;">Habi App - Best Streak Tracker Apps in 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;border-radius:8px;font-family:'VT323',monospace;max-width:400px&quot;&gt;&lt;div style=&quot;color:#dfeeff;font-size:12px;margin-bottom:12px&quot;&gt;HEAT MAP CALENDAR&lt;/div&gt;&lt;div style=&quot;display:grid;grid-template-columns:repeat(7,1fr);gap:6px&quot;&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot; title=&quot;Done&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#ff8a63;border-radius:3px;border:2px solid #1e3a5f&quot; title=&quot;Missed&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#12253c;border-radius:3px;border:2px solid #1e3a5f&quot; title=&quot;Future&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#12253c;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#12253c;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#ff8a63;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:3px;border:2px solid #1e3a5f&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;color:#dfeeff;font-size:10px;margin-top:12px;display:flex;gap:8px&quot;&gt;&lt;div&gt;&lt;span style=&quot;display:inline-block;width:12px;height:12px;background:#7fffb0;border-radius:2px;margin-right:4px&quot;&gt;&lt;/span&gt;Complete&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;display:inline-block;width:12px;height:12px;background:#ff8a63;border-radius:2px;margin-right:4px&quot;&gt;&lt;/span&gt;Break&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Asymmetric Bento Grid Event Layout</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">&lt;cite index="13-5,13-6,13-7"&gt;Bento grids organize content into rounded rectangles of varying sizes in a clean modular grid, where the size of each cell instantly signals importance — a card spanning two columns naturally draws more attention than smaller neighbors&lt;/cite&gt;. Mission Control could reorganize its calendar view and upcoming reminders into a variable-height bento structure: important upcoming events (meetings, focus blocks) get larger cards, routine errands stay compact, all color-coded by event kind. Responds naturally to the JRPG aesthetic with hard box shadows and intentional white space.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://zignuts.com/blog/neumorphism-vs-glassmorphism" target="_blank" rel="noopener" style="color:#ff8a63;">Zignuts - Neumorphism vs Glassmorphism: 2026 Modern UI Design Trends</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;border-radius:8px;font-family:'Press Start 2P','VT323',monospace;max-width:500px&quot;&gt;&lt;div style=&quot;font-size:8px;color:#dfeeff;margin-bottom:12px&quot;&gt;EVENTS (BENTO)&lt;/div&gt;&lt;div style=&quot;display:grid;grid-template-columns:repeat(4,1fr);gap:8px&quot;&gt;&lt;div style=&quot;grid-column:span 2;background:#12253c;border:2px solid #ff8a63;border-radius:4px;padding:8px;box-shadow:inset 0 0 0 2px #ff8a63&quot;&gt;&lt;div style=&quot;font-size:7px;color:#ff8a63;margin-bottom:4px&quot;&gt;MEETING&lt;/div&gt;&lt;div style=&quot;font-size:10px;color:#dfeeff&quot;&gt;Code Review&lt;/div&gt;&lt;div style=&quot;font-size:8px;color:#1e3a5f&quot;&gt;2:00 PM&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background:#12253c;border:2px solid #dfeeff;border-radius:4px;padding:8px;box-shadow:inset 0 0 0 2px #dfeeff&quot;&gt;&lt;div style=&quot;font-size:7px;color:#dfeeff;margin-bottom:4px&quot;&gt;ROUTINE&lt;/div&gt;&lt;div style=&quot;font-size:9px;color:#dfeeff&quot;&gt;Grocery&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background:#12253c;border:2px solid #dfeeff;border-radius:4px;padding:8px;box-shadow:inset 0 0 0 2px #dfeeff&quot;&gt;&lt;div style=&quot;font-size:7px;color:#dfeeff;margin-bottom:4px&quot;&gt;ERRAND&lt;/div&gt;&lt;div style=&quot;font-size:9px;color:#dfeeff&quot;&gt;Gas&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;grid-column:span 2;background:#12253c;border:2px solid #7fffb0;border-radius:4px;padding:8px;box-shadow:inset 0 0 0 2px #7fffb0&quot;&gt;&lt;div style=&quot;font-size:7px;color:#7fffb0;margin-bottom:4px&quot;&gt;FOCUS&lt;/div&gt;&lt;div style=&quot;font-size:10px;color:#dfeeff&quot;&gt;Deep Work: Design&lt;/div&gt;&lt;div style=&quot;font-size:8px;color:#1e3a5f&quot;&gt;10:00 AM – 12:00 PM&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Milestone Celebration Trigger on Calendar Milestones</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">&lt;cite index="19-7"&gt;Pairing a streak counter with a monthly calendar heatmap and triggering milestone celebrations as users build consistency over time keeps systems durable&lt;/cite&gt;. &lt;cite index="20-8"&gt;The emotional weight of what is at stake shapes how much users care about maintaining a streak — loss aversion is only as strong as the perceived value of what is being protected&lt;/cite&gt;. Mission Control could trigger XP pop animations, milestone badges, or brief scanline-burst effects on the calendar when users reach 7-day, 14-day, or monthly streaks, turning the heatmap into a celebration device that reinforces the JRPG reward loop without feeling noise-driven.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://lovable.dev/guides/how-to-build-a-habit-tracker-app" target="_blank" rel="noopener" style="color:#ff8a63;">Lovable - How to Build a Habit Tracker App</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;border-radius:8px;font-family:'VT323',monospace;max-width:400px;position:relative&quot;&gt;&lt;div style=&quot;color:#dfeeff;font-size:12px;margin-bottom:12px&quot;&gt;7 DAY MILESTONE&lt;/div&gt;&lt;div style=&quot;background:#12253c;border:3px inset #ff8a63;border-radius:4px;padding:12px;text-align:center;position:relative;overflow:hidden&quot;&gt;&lt;div style=&quot;font-size:28px;margin:8px 0;animation:pulse 0.6s&quot;&gt;🎯&lt;/div&gt;&lt;div style=&quot;color:#ff8a63;font-size:10px;font-weight:bold&quot;&gt;STREAK ACHIEVED!&lt;/div&gt;&lt;div style=&quot;color:#dfeeff;font-size:12px;margin-top:8px&quot;&gt;7 DAYS COMPLETE&lt;/div&gt;&lt;div style=&quot;color:#7fffb0;font-size:14px;margin-top:8px&quot;&gt;+50 XP&lt;/div&gt;&lt;/div&gt;&lt;style&gt;@keyframes pulse{0%{transform:scale(0.8);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}&lt;/style&gt;&lt;/div&gt;"></iframe></div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  render();
+</script>
+</body></html>
