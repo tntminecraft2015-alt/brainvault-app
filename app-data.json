@@ -222,9 +222,9 @@
       "shiny": true
     },
     "132": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-05-14",
-      "shiny": false
+      "shiny": true
     },
     "133": {
       "count": 2,
@@ -290,5 +290,16 @@
         "auth": "UAWZzE3S9evdPcuKk421BQ"
       }
     }
-  ]
+  ],
+  "designResearch": [
+    {
+      "id": "2026-08-10-design-research-weekly",
+      "date": "2026-08-10",
+      "topic": "",
+      "title": "Mission Control General Improvements: Cognitive Load, White Hat Gamification, Responsive Bento Evolution",
+      "findingsCount": 3,
+      "auto": true
+    }
+  ],
+  "lastDesignResearchAutoRun": "2026-08-10"
 }
