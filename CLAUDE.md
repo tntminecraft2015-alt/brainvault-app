@@ -166,6 +166,25 @@ Produce a lint report. Fix obvious structural issues (orphans, missing links). F
 
 ---
 
+## Workflow: Mission Control Change Requests
+
+Mission Control (`mission-control.html` + `server.js`) is a separate app living in this same repo, pushed to the `app` remote (see "Mission Control git remotes" — not the wiki). ED, the in-app chat assistant, can't edit code itself — when the human asks ED to change something about Mission Control, ED queues a spec file under `change-requests/*.md` (frontmatter `status: pending`) instead, and logs it as a `note` entry in `wiki/log.md`.
+
+**At the start of any session, check for pending requests:**
+```
+grep -l "status: pending" change-requests/*.md
+```
+
+For each pending request:
+1. Read the file — it has a "What the user asked for" section (human's intent) and an "Implementation notes" section (ED's spec).
+2. Implement the change in `mission-control.html` / `server.js`.
+3. Flip the file's frontmatter to `status: done` (or delete it — either is fine, the file is disposable once implemented).
+4. Ask the human before pushing to the `app` remote (pushing deploys live to Render).
+
+Don't treat these specs as gospel — ED is a Haiku-model chat assistant improvising a spec from one conversation, not a design doc; use judgment same as any other feature request.
+
+---
+
 ## Log Format
 
 `wiki/log.md` is append-only. Each entry:

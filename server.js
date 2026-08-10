@@ -166,7 +166,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [] };
 }
 
 function saveAppData(data) {
@@ -227,7 +227,12 @@ function buildSystemPrompt(userMessage) {
     }
   }
 
+  const persona = `You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have three jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, and (3) take requests to change Mission Control itself (the app's UI/behavior). Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. Be concise — this is a chat window, not an essay. You are a separate persona from Red, who only runs design research for the app itself.
+
+For job (3): you cannot edit code yourself. When the user clearly asks for a change to Mission Control (new feature, tweak, fix, visual change, etc.), call the queue_code_change tool with a precise, implementation-ready spec instead of trying to describe how you'd do it in prose. This queues the request to a file that the user's Claude Code session will read and implement later. After calling it, confirm briefly to the user that it's queued — don't restate the whole spec back to them. Only call this tool for actual Mission Control app changes, never for wiki/vault content changes (those go through the normal ingest workflow) and never speculatively.`;
+
   const parts = [
+    persona,
     '# BRAINVAULT SCHEMA (CLAUDE.md)\n' + claudeMd,
     '# WIKI INDEX\n' + indexMd,
     '# OVERVIEW\n' + overviewMd,
@@ -288,6 +293,82 @@ app.post('/api/data', (req, res) => {
   }
 });
 
+const QUEUE_CHANGE_TOOL = {
+  name: 'queue_code_change',
+  description: 'Queue a requested change to Mission Control (the web app itself) for the user\'s Claude Code session to implement and push later. Use ONLY when the user explicitly asks to change, add, fix, or tweak something about how Mission Control looks or behaves — never for wiki/vault content. Write a clear, implementation-ready spec: assume the engineer reading it has the codebase open but no memory of this conversation.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      title:       { type: 'string', description: 'Short title, e.g. "Make accent color blue"' },
+      description: { type: 'string', description: 'One paragraph: what the user asked for and why, in plain language, close to their own words.' },
+      details:     { type: 'string', description: 'Specific, implementation-ready instructions: what to change, where if known (feature/screen names), and any exact values (colors, text, behavior) the user specified. Markdown ok.' },
+    },
+    required: ['title', 'description', 'details'],
+  },
+};
+
+function queueCodeChange({ title, description, details }) {
+  const date  = today();
+  const safeTitle = String(title || 'Untitled change').slice(0, 120);
+  const id    = `${date}-${slugifyTopic(safeTitle) || 'change'}`;
+  writeVault(`change-requests/${id}.md`, `---
+status: pending
+title: "${safeTitle.replace(/"/g, '\\"')}"
+date: "${date}"
+requested_via: "ED chat"
+---
+
+## What the user asked for
+
+${description || ''}
+
+## Implementation notes
+
+${details || ''}
+`);
+  const data = getAppData();
+  data.changeRequests = data.changeRequests || [];
+  data.changeRequests.unshift({ id, date, title: safeTitle, status: 'pending' });
+  data.changeRequests = data.changeRequests.slice(0, 50);
+  saveAppData(data);
+  appendLog('note', `Mission Control change requested via ED: ${safeTitle}`, [], []);
+  return { id, title: safeTitle };
+}
+
+async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
+  let finalText = '';
+  let usage = null;
+  let queuedChange = null;
+  for (let round = 0; round < maxRounds; round++) {
+    const resp = await anthropic.messages.create({
+      model:      'claude-haiku-4-5-20251001',
+      max_tokens: 2048,
+      system,
+      tools,
+      messages,
+    });
+    usage = resp.usage;
+    const textBlocks = stripCiteTags(resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n\n'));
+    if (textBlocks) finalText = textBlocks;
+
+    const clientToolUses = resp.content.filter(b => b.type === 'tool_use' && b.name === 'queue_code_change');
+    if (resp.stop_reason !== 'tool_use' || !clientToolUses.length) break;
+
+    messages.push({ role: 'assistant', content: resp.content });
+    const toolResults = clientToolUses.map(tu => {
+      const result = queueCodeChange(tu.input || {});
+      queuedChange = result;
+      return {
+        type: 'tool_result',
+        tool_use_id: tu.id,
+        content: JSON.stringify({ ok: true, id: result.id, message: `Queued as change-requests/${result.id}.md — Claude Code will pick this up next session.` }),
+      };
+    });
+    messages.push({ role: 'user', content: toolResults });
+  }
+  return { text: finalText || '(no response text)', usage, queuedChange };
+}
+
 app.post('/api/chat', async (req, res) => {
   const key = getApiKey();
   if (!key) return res.status(401).json({ error: 'NO_KEY', message: 'No API key found.' });
@@ -295,16 +376,15 @@ app.post('/api/chat', async (req, res) => {
   if (!message) return res.status(400).json({ error: 'Empty message' });
   const anthropic = makeClient(key);
   try {
-    const resp = await anthropic.messages.create({
-      model:      'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
-      system:     buildSystemPrompt(message),
-      messages:   [...history.map(m => ({ role: m.role, content: m.content })),
-                   { role: 'user', content: message }],
-    });
-    const responseText = resp.content[0].text;
+    const messages = [...history.map(m => ({ role: m.role, content: m.content })),
+                       { role: 'user', content: message }];
+    const tools = [
+      { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
+      QUEUE_CHANGE_TOOL,
+    ];
+    const { text: responseText, usage, queuedChange } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages);
     saveConversation(message, responseText);
-    res.json({ response: responseText, tokens: resp.usage });
+    res.json({ response: responseText, tokens: usage, queuedChange: queuedChange ? { id: queuedChange.id, title: queuedChange.title } : null });
   } catch (err) {
     console.error('Claude API error:', err.status, err.message);
     const msg = String(err.message || '');
@@ -549,6 +629,7 @@ function updateIndex() {
 
 // ── DESIGN RESEARCH LAB ───────────────────────────────────────────────────────
 function escHtml(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function stripCiteTags(s) { return String(s == null ? '' : s).replace(/<\/?cite[^>]*>/gi, ''); }
 function escAttr(s) { return escHtml(s).replace(/"/g,'&quot;'); }
 function slugifyTopic(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
@@ -597,6 +678,12 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
   if (!match) throw new Error('Could not parse research output from ED');
   const parsed = JSON.parse(match[1]);
   if (!Array.isArray(parsed.findings)) throw new Error('Research output missing findings array');
+  parsed.title   = stripCiteTags(parsed.title);
+  parsed.summary = stripCiteTags(parsed.summary);
+  parsed.findings.forEach(f => {
+    f.title       = stripCiteTags(f.title);
+    f.description = stripCiteTags(f.description);
+  });
   return parsed;
 }
 
@@ -613,7 +700,8 @@ function buildSlideshowHtml(topic, result) {
       title:  f.title || `Finding ${i + 1}`,
       body:   `<p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
                ${f.source_url ? `<p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="${escAttr(f.source_url)}" target="_blank" rel="noopener" style="color:#ff8a63;">${escHtml(f.source_title || f.source_url)}</a></p>` : ''}
-               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>`,
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>
+               <button class="add-quest-btn" onclick="addToQuests(${i}, this)">+ ADD TO QUEST LOG</button>`,
     })),
   ];
 
@@ -646,6 +734,20 @@ function buildSlideshowHtml(topic, result) {
   .dots{display:flex;gap:6px;}
   .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
   .dot.active{background:var(--accent);}
+  .add-quest-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
+  .add-quest-btn:hover:not(:disabled){filter:brightness(1.08);}
+  .add-quest-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .add-quest-btn{width:100%;padding:14px;font-size:14px;}
+  }
 </style></head>
 <body>
   <div class="slides" id="slides">${slidesHtml}</div>
@@ -655,6 +757,16 @@ function buildSlideshowHtml(topic, result) {
     <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
   </div>
 <script>
+  const FINDINGS = ${JSON.stringify(result.findings.map(f => ({ title: f.title || '', description: f.description || '' })))};
+  function addToQuests(i, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    const text = (f.title + (f.description ? ' — ' + f.description : '')).slice(0, 140);
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'mc-add-task', text }, window.location.origin);
+    }
+    btn.textContent = '✓ ADDED TO QUEST LOG';
+    btn.disabled = true;
+  }
   const total = ${slides.length};
   let cur = 0;
   const dotsEl = document.getElementById('dots');
@@ -667,6 +779,14 @@ function buildSlideshowHtml(topic, result) {
   }
   function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
   document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
   render();
 </script>
 </body></html>`;
@@ -755,6 +875,11 @@ app.post('/api/design-research', async (req, res) => {
 app.get('/api/design-research', (req, res) => {
   const data = getAppData();
   res.json({ runs: data.designResearch || [] });
+});
+
+app.get('/api/change-requests', (req, res) => {
+  const data = getAppData();
+  res.json({ requests: data.changeRequests || [] });
 });
 
 app.get('/api/design-research/:id', (req, res) => {
