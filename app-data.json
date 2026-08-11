@@ -365,6 +365,13 @@
   "lastDesignResearchAutoRun": "2026-08-11",
   "changeRequests": [
     {
+      "id": "2026-08-11-prevent-duplicate-design-responses-and-s",
+      "date": "2026-08-11",
+      "title": "Prevent duplicate design responses and show viewed status",
+      "status": "pending",
+      "source": "ED chat"
+    },
+    {
       "id": "2026-08-11-progressive-disclosure-for-daily-todos",
       "date": "2026-08-11",
       "title": "Progressive Disclosure for Daily Todos",
