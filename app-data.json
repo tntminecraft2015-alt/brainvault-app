@@ -261,6 +261,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-revisions-1786428538705",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
       "id": "2026-08-11-design-research-revisions-1786428352137",
       "date": "2026-08-11",
       "topic": "",
@@ -570,13 +579,13 @@
   "designThreads": {
     "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
       "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
-      "title": "Instant Completion Micro-Interactions with Sequenced Feedback Loops",
-      "description": "A single click to mark a task done triggers a choreographed sequence: circle fills with color, a checkmark draws, the task label strikes through, a small burst particle effect fires, then the entire row gently collapses or fades. Instead of a drawer or modal, the feedback happens *inline on the card itself*, keeping the battle-menu focus intact while delivering psychological reinforcement and system status confirmation. Fits Mission Control's rank/XP feedback loop perfectly—each rank completion could trigger a unique particle color and confetti burst.",
-      "source_title": "Acme Prototype — Task Completion Micro-interaction",
-      "source_url": "https://thariqs.github.io/html-effectiveness/07-prototype-animation.html",
-      "mockup_html": "<style>\n  .task-row {\n    display: flex; align-items: center; gap: 10px; padding: 12px;\n    background: #12253c; border-radius: 6px; margin-bottom: 8px;\n    transition: opacity 200ms ease-out;\n  }\n  .task-row.done { opacity: 0.5; }\n  .check-circle {\n    width: 24px; height: 24px; border: 2px solid #ff8a63; border-radius: 50%;\n    flex-shrink: 0; position: relative;\n  }\n  .task-row.done .check-circle {\n    background: #7fffb0; border-color: #7fffb0;\n    animation: fillPulse 300ms cubic-bezier(.34,1.56,.64,1);\n  }\n  .checkmark {\n    position: absolute; width: 14px; height: 8px; border: 2px solid white;\n    border-top: 0; border-right: 0; left: 4px; top: 6px;\n    opacity: 0; transform: rotate(-45deg);\n  }\n  .task-row.done .checkmark {\n    animation: drawCheck 200ms ease-out 100ms forwards;\n  }\n  .task-label { color: #dfeeff; font-family: VT323; flex: 1; }\n  .task-row.done .task-label {\n    text-decoration: line-through; color: #8fd6ff; opacity: 0.7;\n  }\n  @keyframes fillPulse {\n    0% { transform: scale(1); background: #ff8a63; }\n    50% { transform: scale(1.15); }\n    100% { transform: scale(1); background: #7fffb0; }\n  }\n  @keyframes drawCheck {\n    to { opacity: 1; }\n  }\n</style>\n<div class=\"task-row\"><div class=\"check-circle\"><div class=\"checkmark\"></div></div><span class=\"task-label\">Draft weekly report</span></div>\n<div class=\"task-row done\"><div class=\"check-circle\"><div class=\"checkmark\"></div></div><span class=\"task-label\">Review PR queue</span></div>",
-      "status": "generating",
-      "revisionCount": 4,
+      "title": "Rank-Locked Celebration Bursts with Staggered Easing Curves",
+      "description": "Asana's task completion uses celebratory animations featuring unexpected reward sequences that make routine achievements feel special. For Mission Control's rank system, apply staggered easing curves per rank (linear for C, ease-out for B, spring overshoot for A/S) so each rank tier *feels* heavier and more rewarding. Circle fills with timed color transition, checkmark draws with stroke animation, label strikes through, then a burst of particles in the rank's own color, before the row gently collapses. Most micro-animations live in the 200–400ms range — cluster fill (0ms) → check (80ms) → strike (120ms) → confetti (200ms) → collapse (600ms).",
+      "source_title": "Asana Task Completion Celebrations",
+      "source_url": "https://asana.com",
+      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff'><div style='display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px;background:#12253c;border-radius:6px'><svg width='28' height='28' viewBox='0 0 28 28' style='fill:none;stroke:#ff8a63;stroke-width:2'><circle cx='14' cy='14' r='10' style='animation:rankFill 200ms cubic-bezier(.34,1.56,.64,1) forwards'/><path d='M10,14l3,3l6-6' style='stroke-dasharray:12;stroke-dashoffset:12;animation:checkDraw 80ms ease-out 80ms forwards'/></svg><span style='flex:1;text-decoration:line-through;animation:strikeThrough 120ms 120ms forwards'>Daily Report Due</span><span style='font-size:12px;color:#7fffb0'>S-RANK</span></div><div style='font-size:11px;color:#8fd6ff;line-height:1.4'>✓ Circle fills (spring) → Check draws (ease-out) → Label strikes → Burst particles (rank color) → Row collapses</div><style>@keyframes rankFill{0%{background:transparent;} 100%{background:#ff8a63;}} @keyframes checkDraw{0%{stroke-dashoffset:12;} 100%{stroke-dashoffset:0;}} @keyframes strikeThrough{0%{opacity:1;} 100%{opacity:.5;}}</style></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 5,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
       "lastComment": "",
@@ -591,7 +600,7 @@
       "source_title": "Best Habit Tracker Apps for Personal Productivity",
       "source_url": "https://viasocket.com/discovery/blog/6ssf8f/7-best-habit-tracker-apps-for-focused-productivity",
       "mockup_html": "<div style='background:#0a1929;padding:20px;font-family:VT323;border-radius:10px;'><div style='background:#12253c;padding:12px;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;gap:10px;'><input type='checkbox' style='width:20px;height:20px;cursor:pointer;accent-color:#ff8a63;' onclick='this.parentElement.style.opacity=0.6;'/><span style='color:#dfeeff;font-size:14px;'>Daily Focus Session</span><span style='margin-left:auto;color:#7fffb0;font-weight:bold;font-size:12px;'>+25 XP</span></div><div style='color:#8fd6ff;font-size:11px;line-height:1.4;'>✓ Check triggers:<br/>• 60ms haptic pulse<br/>• 200ms sine-wave chime (440Hz)<br/>• +XP float animation<br/>→ All dismiss on blur</div></div>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 4,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
