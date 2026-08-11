@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>To-Do List Gamification &amp; Visual Feedback Patterns</title>
+<html><head><meta charset="utf-8"><title>To-Do List Interaction &amp; Feedback Refinement</title>
 <style>
   :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
   *{box-sizing:border-box;}
@@ -53,24 +53,33 @@
   <div class="slides" id="slides">
     <section class="slide active" data-i="0">
       <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
-      <h1>To-Do List Gamification &amp; Visual Feedback Patterns</h1>
-      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Today's most effective productivity apps avoid streak punishment (grace days beat unforgiving chains), pair immediate visual feedback with streak visualization, and limit displayed items to reduce cognitive load. For Mission Control, this means tightening the XP reward system to favor meaningful tasks over volume, and adding a soft-fail mechanic that keeps players engaged after missed days.</p>
+      <h1>To-Do List Interaction &amp; Feedback Refinement</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Gamified to-do lists tap into brains hardwired to respond to rewards and progress through immediate feedback like points and sounds. Mission Control's rank badges and XP pops already match this pattern, but three deeper refinements—layered difficulty signaling, micro-interaction polish, and asymmetric visual weight—can amplify engagement without cluttering the JRPG aesthetic.</p>
                <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: To do list</p></div>
     </section>
 
     <section class="slide" data-i="1">
       <div class="slide-kicker">FINDING 1 / 3</div>
-      <h1>Streak Forgiveness (Grace Days &amp; Freezes)</h1>
-      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players "freeze" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.</p>
-               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/" target="_blank" rel="noopener" style="color:#ff8a63;">Yuki Chou, Octalysis Gamification Research (2026)</a></p>
-               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #ff8a63;padding:16px;font-family:VT323;color:#dfeeff;width:300px&quot;&gt;
-  &lt;div style=&quot;font-size:14px;margin-bottom:8px;text-transform:uppercase;color:#ff8a63&quot;&gt;⚔️ Streak Freeze&lt;/div&gt;
-  &lt;div style=&quot;background:#12253c;border:1px solid #1e3a5f;padding:12px;margin-bottom:8px;font-size:12px&quot;&gt;
-    &lt;div&gt;Current Streak: &lt;strong&gt;18 days&lt;/strong&gt;&lt;/div&gt;
-    &lt;div style=&quot;margin-top:4px&quot;&gt;Freezes Left: &lt;strong&gt;1/1&lt;/strong&gt;&lt;/div&gt;
+      <h1>Difficulty Signaling via Visual Layering (Bento Grid Weight)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics" target="_blank" rel="noopener" style="color:#ff8a63;">Bento Grid Dashboard Design: Complete Guide 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;&quot;&gt;
+  &lt;div style=&quot;margin-bottom:12px;font-weight:bold;font-size:11px;color:#8fd6ff;text-transform:uppercase;&quot;&gt;Daily Tasks&lt;/div&gt;
+  &lt;div style=&quot;display:grid;grid-template-columns:1fr 1fr;gap:8px;&quot;&gt;
+    &lt;div style=&quot;grid-column:span 2;background:#1e3a5f;padding:12px;border-radius:6px;border:1px solid #ff8a63;&quot;&gt;
+      &lt;div style=&quot;font-size:9px;color:#ff8a63;margin-bottom:4px;&quot;&gt;S-RANK&lt;/div&gt;
+      &lt;div style=&quot;font-size:13px;&quot;&gt;Design new feature&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;background:#12253c;padding:10px;border-radius:6px;border:1px solid #66c8ff;&quot;&gt;
+      &lt;div style=&quot;font-size:8px;color:#66c8ff;margin-bottom:3px;&quot;&gt;A-RANK&lt;/div&gt;
+      &lt;div style=&quot;font-size:11px;&quot;&gt;Code review&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;background:#12253c;padding:10px;border-radius:6px;border:1px solid #7fffb0;&quot;&gt;
+      &lt;div style=&quot;font-size:8px;color:#7fffb0;margin-bottom:3px;&quot;&gt;C-RANK&lt;/div&gt;
+      &lt;div style=&quot;font-size:11px;&quot;&gt;Email&lt;/div&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
-  &lt;button style=&quot;width:100%;background:#ff8a63;color:#0a1929;border:none;padding:8px;font-weight:bold;cursor:pointer&quot;&gt;Use Freeze&lt;/button&gt;
-  &lt;div style=&quot;font-size:10px;margin-top:8px;color:#7fffb0&quot;&gt;Skip tomorrow without breaking your streak&lt;/div&gt;
 &lt;/div&gt;"></iframe></div>
                <div class="rate-row" id="rateRow0">
                  <div class="rate-label">RATE THIS IDEA</div>
@@ -91,17 +100,22 @@
 
     <section class="slide" data-i="2">
       <div class="slide-kicker">FINDING 2 / 3</div>
-      <h1>Immediate Visual Feedback on Task Completion</h1>
-      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., "S-rank locked" at task completion) would deepen the JRPG feel.</p>
-               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.rapidnative.com/blogs/habit-tracker-calendar" target="_blank" rel="noopener" style="color:#ff8a63;">RapidNative, Habit Tracker Calendar Design (2025)</a></p>
-               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #7fffb0;padding:16px;font-family:VT323;color:#dfeeff;width:280px;position:relative&quot;&gt;
-  &lt;div style=&quot;background:#12253c;padding:12px;margin-bottom:8px;border:1px solid #1e3a5f&quot;&gt;
-    &lt;input type=&quot;checkbox&quot; style=&quot;width:18px;height:18px;cursor:pointer&quot; checked&gt;
-    &lt;span style=&quot;margin-left:8px;text-decoration:line-through&quot;&gt;Refactor login module&lt;/span&gt;
+      <h1>Streaks with Confetti Micro-Animation on Daily Mark</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://gamestrategies.io/en/blog/gamification-apps/" target="_blank" rel="noopener" style="color:#ff8a63;">Top Gamification Apps 2025: Boost Productivity and Learning</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;text-align:center;&quot;&gt;
+  &lt;div style=&quot;display:inline-block;background:#1e3a5f;padding:8px 12px;border-radius:6px;border:2px solid #7fffb0;position:relative;overflow:hidden;&quot;&gt;
+    &lt;div style=&quot;font-size:9px;color:#8fd6ff;text-transform:uppercase;margin-bottom:4px;&quot;&gt;Streak&lt;/div&gt;
+    &lt;div style=&quot;font-size:18px;font-weight:bold;color:#7fffb0;&quot;&gt;7 DAYS&lt;/div&gt;
+    &lt;div style=&quot;position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;animation:confetti 1s ease-out forwards;opacity:0;&quot; id=&quot;confetti&quot;&gt;✨ ✨&lt;/div&gt;
   &lt;/div&gt;
-  &lt;div style=&quot;position:absolute;top:40px;right:20px;font-size:18px;animation:float-up 1s ease-out forwards&quot;&gt;+50 XP&lt;/div&gt;
-  &lt;div style=&quot;background:#7fffb0;color:#0a1929;padding:8px;font-weight:bold;text-align:center;font-size:11px&quot;&gt;S-RANK UNLOCKED!&lt;/div&gt;
-  &lt;style&gt;@keyframes float-up{0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-30px)}}&lt;/style&gt;
+  &lt;style&gt;
+    @keyframes confetti {
+      0% { opacity:1;transform:translateY(0) scale(1); }
+      100% { opacity:0;transform:translateY(-20px) scale(0); }
+    }
+  &lt;/style&gt;
 &lt;/div&gt;"></iframe></div>
                <div class="rate-row" id="rateRow1">
                  <div class="rate-label">RATE THIS IDEA</div>
@@ -122,23 +136,17 @@
 
     <section class="slide" data-i="3">
       <div class="slide-kicker">FINDING 3 / 3</div>
-      <h1>Quality Over Volume (Task Weighting)</h1>
-      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displaying a "focus score" that weighs larger tasks—would prevent gaming.</p>
-               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://trophy.so/blog/productivity-gamification-examples" target="_blank" rel="noopener" style="color:#ff8a63;">Trophy Gamification Platform Analysis (2026)</a></p>
-               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #dfeeff;padding:16px;font-family:VT323;color:#dfeeff;width:320px&quot;&gt;
-  &lt;div style=&quot;font-size:13px;margin-bottom:12px;text-transform:uppercase;color:#ff8a63&quot;&gt;📊 Focus Score&lt;/div&gt;
-  &lt;div style=&quot;background:#12253c;padding:10px;margin-bottom:10px;border:1px solid #1e3a5f&quot;&gt;
-    &lt;div style=&quot;display:flex;justify-content:space-between;margin-bottom:6px&quot;&gt;
-      &lt;span&gt;Daily Progress&lt;/span&gt;
-      &lt;span style=&quot;color:#7fffb0&quot;&gt;72%&lt;/span&gt;
-    &lt;/div&gt;
-    &lt;div style=&quot;background:#1e3a5f;height:8px;border-radius:2px&quot;&gt;&lt;/div&gt;
-    &lt;div style=&quot;background:#7fffb0;height:8px;width:72%;border-radius:2px;margin-top:-8px&quot;&gt;&lt;/div&gt;
+      <h1>Tap-to-Log Quick Action (Finch / Productive Pattern)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating "log today" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://gridfiti.com/aesthetic-habit-tracker-apps/" target="_blank" rel="noopener" style="color:#ff8a63;">10 Cute &amp; Aesthetic Habit Tracker Apps in 2026 (Desktop &amp; Mobile)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;&quot;&gt;
+  &lt;div style=&quot;margin-bottom:12px;font-weight:bold;font-size:11px;color:#8fd6ff;text-transform:uppercase;&quot;&gt;Quick Log&lt;/div&gt;
+  &lt;div style=&quot;background:#12253c;padding:12px;border-radius:6px;margin-bottom:8px;border-left:3px solid #ff8a63;&quot;&gt;
+    &lt;div style=&quot;font-size:9px;color:#ff8a63;margin-bottom:4px;&quot;&gt;✓ Complete&lt;/div&gt;
+    &lt;div style=&quot;font-size:13px;&quot;&gt;Morning standup&lt;/div&gt;
   &lt;/div&gt;
-  &lt;div style=&quot;font-size:11px;color:#dfeeff;line-height:1.4&quot;&gt;
-    &lt;div&gt;✓ Code review: &lt;strong&gt;S&lt;/strong&gt; (+50 XP)&lt;/div&gt;
-    &lt;div&gt;✓ Email triage: &lt;strong&gt;C&lt;/strong&gt; (+10 XP)&lt;/div&gt;
-  &lt;/div&gt;
+  &lt;button style=&quot;width:100%;background:#ff8a63;color:#070b14;border:none;padding:10px;border-radius:6px;font-family:'VT323',monospace;font-size:12px;font-weight:bold;cursor:pointer;text-transform:uppercase;&quot;&gt;+ Log Task Today&lt;/button&gt;
 &lt;/div&gt;"></iframe></div>
                <div class="rate-row" id="rateRow2">
                  <div class="rate-label">RATE THIS IDEA</div>
@@ -164,7 +172,7 @@
 <script>
   const RESEARCH_ID = "2026-08-11-design-research-to-do-list";
   const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
-  const FINDINGS = [{"title":"Streak Forgiveness (Grace Days & Freezes)","description":"Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.","source_title":"Yuki Chou, Octalysis Gamification Research (2026)","source_url":"https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/"},{"title":"Immediate Visual Feedback on Task Completion","description":"The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., \"S-rank locked\" at task completion) would deepen the JRPG feel.","source_title":"RapidNative, Habit Tracker Calendar Design (2025)","source_url":"https://www.rapidnative.com/blogs/habit-tracker-calendar"},{"title":"Quality Over Volume (Task Weighting)","description":"Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displaying a \"focus score\" that weighs larger tasks—would prevent gaming.","source_title":"Trophy Gamification Platform Analysis (2026)","source_url":"https://trophy.so/blog/productivity-gamification-examples"}];
+  const FINDINGS = [{"title":"Difficulty Signaling via Visual Layering (Bento Grid Weight)","description":"Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.","source_title":"Bento Grid Dashboard Design: Complete Guide 2026","source_url":"https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics","threadId":"thread-1786428178060-0-difficulty-signaling-via-visual-layering"},{"title":"Streaks with Confetti Micro-Animation on Daily Mark","description":"Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.","source_title":"Top Gamification Apps 2025: Boost Productivity and Learning","source_url":"https://gamestrategies.io/en/blog/gamification-apps/","threadId":"thread-1786428178060-1-streaks-with-confetti-micro-animation-on"},{"title":"Tap-to-Log Quick Action (Finch / Productive Pattern)","description":"Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.","source_title":"10 Cute & Aesthetic Habit Tracker Apps in 2026 (Desktop & Mobile)","source_url":"https://gridfiti.com/aesthetic-habit-tracker-apps/","threadId":"thread-1786428178060-2-tap-to-log-quick-action-finch-productive"}];
 
   function lockRateRow(i, statusText) {
     const row = document.getElementById('rateRow'+i);
@@ -182,7 +190,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          findingIndex: i, findingTitle: f.title, findingDescription: f.description, rating, comment,
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
         }),
       });
       const d = await r.json();
@@ -197,6 +205,8 @@
         if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
         lockRateRow(i, '✓ Got it! Queued for Claude Code');
         if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
       } else {
         lockRateRow(i, '✓ Thanks — feedback sent to Red');
       }
