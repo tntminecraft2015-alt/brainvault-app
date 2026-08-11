@@ -165,7 +165,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [] };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [] };
 }
 
 function saveAppData(data) {
@@ -634,6 +634,14 @@ function slugifyTopic(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
 }
 
+const RATING_LABELS = ['Not even close', 'Kind of', 'Almost there', 'Just one more tweak', 'Got it'];
+
+function buildFeedbackDigest() {
+  const feedback = (getAppData().designFeedback || []).slice(0, 20);
+  if (!feedback.length) return '(no feedback yet — this is early days, use your best judgment)';
+  return feedback.map(f => `- "${f.findingTitle}" → ${f.ratingLabel}${f.comment ? ` (user's note: ${f.comment})` : ''}`).join('\n');
+}
+
 async function runDesignResearch(topic) {
   const key = getApiKey();
   if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
@@ -645,6 +653,10 @@ async function runDesignResearch(topic) {
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
+
+# FEEDBACK ON YOUR PAST FINDINGS (most recent first)
+${buildFeedbackDigest()}
+Use this to calibrate: lean into directions similar to what scored "Got it" or "Just one more tweak", and steer away from patterns similar to what scored "Not even close" or "Kind of". If a note explains what needed tweaking, treat that as a specific critique to address in related future ideas — don't just repeat the same idea unchanged.
 
 Use web search to find current, real UI/UX patterns and trends relevant to${focus ? ` "${focus}" in` : ''} personal dashboards, habit trackers, gamified productivity apps, and bento-grid/neumorphic design systems. Prioritize ideas that would make Mission Control more fun, easier to use, and better-looking WITHOUT abandoning its existing JRPG identity. Be economical with searches — a few well-chosen queries beat many broad ones.
 
@@ -686,7 +698,7 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
   return parsed;
 }
 
-function buildSlideshowHtml(topic, result) {
+function buildSlideshowHtml(id, topic, result) {
   const slides = [
     {
       kicker: 'DESIGN RESEARCH · BY RED',
@@ -700,7 +712,21 @@ function buildSlideshowHtml(topic, result) {
       body:   `<p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
                ${f.source_url ? `<p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="${escAttr(f.source_url)}" target="_blank" rel="noopener" style="color:#ff8a63;">${escHtml(f.source_title || f.source_url)}</a></p>` : ''}
                <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>
-               <button class="queue-design-btn" onclick="queueDesign(${i}, this)">+ QUEUE THIS DESIGN</button>`,
+               <div class="rate-row" id="rateRow${i}">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(${i},1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(${i},2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(${i},3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(${i},4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(${i},5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox${i}">
+                   <textarea id="tweakText${i}" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(${i})">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus${i}"></div>
+               </div>`,
     })),
   ];
 
@@ -733,10 +759,23 @@ function buildSlideshowHtml(topic, result) {
   .dots{display:flex;gap:6px;}
   .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
   .dot.active{background:var(--accent);}
-  .queue-design-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
-  .queue-design-btn:hover:not(:disabled){filter:brightness(1.08);}
-  .queue-design-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
-  .queue-design-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
   @media (max-width:600px){
     .slide{padding:20px 18px 16px;}
     .slide h1{font-size:21px;margin-bottom:12px;}
@@ -746,7 +785,7 @@ function buildSlideshowHtml(topic, result) {
     .mockup-frame{height:36vh;min-height:140px;}
     .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
     .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
-    .queue-design-btn{width:100%;padding:14px;font-size:14px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
   }
 </style></head>
 <body>
@@ -757,35 +796,79 @@ function buildSlideshowHtml(topic, result) {
     <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
   </div>
 <script>
+  const RESEARCH_ID = ${JSON.stringify(id)};
+  const RATING_LABELS = ${JSON.stringify(RATING_LABELS)};
   const FINDINGS = ${JSON.stringify(result.findings.map(f => ({
     title: f.title || '', description: f.description || '',
     source_title: f.source_title || '', source_url: f.source_url || '',
   })))};
-  async function queueDesign(i, btn) {
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
     const f = FINDINGS[i]; if (!f) return;
-    btn.disabled = true;
-    btn.classList.remove('failed');
-    btn.textContent = 'QUEUING…';
     try {
-      const r = await fetch('/api/change-requests', {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: f.title, description: f.description,
-          source_title: f.source_title, source_url: f.source_url,
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, rating, comment,
         }),
       });
       const d = await r.json();
       if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
-      btn.textContent = '✓ QUEUED FOR CLAUDE CODE';
-      if (window.parent !== window) {
-        window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
       }
     } catch (e) {
-      btn.textContent = '⚠ FAILED — TAP TO RETRY';
-      btn.classList.add('failed');
-      btn.disabled = false;
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
     }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
   }
   const total = ${slides.length};
   let cur = 0;
@@ -846,7 +929,7 @@ async function runAndSaveDesignResearch(topic, idSuffix) {
   const result = await runDesignResearch(topic);
   const date   = today();
   const id     = `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`;
-  const html   = buildSlideshowHtml(topic, result);
+  const html   = buildSlideshowHtml(id, topic, result);
   writeVault(`design-research/${id}.html`, html);
   saveDesignResearchWiki(id, date, topic, result);
   const data = getAppData();
@@ -859,25 +942,24 @@ async function runAndSaveDesignResearch(topic, idSuffix) {
 
 async function maybeAutoRunDesignResearch() {
   if (!getApiKey()) return;
-  if (new Date().getDay() !== 1) return; // Mondays only
   const data = getAppData();
   if (data.lastDesignResearchAutoRun === today()) return;
   try {
-    const { id, result } = await runAndSaveDesignResearch('', 'weekly');
+    const { id, result } = await runAndSaveDesignResearch('', 'daily');
     const fresh = getAppData();
     fresh.lastDesignResearchAutoRun = today();
     saveAppData(fresh);
     if (PUSH_ENABLED) {
       const subs    = fresh.pushSubscriptions || [];
       const payload = JSON.stringify({
-        title: "🎨 Red's weekly design research is ready",
+        title: "🎨 Red's design research is ready",
         body:  `${result.title || 'New ideas for Mission Control'} — open ED to view.`,
       });
       for (const sub of subs) webpush.sendNotification(sub, payload).catch(() => {});
     }
-    console.log('  Design Lab: weekly auto-research complete —', id);
+    console.log('  Design Lab: daily auto-research complete —', id);
   } catch (err) {
-    console.error('Weekly design research failed:', err.message);
+    console.error('Daily design research failed:', err.message);
   }
 }
 
@@ -929,6 +1011,35 @@ app.get('/api/design-research/:id', (req, res) => {
   if (!html) return res.status(404).send('Not found');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
+});
+
+// Rates one finding from a Design Lab slideshow — feeds back into Red's future prompts.
+app.post('/api/design-research/:id/rate', (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).json({ error: 'Invalid id' });
+    const { findingIndex, findingTitle, findingDescription, rating, comment } = req.body || {};
+    const ratingNum = Number(rating);
+    if (!Number.isInteger(findingIndex) || findingIndex < 0) return res.status(400).json({ error: 'Invalid findingIndex' });
+    if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) return res.status(400).json({ error: 'Invalid rating' });
+    const data = getAppData();
+    data.designFeedback = data.designFeedback || [];
+    data.designFeedback.unshift({
+      id,
+      findingIndex,
+      findingTitle:       String(findingTitle || '').slice(0, 200),
+      findingDescription: String(findingDescription || '').slice(0, 500),
+      rating:      ratingNum,
+      ratingLabel: RATING_LABELS[ratingNum - 1] || '',
+      comment:     String(comment || '').slice(0, 500),
+      date: today(),
+    });
+    data.designFeedback = data.designFeedback.slice(0, 200);
+    saveAppData(data);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ── REMINDER PUSH CHECK ────────────────────────────────────────────────────────
