@@ -165,7 +165,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [] };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {} };
 }
 
 function saveAppData(data) {
@@ -698,6 +698,72 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
   return parsed;
 }
 
+const FINDING_JSON_SCHEMA = `{
+  "title": "short name of the pattern/idea",
+  "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
+  "source_title": "name of the site/app it's drawn from",
+  "source_url": "https://...",
+  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines and visually representative, not just a text description."
+}`;
+
+// Produces one revised finding for an open thread, per the tier rules: rating 1 switches
+// direction entirely (fresh search), rating 2 refines the same direction (fresh search),
+// ratings 3-4 just polish/apply the user's tweak with no search at all.
+async function runSingleFindingRevision(thread) {
+  const key = getApiKey();
+  if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
+  const anthropic = makeClient(key);
+  const mcPage = readWiki('entities/mission-control.md');
+  const rating = thread.lastRating;
+
+  let instruction;
+  let useSearch = false;
+  if (rating === 1) {
+    instruction = `The user rated your previous idea "${thread.title}" as "Not even close" — it's the wrong direction entirely. Propose a genuinely different idea for the same general problem area, NOT a variation of the previous one. Use web search to find a different real-world pattern.`;
+    useSearch = true;
+  } else if (rating === 2) {
+    instruction = `The user rated your previous idea "${thread.title}" as "Kind of" — on the right track but weak. Keep the same core direction, but use web search to find a stronger real-world example or a better-executed version of it.`;
+    useSearch = true;
+  } else if (rating === 3) {
+    instruction = `The user rated your previous idea "${thread.title}" as "Almost there" — close, just needs polish. Refine the description and mockup to make it sharper and more concrete. Do NOT change the core idea, and do NOT use web search — work from what you already proposed.`;
+  } else {
+    instruction = `The user rated your previous idea "${thread.title}" as "Just one more tweak" and left this note: "${thread.lastComment || '(no note given)'}". Make exactly that tweak and nothing else. Do NOT change the core idea, and do NOT use web search.`;
+  }
+
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback.
+
+# CURRENT MISSION CONTROL DESIGN
+${mcPage || '(no design doc on file)'}
+
+# THE IDEA YOU'RE REVISING
+Title: ${thread.title}
+Description: ${thread.description}
+${thread.source_url ? `Source: ${thread.source_title || thread.source_url} (${thread.source_url})` : ''}
+
+# YOUR TASK
+${instruction}
+
+Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema — produce exactly ONE revised finding:
+${FINDING_JSON_SCHEMA}
+Keep it concise — this is a budget-conscious run.`;
+
+  const resp = await anthropic.messages.create({
+    model:      'claude-haiku-4-5-20251001',
+    max_tokens: 1500,
+    system,
+    tools:      useSearch ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }] : undefined,
+    messages:   [{ role: 'user', content: 'Produce the revised finding now.' }],
+  });
+
+  const textBlocks = resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const match = textBlocks.match(/```json\s*([\s\S]*?)```/) || textBlocks.match(/(\{[\s\S]*\})/);
+  if (!match) throw new Error('Could not parse revision output from Red');
+  const finding = JSON.parse(match[1]);
+  finding.title       = stripCiteTags(finding.title);
+  finding.description = stripCiteTags(finding.description);
+  return finding;
+}
+
 function buildSlideshowHtml(id, topic, result) {
   const slides = [
     {
@@ -707,9 +773,10 @@ function buildSlideshowHtml(id, topic, result) {
                <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">${result.findings.length} findings${topic ? ' · focus: ' + escHtml(topic) : ''}</p>`,
     },
     ...result.findings.map((f, i) => ({
-      kicker: `FINDING ${i + 1} / ${result.findings.length}`,
+      kicker: f.revisionInfo ? `REVISION ${f.revisionInfo.revisionCount} · FINDING ${i + 1} / ${result.findings.length}` : `FINDING ${i + 1} / ${result.findings.length}`,
       title:  f.title || `Finding ${i + 1}`,
-      body:   `<p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
+      body:   `${f.revisionInfo ? `<p style="font-size:13px;opacity:.65;margin-bottom:10px;font-family:monospace;">↻ Revising based on your rating: "${escHtml(f.revisionInfo.previousRatingLabel)}"${f.revisionInfo.previousComment ? ` — "${escHtml(f.revisionInfo.previousComment)}"` : ''}</p>` : ''}
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">${escHtml(f.description || '')}</p>
                ${f.source_url ? `<p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="${escAttr(f.source_url)}" target="_blank" rel="noopener" style="color:#ff8a63;">${escHtml(f.source_title || f.source_url)}</a></p>` : ''}
                <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="${escAttr(f.mockup_html || '<p style=\'color:#888;font-family:sans-serif;padding:20px;\'>No mockup generated</p>')}"></iframe></div>
                <div class="rate-row" id="rateRow${i}">
@@ -801,6 +868,7 @@ function buildSlideshowHtml(id, topic, result) {
   const FINDINGS = ${JSON.stringify(result.findings.map(f => ({
     title: f.title || '', description: f.description || '',
     source_title: f.source_title || '', source_url: f.source_url || '',
+    threadId: f.threadId || null,
   })))};
 
   function lockRateRow(i, statusText) {
@@ -819,7 +887,7 @@ function buildSlideshowHtml(id, topic, result) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          findingIndex: i, findingTitle: f.title, findingDescription: f.description, rating, comment,
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
         }),
       });
       const d = await r.json();
@@ -834,6 +902,8 @@ function buildSlideshowHtml(id, topic, result) {
         if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
         lockRateRow(i, '✓ Got it! Queued for Claude Code');
         if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\\'ll see it once a couple more are ready)');
       } else {
         lockRateRow(i, '✓ Thanks — feedback sent to Red');
       }
@@ -929,15 +999,112 @@ async function runAndSaveDesignResearch(topic, idSuffix) {
   const result = await runDesignResearch(topic);
   const date   = today();
   const id     = `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`;
-  const html   = buildSlideshowHtml(id, topic, result);
+
+  const data = getAppData();
+  data.designThreads = data.designThreads || {};
+  result.findings.forEach((f, i) => {
+    const threadId = `thread-${Date.now()}-${i}-${slugifyTopic(f.title) || 'idea'}`;
+    f.threadId = threadId;
+    data.designThreads[threadId] = {
+      id: threadId,
+      title: f.title || '', description: f.description || '',
+      source_title: f.source_title || '', source_url: f.source_url || '', mockup_html: f.mockup_html || '',
+      status: 'awaiting_rating',
+      revisionCount: 0,
+      lastRating: null, lastRatingLabel: null, lastComment: '',
+      createdDate: date, updatedDate: date,
+      originResearchId: id,
+    };
+  });
+
+  const html = buildSlideshowHtml(id, topic, result);
   writeVault(`design-research/${id}.html`, html);
   saveDesignResearchWiki(id, date, topic, result);
-  const data = getAppData();
   data.designResearch = data.designResearch || [];
   data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix });
   data.designResearch = data.designResearch.slice(0, 30);
   saveAppData(data);
   return { id, result };
+}
+
+// Generates a revision for one open thread, right after the user rates it 1-4.
+// Stores the new content on the thread (status: 'ready_to_ship') and checks whether
+// enough threads are now ready to bundle into a viewable slideshow.
+async function generateThreadRevision(threadId) {
+  const data = getAppData();
+  const thread = (data.designThreads || {})[threadId];
+  if (!thread || thread.status !== 'generating') return;
+  try {
+    const revised = await runSingleFindingRevision(thread);
+    const fresh = getAppData();
+    const t = (fresh.designThreads || {})[threadId];
+    if (!t) return;
+    t.title         = revised.title || t.title;
+    t.description   = revised.description || t.description;
+    t.source_title  = revised.source_title || '';
+    t.source_url    = revised.source_url || '';
+    t.mockup_html   = revised.mockup_html || '';
+    t.revisionCount = (t.revisionCount || 0) + 1;
+    t.status        = 'ready_to_ship';
+    t.updatedDate   = today();
+    saveAppData(fresh);
+    await maybeShipRevisionBundle();
+  } catch (err) {
+    console.error('Thread revision failed for', threadId, ':', err.message);
+    const fresh = getAppData();
+    const t = (fresh.designThreads || {})[threadId];
+    if (t) { t.status = 'revision_failed'; saveAppData(fresh); }
+  }
+}
+
+// Ships accumulated revised threads as a bundled slideshow: groups of 3 preferred,
+// groups of 2 if that's all that's available, a lone ready thread waits for a partner.
+async function maybeShipRevisionBundle() {
+  const data = getAppData();
+  const threads = data.designThreads || {};
+  const ready = Object.keys(threads).filter(tid => threads[tid].status === 'ready_to_ship');
+  if (ready.length < 2) return;
+
+  const pool = [...ready];
+  const groups = [];
+  while (pool.length >= 3) groups.push(pool.splice(0, 3));
+  if (pool.length === 2) groups.push(pool.splice(0, 2));
+  // a single leftover thread (pool.length === 1) stays 'ready_to_ship' and waits for a partner
+
+  for (const group of groups) {
+    const date = today();
+    const id   = `${date}-design-research-revisions-${Date.now()}`;
+    const findings = group.map(tid => {
+      const t = threads[tid];
+      return {
+        title: t.title, description: t.description, source_title: t.source_title, source_url: t.source_url, mockup_html: t.mockup_html,
+        threadId: tid,
+        revisionInfo: { revisionCount: t.revisionCount, previousRatingLabel: t.lastRatingLabel, previousComment: t.lastComment },
+      };
+    });
+    const result = {
+      title:   'Revisions — Ready for Another Look',
+      summary: `${findings.length} idea${findings.length > 1 ? 's' : ''} Red reworked based on your feedback.`,
+      findings,
+    };
+    const html = buildSlideshowHtml(id, '', result);
+    writeVault(`design-research/${id}.html`, html);
+    saveDesignResearchWiki(id, date, '', result);
+    data.designResearch = data.designResearch || [];
+    data.designResearch.unshift({ id, date, topic: '', title: result.title, findingsCount: findings.length, auto: true, isRevision: true });
+    data.designResearch = data.designResearch.slice(0, 30);
+    for (const tid of group) threads[tid].status = 'awaiting_rating';
+
+    if (PUSH_ENABLED) {
+      const subs    = data.pushSubscriptions || [];
+      const payload = JSON.stringify({
+        title: '🔁 Red has revisions ready for another look',
+        body:  `${findings.length} reworked idea${findings.length > 1 ? 's' : ''} — open ED to view.`,
+      });
+      for (const sub of subs) webpush.sendNotification(sub, payload).catch(() => {});
+    }
+  }
+  saveAppData(data);
 }
 
 async function maybeAutoRunDesignResearch() {
@@ -1018,7 +1185,7 @@ app.post('/api/design-research/:id/rate', (req, res) => {
   try {
     const { id } = req.params;
     if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).json({ error: 'Invalid id' });
-    const { findingIndex, findingTitle, findingDescription, rating, comment } = req.body || {};
+    const { findingIndex, findingTitle, findingDescription, threadId, rating, comment } = req.body || {};
     const ratingNum = Number(rating);
     if (!Number.isInteger(findingIndex) || findingIndex < 0) return res.status(400).json({ error: 'Invalid findingIndex' });
     if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 5) return res.status(400).json({ error: 'Invalid rating' });
@@ -1027,6 +1194,7 @@ app.post('/api/design-research/:id/rate', (req, res) => {
     data.designFeedback.unshift({
       id,
       findingIndex,
+      threadId:           threadId || null,
       findingTitle:       String(findingTitle || '').slice(0, 200),
       findingDescription: String(findingDescription || '').slice(0, 500),
       rating:      ratingNum,
@@ -1035,7 +1203,22 @@ app.post('/api/design-research/:id/rate', (req, res) => {
       date: today(),
     });
     data.designFeedback = data.designFeedback.slice(0, 200);
-    saveAppData(data);
+
+    // Old slideshows generated before threads existed won't carry a threadId — record
+    // the feedback (above) but skip the revision loop entirely for those.
+    data.designThreads = data.designThreads || {};
+    const thread = threadId ? data.designThreads[threadId] : null;
+    if (thread) {
+      thread.lastRating      = ratingNum;
+      thread.lastRatingLabel = RATING_LABELS[ratingNum - 1] || '';
+      thread.lastComment     = String(comment || '').slice(0, 500);
+      thread.updatedDate     = today();
+      thread.status          = ratingNum === 5 ? 'resolved' : 'generating';
+      saveAppData(data);
+      if (ratingNum !== 5) generateThreadRevision(threadId).catch(err => console.error('generateThreadRevision error:', err.message));
+    } else {
+      saveAppData(data);
+    }
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

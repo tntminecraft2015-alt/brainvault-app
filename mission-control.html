@@ -1427,7 +1427,7 @@
 <div class="overlay" id="designLabModal">
   <div class="modal" style="width:560px;max-width:95vw;">
     <div class="modal-title">🎨 DESIGN LAB</div>
-    <p class="key-info" style="margin-bottom:10px;">Send Red — ED's research counterpart — off to research UI/UX ideas for Mission Control. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs every Monday too.</p>
+    <p class="key-info" style="margin-bottom:10px;">Send Red — ED's research counterpart — off to research UI/UX ideas for Mission Control. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs daily too. Rate findings on the scale to send Red back to refine them.</p>
     <div style="display:flex;gap:6px;margin-bottom:10px;">
       <input id="dlTopicInp" class="m-inp" type="text" placeholder="Optional focus (e.g. 'mobile nav', 'gamification')..." style="flex:1;" onkeydown="if(event.key==='Enter')runDesignResearch();">
       <button class="modal-btn ok" id="dlRunBtn" onclick="runDesignResearch()">▶ RESEARCH</button>
@@ -2953,7 +2953,7 @@ async function loadDesignResearchList(){
     if(!runs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No research yet — run one above.</div>'; return; }
     list.innerHTML=runs.map(r=>`
       <div class="wiki-row" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
-        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${esc(r.title)}${r.auto?' <span style="opacity:.5;font-size:13px;">(weekly)</span>':''}</div>
+        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
         <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
       </div>`).join('');
   }catch(e){ list.innerHTML='<div style="opacity:.5;">Failed to load.</div>'; }
