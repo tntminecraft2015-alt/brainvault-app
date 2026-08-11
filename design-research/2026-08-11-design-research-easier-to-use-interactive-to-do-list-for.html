@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Daily Todo Separation &amp; Visual Gamification Patterns</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .queue-design-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
+  .queue-design-btn:hover:not(:disabled){filter:brightness(1.08);}
+  .queue-design-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  .queue-design-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .queue-design-btn{width:100%;padding:14px;font-size:14px;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Daily Todo Separation &amp; Visual Gamification Patterns</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Found three high-impact UX patterns to elevate Mission Control's daily todo list: progressive disclosure to simplify task overview, compound-gesture feedback for snappier todo interactions, and hierarchical bento layouts to better separate todos from calendar content. Each combines current design trends (clarity, intentional motion, visual hierarchy) with Mission Control's existing gamification DNA.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: Easier to use interactive to do list for the day seperate from calander</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Progressive Disclosure for Daily Todos</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Progressive disclosure shows only essential information upfront and reveals details when needed, simplifying the interface and improving focus. For Mission Control, this means collapsing lower-priority todos by default (C/B ranks shown compact, S/A expanded), unfolding rank badges, XP values, and time estimates only on hover or tap. Reduces cognitive load on first glance while keeping power users' full data a gesture away—fits the JRPG battle-menu vibe of toggling menu depth.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.wikitechy.com/unique-ui-design-patterns-2026/" target="_blank" rel="noopener" style="color:#ff8a63;">UI Design Patterns 2026 - Wikitechy</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; padding: 20px; font-family: VT323, monospace; color: #dfeeff; border: 2px solid #ff8a63; max-width: 280px;'&gt;&lt;div style='margin-bottom: 12px; font-size: 10px; text-transform: uppercase; color: #7fffb0; font-weight: bold;'&gt;TODAY'S QUESTS&lt;/div&gt;&lt;div style='background: #12253c; padding: 8px; margin-bottom: 6px; border-left: 3px solid #ff8a63; cursor: pointer;'&gt;&lt;div style='display: flex; justify-content: space-between; align-items: center;'&gt;&lt;span&gt;Finish report&lt;/span&gt;&lt;span style='color: #ff8a63; font-size: 11px;'&gt;S&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style='background: #12253c; padding: 8px; margin-bottom: 6px; border-left: 3px solid #4a90d9;'&gt;&lt;div style='display: flex; justify-content: space-between; align-items: center;'&gt;&lt;span style='font-size: 12px;'&gt;Code review&lt;/span&gt;&lt;span style='color: #4a90d9; font-size: 10px;'&gt;B&lt;/span&gt;&lt;/div&gt;&lt;div style='font-size: 9px; color: #7fffb0; margin-top: 4px;'&gt;→ 45min | +15 XP&lt;/div&gt;&lt;/div&gt;&lt;div style='background: #12253c; padding: 8px; border-left: 3px solid #7a8a78;'&gt;&lt;div style='display: flex; justify-content: space-between; align-items: center;'&gt;&lt;span style='font-size: 12px;'&gt;Daily standup&lt;/span&gt;&lt;span style='color: #7a8a78; font-size: 10px;'&gt;C&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(0, this)">+ QUEUE THIS DESIGN</button></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Compound-Gesture Feedback on Todo Interactions</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">2026 trends shift from simple gestures (swipe, tap, pinch) to compound gestures with distinct haptic feedback, so users' thumbs know what they triggered before eyes confirm it. For Mission Control, map swipe-right-to-complete, swipe-left-to-reschedule, long-press-for-details on each todo item. Pair with the existing XP pop animation and scanline flicker to reinforce feedback—turns checkbox interaction into a tactile, game-like moment that feels rewarding and fast.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://muz.li/blog/whats-changing-in-mobile-app-design-ui-patterns-that-matter-in-2026/" target="_blank" rel="noopener" style="color:#ff8a63;">Mobile App Design Trends 2026 - Muzli Blog</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; padding: 20px; font-family: VT323, monospace; color: #dfeeff; border: 2px solid #ff8a63; max-width: 280px;'&gt;&lt;div style='font-size: 10px; color: #7fffb0; margin-bottom: 12px; text-transform: uppercase;'&gt;SWIPE RIGHT = DONE | SWIPE LEFT = RESCHEDULE&lt;/div&gt;&lt;div style='background: #12253c; padding: 10px; margin-bottom: 8px; border: 1px solid #1e3a5f; position: relative; transform: translateX(0); transition: transform 0.2s;'&gt;&lt;div style='display: flex; align-items: center; gap: 8px;'&gt;&lt;div style='width: 20px; height: 20px; border: 2px solid #ff8a63; border-radius: 2px;'&gt;&lt;/div&gt;&lt;span&gt;Finish report&lt;/span&gt;&lt;/div&gt;&lt;div style='position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #7fffb0;'&gt;→ SWIPE&lt;/div&gt;&lt;/div&gt;&lt;div style='background: #12253c; padding: 10px; border: 1px solid #4a90d9; position: relative;'&gt;&lt;div style='display: flex; align-items: center; gap: 8px;'&gt;&lt;div style='width: 20px; height: 20px; border: 2px solid #4a90d9; border-radius: 2px;'&gt;&lt;/div&gt;&lt;span&gt;Code review&lt;/span&gt;&lt;/div&gt;&lt;div style='position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #ff8a63;'&gt;← LONG-PRESS&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(1, this)">+ QUEUE THIS DESIGN</button></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Hierarchical Bento Layout to Isolate Todos from Calendar</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Bento grids encode hierarchy directly into layout structure—a card spanning two columns and two rows signals greater importance than single-unit neighbors. Currently Mission Control's three-column grid (todos | schedule | reminders) competes visually. Redesign as a 2×2 bento with a tall hero "Today's Todos" card (left, double-height), a smaller "Calendar Peek" widget (top-right), and reminders/streak counter (bottom-right). Visually separates the daily task focus from calendar clutter while keeping reminders visible. Fits the existing bento-card aesthetic.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://landdding.com/blog/blog-bento-grid-design-guide" target="_blank" rel="noopener" style="color:#ff8a63;">Bento Grid Design Guide 2026 - Landdding</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; padding: 16px; font-family: Press Start 2P, monospace; display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto auto; gap: 8px; max-width: 500px;'&gt;&lt;div style='grid-row: span 2; background: #12253c; border: 3px inset #ff8a63, 5px inset #0a1929, 7px inset #ff8a63; padding: 12px; color: #dfeeff; font-size: 9px;'&gt;&lt;div style='color: #ff8a63; margin-bottom: 8px; font-size: 8px;'&gt;TODAY&lt;/div&gt;&lt;div style='background: #1e3a5f; padding: 6px; margin-bottom: 6px; border-left: 2px solid #ff8a63; font-family: VT323;'&gt;Finish report [S]&lt;/div&gt;&lt;div style='background: #1e3a5f; padding: 6px; margin-bottom: 6px; border-left: 2px solid #4a90d9; font-family: VT323;'&gt;Code review [B]&lt;/div&gt;&lt;div style='background: #1e3a5f; padding: 6px; border-left: 2px solid #7a8a78; font-family: VT323;'&gt;Standup [C]&lt;/div&gt;&lt;/div&gt;&lt;div style='background: #12253c; border: 3px inset #7fffb0, 5px inset #0a1929, 7px inset #7fffb0; padding: 8px; color: #dfeeff; font-size: 8px;'&gt;&lt;div style='color: #7fffb0; margin-bottom: 4px;'&gt;TODAY&lt;/div&gt;&lt;div style='font-family: VT323; font-size: 10px;'&gt;2 events&lt;/div&gt;&lt;/div&gt;&lt;div style='background: #12253c; border: 3px inset #ff8a63, 5px inset #0a1929, 7px inset #ff8a63; padding: 8px; color: #dfeeff; font-size: 8px;'&gt;&lt;div style='color: #ff8a63; margin-bottom: 4px;'&gt;STREAK&lt;/div&gt;&lt;div style='font-family: VT323; font-size: 14px; color: #7fffb0;'&gt;7 DAYS&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(2, this)">+ QUEUE THIS DESIGN</button></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const FINDINGS = [{"title":"Progressive Disclosure for Daily Todos","description":"Progressive disclosure shows only essential information upfront and reveals details when needed, simplifying the interface and improving focus. For Mission Control, this means collapsing lower-priority todos by default (C/B ranks shown compact, S/A expanded), unfolding rank badges, XP values, and time estimates only on hover or tap. Reduces cognitive load on first glance while keeping power users' full data a gesture away—fits the JRPG battle-menu vibe of toggling menu depth.","source_title":"UI Design Patterns 2026 - Wikitechy","source_url":"https://www.wikitechy.com/unique-ui-design-patterns-2026/"},{"title":"Compound-Gesture Feedback on Todo Interactions","description":"2026 trends shift from simple gestures (swipe, tap, pinch) to compound gestures with distinct haptic feedback, so users' thumbs know what they triggered before eyes confirm it. For Mission Control, map swipe-right-to-complete, swipe-left-to-reschedule, long-press-for-details on each todo item. Pair with the existing XP pop animation and scanline flicker to reinforce feedback—turns checkbox interaction into a tactile, game-like moment that feels rewarding and fast.","source_title":"Mobile App Design Trends 2026 - Muzli Blog","source_url":"https://muz.li/blog/whats-changing-in-mobile-app-design-ui-patterns-that-matter-in-2026/"},{"title":"Hierarchical Bento Layout to Isolate Todos from Calendar","description":"Bento grids encode hierarchy directly into layout structure—a card spanning two columns and two rows signals greater importance than single-unit neighbors. Currently Mission Control's three-column grid (todos | schedule | reminders) competes visually. Redesign as a 2×2 bento with a tall hero \"Today's Todos\" card (left, double-height), a smaller \"Calendar Peek\" widget (top-right), and reminders/streak counter (bottom-right). Visually separates the daily task focus from calendar clutter while keeping reminders visible. Fits the existing bento-card aesthetic.","source_title":"Bento Grid Design Guide 2026 - Landdding","source_url":"https://landdding.com/blog/blog-bento-grid-design-guide"}];
+  async function queueDesign(i, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    btn.disabled = true;
+    btn.classList.remove('failed');
+    btn.textContent = 'QUEUING…';
+    try {
+      const r = await fetch('/api/change-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: f.title, description: f.description,
+          source_title: f.source_title, source_url: f.source_url,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      btn.textContent = '✓ QUEUED FOR CLAUDE CODE';
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      }
+    } catch (e) {
+      btn.textContent = '⚠ FAILED — TAP TO RETRY';
+      btn.classList.add('failed');
+      btn.disabled = false;
+    }
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
