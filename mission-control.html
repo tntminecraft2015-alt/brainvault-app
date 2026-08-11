@@ -213,6 +213,11 @@
     .pix-x      { width:7px; height:7px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
     .task-row.done .pix-x { display:block; }
     .rank-badge { font-family:'Press Start 2P',monospace; font-size:6px; width:13px; text-align:center; padding:2px 0; color:#fff; flex-shrink:0; line-height:1; }
+    .rank-badge.compact { opacity:.5; transition:opacity .15s; }
+    .task-row:hover .rank-badge.compact { opacity:1; }
+    .xp-chip    { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent); opacity:0; flex-shrink:0; transition:opacity .15s; white-space:nowrap; }
+    .task-row:hover .xp-chip { opacity:1; }
+    .xp-chip.always { opacity:.85; }
     .task-label { flex:1; font-size:12px; line-height:1.1; }
     .task-row.done .task-label { text-decoration:line-through; }
     .task-del   { opacity:0; background:none; border:none; color:rgba(223,238,255,.5); font-size:10px; cursor:pointer; padding:0 2px; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
@@ -476,6 +481,8 @@
       .mob-pix-x  { width:19px; height:19px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
       .mob-task-row.done .mob-pix-x { display:block; }
       .mob-rank-badge { font-family:'Press Start 2P',monospace; font-size:8px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; border-radius:var(--r-pill); }
+      .mob-rank-badge.compact { opacity:.55; }
+      .mob-xp-chip { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); flex-shrink:0; }
       .mob-task-label { flex:1; font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
       .mob-task-row.done .mob-task-label { text-decoration:line-through; }
       .mob-task-del  { background:none; border:none; color:rgba(223,238,255,.45); font-size:18px; cursor:pointer; padding:6px; flex-shrink:0; }
@@ -1876,10 +1883,12 @@ function renderMobHomeQuests(){
   if(!tasks.length){ el.innerHTML='<div class="empty">No quests — add one on the Tasks tab</div>'; return; }
   el.innerHTML=tasks.map((t,i)=>{
     const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
+    const isS=rank==='S'; const xp=RANK_XP[rank]||RANK_XP.B;
     return`<div class="mob-task-row${t.done?' done':''}">
       <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
-      <div class="mob-rank-badge" style="background:${col};">${rank}</div>
+      <div class="mob-rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
       <div class="mob-task-label">${esc(t.text)}</div>
+      ${isS?`<div class="mob-xp-chip">+${xp}</div>`:''}
     </div>`;
   }).slice(0,5).join('');
 }
@@ -2024,6 +2033,10 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
     btn.className=(isMob?'mob-day-cell':'day-cell')+(isToday?' today':'')+(isSel?' sel':'');
     const dots=evs.slice(0,4).map(e=>`<div class="${isMob?'mob-dot-sq':'dot-sq'}" style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'};"></div>`).join('');
     btn.innerHTML=`<span class="dn">${d}</span><div class="${isMob?'mob-day-dots':'day-dots'}">${dots}</div>`;
+    if(evs.length && !isSel){
+      const tint=KIND_COLORS[evs[0].kind||'focus']||'var(--fg)';
+      btn.style.background=hexAlpha(tint, Math.min(.12+evs.length*.06, .4));
+    }
     btn.onclick=()=>{ selectedKey=key; renderMonthGrid(); renderMobMonthGrid(); renderDaySummary(); renderMobDaySummary(); openDayModal(key,dt); };
     gridEl.appendChild(btn);
   });
@@ -2318,16 +2331,19 @@ function renderTasksInto(el, tasks, isMob){
   if(!tasks.length){el.innerHTML='<div class="empty">No quests — add one below</div>';return;}
   el.innerHTML=tasks.map((t,i)=>{
     const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
+    const isS=rank==='S'; const xp=RANK_XP[rank]||RANK_XP.B;
     if(isMob) return`<div class="mob-task-row${t.done?' done':''}">
       <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
-      <div class="mob-rank-badge" style="background:${col};">${rank}</div>
+      <div class="mob-rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
       <div class="mob-task-label">${esc(t.text)}</div>
+      ${isS?`<div class="mob-xp-chip">+${xp}</div>`:''}
       <button class="mob-task-del" onclick="deleteTask(${i})">✕</button>
     </div>`;
     return`<div class="task-row${t.done?' done':''}">
       <button class="pix-check" onclick="toggleTask(${i})"><div class="pix-x"></div></button>
-      <div class="rank-badge" style="background:${col};">${rank}</div>
+      <div class="rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
       <div class="task-label">${esc(t.text)}</div>
+      <div class="xp-chip${isS?' always':''}">+${xp}</div>
       <button class="task-del" onclick="deleteTask(${i})">✕</button>
     </div>`;
   }).join('');

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Micro-Interactions, Real-Time Feedback &amp; Cognitive Load</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .queue-design-btn{margin-top:14px;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:11px 18px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:13px;letter-spacing:.5px;}
+  .queue-design-btn:hover:not(:disabled){filter:brightness(1.08);}
+  .queue-design-btn:disabled{background:rgba(223,238,255,.15);color:var(--fg);opacity:.7;cursor:default;}
+  .queue-design-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .queue-design-btn{width:100%;padding:14px;font-size:14px;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Micro-Interactions, Real-Time Feedback &amp; Cognitive Load</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Current 2026 design trends emphasize purposeful micro-interactions that signal system feedback without distraction, real-time dynamic updates to keep dashboards relevant, and intentional cognitive load reduction by hiding non-essential elements. Mission Control can adopt these patterns to make its JRPG aesthetic feel more responsive and less overwhelming while maintaining engagement.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Restrained Micro-Interactions with Motion Sensitivity Awareness</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Modern dashboards prioritize micro-interactions that provide meaningful feedback—animations on checkbox completion, subtle pop confirmations, smooth state transitions—but kept purposeful and tested for motion sensitivity. Mission Control's XP pop animations and rank-badge transitions are already strong, but should add prefers-reduced-motion support and replace excessive celebratory animations with quieter, confidence-building feedback. This bridges the gap between gamification that works long-term versus the burnout pattern seen in purely dopamine-driven apps.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://codewave.com/insights/ux-design-trends-future/" target="_blank" rel="noopener" style="color:#ff8a63;">Dashboard Design Trends 2026: Top 10 UX Trends</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; color: #dfeeff; padding: 20px; font-family: VT323; border-radius: 6px; border: 2px solid #ff8a63;&quot;&gt;&lt;div style=&quot;margin-bottom: 12px; font-size: 14px;&quot;&gt;✓ Task Completed&lt;/div&gt;&lt;div style=&quot;animation: slideUp 0.6s ease-out; margin: 8px 0; font-size: 12px; opacity: 0.7;&quot;&gt;@media (prefers-reduced-motion) { animation: none; opacity: 1; }&lt;/div&gt;&lt;div style=&quot;background: rgba(127, 255, 176, 0.2); border: 1px solid #7fffb0; padding: 6px; border-radius: 3px; font-size: 11px;&quot;&gt;+15 XP (quiet feedback)&lt;/div&gt;&lt;/div&gt;&lt;style&gt;@keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }&lt;/style&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(0, this)">+ QUEUE THIS DESIGN</button></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Real-Time Ticker &amp; Dynamic Vault Stats Display</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Real-time content keeps dashboards engaging and users exploring longer. Mission Control already has a bottom ticker bar showing vault stats, but it could expand to show live XP changes, today's progress % (todos done vs. total), and upcoming reminders count—all updating instantly as tasks complete. This transforms passive viewing into active feedback that feels alive without requiring user action.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://musemind.agency/blog/ui-design-trends" target="_blank" rel="noopener" style="color:#ff8a63;">UI Design Trends in 2026: Real-Time Content &amp; Immersive Design</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; padding: 12px; border-top: 2px solid #ff8a63; font-family: VT323; font-size: 11px; color: #dfeeff; display: flex; gap: 20px; overflow-x: auto;&quot;&gt;&lt;div style=&quot;white-space: nowrap;&quot;&gt;📊 Progress: &lt;span style=&quot;color: #7fffb0;&quot;&gt;8/12 todos&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;white-space: nowrap;&quot;&gt;⚡ XP Today: &lt;span style=&quot;color: #ff8a63;&quot;&gt;85/150&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;white-space: nowrap;&quot;&gt;🔔 Up Next: &lt;span style=&quot;color: #7fffb0;&quot;&gt;3 reminders&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;white-space: nowrap;&quot;&gt;📈 Streak: &lt;span style=&quot;color: #ff8a63;&quot;&gt;12 days&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;animation: scroll 8s linear infinite; white-space: nowrap; opacity: 0.6;&quot;&gt;→ Stay consistent, climb the ranks →&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(1, this)">+ QUEUE THIS DESIGN</button></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Cognitive Load Reduction: Context-Aware View Modes</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">2026 dashboard design centers on reducing cognitive overload by showing only what's relevant now. Mission Control could add a simple toggle—e.g., 'Focus Mode' that hides the calendar and weekly schedule, leaving only today's todos and reminders. Alternatively, a 'Dashboard' mode that hides all-day todos and surfaces only upcoming events within 4 hours. This follows the principle that every element should support current decision-making, lowering friction for quick check-ins while keeping full power for deep planning.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://fuselabcreative.com/top-dashboard-design-trends-2025/" target="_blank" rel="noopener" style="color:#ff8a63;">Dashboard Design Trends 2026: Cognitive Load &amp; Context-Aware Design</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; color: #dfeeff; padding: 16px; font-family: Press Start 2P; font-size: 7px; border: 2px solid #1e3a5f; border-radius: 4px;&quot;&gt;&lt;div style=&quot;display: flex; gap: 8px; margin-bottom: 12px; justify-content: space-between;&quot;&gt;&lt;div style=&quot;background: #ff8a63; padding: 4px 8px; border-radius: 2px; cursor: pointer;&quot;&gt;TODAY&lt;/div&gt;&lt;div style=&quot;background: rgba(30, 58, 95, 0.8); padding: 4px 8px; border-radius: 2px; cursor: pointer;&quot;&gt;FOCUS&lt;/div&gt;&lt;div style=&quot;background: rgba(30, 58, 95, 0.8); padding: 4px 8px; border-radius: 2px; cursor: pointer;&quot;&gt;WEEK&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background: #12253c; padding: 8px; border-radius: 3px; font-family: VT323; font-size: 12px;&quot;&gt;→ TODAY view: todos + 4h window reminders only&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <button class="queue-design-btn" onclick="queueDesign(2, this)">+ QUEUE THIS DESIGN</button></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const FINDINGS = [{"title":"Restrained Micro-Interactions with Motion Sensitivity Awareness","description":"Modern dashboards prioritize micro-interactions that provide meaningful feedback—animations on checkbox completion, subtle pop confirmations, smooth state transitions—but kept purposeful and tested for motion sensitivity. Mission Control's XP pop animations and rank-badge transitions are already strong, but should add prefers-reduced-motion support and replace excessive celebratory animations with quieter, confidence-building feedback. This bridges the gap between gamification that works long-term versus the burnout pattern seen in purely dopamine-driven apps.","source_title":"Dashboard Design Trends 2026: Top 10 UX Trends","source_url":"https://codewave.com/insights/ux-design-trends-future/"},{"title":"Real-Time Ticker & Dynamic Vault Stats Display","description":"Real-time content keeps dashboards engaging and users exploring longer. Mission Control already has a bottom ticker bar showing vault stats, but it could expand to show live XP changes, today's progress % (todos done vs. total), and upcoming reminders count—all updating instantly as tasks complete. This transforms passive viewing into active feedback that feels alive without requiring user action.","source_title":"UI Design Trends in 2026: Real-Time Content & Immersive Design","source_url":"https://musemind.agency/blog/ui-design-trends"},{"title":"Cognitive Load Reduction: Context-Aware View Modes","description":"2026 dashboard design centers on reducing cognitive overload by showing only what's relevant now. Mission Control could add a simple toggle—e.g., 'Focus Mode' that hides the calendar and weekly schedule, leaving only today's todos and reminders. Alternatively, a 'Dashboard' mode that hides all-day todos and surfaces only upcoming events within 4 hours. This follows the principle that every element should support current decision-making, lowering friction for quick check-ins while keeping full power for deep planning.","source_title":"Dashboard Design Trends 2026: Cognitive Load & Context-Aware Design","source_url":"https://fuselabcreative.com/top-dashboard-design-trends-2025/"}];
+  async function queueDesign(i, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    btn.disabled = true;
+    btn.classList.remove('failed');
+    btn.textContent = 'QUEUING…';
+    try {
+      const r = await fetch('/api/change-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: f.title, description: f.description,
+          source_title: f.source_title, source_url: f.source_url,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      btn.textContent = '✓ QUEUED FOR CLAUDE CODE';
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      }
+    } catch (e) {
+      btn.textContent = '⚠ FAILED — TAP TO RETRY';
+      btn.classList.add('failed');
+      btn.disabled = false;
+    }
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>

@@ -308,6 +308,14 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-weekly",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load",
+      "findingsCount": 3,
+      "auto": true
+    },
+    {
       "id": "2026-08-11-design-research-easier-to-use-interactive-to-do-list-for",
       "date": "2026-08-11",
       "topic": "Easier to use interactive to do list for the day seperate from calander",
@@ -340,20 +348,20 @@
       "auto": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-08-10",
+  "lastDesignResearchAutoRun": "2026-08-11",
   "changeRequests": [
     {
       "id": "2026-08-11-progressive-disclosure-for-daily-todos",
       "date": "2026-08-11",
       "title": "Progressive Disclosure for Daily Todos",
-      "status": "pending",
+      "status": "done",
       "source": "Design Lab"
     },
     {
       "id": "2026-08-11-tile-based-streak-grid-gamification-via-",
       "date": "2026-08-11",
       "title": "Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)",
-      "status": "pending",
+      "status": "done",
       "source": "Design Lab"
     }
   ]
