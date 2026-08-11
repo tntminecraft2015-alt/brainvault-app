@@ -9,7 +9,6 @@ tags: [schedule, routine]
 
 | Time | Mission | Kind |
 |------|---------|------|
-| 19:00 | Enjoy | focus |
 | 23:59 | Bedtime | focus |
 
 _Last synced: 8/11/2026, 4:41:45 AM_
