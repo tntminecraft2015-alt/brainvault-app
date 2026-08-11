@@ -382,6 +382,17 @@
   "designFeedback": [
     {
       "id": "2026-08-11-design-research-revisions-1786428352137",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Consequential Instant Feedback: Haptic + Audio Pulse on Task Completion",
+      "findingDescription": "Tapping a habit gives instant XP and gold feedback, making choices feel consequential. Instead of a silent animation, Mission Control's checkbox could trigger a brief haptic pulse (vibration on mobile, rumble on controller-paired desktops) paired with a subtle chime—creating a tactile, multi-sensory reward loop that feels *earned* rather than decorative. The sensation is instantaneous and dismissible, respecting focus while confirming the action unmistakably.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428352137",
       "findingIndex": 0,
       "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
       "findingTitle": "Instant Completion Micro-Interactions with Sequenced Feedback Loops",
@@ -600,10 +611,10 @@
       "source_title": "Best Habit Tracker Apps for Personal Productivity",
       "source_url": "https://viasocket.com/discovery/blog/6ssf8f/7-best-habit-tracker-apps-for-focused-productivity",
       "mockup_html": "<div style='background:#0a1929;padding:20px;font-family:VT323;border-radius:10px;'><div style='background:#12253c;padding:12px;border-radius:6px;margin-bottom:12px;display:flex;align-items:center;gap:10px;'><input type='checkbox' style='width:20px;height:20px;cursor:pointer;accent-color:#ff8a63;' onclick='this.parentElement.style.opacity=0.6;'/><span style='color:#dfeeff;font-size:14px;'>Daily Focus Session</span><span style='margin-left:auto;color:#7fffb0;font-weight:bold;font-size:12px;'>+25 XP</span></div><div style='color:#8fd6ff;font-size:11px;line-height:1.4;'>✓ Check triggers:<br/>• 60ms haptic pulse<br/>• 200ms sine-wave chime (440Hz)<br/>• +XP float animation<br/>→ All dismiss on blur</div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 4,
-      "lastRating": 3,
-      "lastRatingLabel": "Almost there",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-11",
       "updatedDate": "2026-08-11",
