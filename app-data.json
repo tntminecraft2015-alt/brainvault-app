@@ -1,56 +1,5 @@
 {
-  "schedule": [
-    {
-      "time": "23:59",
-      "title": "Bedtime",
-      "kind": "focus"
-    },
-    {
-      "time": "09:00",
-      "title": "Wake Up",
-      "kind": "focus"
-    },
-    {
-      "time": "09:30",
-      "title": "Breakfast",
-      "kind": "focus"
-    },
-    {
-      "time": "10:00",
-      "title": "Grind Time",
-      "kind": "focus"
-    },
-    {
-      "time": "12:00",
-      "title": "Lunch",
-      "kind": "focus"
-    },
-    {
-      "time": "12:30",
-      "title": "Walk/Gym",
-      "kind": "focus"
-    },
-    {
-      "time": "13:30",
-      "title": "Guitar",
-      "kind": "focus"
-    },
-    {
-      "time": "15:00",
-      "title": "Grind 2 Electric Boogaloo",
-      "kind": "focus"
-    },
-    {
-      "time": "18:00",
-      "title": "Dinner",
-      "kind": "focus"
-    },
-    {
-      "time": "19:00",
-      "title": "Enjoy",
-      "kind": "focus"
-    }
-  ],
+  "schedule": [],
   "events": {
     "2026-05-19": [
       {
@@ -261,7 +210,7 @@
       "shiny": false
     },
     "252": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-05-15",
       "shiny": false
     },
@@ -276,9 +225,9 @@
       "shiny": true
     },
     "359": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-07-08",
-      "shiny": false
+      "shiny": true
     },
     "390": {
       "count": 1,
@@ -311,6 +260,67 @@
     }
   ],
   "designResearch": [
+    {
+      "id": "2026-08-11-design-research-revisions-1786428538705",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428352137",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428311937",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428260206",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428223878",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "date": "2026-08-11",
+      "topic": "To do list",
+      "title": "To-Do List Interaction & Feedback Refinement",
+      "findingsCount": 3,
+      "auto": false
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "date": "2026-08-11",
+      "topic": "To do list",
+      "title": "To-Do List Gamification & Visual Feedback Patterns",
+      "findingsCount": 3,
+      "auto": false
+    },
     {
       "id": "2026-08-11-design-research-weekly",
       "date": "2026-08-11",
@@ -355,6 +365,13 @@
   "lastDesignResearchAutoRun": "2026-08-11",
   "changeRequests": [
     {
+      "id": "2026-08-11-prevent-duplicate-design-responses-and-s",
+      "date": "2026-08-11",
+      "title": "Prevent duplicate design responses and show viewed status",
+      "status": "pending",
+      "source": "ED chat"
+    },
+    {
       "id": "2026-08-11-progressive-disclosure-for-daily-todos",
       "date": "2026-08-11",
       "title": "Progressive Disclosure for Daily Todos",
@@ -369,5 +386,273 @@
       "source": "Design Lab"
     }
   ],
-  "designFeedback": []
+  "designFeedback": [
+    {
+      "id": "2026-08-11-design-research-revisions-1786428538705",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Consequential Instant Feedback: Haptic + Audio Pulse on Task Completion",
+      "findingDescription": "When a player checks off a todo or daily habit, Mission Control triggers a millisecond haptic pulse (vibration on mobile, controller rumble on desktop) paired with a crisp, brief chime—creating instant, multi-sensory confirmation that the action *landed*. This makes task completion feel earned and consequential, not just a visual flourish; the sensation is snappy enough to respect focus while being unmistakable enough to feel rewarding.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428352137",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Consequential Instant Feedback: Haptic + Audio Pulse on Task Completion",
+      "findingDescription": "Tapping a habit gives instant XP and gold feedback, making choices feel consequential. Instead of a silent animation, Mission Control's checkbox could trigger a brief haptic pulse (vibration on mobile, rumble on controller-paired desktops) paired with a subtle chime—creating a tactile, multi-sensory reward loop that feels *earned* rather than decorative. The sensation is instantaneous and dismissible, respecting focus while confirming the action unmistakably.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428352137",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Instant Completion Micro-Interactions with Sequenced Feedback Loops",
+      "findingDescription": "A single click to mark a task done triggers a choreographed sequence: circle fills with color, a checkmark draws, the task label strikes through, a small burst particle effect fires, then the entire row gently collapses or fades. Instead of a drawer or modal, the feedback happens *inline on the card itself*, keeping the battle-menu focus intact while delivering psychological reinforcement and system status confirmation. Fits Mission Control's rank/XP feedback loop perfectly—each rank completion ",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428260206",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Reflective Progress Heatmap Instead of Instant Confetti",
+      "findingDescription": "Rather than ephemeral animations, adopt a GitHub-style contribution grid where each completed day tiles up on a calendar heatmap—empty tiles create visible gaps that push you to fill them. Mission Control's header could swap its linear streak badge for a compact 7-day or 30-day heatmap (rows of colored boxes), letting the daily completion history tell the story visually without cheap confetti noise. The metric becomes compliance against the plan, not consecutive perfection—missing a day is a dat",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428260206",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Drill-Down Detail Exposure (Progressive Disclosure via Expandable Task Cells)",
+      "findingDescription": "Essential data presented first with supporting metrics accessible via progressive drill-down that starts with a general overview and then goes into detail, facilitating data prioritization and creating clarity. For Mission Control's daily todos, each task cell shows only rank + title by default; tapping/clicking expands to reveal subtasks, due time, tags, or notes in a bottom-drawer slide or inline toggle. Keeps the grid uncluttered while respecting the JRPG battle-menu aesthetic—UI feels lightw",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428223878",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Streak Confetti Burst on Daily Completion",
+      "findingDescription": "When the user checks off their first task of the day, trigger a brief 1-second CSS keyframe confetti animation (3–5 particles scaling and fading upward) centered on the streak badge in the header. The effect rewards daily habit closure with instant tactile feedback, reinforcing the JRPG battle-menu aesthetic while borrowing gamification momentum from modern habit trackers. Confetti only fires once per calendar day, preventing fatigue.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428223878",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Anchor + Supporting Cell Ratio (Bento Hierarchy via Area, Not Just Label)",
+      "findingDescription": "Every bento has one anchor that wins on size by a clear margin, ideally twice the area of the next cell, and the anchor is where the strongest copy, most important visual, or highest-stakes interaction lives. For Mission Control's daily todos, make the S-rank task an anchor (spanning 2 grid columns + 2 rows), A-ranks as secondary cells (1 col × 1.5 rows), and C-rank routine items as minimal supporting cells (1 col × 0.8 rows). This ratio mirrors the visual hierarchy the rest of the page uses, co",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 2,
+      "threadId": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+      "findingTitle": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "findingDescription": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "findingDescription": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "findingDescription": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 2,
+      "threadId": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+      "findingTitle": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "findingDescription": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "findingDescription": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "findingDescription": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 2,
+      "threadId": null,
+      "findingTitle": "Quality Over Volume (Task Weighting)",
+      "findingDescription": "Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displ",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "threadId": null,
+      "findingTitle": "Immediate Visual Feedback on Task Completion",
+      "findingDescription": "The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., \"S-rank locked\" at task completion) would deepen the JRPG feel.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": null,
+      "findingTitle": "Streak Forgiveness (Grace Days & Freezes)",
+      "findingDescription": "Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": null,
+      "findingTitle": "Streak Forgiveness (Grace Days & Freezes)",
+      "findingDescription": "Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 2,
+      "findingTitle": "Quality Over Volume (Task Weighting)",
+      "findingDescription": "Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displ",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "findingTitle": "Immediate Visual Feedback on Task Completion",
+      "findingDescription": "The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., \"S-rank locked\" at task completion) would deepen the JRPG feel.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "findingTitle": "Streak Forgiveness (Grace Days & Freezes)",
+      "findingDescription": "Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    }
+  ],
+  "designThreads": {
+    "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
+      "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "title": "Rank-Locked Celebration Bursts with Staggered Easing Curves",
+      "description": "Asana's task completion uses celebratory animations featuring unexpected reward sequences that make routine achievements feel special. For Mission Control's rank system, apply staggered easing curves per rank (linear for C, ease-out for B, spring overshoot for A/S) so each rank tier *feels* heavier and more rewarding. Circle fills with timed color transition, checkmark draws with stroke animation, label strikes through, then a burst of particles in the rank's own color, before the row gently collapses. Most micro-animations live in the 200–400ms range — cluster fill (0ms) → check (80ms) → strike (120ms) → confetti (200ms) → collapse (600ms).",
+      "source_title": "Asana Task Completion Celebrations",
+      "source_url": "https://asana.com",
+      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff'><div style='display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px;background:#12253c;border-radius:6px'><svg width='28' height='28' viewBox='0 0 28 28' style='fill:none;stroke:#ff8a63;stroke-width:2'><circle cx='14' cy='14' r='10' style='animation:rankFill 200ms cubic-bezier(.34,1.56,.64,1) forwards'/><path d='M10,14l3,3l6-6' style='stroke-dasharray:12;stroke-dashoffset:12;animation:checkDraw 80ms ease-out 80ms forwards'/></svg><span style='flex:1;text-decoration:line-through;animation:strikeThrough 120ms 120ms forwards'>Daily Report Due</span><span style='font-size:12px;color:#7fffb0'>S-RANK</span></div><div style='font-size:11px;color:#8fd6ff;line-height:1.4'>✓ Circle fills (spring) → Check draws (ease-out) → Label strikes → Burst particles (rank color) → Row collapses</div><style>@keyframes rankFill{0%{background:transparent;} 100%{background:#ff8a63;}} @keyframes checkDraw{0%{stroke-dashoffset:12;} 100%{stroke-dashoffset:0;}} @keyframes strikeThrough{0%{opacity:1;} 100%{opacity:.5;}}</style></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 5,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    },
+    "thread-1786428178060-1-streaks-with-confetti-micro-animation-on": {
+      "id": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "title": "Single-Tap Affordance Toggles: Friction-Free Task Completion",
+      "description": "Since a 20-second delay can break automatic behavior and small amounts of friction often beat motivation, Mission Control's todos should support instant checkbox affordance via a single, oversized tap zone per task—no modal, no confirmation, just state-change haptic + color shift. Reducing friction by minimizing steps keeps the daily ritual effortless and habitual, making logging feel automatic rather than ceremonial.",
+      "source_title": "Environment Design for Habits: A Room-by-Room Guide + Designing for Habits: A UX Guide",
+      "source_url": "https://www.ehm-tech.com/habit/blog/environment-design-for-habits/",
+      "mockup_html": "<style>body { font-family: VT323; background: #0a1929; padding: 20px; } .todo-item { background: #12253c; border: 2px solid #ff8a63; border-radius: 10px; margin: 10px 0; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; } .todo-item:hover { background: #1e3a5f; transform: scale(1.02); } .todo-item.done { background: #1e3a5f; border-color: #7fffb0; } .toggle { width: 48px; height: 48px; border-radius: 8px; background: #ff8a63; border: none; cursor: pointer; font-size: 20px; transition: all 0.1s; } .todo-item.done .toggle { background: #7fffb0; } .toggle:active { transform: scale(0.95); } .text { flex: 1; color: #dfeeff; font-size: 16px; } .todo-item.done .text { color: #8fd6ff; opacity: 0.6; text-decoration: line-through; }</style><div class='todo-item'><button class='toggle'>☐</button><span class='text'>Morning meditation</span></div><div class='todo-item done'><button class='toggle'>✓</button><span class='text'>Morning meditation</span></div>",
+      "status": "ready_to_ship",
+      "revisionCount": 6,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    },
+    "thread-1786428178060-2-tap-to-log-quick-action-finch-productive": {
+      "id": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+      "title": "Partial-Fill Progress Bar (Done/Do Habits Pattern)",
+      "description": "Done's minimalist habit tracker uses a single-tap interface where gray habit bars fill with color as you progress toward a daily goal—no navigation, no forms, no friction. Apply this to Mission Control's todo list by replacing checkboxes with color-coded progress bars for today's todos; tapping a bar increments its fill and triggers instant XP feedback, turning logging into satisfying micro-interactions that keep streaks alive.",
+      "source_title": "Done: Habit Tracker (now Do Habits)",
+      "source_url": "https://apps.apple.com/us/app/done-habit-tracker/id6757984661",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;font-family:VT323,monospace;border:2px solid #ff8a63\">\n  <div style=\"font-size:9px;text-transform:uppercase;margin-bottom:12px;color:#8fd6ff\">Today's Todos</div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Morning Jog</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:60%;height:100%;background:#7fffb0;transition:width 0.3s\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">3/5</div>\n    </div>\n  </div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Code Review</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:0%;height:100%;background:#ff8a63\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">0/1 tap</div>\n    </div>\n  </div>\n  <div style=\"margin-top:16px;padding:8px;background:#12253c;border-radius:6px;text-align:center;font-size:10px;color:#7fffb0\">↑ tap bar to log | +50 XP on complete</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 2,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    }
+  }
 }

@@ -472,3 +472,30 @@ Mission Control change requested via Design Lab: Tile-Based Streak Grid (Gamific
 **Pages created:** [[2026-08-11-design-research-weekly]]
 
 Design research: General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load (3 findings)
+
+## [2026-08-11] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-11-design-research-to-do-list]]
+
+Design research: To-Do List Interaction & Feedback Refinement (3 findings)
+
+## [2026-08-11] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-11-design-research-revisions-1786428223878]]
+
+Design research: Revisions — Ready for Another Look (2 findings)
+
+## [2026-08-11] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Prevent duplicate design responses and show viewed status
+
+## [2026-08-11] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-11]]
+
+Chat session on 2026-08-11
