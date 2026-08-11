@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>To-Do List Gamification &amp; Visual Feedback Patterns</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>To-Do List Gamification &amp; Visual Feedback Patterns</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Today's most effective productivity apps avoid streak punishment (grace days beat unforgiving chains), pair immediate visual feedback with streak visualization, and limit displayed items to reduce cognitive load. For Mission Control, this means tightening the XP reward system to favor meaningful tasks over volume, and adding a soft-fail mechanic that keeps players engaged after missed days.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: To do list</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Streak Forgiveness (Grace Days &amp; Freezes)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players "freeze" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/" target="_blank" rel="noopener" style="color:#ff8a63;">Yuki Chou, Octalysis Gamification Research (2026)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #ff8a63;padding:16px;font-family:VT323;color:#dfeeff;width:300px&quot;&gt;
+  &lt;div style=&quot;font-size:14px;margin-bottom:8px;text-transform:uppercase;color:#ff8a63&quot;&gt;⚔️ Streak Freeze&lt;/div&gt;
+  &lt;div style=&quot;background:#12253c;border:1px solid #1e3a5f;padding:12px;margin-bottom:8px;font-size:12px&quot;&gt;
+    &lt;div&gt;Current Streak: &lt;strong&gt;18 days&lt;/strong&gt;&lt;/div&gt;
+    &lt;div style=&quot;margin-top:4px&quot;&gt;Freezes Left: &lt;strong&gt;1/1&lt;/strong&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;button style=&quot;width:100%;background:#ff8a63;color:#0a1929;border:none;padding:8px;font-weight:bold;cursor:pointer&quot;&gt;Use Freeze&lt;/button&gt;
+  &lt;div style=&quot;font-size:10px;margin-top:8px;color:#7fffb0&quot;&gt;Skip tomorrow without breaking your streak&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Immediate Visual Feedback on Task Completion</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., "S-rank locked" at task completion) would deepen the JRPG feel.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.rapidnative.com/blogs/habit-tracker-calendar" target="_blank" rel="noopener" style="color:#ff8a63;">RapidNative, Habit Tracker Calendar Design (2025)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #7fffb0;padding:16px;font-family:VT323;color:#dfeeff;width:280px;position:relative&quot;&gt;
+  &lt;div style=&quot;background:#12253c;padding:12px;margin-bottom:8px;border:1px solid #1e3a5f&quot;&gt;
+    &lt;input type=&quot;checkbox&quot; style=&quot;width:18px;height:18px;cursor:pointer&quot; checked&gt;
+    &lt;span style=&quot;margin-left:8px;text-decoration:line-through&quot;&gt;Refactor login module&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;position:absolute;top:40px;right:20px;font-size:18px;animation:float-up 1s ease-out forwards&quot;&gt;+50 XP&lt;/div&gt;
+  &lt;div style=&quot;background:#7fffb0;color:#0a1929;padding:8px;font-weight:bold;text-align:center;font-size:11px&quot;&gt;S-RANK UNLOCKED!&lt;/div&gt;
+  &lt;style&gt;@keyframes float-up{0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-30px)}}&lt;/style&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Quality Over Volume (Task Weighting)</h1>
+      <div class="slide-body"><p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displaying a "focus score" that weighs larger tasks—would prevent gaming.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://trophy.so/blog/productivity-gamification-examples" target="_blank" rel="noopener" style="color:#ff8a63;">Trophy Gamification Platform Analysis (2026)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;border:3px inset #dfeeff;padding:16px;font-family:VT323;color:#dfeeff;width:320px&quot;&gt;
+  &lt;div style=&quot;font-size:13px;margin-bottom:12px;text-transform:uppercase;color:#ff8a63&quot;&gt;📊 Focus Score&lt;/div&gt;
+  &lt;div style=&quot;background:#12253c;padding:10px;margin-bottom:10px;border:1px solid #1e3a5f&quot;&gt;
+    &lt;div style=&quot;display:flex;justify-content:space-between;margin-bottom:6px&quot;&gt;
+      &lt;span&gt;Daily Progress&lt;/span&gt;
+      &lt;span style=&quot;color:#7fffb0&quot;&gt;72%&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;background:#1e3a5f;height:8px;border-radius:2px&quot;&gt;&lt;/div&gt;
+    &lt;div style=&quot;background:#7fffb0;height:8px;width:72%;border-radius:2px;margin-top:-8px&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;font-size:11px;color:#dfeeff;line-height:1.4&quot;&gt;
+    &lt;div&gt;✓ Code review: &lt;strong&gt;S&lt;/strong&gt; (+50 XP)&lt;/div&gt;
+    &lt;div&gt;✓ Email triage: &lt;strong&gt;C&lt;/strong&gt; (+10 XP)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-11-design-research-to-do-list";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Streak Forgiveness (Grace Days & Freezes)","description":"Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.","source_title":"Yuki Chou, Octalysis Gamification Research (2026)","source_url":"https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/"},{"title":"Immediate Visual Feedback on Task Completion","description":"The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., \"S-rank locked\" at task completion) would deepen the JRPG feel.","source_title":"RapidNative, Habit Tracker Calendar Design (2025)","source_url":"https://www.rapidnative.com/blogs/habit-tracker-calendar"},{"title":"Quality Over Volume (Task Weighting)","description":"Karma rewards task completion regardless of task importance, which means the fastest path to a higher score is completing a high volume of small, easy tasks rather than fewer, meaningful ones. Users who discover this optimize for it, and the inbox fills with two-minute items, important projects sit untouched, and the Karma number climbs while actual productivity declines. Mission Control's rank system already differentiates (S/A/B/C), but making S-ranks harder to earn than quick C-ranks—or displaying a \"focus score\" that weighs larger tasks—would prevent gaming.","source_title":"Trophy Gamification Platform Analysis (2026)","source_url":"https://trophy.so/blog/productivity-gamification-examples"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
