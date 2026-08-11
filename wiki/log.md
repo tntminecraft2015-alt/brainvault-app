@@ -459,3 +459,9 @@ One thing this surfaced: `design-research/*.html` lives outside the paths `.giti
 **Pages created:** [[chat-2026-08-10]]
 
 Chat session on 2026-08-10
+
+## [2026-08-11] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via Design Lab: Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)
