@@ -337,6 +337,17 @@
   "designFeedback": [
     {
       "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "findingDescription": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
       "findingIndex": 0,
       "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
       "findingTitle": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
@@ -445,10 +456,10 @@
       "source_title": "Top Gamification Apps 2025: Boost Productivity and Learning",
       "source_url": "https://gamestrategies.io/en/blog/gamification-apps/",
       "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;text-align:center;\">\n  <div style=\"display:inline-block;background:#1e3a5f;padding:8px 12px;border-radius:6px;border:2px solid #7fffb0;position:relative;overflow:hidden;\">\n    <div style=\"font-size:9px;color:#8fd6ff;text-transform:uppercase;margin-bottom:4px;\">Streak</div>\n    <div style=\"font-size:18px;font-weight:bold;color:#7fffb0;\">7 DAYS</div>\n    <div style=\"position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;animation:confetti 1s ease-out forwards;opacity:0;\" id=\"confetti\">✨ ✨</div>\n  </div>\n  <style>\n    @keyframes confetti {\n      0% { opacity:1;transform:translateY(0) scale(1); }\n      100% { opacity:0;transform:translateY(-20px) scale(0); }\n    }\n  </style>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-08-11",
       "updatedDate": "2026-08-11",
