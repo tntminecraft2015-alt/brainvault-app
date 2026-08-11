@@ -329,6 +329,17 @@
   "designFeedback": [
     {
       "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 1,
+      "threadId": null,
+      "findingTitle": "Immediate Visual Feedback on Task Completion",
+      "findingDescription": "The core of the experience is the visual feedback loop. When a user marks a habit as complete, the app must acknowledge it—instantly and satisfyingly. This doesn't mean over-the-top fireworks, but a clear, immediate confirmation that their effort has been recorded. Mission Control already does this well with XP pop animations; enhancing it with a color pulse or rank-check notification (e.g., \"S-rank locked\" at task completion) would deepen the JRPG feel.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
       "findingIndex": 0,
       "threadId": null,
       "findingTitle": "Streak Forgiveness (Grace Days & Freezes)",
