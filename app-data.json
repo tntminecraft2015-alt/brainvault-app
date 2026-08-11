@@ -308,6 +308,14 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-easier-to-use-interactive-to-do-list-for",
+      "date": "2026-08-11",
+      "topic": "Easier to use interactive to do list for the day seperate from calander",
+      "title": "Daily Todo Separation & Visual Gamification Patterns",
+      "findingsCount": 3,
+      "auto": false
+    },
+    {
       "id": "2026-08-10-design-research-calendar-upgrades-and-designs",
       "date": "2026-08-10",
       "topic": "Calendar upgrades and designs",
@@ -334,6 +342,13 @@
   ],
   "lastDesignResearchAutoRun": "2026-08-10",
   "changeRequests": [
+    {
+      "id": "2026-08-11-progressive-disclosure-for-daily-todos",
+      "date": "2026-08-11",
+      "title": "Progressive Disclosure for Daily Todos",
+      "status": "pending",
+      "source": "Design Lab"
+    },
     {
       "id": "2026-08-11-tile-based-streak-grid-gamification-via-",
       "date": "2026-08-11",
