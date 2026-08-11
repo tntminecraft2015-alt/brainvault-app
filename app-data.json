@@ -108,9 +108,9 @@
     },
     {
       "text": "Data-Rich Calendar Heatmaps (Dual-View Pattern) — Calendar interfaces can overlay heatmaps showing financial or contextual performance along",
-      "done": true,
+      "done": false,
       "rank": "B",
-      "doneDate": "2026-08-10"
+      "doneDate": null
     }
   ],
   "streakDays": [],
