@@ -977,6 +977,20 @@ async function checkReminders() {
   if (changed) saveAppData(data);
 }
 
+async function pruneOldEvents() {
+  const data = getAppData();
+  const cutoff = new Date();
+  cutoff.setFullYear(cutoff.getFullYear() - 1);
+  let changed = false;
+  for (const dateStr of Object.keys(data.events || {})) {
+    if (new Date(dateStr + 'T00:00:00') < cutoff) {
+      delete data.events[dateStr];
+      changed = true;
+    }
+  }
+  if (changed) saveAppData(data);
+}
+
 // ── START ─────────────────────────────────────────────────────────────────────
 async function main() {
   await initStore();
@@ -1002,6 +1016,9 @@ async function main() {
 
   maybeAutoRunDesignResearch().catch(console.error);
   setInterval(() => maybeAutoRunDesignResearch().catch(console.error), 6 * 60 * 60 * 1000);
+
+  pruneOldEvents().catch(console.error);
+  setInterval(() => pruneOldEvents().catch(console.error), 24 * 60 * 60 * 1000);
 }
 
 main().catch(console.error);
