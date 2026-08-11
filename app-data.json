@@ -261,6 +261,14 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-to-do-list",
+      "date": "2026-08-11",
+      "topic": "To do list",
+      "title": "To-Do List Gamification & Visual Feedback Patterns",
+      "findingsCount": 3,
+      "auto": false
+    },
+    {
       "id": "2026-08-11-design-research-weekly",
       "date": "2026-08-11",
       "topic": "",
@@ -316,6 +324,18 @@
       "title": "Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)",
       "status": "done",
       "source": "Design Lab"
+    }
+  ],
+  "designFeedback": [
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "findingTitle": "Streak Forgiveness (Grace Days & Freezes)",
+      "findingDescription": "Streak forgiveness (freezes, grace days, pause buttons) went from premium feature to baseline expectation, driven by the fact that an unforgiving streak breaks once and then breaks forever, because the psychological cost of restarting from zero is heavier than the cost of skipping today. Mission Control could let players \"freeze\" one day per week without losing their XP streak, or offer a monthly streak-reset token—keeping the JRPG rank feel while staying psychologically forgiving.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
     }
   ]
 }
