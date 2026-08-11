@@ -261,6 +261,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-revisions-1786428352137",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
       "id": "2026-08-11-design-research-revisions-1786428311937",
       "date": "2026-08-11",
       "topic": "",
@@ -362,6 +371,17 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-11-design-research-revisions-1786428260206",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Reflective Progress Heatmap Instead of Instant Confetti",
+      "findingDescription": "Rather than ephemeral animations, adopt a GitHub-style contribution grid where each completed day tiles up on a calendar heatmap—empty tiles create visible gaps that push you to fill them. Mission Control's header could swap its linear streak badge for a compact 7-day or 30-day heatmap (rows of colored boxes), letting the daily completion history tell the story visually without cheap confetti noise. The metric becomes compliance against the plan, not consecutive perfection—missing a day is a dat",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-11"
+    },
     {
       "id": "2026-08-11-design-research-revisions-1786428260206",
       "findingIndex": 0,
@@ -539,13 +559,13 @@
   "designThreads": {
     "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
       "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
-      "title": "Drill-Down Detail Exposure (Progressive Disclosure via Expandable Task Cells)",
-      "description": "Each task cell in Mission Control's daily todo grid displays only rank badge and title by default—a clean, scannable overview. Tapping the cell reveals a bottom slide-drawer showing subtasks, due time, tags, and notes without leaving the hub, keeping the JRPG battle-menu aesthetic lightweight and focused until the player summons deeper intel.",
-      "source_title": "Dashboard Design: Best Practices With Examples | Toptal®",
-      "source_url": "https://www.toptal.com/designers/data-visualization/dashboard-design-best-practices",
-      "mockup_html": "<style>body{margin:0;padding:20px;background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}.task{background:#12253c;border:2px solid #1e3a5f;padding:12px;cursor:pointer;transition:all.2s}.task:hover{background:#1e3a5f;border-color:#ff8a63}.rank{display:inline-block;width:28px;height:28px;background:#e85d3a;color:#0a1929;text-align:center;line-height:28px;font-weight:bold;margin-right:8px;border-radius:4px}.title{display:inline;font-size:14px}.drawer{background:#1e3a5f;border-top:3px solid #ff8a63;padding:16px;margin-top:12px;border-radius:6px;font-size:12px;line-height:1.6}.drawer-item{margin:8px 0}.label{color:#66c8ff;font-weight:bold}.val{color:#dfeeff;margin-left:4px}</style><div class='grid'><div class='task'><span class='rank'>A</span><span class='title'>Deploy API</span></div><div class='task'><span class='rank'>B</span><span class='title'>Review PRs</span></div></div><div class='drawer'><div class='drawer-item'><span class='label'>Subtasks:</span><span class='val'>Build tests · Deploy staging</span></div><div class='drawer-item'><span class='label'>Due:</span><span class='val'>14:00 (4h 23m left)</span></div><div class='drawer-item'><span class='label'>Tags:</span><span class='val'>#focus #critical</span></div><div class='drawer-item'><span class='label'>Notes:</span><span class='val'>Wait for CI green before prod push</span></div></div>",
-      "status": "generating",
-      "revisionCount": 3,
+      "title": "Instant Completion Micro-Interactions with Sequenced Feedback Loops",
+      "description": "A single click to mark a task done triggers a choreographed sequence: circle fills with color, a checkmark draws, the task label strikes through, a small burst particle effect fires, then the entire row gently collapses or fades. Instead of a drawer or modal, the feedback happens *inline on the card itself*, keeping the battle-menu focus intact while delivering psychological reinforcement and system status confirmation. Fits Mission Control's rank/XP feedback loop perfectly—each rank completion could trigger a unique particle color and confetti burst.",
+      "source_title": "Acme Prototype — Task Completion Micro-interaction",
+      "source_url": "https://thariqs.github.io/html-effectiveness/07-prototype-animation.html",
+      "mockup_html": "<style>\n  .task-row {\n    display: flex; align-items: center; gap: 10px; padding: 12px;\n    background: #12253c; border-radius: 6px; margin-bottom: 8px;\n    transition: opacity 200ms ease-out;\n  }\n  .task-row.done { opacity: 0.5; }\n  .check-circle {\n    width: 24px; height: 24px; border: 2px solid #ff8a63; border-radius: 50%;\n    flex-shrink: 0; position: relative;\n  }\n  .task-row.done .check-circle {\n    background: #7fffb0; border-color: #7fffb0;\n    animation: fillPulse 300ms cubic-bezier(.34,1.56,.64,1);\n  }\n  .checkmark {\n    position: absolute; width: 14px; height: 8px; border: 2px solid white;\n    border-top: 0; border-right: 0; left: 4px; top: 6px;\n    opacity: 0; transform: rotate(-45deg);\n  }\n  .task-row.done .checkmark {\n    animation: drawCheck 200ms ease-out 100ms forwards;\n  }\n  .task-label { color: #dfeeff; font-family: VT323; flex: 1; }\n  .task-row.done .task-label {\n    text-decoration: line-through; color: #8fd6ff; opacity: 0.7;\n  }\n  @keyframes fillPulse {\n    0% { transform: scale(1); background: #ff8a63; }\n    50% { transform: scale(1.15); }\n    100% { transform: scale(1); background: #7fffb0; }\n  }\n  @keyframes drawCheck {\n    to { opacity: 1; }\n  }\n</style>\n<div class=\"task-row\"><div class=\"check-circle\"><div class=\"checkmark\"></div></div><span class=\"task-label\">Draft weekly report</span></div>\n<div class=\"task-row done\"><div class=\"check-circle\"><div class=\"checkmark\"></div></div><span class=\"task-label\">Review PR queue</span></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 4,
       "lastRating": 1,
       "lastRatingLabel": "Not even close",
       "lastComment": "",
@@ -560,10 +580,10 @@
       "source_title": "Best Habit Tracker Apps for Personal Productivity",
       "source_url": "https://viasocket.com/discovery/blog/6ssf8f/7-best-habit-tracker-apps-for-focused-productivity",
       "mockup_html": "<div style=\"background: #0a1929; padding: 24px; border-radius: 10px; font-family: VT323, monospace; color: #dfeeff;\">\n  <div style=\"margin-bottom: 16px; font-size: 12px; color: #8fd6ff;\">TODAY'S TASK</div>\n  <div style=\"display: flex; align-items: center; gap: 12px; padding: 12px; background: #12253c; border-radius: 8px; border: 1px solid #1e3a5f;\">\n    <input type=\"checkbox\" id=\"demo-task\" style=\"width: 20px; height: 20px; cursor: pointer;\" />\n    <label for=\"demo-task\" style=\"flex: 1; cursor: pointer;\">Review sprint retrospective</label>\n    <div id=\"feedback-zone\" style=\"width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 14px;\"></div>\n  </div>\n  <script>\n    document.getElementById('demo-task').addEventListener('change', function(e) {\n      if (e.target.checked) {\n        const zone = document.getElementById('feedback-zone');\n        zone.textContent = '✓';\n        zone.style.color = '#7fffb0';\n        zone.style.animation = 'pulse 0.3s ease-out';\n        if (navigator.vibrate) navigator.vibrate(30);\n        const beep = new (window.AudioContext || window.webkitAudioContext)();\n        const osc = beep.createOscillator();\n        const gain = beep.createGain();\n        osc.connect(gain);\n        gain.connect(beep.destination);\n        osc.frequency.value = 800;\n        gain.gain.setValueAtTime(0.1, beep.currentTime);\n        gain.gain.exponentialRampToValueAtTime(0.01, beep.currentTime + 0.1);\n        osc.start(beep.currentTime);\n        osc.stop(beep.currentTime + 0.1);\n      }\n    });\n  </script>\n  <style>\n    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); opacity: 0; } }\n  </style>\n</div>",
-      "status": "ready_to_ship",
+      "status": "generating",
       "revisionCount": 3,
-      "lastRating": 1,
-      "lastRatingLabel": "Not even close",
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-08-11",
       "updatedDate": "2026-08-11",
