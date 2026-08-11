@@ -141,7 +141,6 @@ const VAPID_PUBLIC  = process.env.VAPID_PUBLIC_KEY  || '';
 const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || '';
 const VAPID_CONTACT = process.env.VAPID_CONTACT_EMAIL || 'mailto:admin@example.com';
 const PUSH_ENABLED  = !!(VAPID_PUBLIC && VAPID_PRIVATE);
-const REMINDER_LEAD_MIN = 30;
 
 if (PUSH_ENABLED) {
   webpush.setVapidDetails(VAPID_CONTACT, VAPID_PUBLIC, VAPID_PRIVATE);
@@ -944,11 +943,11 @@ async function checkReminders() {
   let changed = false;
   for (const [date, evs] of Object.entries(data.events || {})) {
     for (const ev of evs) {
-      if (!ev.time) continue;
+      if (!ev.time || !ev.notify || !ev.notifyLeadMin) continue;
       const evDt = new Date(`${date}T${ev.time}:00`);
       const diffMin = (evDt - now) / 60000;
       const key = `${date}|${ev.time}|${ev.title}`;
-      if (diffMin <= 0 || diffMin > REMINDER_LEAD_MIN || data.notifiedEvents[key]) continue;
+      if (diffMin <= 0 || diffMin > ev.notifyLeadMin || data.notifiedEvents[key]) continue;
       data.notifiedEvents[key] = true;
       changed = true;
       const payload = JSON.stringify({
