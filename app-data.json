@@ -346,6 +346,17 @@
   "designFeedback": [
     {
       "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "findingDescription": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
       "findingIndex": 2,
       "threadId": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
       "findingTitle": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
@@ -460,10 +471,10 @@
       "source_title": "Bento Grid Design: A 2026 Guide to Layouts and Spacing | Brainy Papers",
       "source_url": "https://brainy.ink/paper/bento-grid-design-guide",
       "mockup_html": "<html><head><style>body{margin:0;padding:12px;background:#0a1929;font-family:'VT323',monospace;color:#dfeeff;}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}.anchor{grid-column:span 2;grid-row:span 2;background:#1e3a5f;border:2px solid #ff8a63;padding:12px;border-radius:6px;}.secondary{grid-column:span 1;grid-row:span 1.5;background:#12253c;border:1px solid #8fd6ff;padding:10px;border-radius:6px;}.supporting{grid-column:span 1;grid-row:span 0.8;background:#12253c;border:1px solid #7a8a78;padding:6px;font-size:12px;}.label{font-size:10px;opacity:0.6;margin-bottom:4px;}</style></head><body><div class=\"grid\"><div class=\"anchor\"><div class=\"label\">S-RANK</div><strong>Redesign homepage</strong><br/><small>11:00–13:30</small></div><div class=\"secondary\"><div class=\"label\">A-RANK</div>Review PR</div><div class=\"secondary\"><div class=\"label\">A-RANK</div>Team sync</div><div class=\"supporting\"><div class=\"label\">C</div>Email</div><div class=\"supporting\"><div class=\"label\">C</div>Restock</div></div></body></html>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 1,
-      "lastRating": 2,
-      "lastRatingLabel": "Kind of",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-11",
       "updatedDate": "2026-08-11",
