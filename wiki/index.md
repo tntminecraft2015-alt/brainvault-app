@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[chat-2026-08-11]] — Claude conversation log for 2026-08-11
 - [[2026-08-10-columbus-music-career-job-leads]] — Realistic Columbus, OH job leads to further Thomas's music career, with direct apply links, based on `raw/thomas-terrell-resume.pdf`
 - [[chat-2026-05-15]] — Claude conversation log for 2026-05-15
 - [[chat-2026-05-14]] — Claude conversation log for 2026-05-14
