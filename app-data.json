@@ -264,6 +264,14 @@
       "id": "2026-08-11-design-research-to-do-list",
       "date": "2026-08-11",
       "topic": "To do list",
+      "title": "To-Do List Interaction & Feedback Refinement",
+      "findingsCount": 3,
+      "auto": false
+    },
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "date": "2026-08-11",
+      "topic": "To do list",
       "title": "To-Do List Gamification & Visual Feedback Patterns",
       "findingsCount": 3,
       "auto": false
@@ -327,6 +335,17 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 0,
+      "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "findingTitle": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "findingDescription": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
     {
       "id": "2026-08-11-design-research-to-do-list",
       "findingIndex": 2,
@@ -402,5 +421,54 @@
       "date": "2026-08-11"
     }
   ],
-  "designThreads": {}
+  "designThreads": {
+    "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
+      "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+      "title": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "description": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
+      "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
+      "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;\">\n  <div style=\"margin-bottom:12px;font-weight:bold;font-size:11px;color:#8fd6ff;text-transform:uppercase;\">Daily Tasks</div>\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:8px;\">\n    <div style=\"grid-column:span 2;background:#1e3a5f;padding:12px;border-radius:6px;border:1px solid #ff8a63;\">\n      <div style=\"font-size:9px;color:#ff8a63;margin-bottom:4px;\">S-RANK</div>\n      <div style=\"font-size:13px;\">Design new feature</div>\n    </div>\n    <div style=\"background:#12253c;padding:10px;border-radius:6px;border:1px solid #66c8ff;\">\n      <div style=\"font-size:8px;color:#66c8ff;margin-bottom:3px;\">A-RANK</div>\n      <div style=\"font-size:11px;\">Code review</div>\n    </div>\n    <div style=\"background:#12253c;padding:10px;border-radius:6px;border:1px solid #7fffb0;\">\n      <div style=\"font-size:8px;color:#7fffb0;margin-bottom:3px;\">C-RANK</div>\n      <div style=\"font-size:11px;\">Email</div>\n    </div>\n  </div>\n</div>",
+      "status": "generating",
+      "revisionCount": 0,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    },
+    "thread-1786428178060-1-streaks-with-confetti-micro-animation-on": {
+      "id": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "title": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "description": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "source_title": "Top Gamification Apps 2025: Boost Productivity and Learning",
+      "source_url": "https://gamestrategies.io/en/blog/gamification-apps/",
+      "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;text-align:center;\">\n  <div style=\"display:inline-block;background:#1e3a5f;padding:8px 12px;border-radius:6px;border:2px solid #7fffb0;position:relative;overflow:hidden;\">\n    <div style=\"font-size:9px;color:#8fd6ff;text-transform:uppercase;margin-bottom:4px;\">Streak</div>\n    <div style=\"font-size:18px;font-weight:bold;color:#7fffb0;\">7 DAYS</div>\n    <div style=\"position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;animation:confetti 1s ease-out forwards;opacity:0;\" id=\"confetti\">✨ ✨</div>\n  </div>\n  <style>\n    @keyframes confetti {\n      0% { opacity:1;transform:translateY(0) scale(1); }\n      100% { opacity:0;transform:translateY(-20px) scale(0); }\n    }\n  </style>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    },
+    "thread-1786428178060-2-tap-to-log-quick-action-finch-productive": {
+      "id": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+      "title": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "description": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "source_title": "10 Cute & Aesthetic Habit Tracker Apps in 2026 (Desktop & Mobile)",
+      "source_url": "https://gridfiti.com/aesthetic-habit-tracker-apps/",
+      "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;\">\n  <div style=\"margin-bottom:12px;font-weight:bold;font-size:11px;color:#8fd6ff;text-transform:uppercase;\">Quick Log</div>\n  <div style=\"background:#12253c;padding:12px;border-radius:6px;margin-bottom:8px;border-left:3px solid #ff8a63;\">\n    <div style=\"font-size:9px;color:#ff8a63;margin-bottom:4px;\">✓ Complete</div>\n    <div style=\"font-size:13px;\">Morning standup</div>\n  </div>\n  <button style=\"width:100%;background:#ff8a63;color:#070b14;border:none;padding:10px;border-radius:6px;font-family:'VT323',monospace;font-size:12px;font-weight:bold;cursor:pointer;text-transform:uppercase;\">+ Log Task Today</button>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-11",
+      "updatedDate": "2026-08-11",
+      "originResearchId": "2026-08-11-design-research-to-do-list"
+    }
+  }
 }
