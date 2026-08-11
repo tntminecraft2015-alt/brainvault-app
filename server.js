@@ -642,6 +642,78 @@ function buildFeedbackDigest() {
   return feedback.map(f => `- "${f.findingTitle}" → ${f.ratingLabel}${f.comment ? ` (user's note: ${f.comment})` : ''}`).join('\n');
 }
 
+// Ground-truth extraction from the real mission-control.html — cheap regex passes,
+// no LLM call, so this stays accurate automatically as the app changes (unlike the
+// hand-maintained wiki doc, which drifts).
+function buildLiveAppFacts() {
+  const html = readVault('mission-control.html');
+  if (!html) return '(could not read mission-control.html)';
+
+  const rootMatch = html.match(/:root\s*\{([\s\S]*?)\}/);
+  const cssVars = rootMatch
+    ? rootMatch[1].split(';').map(l => l.trim()).filter(l => l.startsWith('--')).join('\n')
+    : '(no :root block found)';
+
+  const styleBlocks = [...html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n');
+  const classNames = new Set();
+  for (const m of styleBlocks.matchAll(/\.([a-zA-Z][a-zA-Z0-9_-]*)(?=[\s,.:{\[])/g)) classNames.add(m[1]);
+  const groups = {};
+  for (const cls of classNames) {
+    const prefix = cls.split('-')[0];
+    groups[prefix] = (groups[prefix] || 0) + 1;
+  }
+  const classInventory = Object.entries(groups)
+    .sort((a, b) => b[1] - a[1])
+    .map(([prefix, count]) => `${prefix}(${count})`)
+    .join(', ');
+
+  const scriptBlocks = [...html.matchAll(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n');
+  const funcNames = new Set();
+  for (const m of scriptBlocks.matchAll(/function\s+([a-zA-Z0-9_]+)\s*\(/g)) funcNames.add(m[1]);
+  const funcList = [...funcNames].sort().join(', ');
+
+  return `Current CSS custom properties (use these exact values, not whatever the design doc above says):
+${cssVars}
+
+CSS class-name groups present in the real file (prefix(count) — tells you what modules/features already exist, e.g. "budget" = an existing budget tracker, "notify" = an existing notification toggle):
+${classInventory}
+
+Client-side function names already defined (self-documenting — don't propose something that duplicates one of these):
+${funcList}`;
+}
+
+// What's already been asked for, queued, implemented, or researched before — so Red
+// doesn't propose duplicates of existing or already-rejected ideas.
+function buildKnownWorkDigest() {
+  const data = getAppData();
+
+  const changeRequests = (data.changeRequests || []).slice(0, 20);
+  const crText = changeRequests.length
+    ? changeRequests.map(c => `- "${c.title}" (${c.status}, requested ${c.date})`).join('\n')
+    : '(none queued yet)';
+
+  const threads = Object.values(data.designThreads || {})
+    .sort((a, b) => (b.updatedDate || '').localeCompare(a.updatedDate || ''))
+    .slice(0, 25);
+  const threadsText = threads.length
+    ? threads.map(t => `- "${t.title}" (${t.status})`).join('\n')
+    : '(none yet)';
+
+  const runs = (data.designResearch || []).slice(0, 15);
+  const runsText = runs.length
+    ? runs.map(r => `- ${r.date}: "${r.title}"${r.topic ? ` (focus: ${r.topic})` : ''}`).join('\n')
+    : '(none yet)';
+
+  return `Mission Control change requests (queued for or already implemented by Claude Code):
+${crText}
+
+Individual ideas proposed so far, with their current status:
+${threadsText}
+
+Past research run topics:
+${runsText}`;
+}
+
 async function runDesignResearch(topic) {
   const key = getApiKey();
   if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
@@ -653,6 +725,12 @@ async function runDesignResearch(topic) {
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
+
+# LIVE APP FACTS (auto-extracted just now from the real mission-control.html — trust this over the design doc above if they conflict)
+${buildLiveAppFacts()}
+
+# ALREADY QUEUED OR PROPOSED (avoid duplicating these)
+${buildKnownWorkDigest()}
 
 # FEEDBACK ON YOUR PAST FINDINGS (most recent first)
 ${buildFeedbackDigest()}
@@ -730,10 +808,17 @@ async function runSingleFindingRevision(thread) {
     instruction = `The user rated your previous idea "${thread.title}" as "Just one more tweak" and left this note: "${thread.lastComment || '(no note given)'}". Make exactly that tweak and nothing else. Do NOT change the core idea, and do NOT use web search.`;
   }
 
+  // Only the search-backed tiers (1-2) are effectively mini fresh-discovery calls with
+  // real duplicate risk — ratings 3-4 are anchored to one known idea, keep them lean/cheap.
+  const knownWork = useSearch ? `\n\n# ALREADY QUEUED OR PROPOSED (avoid duplicating these)\n${buildKnownWorkDigest()}` : '';
+
   const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback.
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
+
+# LIVE APP FACTS (auto-extracted just now from the real mission-control.html — trust this over the design doc above if they conflict)
+${buildLiveAppFacts()}${knownWork}
 
 # THE IDEA YOU'RE REVISING
 Title: ${thread.title}
