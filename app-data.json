@@ -259,116 +259,21 @@
       }
     }
   ],
-  "designResearch": [
-    {
-      "id": "2026-08-11-design-research-revisions-1786428538705",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "Revisions — Ready for Another Look",
-      "findingsCount": 2,
-      "auto": true,
-      "isRevision": true
-    },
-    {
-      "id": "2026-08-11-design-research-revisions-1786428352137",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "Revisions — Ready for Another Look",
-      "findingsCount": 2,
-      "auto": true,
-      "isRevision": true
-    },
-    {
-      "id": "2026-08-11-design-research-revisions-1786428311937",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "Revisions — Ready for Another Look",
-      "findingsCount": 2,
-      "auto": true,
-      "isRevision": true
-    },
-    {
-      "id": "2026-08-11-design-research-revisions-1786428260206",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "Revisions — Ready for Another Look",
-      "findingsCount": 2,
-      "auto": true,
-      "isRevision": true
-    },
-    {
-      "id": "2026-08-11-design-research-revisions-1786428223878",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "Revisions — Ready for Another Look",
-      "findingsCount": 2,
-      "auto": true,
-      "isRevision": true
-    },
-    {
-      "id": "2026-08-11-design-research-to-do-list",
-      "date": "2026-08-11",
-      "topic": "To do list",
-      "title": "To-Do List Interaction & Feedback Refinement",
-      "findingsCount": 3,
-      "auto": false
-    },
-    {
-      "id": "2026-08-11-design-research-to-do-list",
-      "date": "2026-08-11",
-      "topic": "To do list",
-      "title": "To-Do List Gamification & Visual Feedback Patterns",
-      "findingsCount": 3,
-      "auto": false
-    },
-    {
-      "id": "2026-08-11-design-research-weekly",
-      "date": "2026-08-11",
-      "topic": "",
-      "title": "General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load",
-      "findingsCount": 3,
-      "auto": true
-    },
-    {
-      "id": "2026-08-11-design-research-easier-to-use-interactive-to-do-list-for",
-      "date": "2026-08-11",
-      "topic": "Easier to use interactive to do list for the day seperate from calander",
-      "title": "Daily Todo Separation & Visual Gamification Patterns",
-      "findingsCount": 3,
-      "auto": false
-    },
-    {
-      "id": "2026-08-10-design-research-calendar-upgrades-and-designs",
-      "date": "2026-08-10",
-      "topic": "Calendar upgrades and designs",
-      "title": "Calendar Upgrades & Gamification for Mission Control",
-      "findingsCount": 3,
-      "auto": false
-    },
-    {
-      "id": "2026-08-10-design-research-mobile-home-tab-widgets",
-      "date": "2026-08-10",
-      "topic": "mobile home tab widgets",
-      "title": "Mobile Widget Interaction & Retro Gamification in Personal Dashboards",
-      "findingsCount": 3,
-      "auto": false
-    },
-    {
-      "id": "2026-08-10-design-research-weekly",
-      "date": "2026-08-10",
-      "topic": "",
-      "title": "Dashboard Clarity & Gamification Engagement",
-      "findingsCount": 3,
-      "auto": true
-    }
-  ],
+  "designResearch": [],
   "lastDesignResearchAutoRun": "2026-08-11",
   "changeRequests": [
+    {
+      "id": "2026-08-11-archive-and-remove-all-current-red-desig",
+      "date": "2026-08-11",
+      "title": "Archive and remove all current Red designs from Mission Control",
+      "status": "done",
+      "source": "ED chat"
+    },
     {
       "id": "2026-08-11-prevent-duplicate-design-responses-and-s",
       "date": "2026-08-11",
       "title": "Prevent duplicate design responses and show viewed status",
-      "status": "pending",
+      "status": "done",
       "source": "ED chat"
     },
     {
@@ -605,54 +510,305 @@
       "date": "2026-08-11"
     }
   ],
-  "designThreads": {
-    "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
-      "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
+  "designThreads": {},
+  "designArchive": [
+    {
       "title": "Rank-Locked Celebration Bursts with Staggered Easing Curves",
       "description": "Asana's task completion uses celebratory animations featuring unexpected reward sequences that make routine achievements feel special. For Mission Control's rank system, apply staggered easing curves per rank (linear for C, ease-out for B, spring overshoot for A/S) so each rank tier *feels* heavier and more rewarding. Circle fills with timed color transition, checkmark draws with stroke animation, label strikes through, then a burst of particles in the rank's own color, before the row gently collapses. Most micro-animations live in the 200–400ms range — cluster fill (0ms) → check (80ms) → strike (120ms) → confetti (200ms) → collapse (600ms).",
       "source_title": "Asana Task Completion Celebrations",
       "source_url": "https://asana.com",
-      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff'><div style='display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px;background:#12253c;border-radius:6px'><svg width='28' height='28' viewBox='0 0 28 28' style='fill:none;stroke:#ff8a63;stroke-width:2'><circle cx='14' cy='14' r='10' style='animation:rankFill 200ms cubic-bezier(.34,1.56,.64,1) forwards'/><path d='M10,14l3,3l6-6' style='stroke-dasharray:12;stroke-dashoffset:12;animation:checkDraw 80ms ease-out 80ms forwards'/></svg><span style='flex:1;text-decoration:line-through;animation:strikeThrough 120ms 120ms forwards'>Daily Report Due</span><span style='font-size:12px;color:#7fffb0'>S-RANK</span></div><div style='font-size:11px;color:#8fd6ff;line-height:1.4'>✓ Circle fills (spring) → Check draws (ease-out) → Label strikes → Burst particles (rank color) → Row collapses</div><style>@keyframes rankFill{0%{background:transparent;} 100%{background:#ff8a63;}} @keyframes checkDraw{0%{stroke-dashoffset:12;} 100%{stroke-dashoffset:0;}} @keyframes strikeThrough{0%{opacity:1;} 100%{opacity:.5;}}</style></div>",
-      "status": "awaiting_rating",
-      "revisionCount": 5,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
       "lastComment": "",
-      "createdDate": "2026-08-11",
-      "updatedDate": "2026-08-11",
-      "originResearchId": "2026-08-11-design-research-to-do-list"
+      "revisionCount": 5,
+      "status": "awaiting_rating",
+      "archivedDate": "2026-08-11",
+      "origin": "thread"
     },
-    "thread-1786428178060-1-streaks-with-confetti-micro-animation-on": {
-      "id": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+    {
       "title": "Single-Tap Affordance Toggles: Friction-Free Task Completion",
       "description": "Since a 20-second delay can break automatic behavior and small amounts of friction often beat motivation, Mission Control's todos should support instant checkbox affordance via a single, oversized tap zone per task—no modal, no confirmation, just state-change haptic + color shift. Reducing friction by minimizing steps keeps the daily ritual effortless and habitual, making logging feel automatic rather than ceremonial.",
       "source_title": "Environment Design for Habits: A Room-by-Room Guide + Designing for Habits: A UX Guide",
       "source_url": "https://www.ehm-tech.com/habit/blog/environment-design-for-habits/",
-      "mockup_html": "<style>body { font-family: VT323; background: #0a1929; padding: 20px; } .todo-item { background: #12253c; border: 2px solid #ff8a63; border-radius: 10px; margin: 10px 0; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.15s; } .todo-item:hover { background: #1e3a5f; transform: scale(1.02); } .todo-item.done { background: #1e3a5f; border-color: #7fffb0; } .toggle { width: 48px; height: 48px; border-radius: 8px; background: #ff8a63; border: none; cursor: pointer; font-size: 20px; transition: all 0.1s; } .todo-item.done .toggle { background: #7fffb0; } .toggle:active { transform: scale(0.95); } .text { flex: 1; color: #dfeeff; font-size: 16px; } .todo-item.done .text { color: #8fd6ff; opacity: 0.6; text-decoration: line-through; }</style><div class='todo-item'><button class='toggle'>☐</button><span class='text'>Morning meditation</span></div><div class='todo-item done'><button class='toggle'>✓</button><span class='text'>Morning meditation</span></div>",
-      "status": "ready_to_ship",
-      "revisionCount": 6,
       "lastRating": 1,
       "lastRatingLabel": "Not even close",
       "lastComment": "",
-      "createdDate": "2026-08-11",
-      "updatedDate": "2026-08-11",
-      "originResearchId": "2026-08-11-design-research-to-do-list"
+      "revisionCount": 6,
+      "status": "ready_to_ship",
+      "archivedDate": "2026-08-11",
+      "origin": "thread"
     },
-    "thread-1786428178060-2-tap-to-log-quick-action-finch-productive": {
-      "id": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+    {
       "title": "Partial-Fill Progress Bar (Done/Do Habits Pattern)",
       "description": "Done's minimalist habit tracker uses a single-tap interface where gray habit bars fill with color as you progress toward a daily goal—no navigation, no forms, no friction. Apply this to Mission Control's todo list by replacing checkboxes with color-coded progress bars for today's todos; tapping a bar increments its fill and triggers instant XP feedback, turning logging into satisfying micro-interactions that keep streaks alive.",
       "source_title": "Done: Habit Tracker (now Do Habits)",
       "source_url": "https://apps.apple.com/us/app/done-habit-tracker/id6757984661",
-      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;font-family:VT323,monospace;border:2px solid #ff8a63\">\n  <div style=\"font-size:9px;text-transform:uppercase;margin-bottom:12px;color:#8fd6ff\">Today's Todos</div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Morning Jog</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:60%;height:100%;background:#7fffb0;transition:width 0.3s\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">3/5</div>\n    </div>\n  </div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Code Review</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:0%;height:100%;background:#ff8a63\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">0/1 tap</div>\n    </div>\n  </div>\n  <div style=\"margin-top:16px;padding:8px;background:#12253c;border-radius:6px;text-align:center;font-size:10px;color:#7fffb0\">↑ tap bar to log | +50 XP on complete</div>\n</div>",
-      "status": "awaiting_rating",
-      "revisionCount": 2,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
       "lastComment": "",
-      "createdDate": "2026-08-11",
-      "updatedDate": "2026-08-11",
-      "originResearchId": "2026-08-11-design-research-to-do-list"
+      "revisionCount": 2,
+      "status": "awaiting_rating",
+      "archivedDate": "2026-08-11",
+      "origin": "thread"
+    },
+    {
+      "title": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "description": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
+      "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
+      "runTitle": "To-Do List Interaction & Feedback Refinement",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "description": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "source_title": "Top Gamification Apps 2025: Boost Productivity and Learning",
+      "source_url": "https://gamestrategies.io/en/blog/gamification-apps/",
+      "runTitle": "To-Do List Interaction & Feedback Refinement",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "description": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "source_title": "10 Cute & Aesthetic Habit Tracker Apps in 2026 (Desktop & Mobile)",
+      "source_url": "https://gridfiti.com/aesthetic-habit-tracker-apps/",
+      "runTitle": "To-Do List Interaction & Feedback Refinement",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Difficulty Signaling via Visual Layering (Bento Grid Weight)",
+      "description": "Bento grid is an information architecture decision that controls cognitive load by giving each piece of data its own spatial weight. Apply this to daily todos: bigger/taller cards for high-rank (S/A) tasks, compact rows for routine (C) ones. This mirrors how a hero tile spanning 6 columns creates visual hierarchy through spatial weight so the bigger tile appears more important—letting users visually triage at a glance without text labels.",
+      "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
+      "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
+      "runTitle": "To-Do List Gamification & Visual Feedback Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Streaks with Confetti Micro-Animation on Daily Mark",
+      "description": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "source_title": "Top Gamification Apps 2025: Boost Productivity and Learning",
+      "source_url": "https://gamestrategies.io/en/blog/gamification-apps/",
+      "runTitle": "To-Do List Gamification & Visual Feedback Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "description": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "source_title": "10 Cute & Aesthetic Habit Tracker Apps in 2026 (Desktop & Mobile)",
+      "source_url": "https://gridfiti.com/aesthetic-habit-tracker-apps/",
+      "runTitle": "To-Do List Gamification & Visual Feedback Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "To do list",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Restrained Micro-Interactions with Motion Sensitivity Awareness",
+      "description": "Modern dashboards prioritize micro-interactions that provide meaningful feedback—animations on checkbox completion, subtle pop confirmations, smooth state transitions—but kept purposeful and tested for motion sensitivity. Mission Control's XP pop animations and rank-badge transitions are already strong, but should add prefers-reduced-motion support and replace excessive celebratory animations with quieter, confidence-building feedback. This bridges the gap between gamification that works long-term versus the burnout pattern seen in purely dopamine-driven apps.",
+      "source_title": "Dashboard Design Trends 2026: Top 10 UX Trends",
+      "source_url": "https://codewave.com/insights/ux-design-trends-future/",
+      "runTitle": "General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Real-Time Ticker & Dynamic Vault Stats Display",
+      "description": "Real-time content keeps dashboards engaging and users exploring longer. Mission Control already has a bottom ticker bar showing vault stats, but it could expand to show live XP changes, today's progress % (todos done vs. total), and upcoming reminders count—all updating instantly as tasks complete. This transforms passive viewing into active feedback that feels alive without requiring user action.",
+      "source_title": "UI Design Trends in 2026: Real-Time Content & Immersive Design",
+      "source_url": "https://musemind.agency/blog/ui-design-trends",
+      "runTitle": "General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Cognitive Load Reduction: Context-Aware View Modes",
+      "description": "2026 dashboard design centers on reducing cognitive overload by showing only what's relevant now. Mission Control could add a simple toggle—e.g., 'Focus Mode' that hides the calendar and weekly schedule, leaving only today's todos and reminders. Alternatively, a 'Dashboard' mode that hides all-day todos and surfaces only upcoming events within 4 hours. This follows the principle that every element should support current decision-making, lowering friction for quick check-ins while keeping full power for deep planning.",
+      "source_title": "Dashboard Design Trends 2026: Cognitive Load & Context-Aware Design",
+      "source_url": "https://fuselabcreative.com/top-dashboard-design-trends-2025/",
+      "runTitle": "General Improvements: Micro-Interactions, Real-Time Feedback & Cognitive Load",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Progressive Disclosure for Daily Todos",
+      "description": "Progressive disclosure shows only essential information upfront and reveals details when needed, simplifying the interface and improving focus. For Mission Control, this means collapsing lower-priority todos by default (C/B ranks shown compact, S/A expanded), unfolding rank badges, XP values, and time estimates only on hover or tap. Reduces cognitive load on first glance while keeping power users' full data a gesture away—fits the JRPG battle-menu vibe of toggling menu depth.",
+      "source_title": "UI Design Patterns 2026 - Wikitechy",
+      "source_url": "https://www.wikitechy.com/unique-ui-design-patterns-2026/",
+      "runTitle": "Daily Todo Separation & Visual Gamification Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "Easier to use interactive to do list for the day seperate from calander",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Compound-Gesture Feedback on Todo Interactions",
+      "description": "2026 trends shift from simple gestures (swipe, tap, pinch) to compound gestures with distinct haptic feedback, so users' thumbs know what they triggered before eyes confirm it. For Mission Control, map swipe-right-to-complete, swipe-left-to-reschedule, long-press-for-details on each todo item. Pair with the existing XP pop animation and scanline flicker to reinforce feedback—turns checkbox interaction into a tactile, game-like moment that feels rewarding and fast.",
+      "source_title": "Mobile App Design Trends 2026 - Muzli Blog",
+      "source_url": "https://muz.li/blog/whats-changing-in-mobile-app-design-ui-patterns-that-matter-in-2026/",
+      "runTitle": "Daily Todo Separation & Visual Gamification Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "Easier to use interactive to do list for the day seperate from calander",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Hierarchical Bento Layout to Isolate Todos from Calendar",
+      "description": "Bento grids encode hierarchy directly into layout structure—a card spanning two columns and two rows signals greater importance than single-unit neighbors. Currently Mission Control's three-column grid (todos | schedule | reminders) competes visually. Redesign as a 2×2 bento with a tall hero \"Today's Todos\" card (left, double-height), a smaller \"Calendar Peek\" widget (top-right), and reminders/streak counter (bottom-right). Visually separates the daily task focus from calendar clutter while keeping reminders visible. Fits the existing bento-card aesthetic.",
+      "source_title": "Bento Grid Design Guide 2026 - Landdding",
+      "source_url": "https://landdding.com/blog/blog-bento-grid-design-guide",
+      "runTitle": "Daily Todo Separation & Visual Gamification Patterns",
+      "runDate": "2026-08-11",
+      "runTopic": "Easier to use interactive to do list for the day seperate from calander",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Data-Rich Calendar Heatmaps (Dual-View Pattern)",
+      "description": "Calendar interfaces can overlay heatmaps showing financial or contextual performance alongside event scheduling, giving users both scheduling and strategic overviews at a glance. For Mission Control, this means toggling between a standard monthly grid and a heatmap showing XP earned per day, task completion density, or event-kind frequency. Mission Control's rank colors (S/A/B/C) and event kind chips already support this visual layering. A heatmap toggle in the calendar modal lets players see patterns at a glance.",
+      "source_title": "Eleken Blog — Calendar UI Examples",
+      "source_url": "https://www.eleken.co/blog-posts/calendar-ui",
+      "runTitle": "Calendar Upgrades & Gamification for Mission Control",
+      "runDate": "2026-08-10",
+      "runTopic": "Calendar upgrades and designs",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)",
+      "description": "Habit trackers using tile-based grids make tracking visually intuitive and satisfying, transforming habit tracking into an engaging experience. Apps like HabitBull visualize streaks by highlighting successful days in green and missed days in pink, acknowledging that life can interfere with streaks while still providing a positive overall view. Mission Control's event-kind chips (training/meeting/focus/social/errand/routine) could fill calendar cells with color blocks instead of text event titles, making a full month of colored tiles feel like filling a progress grid—pure visual satisfaction.",
+      "source_title": "Habit Rewards & Gamification+ — Habit Tracker Design",
+      "source_url": "https://habitrewards.me/",
+      "runTitle": "Calendar Upgrades & Gamification for Mission Control",
+      "runDate": "2026-08-10",
+      "runTopic": "Calendar upgrades and designs",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "Overflow Management with '+N More' Popovers & Expand Toggle",
+      "description": "The standard calendar overflow approach shows 2–3 events with a '+N more' indicator—clicking it reveals a popover or expands the cell. Mission Control's current monthly grid already hints at event overflow; implementing a popover for dense days lets high-activity calendars remain scannable while hiding nothing. Event styling should communicate category and duration through color and icons, especially in high-density calendars where color-coding must include pattern or icon differentiation for color-blind users.",
+      "source_title": "Muzli — Calendar UI/UX Inspiration",
+      "source_url": "https://muz.li/inspiration/calendar/",
+      "runTitle": "Calendar Upgrades & Gamification for Mission Control",
+      "runDate": "2026-08-10",
+      "runTopic": "Calendar upgrades and designs",
+      "archivedDate": "2026-08-11",
+      "origin": "run"
+    },
+    {
+      "title": "One-Tap Habit Widget (Zero-Friction Completion)",
+      "description": "Habit trackers like Loop Habit Tracker and HabitHub succeed by letting users mark habits done directly from the home screen widget in one tap, saving 20–30 seconds per habit per day. Mission Control could surface today's highest-priority todos (rank S/A) as a dedicated widget card that toggles completion state without opening the full dashboard. Pairs with the existing rank/XP system and keeps the home tab focused on immediate action.",
+      "runTitle": "Mobile Widget Interaction & Retro Gamification in Personal Dashboards",
+      "runDate": "2026-08-10",
+      "runTopic": "mobile home tab widgets",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Claymorphism Touch on Retro Grid (Tactile Neumorphism for Gaming UI)",
+      "description": "2025–26 design trends show claymorphism (soft 3D, friendlier than neumorphism) pairs beautifully with retro gaming aesthetics—Press Start microtrend merges '70s–'80s pixel art with neon and tech-inspired visuals. Mission Control already uses inset shadows and bold colors; replacing hard shadows with softer, rounded 3D-effect tiles on the mobile home tab (todos, reminders, schedule widgets) would feel more tactile and 'playable' while honoring the JRPG identity.",
+      "runTitle": "Mobile Widget Interaction & Retro Gamification in Personal Dashboards",
+      "runDate": "2026-08-10",
+      "runTopic": "mobile home tab widgets",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Asymmetric Bento Grid for Mobile (Spatial Priority Signaling)",
+      "description": "Bento grids (variable-size tiles in CSS Grid) communicate data priority through spatial weight alone—larger tiles draw eyes first. Perfect for Mission Control's mobile home tab: make today's rank-S todos span 2 columns, reminders 1 column, and the weekly bar full-width below. No badge inflation needed; the grid layout does the hierarchy. Reduces cognitive load on small screens and scales cleanly across devices.",
+      "runTitle": "Mobile Widget Interaction & Retro Gamification in Personal Dashboards",
+      "runDate": "2026-08-10",
+      "runTopic": "mobile home tab widgets",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Cognitive Load Zones – Progressive Information Reveal",
+      "description": "<cite index=\"3-12\">Accessible dashboards must design for cognitive load, removing elements that don't support the user's current decision</cite>. Mission Control's three-column layout is strong, but the weekly schedule expansion toggle could be enhanced with a \"progressive disclosure\" approach: show only today's + tomorrow's events by default, expand on-demand. <cite index=\"16-8\">Bento grids control cognitive load by giving each piece of data its own spatial weight</cite>. Apply this to reminders: group by time-until-due (due today, due this week, due later) rather than flat chronology.",
+      "runTitle": "Dashboard Clarity & Gamification Engagement",
+      "runDate": "2026-08-10",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Weekend Gamification Anchor – Weekly Challenge Reset",
+      "description": "<cite index=\"9-5,9-6\">Productivity app streaks break 25% more on Fridays because external work structure disappears, and the habit fails completely at weekends</cite>. Mission Control already seeds weekly Pokémon every Monday, which is strong. Enhance this: add a \"Weekend Quest\" mode that unlocks Friday afternoon—goals shift from work-focused (training, meeting) to personal (social, routine) with reduced XP thresholds, and a \"Comeback Bonus\" if streaks resume Monday. This uses gamification's documented ability to <cite index=\"8-7\">transform routine activities into experiences users actively want to complete</cite>.",
+      "runTitle": "Dashboard Clarity & Gamification Engagement",
+      "runDate": "2026-08-10",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Metric Gaming Prevention – Outcome-Over-Volume Reward",
+      "description": "<cite index=\"9-17,9-18\">Points systems work for productivity when they reward the right actions, not actions optimized for the metric itself</cite>. Mission Control's rank system (S/A/B/C with fixed XP per rank) is clean but rewards task completion count equally regardless of effort. Consider a \"depth badge\": if a task stays marked as in-progress for >2 hours (indicating focus work), award +2 XP; if finished in <10 minutes, award +1. <cite index=\"8-9,8-10,8-11\">Visibility of progress is powerful for long-term goals, but learning/habits rarely deliver immediate results</cite>. The depth metric makes focus visible and rewards concentration, not speed.",
+      "runTitle": "Dashboard Clarity & Gamification Engagement",
+      "runDate": "2026-08-10",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-legacy-html-parse"
+    },
+    {
+      "title": "Revisions — Ready for Another Look",
+      "description": "(source file missing — likely a failed GitHub sync during live use; content unrecoverable, run-level record only)",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-missing-file"
+    },
+    {
+      "title": "Revisions — Ready for Another Look",
+      "description": "(source file missing — likely a failed GitHub sync during live use; content unrecoverable, run-level record only)",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-missing-file"
+    },
+    {
+      "title": "Revisions — Ready for Another Look",
+      "description": "(source file missing — likely a failed GitHub sync during live use; content unrecoverable, run-level record only)",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-missing-file"
+    },
+    {
+      "title": "Revisions — Ready for Another Look",
+      "description": "(source file missing — likely a failed GitHub sync during live use; content unrecoverable, run-level record only)",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-missing-file"
+    },
+    {
+      "title": "Revisions — Ready for Another Look",
+      "description": "(source file missing — likely a failed GitHub sync during live use; content unrecoverable, run-level record only)",
+      "runDate": "2026-08-11",
+      "runTopic": "",
+      "archivedDate": "2026-08-11",
+      "origin": "run-missing-file"
     }
-  }
+  ]
 }

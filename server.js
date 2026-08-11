@@ -704,6 +704,11 @@ function buildKnownWorkDigest() {
     ? runs.map(r => `- ${r.date}: "${r.title}"${r.topic ? ` (focus: ${r.topic})` : ''}`).join('\n')
     : '(none yet)';
 
+  const archive = (data.designArchive || []).slice(0, 20);
+  const archiveText = archive.length
+    ? archive.map(a => `- "${a.title}"${a.lastRatingLabel ? ` (${a.lastRatingLabel})` : ''}`).join('\n')
+    : '(none)';
+
   return `Mission Control change requests (queued for or already implemented by Claude Code):
 ${crText}
 
@@ -711,7 +716,10 @@ Individual ideas proposed so far, with their current status:
 ${threadsText}
 
 Past research run topics:
-${runsText}`;
+${runsText}
+
+Archived ideas from before a cleanup wipe (still real history — don't repeat these either):
+${archiveText}`;
 }
 
 async function runDesignResearch(topic) {
@@ -1080,12 +1088,23 @@ _Generated: ${new Date().toLocaleString()}_
   }
 }
 
+// Same-day same-topic runs used to collide on id, silently overwriting the earlier
+// run's actual file content. Disambiguate with a numeric suffix on collision.
+function uniqueDesignResearchId(data, baseId) {
+  let id = baseId, n = 1;
+  while ((data.designResearch || []).some(r => r.id === id) || readVault(`design-research/${id}.html`)) {
+    n += 1;
+    id = `${baseId}-${n}`;
+  }
+  return id;
+}
+
 async function runAndSaveDesignResearch(topic, idSuffix) {
   const result = await runDesignResearch(topic);
   const date   = today();
-  const id     = `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`;
+  const data   = getAppData();
+  const id     = uniqueDesignResearchId(data, `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`);
 
-  const data = getAppData();
   data.designThreads = data.designThreads || {};
   result.findings.forEach((f, i) => {
     const threadId = `thread-${Date.now()}-${i}-${slugifyTopic(f.title) || 'idea'}`;
@@ -1106,7 +1125,7 @@ async function runAndSaveDesignResearch(topic, idSuffix) {
   writeVault(`design-research/${id}.html`, html);
   saveDesignResearchWiki(id, date, topic, result);
   data.designResearch = data.designResearch || [];
-  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix });
+  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix, viewed: false });
   data.designResearch = data.designResearch.slice(0, 30);
   saveAppData(data);
   return { id, result };
@@ -1158,7 +1177,7 @@ async function maybeShipRevisionBundle() {
 
   for (const group of groups) {
     const date = today();
-    const id   = `${date}-design-research-revisions-${Date.now()}`;
+    const id   = uniqueDesignResearchId(data, `${date}-design-research-revisions-${Date.now()}`);
     const findings = group.map(tid => {
       const t = threads[tid];
       return {
@@ -1167,8 +1186,12 @@ async function maybeShipRevisionBundle() {
         revisionInfo: { revisionCount: t.revisionCount, previousRatingLabel: t.lastRatingLabel, previousComment: t.lastComment },
       };
     });
+    // Every bundle used to share the exact same generic title, making them
+    // indistinguishable in the Design Lab history list — name it after what's inside.
+    const titleJoined = findings.map(f => `"${f.title}"`).join(', ');
+    const bundleTitle = titleJoined.length <= 80 ? `Revisions: ${titleJoined}` : `Revisions: ${titleJoined.slice(0, 79)}…`;
     const result = {
-      title:   'Revisions — Ready for Another Look',
+      title:   bundleTitle,
       summary: `${findings.length} idea${findings.length > 1 ? 's' : ''} Red reworked based on your feedback.`,
       findings,
     };
@@ -1176,7 +1199,7 @@ async function maybeShipRevisionBundle() {
     writeVault(`design-research/${id}.html`, html);
     saveDesignResearchWiki(id, date, '', result);
     data.designResearch = data.designResearch || [];
-    data.designResearch.unshift({ id, date, topic: '', title: result.title, findingsCount: findings.length, auto: true, isRevision: true });
+    data.designResearch.unshift({ id, date, topic: '', title: result.title, findingsCount: findings.length, auto: true, isRevision: true, viewed: false });
     data.designResearch = data.designResearch.slice(0, 30);
     for (const tid of group) threads[tid].status = 'awaiting_rating';
 
@@ -1263,6 +1286,11 @@ app.get('/api/design-research/:id', (req, res) => {
   if (!html) return res.status(404).send('Not found');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
+
+  // Mark viewed as a side effect of actually opening the slideshow — don't block the response on it.
+  const data = getAppData();
+  const entry = (data.designResearch || []).find(r => r.id === id);
+  if (entry && !entry.viewed) { entry.viewed = true; saveAppData(data); }
 });
 
 // Rates one finding from a Design Lab slideshow — feeds back into Red's future prompts.

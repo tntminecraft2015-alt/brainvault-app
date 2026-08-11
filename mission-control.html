@@ -2952,8 +2952,8 @@ async function loadDesignResearchList(){
     const runs=d.runs||[];
     if(!runs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No research yet — run one above.</div>'; return; }
     list.innerHTML=runs.map(r=>`
-      <div class="wiki-row" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
-        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
+      <div class="wiki-row" id="dlRow-${r.id}" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
+        <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
         <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
       </div>`).join('');
   }catch(e){ list.innerHTML='<div style="opacity:.5;">Failed to load.</div>'; }
@@ -2977,6 +2977,8 @@ async function runDesignResearch(){
 function openSlideshow(id){
   document.getElementById('dlSlideshowFrame').src=`${SERVER}/api/design-research/${id}`;
   openModal('dlSlideshowModal');
+  const dot=document.querySelector(`#dlRow-${CSS.escape(id)} .dl-unviewed-dot`);
+  if(dot) dot.remove();
 }
 window.addEventListener('message', e=>{
   if(e.origin!==location.origin || !e.data) return;
