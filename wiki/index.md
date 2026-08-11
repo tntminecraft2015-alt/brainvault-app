@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-11-design-research-revisions-1786428260206]] — 2 ideas Red reworked based on your feedback.
 - [[2026-08-11-design-research-revisions-1786428223878]] — 2 ideas Red reworked based on your feedback.
 - [[2026-08-11-design-research-to-do-list]] — Gamified to-do lists tap into brains hardwired to respond to rewards and progress through immediate feedback like points and sounds. Mission
 - [[chat-2026-08-11]] — Claude conversation log for 2026-08-11
