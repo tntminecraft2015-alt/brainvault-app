@@ -226,6 +226,11 @@
     "current": 40
   },
   "caughtPoke": {
+    "54": {
+      "count": 1,
+      "firstCaught": "2026-08-10",
+      "shiny": false
+    },
     "79": {
       "count": 2,
       "firstCaught": "2026-05-14",
@@ -328,5 +333,13 @@
     }
   ],
   "lastDesignResearchAutoRun": "2026-08-10",
-  "changeRequests": []
+  "changeRequests": [
+    {
+      "id": "2026-08-11-tile-based-streak-grid-gamification-via-",
+      "date": "2026-08-11",
+      "title": "Tile-Based Streak Grid (Gamification via Color, Not Just Numbers)",
+      "status": "pending",
+      "source": "Design Lab"
+    }
+  ]
 }
