@@ -261,6 +261,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-revisions-1786428223878",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
       "id": "2026-08-11-design-research-to-do-list",
       "date": "2026-08-11",
       "topic": "To do list",
@@ -335,6 +344,17 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-11-design-research-to-do-list",
+      "findingIndex": 2,
+      "threadId": "thread-1786428178060-2-tap-to-log-quick-action-finch-productive",
+      "findingTitle": "Tap-to-Log Quick Action (Finch / Productive Pattern)",
+      "findingDescription": "Apps like Finch use a cozy, supportive interface for tracking daily goals, making productivity feel gentle rather than demanding. Add a floating \"log today\" button or a prominent quick-tap region at the bottom of the daily todo list that pre-fills today's date and opens a minimal modal (rank + title only). The best habit tracking apps offer a seamless habits setup process, making sure users log habits fast, reducing friction vs. the current three-step add flow.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-11"
+    },
     {
       "id": "2026-08-11-design-research-to-do-list",
       "findingIndex": 1,
@@ -440,7 +460,7 @@
       "source_title": "Bento Grid Design: A 2026 Guide to Layouts and Spacing | Brainy Papers",
       "source_url": "https://brainy.ink/paper/bento-grid-design-guide",
       "mockup_html": "<html><head><style>body{margin:0;padding:12px;background:#0a1929;font-family:'VT323',monospace;color:#dfeeff;}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}.anchor{grid-column:span 2;grid-row:span 2;background:#1e3a5f;border:2px solid #ff8a63;padding:12px;border-radius:6px;}.secondary{grid-column:span 1;grid-row:span 1.5;background:#12253c;border:1px solid #8fd6ff;padding:10px;border-radius:6px;}.supporting{grid-column:span 1;grid-row:span 0.8;background:#12253c;border:1px solid #7a8a78;padding:6px;font-size:12px;}.label{font-size:10px;opacity:0.6;margin-bottom:4px;}</style></head><body><div class=\"grid\"><div class=\"anchor\"><div class=\"label\">S-RANK</div><strong>Redesign homepage</strong><br/><small>11:00–13:30</small></div><div class=\"secondary\"><div class=\"label\">A-RANK</div>Review PR</div><div class=\"secondary\"><div class=\"label\">A-RANK</div>Team sync</div><div class=\"supporting\"><div class=\"label\">C</div>Email</div><div class=\"supporting\"><div class=\"label\">C</div>Restock</div></div></body></html>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 1,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
@@ -451,13 +471,13 @@
     },
     "thread-1786428178060-1-streaks-with-confetti-micro-animation-on": {
       "id": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
-      "title": "Streaks with Confetti Micro-Animation on Daily Mark",
-      "description": "Subtle micro animations and visual feedback like confetti explosions reward user actions in real-time. Mission Control has a static streak counter. Add a brief 1-second confetti burst (via CSS keyframes) when a user checks off today's first/final task, triggering only on the streak badge itself. Habit trackers now commonly feature confetti animations and Android support, and retro JRPG menus pair well with particle effects.",
+      "title": "Streak Confetti Burst on Daily Completion",
+      "description": "When the user checks off their first task of the day, trigger a brief 1-second CSS keyframe confetti animation (3–5 particles scaling and fading upward) centered on the streak badge in the header. The effect rewards daily habit closure with instant tactile feedback, reinforcing the JRPG battle-menu aesthetic while borrowing gamification momentum from modern habit trackers. Confetti only fires once per calendar day, preventing fatigue.",
       "source_title": "Top Gamification Apps 2025: Boost Productivity and Learning",
       "source_url": "https://gamestrategies.io/en/blog/gamification-apps/",
-      "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;text-align:center;\">\n  <div style=\"display:inline-block;background:#1e3a5f;padding:8px 12px;border-radius:6px;border:2px solid #7fffb0;position:relative;overflow:hidden;\">\n    <div style=\"font-size:9px;color:#8fd6ff;text-transform:uppercase;margin-bottom:4px;\">Streak</div>\n    <div style=\"font-size:18px;font-weight:bold;color:#7fffb0;\">7 DAYS</div>\n    <div style=\"position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;animation:confetti 1s ease-out forwards;opacity:0;\" id=\"confetti\">✨ ✨</div>\n  </div>\n  <style>\n    @keyframes confetti {\n      0% { opacity:1;transform:translateY(0) scale(1); }\n      100% { opacity:0;transform:translateY(-20px) scale(0); }\n    }\n  </style>\n</div>",
-      "status": "generating",
-      "revisionCount": 0,
+      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:20px;font-family:VT323,monospace;border:2px solid #ff8a63;border-radius:10px;position:relative;height:120px;'><div style='display:flex;gap:10px;margin-bottom:10px;'><span style='background:#12253c;padding:6px 12px;border-radius:6px;font-size:12px;'>STREAK: 15</span><span style='background:#ff8a63;color:#0a1929;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:bold;position:relative;' id='streak-badge'>✦ DAILY<style>@keyframes confetti-burst{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-40px) scale(0)}}.confetti{position:absolute;width:6px;height:6px;pointer-events:none;background:#ff8a63;border-radius:50%;animation:confetti-burst 1s ease-out forwards}.c1{left:5px;top:-8px;animation-delay:0ms}.c2{left:15px;top:-12px;animation-delay:80ms;background:#7fffb0}.c3{left:-5px;top:-10px;animation-delay:160ms;background:#66c8ff}</style><span class='confetti c1'></span><span class='confetti c2'></span><span class='confetti c3'></span></span></div><div style='font-size:13px;color:#8fd6ff;margin-top:8px;'>✓ First task checked = confetti blooms from badge</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 1,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
       "lastComment": "",
@@ -472,10 +492,10 @@
       "source_title": "10 Cute & Aesthetic Habit Tracker Apps in 2026 (Desktop & Mobile)",
       "source_url": "https://gridfiti.com/aesthetic-habit-tracker-apps/",
       "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;\">\n  <div style=\"margin-bottom:12px;font-weight:bold;font-size:11px;color:#8fd6ff;text-transform:uppercase;\">Quick Log</div>\n  <div style=\"background:#12253c;padding:12px;border-radius:6px;margin-bottom:8px;border-left:3px solid #ff8a63;\">\n    <div style=\"font-size:9px;color:#ff8a63;margin-bottom:4px;\">✓ Complete</div>\n    <div style=\"font-size:13px;\">Morning standup</div>\n  </div>\n  <button style=\"width:100%;background:#ff8a63;color:#070b14;border:none;padding:10px;border-radius:6px;font-family:'VT323',monospace;font-size:12px;font-weight:bold;cursor:pointer;text-transform:uppercase;\">+ Log Task Today</button>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
       "lastComment": "",
       "createdDate": "2026-08-11",
       "updatedDate": "2026-08-11",
