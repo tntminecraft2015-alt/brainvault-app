@@ -364,6 +364,17 @@
   "designFeedback": [
     {
       "id": "2026-08-11-design-research-revisions-1786428223878",
+      "findingIndex": 1,
+      "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
+      "findingTitle": "Streak Confetti Burst on Daily Completion",
+      "findingDescription": "When the user checks off their first task of the day, trigger a brief 1-second CSS keyframe confetti animation (3–5 particles scaling and fading upward) centered on the streak badge in the header. The effect rewards daily habit closure with instant tactile feedback, reinforcing the JRPG battle-menu aesthetic while borrowing gamification momentum from modern habit trackers. Confetti only fires once per calendar day, preventing fatigue.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-11"
+    },
+    {
+      "id": "2026-08-11-design-research-revisions-1786428223878",
       "findingIndex": 0,
       "threadId": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
       "findingTitle": "Anchor + Supporting Cell Ratio (Bento Hierarchy via Area, Not Just Label)",
@@ -538,7 +549,7 @@
       "source_title": "7 Best Streak Tracker Apps in 2026 (Tested) - Habi",
       "source_url": "https://habi.app/insights/best-streak-tracker-apps/",
       "mockup_html": "<div style=\"padding:12px;background:#0a1929;border-radius:6px;font-family:VT323,monospace;font-size:14px;color:#dfeeff\">\n  <div style=\"margin-bottom:8px;color:#8fd6ff;font-size:10px;letter-spacing:1px\">LAST 7 DAYS</div>\n  <div style=\"display:grid;grid-template-columns:repeat(7,1fr);gap:3px\">\n    <div style=\"width:24px;height:24px;background:#7fffb0;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#7fffb0;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#7fffb0;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#1e3a5f;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#7fffb0;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#66c8ff;border:1px solid #12253c;border-radius:4px\"></div>\n    <div style=\"width:24px;height:24px;background:#ff8a63;border:2px solid #ff8a63;border-radius:4px\"></div>\n  </div>\n  <div style=\"margin-top:8px;font-size:11px;color:#8fd6ff\">6 of 7 • one miss is just data</div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 2,
       "lastRating": 1,
       "lastRatingLabel": "Not even close",
