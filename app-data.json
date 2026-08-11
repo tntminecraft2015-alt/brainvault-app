@@ -261,6 +261,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-11-design-research-revisions-1786428311937",
+      "date": "2026-08-11",
+      "topic": "",
+      "title": "Revisions — Ready for Another Look",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true
+    },
+    {
       "id": "2026-08-11-design-research-revisions-1786428260206",
       "date": "2026-08-11",
       "topic": "",
@@ -509,12 +518,12 @@
     "thread-1786428178060-0-difficulty-signaling-via-visual-layering": {
       "id": "thread-1786428178060-0-difficulty-signaling-via-visual-layering",
       "title": "Drill-Down Detail Exposure (Progressive Disclosure via Expandable Task Cells)",
-      "description": "Essential data presented first with supporting metrics accessible via progressive drill-down that starts with a general overview and then goes into detail, facilitating data prioritization and creating clarity. For Mission Control's daily todos, each task cell shows only rank + title by default; tapping/clicking expands to reveal subtasks, due time, tags, or notes in a bottom-drawer slide or inline toggle. Keeps the grid uncluttered while respecting the JRPG battle-menu aesthetic—UI feels lightweight until the user summons deeper information.",
+      "description": "Each task cell in Mission Control's daily todo grid displays only rank badge and title by default—a clean, scannable overview. Tapping the cell reveals a bottom slide-drawer showing subtasks, due time, tags, and notes without leaving the hub, keeping the JRPG battle-menu aesthetic lightweight and focused until the player summons deeper intel.",
       "source_title": "Dashboard Design: Best Practices With Examples | Toptal®",
       "source_url": "https://www.toptal.com/designers/data-visualization/dashboard-design-best-practices",
-      "mockup_html": "<style>\n  body { margin: 0; padding: 16px; background: #0a1929; font-family: VT323; color: #dfeeff; }\n  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }\n  .task { background: #12253c; border: 2px solid #8fd6ff; border-radius: 6px; padding: 12px; cursor: pointer; transition: all 0.2s; }\n  .task:hover { border-color: #ff8a63; box-shadow: inset 0 0 0 3px #ff8a63; }\n  .task.expanded { grid-column: span 2; grid-row: span 1.5; }\n  .header { font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 6px; }\n  .badge { display: inline-block; width: 24px; height: 24px; border-radius: 3px; background: #e85d3a; font-size: 10px; text-align: center; line-height: 24px; }\n  .details { margin-top: 8px; font-size: 12px; color: rgba(223, 238, 255, 0.65); max-height: 0; overflow: hidden; transition: max-height 0.3s; }\n  .task.expanded .details { max-height: 120px; }\n  .detail-item { margin: 4px 0; padding: 4px; background: rgba(30, 58, 95, 0.5); border-left: 2px solid #66c8ff; padding-left: 6px; font-size: 11px; }\n</style>\n<div class=\"grid\">\n  <div class=\"task\" onclick=\"this.classList.toggle('expanded')\">\n    <div class=\"header\"><span class=\"badge\">S</span> Design Lab Review</div>\n    <div class=\"details\">\n      <div class=\"detail-item\">Due: 2:30 PM</div>\n      <div class=\"detail-item\">Tag: #design</div>\n      <div class=\"detail-item\">✓ Prep mockups</div>\n      <div class=\"detail-item\">✓ Check sources</div>\n    </div>\n  </div>\n  <div class=\"task\">\n    <div class=\"header\"><span class=\"badge\" style=\"background: #f0a020;\">A</span> Email Reply</div>\n  </div>\n  <div class=\"task\">\n    <div class=\"header\"><span class=\"badge\" style=\"background: #4a90d9;\">B</span> Standup</div>\n  </div>\n  <div class=\"task\">\n    <div class=\"header\"><span class=\"badge\" style=\"background: #7a8a78;\">C</span> Lunch</div>\n  </div>\n</div>",
-      "status": "generating",
-      "revisionCount": 2,
+      "mockup_html": "<style>body{margin:0;padding:20px;background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px}.task{background:#12253c;border:2px solid #1e3a5f;padding:12px;cursor:pointer;transition:all.2s}.task:hover{background:#1e3a5f;border-color:#ff8a63}.rank{display:inline-block;width:28px;height:28px;background:#e85d3a;color:#0a1929;text-align:center;line-height:28px;font-weight:bold;margin-right:8px;border-radius:4px}.title{display:inline;font-size:14px}.drawer{background:#1e3a5f;border-top:3px solid #ff8a63;padding:16px;margin-top:12px;border-radius:6px;font-size:12px;line-height:1.6}.drawer-item{margin:8px 0}.label{color:#66c8ff;font-weight:bold}.val{color:#dfeeff;margin-left:4px}</style><div class='grid'><div class='task'><span class='rank'>A</span><span class='title'>Deploy API</span></div><div class='task'><span class='rank'>B</span><span class='title'>Review PRs</span></div></div><div class='drawer'><div class='drawer-item'><span class='label'>Subtasks:</span><span class='val'>Build tests · Deploy staging</span></div><div class='drawer-item'><span class='label'>Due:</span><span class='val'>14:00 (4h 23m left)</span></div><div class='drawer-item'><span class='label'>Tags:</span><span class='val'>#focus #critical</span></div><div class='drawer-item'><span class='label'>Notes:</span><span class='val'>Wait for CI green before prod push</span></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 3,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
       "lastComment": "",
@@ -545,7 +554,7 @@
       "source_title": "Done: Habit Tracker (now Do Habits)",
       "source_url": "https://apps.apple.com/us/app/done-habit-tracker/id6757984661",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;font-family:VT323,monospace;border:2px solid #ff8a63\">\n  <div style=\"font-size:9px;text-transform:uppercase;margin-bottom:12px;color:#8fd6ff\">Today's Todos</div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Morning Jog</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:60%;height:100%;background:#7fffb0;transition:width 0.3s\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">3/5</div>\n    </div>\n  </div>\n  <div style=\"margin-bottom:10px\">\n    <div style=\"font-size:14px;margin-bottom:4px\">Code Review</div>\n    <div style=\"display:flex;gap:2px;align-items:center\">\n      <div style=\"flex:1;height:12px;background:#1e3a5f;border-radius:2px;overflow:hidden\">\n        <div style=\"width:0%;height:100%;background:#ff8a63\"></div>\n      </div>\n      <div style=\"font-size:10px;color:#8fd6ff\">0/1 tap</div>\n    </div>\n  </div>\n  <div style=\"margin-top:16px;padding:8px;background:#12253c;border-radius:6px;text-align:center;font-size:10px;color:#7fffb0\">↑ tap bar to log | +50 XP on complete</div>\n</div>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 2,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
