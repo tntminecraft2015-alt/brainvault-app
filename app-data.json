@@ -339,6 +339,15 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-budget-tracker-overhaul-vision-coordinat",
+      "date": "2026-08-12",
+      "title": "Budget Tracker Overhaul: Vision & Coordination",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants a comprehensive overhaul of the budget tracker that encompasses visual redesign, interaction patterns, data visualization, and gamification — all three coordinating under one vision. The two existing queued items (Coins-for-Log Micro-Rewards and Category Labels on Donut Slices) should be implemented as separate tasks but aligned to serve this overarching vision, not replace it.",
+      "details": "This is a coordination spec, not an implementation task yet. Before Claude Code implements any budget changes, read this first:\n\n**Vision:** Transform the budget tracker from a transaction logger into an engaging, gamified financial dashboard that rewards tracking, visualizes spending at a glance, and makes category breakdowns intuitive.\n\n**Scope (all four areas):**\n1. **Visual redesign** — Layout, spacing, hierarchy, use of the bento-grid tile system already in the codebase\n2. **Interaction patterns** — How users add/edit transactions; quick-add workflows; category selection\n3. **Data visualization** — Enhance charts, breakdowns, period comparisons; make data scannable\n4. **Gamification** — Micro-rewards (coins-for-logging), progress indicators, streaks, visual feedback\n\n**Alignment with existing queue:**\n- `Entry-Level Micro-Rewards: Coins-for-Log` — implement this as specified; it serves the gamification pillar\n- `Category Labels on Donut Slices (Enhanced)` — implement this as specified; it serves the visualization pillar\n\n**Implementation order:** Do NOT start until user explicitly approves this vision. When approved, clarify with user whether to run the two existing items first, or whether this vision spec requires changes to them before implementation."
+    },
+    {
       "id": "2026-08-12-entry-level-micro-rewards-coins-for-log-",
       "date": "2026-08-12",
       "title": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
