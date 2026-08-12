@@ -139,7 +139,8 @@
         "type": "income"
       }
     ],
-    "mode": "weekly"
+    "mode": "weekly",
+    "weeklyLimit": 12
   },
   "theme": {
     "preset": "Cyan",
