@@ -341,15 +341,19 @@
       "id": "2026-08-12-auto-reload-design-revisions-in-design-l",
       "date": "2026-08-12",
       "title": "Auto-reload design revisions in Design Lab",
-      "status": "pending",
-      "source": "ED chat"
+      "status": "done",
+      "source": "ED chat",
+      "description": "Design Lab required manually reopening the slideshow to see revised findings after rating one — no indication a revision had even shipped. This implements auto-reload: the Design Lab list and any open slideshow poll for new research/revisions while open, a small pulsing dot shows live-checking is active, a banner announces a ready revision and cross-fades it in automatically after a few seconds, and a pause button in the slideshow footer lets the user freeze auto-refresh mid-read.",
+      "details": "Implemented directly in mission-control.html: checkDlListForNewRuns()/checkSlideshowForRevision() poll GET /api/design-research every 10s only while the relevant modal has the .active class; dl-live-dot pulses via CSS animation; new list rows fade in with dl-row-new; #dlRevisionBanner shows on a fresh isRevision run and swaps the #dlSlideshowFrame src with an opacity fade unless _slideshowPaused is true; #dlPauseBtn toggles that flag. No backend changes needed — reuses the existing design-research/rate endpoints."
     },
     {
       "id": "2026-08-12-smart-tile-hierarchy-variable-size-cards",
       "date": "2026-08-12",
       "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
-      "status": "pending",
-      "source": "Design Lab"
+      "status": "done",
+      "source": "Design Lab",
+      "description": "Unlike equal-width card layouts, a bento grid uses tile size to signal importance — hero KPIs anchor in large tiles, category breakdowns sit in smaller secondary tiles, guiding attention without relying on labels alone. Applied to Mission Control's GIL WALLET: the period spent total is now a 2-column hero card with its progress bar, REMAINING is a secondary tile, and per-category spend (food, transport, etc.) renders as small sorted tiles below.",
+      "details": "Implemented directly in mission-control.html: new categoryBreakdown(txns) computes per-category expense totals (excludes income) sorted descending; bentoCatTilesHtml() renders up to 4 category tiles using existing BUDGET_CATS icons/labels. buildBudgetGilHTML() (desktop) and buildMobBudgetGilHTML() (mobile) both replaced their equal-width SPENT/REMAINING row with a .bento-grid: a .bento-hero tile (period spent + bar) spanning full width, a REMAINING tile, then the category tiles. New CSS classes: .bento-grid/.bento-tile/.bento-hero/.bento-cat/.bento-label/.bento-val/.bento-bar-wrap/.bento-sub, with #mobBudgetView overrides for larger phone type."
     },
     {
       "id": "2026-08-11-archive-and-remove-all-current-red-desig",
@@ -1198,5 +1202,6 @@
       "archivedDate": "2026-08-11",
       "origin": "run-missing-file"
     }
-  ]
+  ],
+  "edMemory": []
 }

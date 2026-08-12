@@ -216,7 +216,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {} };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [] };
 }
 
 function saveAppData(data) {
@@ -277,20 +277,30 @@ function buildSystemPrompt(userMessage) {
     }
   }
 
-  const pending = (getAppData().changeRequests || []).filter(r => r.status === 'pending');
+  const appData = getAppData();
+  const pending = (appData.changeRequests || []).filter(r => r.status === 'pending');
   const pendingText = pending.length
     ? pending.map(r => `- id: ${r.id} | title: "${r.title}" | queued via ${r.source} on ${r.date}`).join('\n')
     : '(queue is empty)';
 
-  const persona = `You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have three jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, and (3) take requests to change Mission Control itself (the app's UI/behavior). Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. Be concise — this is a chat window, not an essay. You are a separate persona from Red, who only runs design research for the app itself.
+  const memory = appData.edMemory || [];
+  const memoryText = memory.length
+    ? memory.map(m => `- id: ${m.id} | [${m.date}] ${m.text}`).join('\n')
+    : '(nothing remembered yet)';
 
-Be honest about what you can and can't actually do. Your only real actions are the two tools below (queue_code_change, remove_queued_change) plus web search — you cannot edit code, you cannot directly delete or modify anything else, and you have no memory beyond this conversation's history. Never say you've done something (queued a change, removed a change, changed a setting, etc.) unless you actually called the matching tool and it returned success in this same turn. If the user asks whether you can do something, or asks you to do something you have no tool for, say plainly that you can't and explain what your real options are (e.g. queuing it as a change request instead) — don't guess or role-play compliance.
+  const persona = `You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have four jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, (3) take requests to change Mission Control itself (the app's UI/behavior), and (4) act on real requests using your action tools (add_task, log_expense) instead of just talking about them. Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. Be concise — this is a chat window, not an essay. You are a separate persona from Red, who only runs design research for the app itself.
+
+Be honest about what you can and can't actually do. Your only real actions are the tools below plus web search — you cannot edit code, and you cannot directly delete or modify anything you don't have a tool for. Never say you've done something (queued a change, removed a change, added a task, logged an expense, remembered something, etc.) unless you actually called the matching tool and it returned success in this same turn. If the user asks whether you can do something, or asks you to do something you have no tool for, say plainly that you can't and explain what your real options are (e.g. queuing it as a change request instead) — don't guess or role-play compliance.
 
 For job (1), when asked about Mission Control's own current features or behavior, trust the LIVE APP FACTS section below (auto-extracted from the real file just now) over anything that sounds outdated in the wiki context — the wiki design doc is hand-maintained and can lag behind the actual app.
 
 For job (3): you cannot edit code yourself. When the user clearly asks for a change to Mission Control (new feature, tweak, fix, visual change, etc.), call the queue_code_change tool with a precise, implementation-ready spec instead of trying to describe how you'd do it in prose. Use the LIVE APP FACTS below to ground that spec in what actually exists (real CSS variables, real function names) instead of guessing. This queues the request to a file that the user's Claude Code session will read and implement later. After calling it, confirm briefly to the user that it's queued — don't restate the whole spec back to them. Only call this tool for actual Mission Control app changes, never for wiki/vault content changes (those go through the normal ingest workflow) and never speculatively.
 
-If the user asks to cancel, remove, undo, or discard a queued request, use the remove_queued_change tool with the exact id from the PENDING CHANGE QUEUE below — never claim you removed something without calling the tool. If nothing in the queue matches what they described, say so plainly and ask them to clarify which one they mean rather than guessing or picking one arbitrarily.`;
+If the user asks to cancel, remove, undo, or discard a queued request, use the remove_queued_change tool with the exact id from the PENDING CHANGE QUEUE below — never claim you removed something without calling the tool. If nothing in the queue matches what they described, say so plainly and ask them to clarify which one they mean rather than guessing or picking one arbitrarily.
+
+For job (4): when the user clearly asks you to add/log/remember a to-do or an expense right now (e.g. "add 'call the vet' to my tasks", "log $12 for lunch"), call add_task or log_expense instead of just acknowledging in prose — a personal assistant that only talks and never acts isn't useful. Don't call these speculatively or infer them from unrelated chat.
+
+You also have persistent memory across every conversation, not just this one — the WHAT ED REMEMBERS section below is durable notes you've saved about the user over time (preferences, ongoing projects, recurring context, things they've corrected you on). Actually use it: let it shape how you answer instead of just restating it back. When you learn something durable and reusable in this conversation — a preference, a standing fact about their life/projects, a correction to how you should behave — call save_memory to write it down in your own words, concisely. Don't save one-off ephemeral chat content (e.g. "user asked what time it is"), don't save duplicates of what's already in the list below, and don't narrate that you're saving something unless it's naturally relevant. If a memory turns out to be wrong or the user tells you to forget something, call forget_memory with its exact id from the list below.`;
 
   const parts = [
     persona,
@@ -299,6 +309,7 @@ If the user asks to cancel, remove, undo, or discard a queued request, use the r
     '# OVERVIEW\n' + overviewMd,
     '# LIVE APP FACTS (auto-extracted just now from the real mission-control.html)\n' + buildLiveAppFacts(),
     '# PENDING CHANGE QUEUE (things already queued for Claude Code — use exact ids for remove_queued_change)\n' + pendingText,
+    '# WHAT ED REMEMBERS ABOUT THE USER (across all past conversations — use exact ids for forget_memory)\n' + memoryText,
   ];
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
@@ -391,7 +402,11 @@ ${details || ''}
 `);
   const data = getAppData();
   data.changeRequests = data.changeRequests || [];
-  data.changeRequests.unshift({ id, date, title: safeTitle, status: 'pending', source });
+  // Description/details used to live only in the .md file written above, which is a
+  // debounced GitHub write — if the process restarted before it flushed, the spec was
+  // gone for good even though this array entry survived (saveAppData is written synchronously
+  // to fileStore). Store the spec here too so the queue never loses its own content.
+  data.changeRequests.unshift({ id, date, title: safeTitle, status: 'pending', source, description: description || '', details: details || '' });
   data.changeRequests = data.changeRequests.slice(0, 50);
   saveAppData(data);
   appendLog('note', `Mission Control change requested via ${source}: ${safeTitle}`, [], []);
@@ -423,7 +438,112 @@ async function removeQueuedChange({ id }) {
   return { ok: true, id, title: removed.title };
 }
 
-const CLIENT_TOOL_NAMES = ['queue_code_change', 'remove_queued_change'];
+const SAVE_MEMORY_TOOL = {
+  name: 'save_memory',
+  description: 'Save a durable, reusable note about the user to your persistent memory — carries over into every future conversation, not just this one. Use for real preferences, ongoing projects, standing facts about their life/work, or corrections to how you should behave. Never use for one-off ephemeral chat content, and never save something that already appears in the WHAT ED REMEMBERS list.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      text: { type: 'string', description: 'The fact/preference/note itself, written concisely in your own words, e.g. "Prefers metric units" or "Working on a woodworking project in the garage, calls it \'the bench build\'."' },
+    },
+    required: ['text'],
+  },
+};
+
+function saveEdMemory({ text }) {
+  const clean = String(text || '').trim().slice(0, 400);
+  if (!clean) return { ok: false, error: 'Empty memory text' };
+  const data = getAppData();
+  data.edMemory = data.edMemory || [];
+  const id = `mem-${Date.now()}`;
+  data.edMemory.unshift({ id, date: today(), text: clean });
+  data.edMemory = data.edMemory.slice(0, 150);
+  saveAppData(data);
+  return { ok: true, id, text: clean };
+}
+
+const FORGET_MEMORY_TOOL = {
+  name: 'forget_memory',
+  description: 'Permanently delete one saved memory. Use ONLY when the user asks you to forget something, or a remembered note turns out to be wrong/outdated. Never call this speculatively, and never claim you forgot something without calling it.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      id: { type: 'string', description: 'The exact id of the memory to delete, copied from the WHAT ED REMEMBERS list, e.g. "mem-1786517286745".' },
+    },
+    required: ['id'],
+  },
+};
+
+function forgetEdMemory({ id }) {
+  if (!id || !/^mem-\d+$/.test(id)) return { ok: false, error: 'Invalid id' };
+  const data = getAppData();
+  data.edMemory = data.edMemory || [];
+  const idx = data.edMemory.findIndex(m => m.id === id);
+  if (idx === -1) return { ok: false, error: 'No memory with that id' };
+  const [removed] = data.edMemory.splice(idx, 1);
+  saveAppData(data);
+  return { ok: true, id, text: removed.text };
+}
+
+const ADD_TASK_TOOL = {
+  name: 'add_task',
+  description: 'Add a real to-do item to the user\'s task list for today. Use ONLY when the user clearly asks you to add, create, or remember a task/to-do right now — not for hypothetical or future-conditional requests.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      text: { type: 'string', description: 'The task text, e.g. "Call the vet about Max\'s checkup".' },
+      rank: { type: 'string', enum: ['S', 'B'], description: 'S = important/planned (shows as a bigger quest), B = ordinary to-do. Default B if unsure.' },
+    },
+    required: ['text'],
+  },
+};
+
+function addEdTask({ text, rank }) {
+  const clean = String(text || '').trim().slice(0, 200);
+  if (!clean) return { ok: false, error: 'Empty task text' };
+  const data = getAppData();
+  if (!Array.isArray(data.tasks)) data.tasks = [];
+  const date = today();
+  data.tasks.push({ text: clean, done: false, rank: rank === 'S' ? 'S' : 'B', date, time: null });
+  recalcStreak(data, date);
+  saveAppData(data);
+  syncTasks(data.tasks, date);
+  return { ok: true, text: clean };
+}
+
+// Mirrors BUDGET_CATS keys in mission-control.html — keep in sync if that list changes.
+const BUDGET_CATEGORY_KEYS = ['food', 'rent', 'transport', 'fun', 'health', 'income', 'other'];
+
+const LOG_EXPENSE_TOOL = {
+  name: 'log_expense',
+  description: 'Log a real transaction (expense or income) to the user\'s GIL WALLET budget tracker. Use ONLY when the user clearly asks you to log/record/add a specific expense or income amount right now.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      amount:   { type: 'number', description: 'Positive dollar amount, e.g. 12.50.' },
+      category: { type: 'string', enum: BUDGET_CATEGORY_KEYS, description: 'Budget category. Use "other" if unclear.' },
+      note:     { type: 'string', description: 'Short label for the transaction, e.g. "Lunch with Sam".' },
+      type:     { type: 'string', enum: ['expense', 'income'], description: 'Default expense unless the user is logging money received.' },
+    },
+    required: ['amount', 'category'],
+  },
+};
+
+function logEdExpense({ amount, category, note, type }) {
+  const amt = Number(amount);
+  if (!Number.isFinite(amt) || amt <= 0) return { ok: false, error: 'Invalid amount' };
+  const cat = BUDGET_CATEGORY_KEYS.includes(category) ? category : 'other';
+  const data = getAppData();
+  if (!data.budget) data.budget = { monthlyLimit: 2000, transactions: [], mode: 'monthly' };
+  if (!Array.isArray(data.budget.transactions)) data.budget.transactions = [];
+  const txnType = type === 'income' ? 'income' : 'expense';
+  const txn = { id: Date.now(), date: today(), amount: amt, category: cat, note: String(note || '').trim().slice(0, 120) || cat, type: txnType };
+  data.budget.transactions.unshift(txn);
+  saveAppData(data);
+  return { ok: true, txn };
+}
+
+const CLIENT_TOOL_NAMES = ['queue_code_change', 'remove_queued_change', 'save_memory', 'forget_memory', 'add_task', 'log_expense'];
 
 async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
   let finalText = '';
@@ -458,6 +578,22 @@ async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
         payload = result.ok
           ? { ok: true, message: `Removed change-requests/${result.id}.md and its queue entry.` }
           : { ok: false, message: result.error };
+      } else if (tu.name === 'save_memory') {
+        const result = saveEdMemory(tu.input || {});
+        if (result.ok) toolActions.push({ type: 'memory_saved', text: result.text });
+        payload = result.ok ? { ok: true, id: result.id, message: 'Saved to persistent memory.' } : { ok: false, message: result.error };
+      } else if (tu.name === 'forget_memory') {
+        const result = forgetEdMemory(tu.input || {});
+        if (result.ok) toolActions.push({ type: 'memory_forgotten', text: result.text });
+        payload = result.ok ? { ok: true, message: 'Forgotten.' } : { ok: false, message: result.error };
+      } else if (tu.name === 'add_task') {
+        const result = addEdTask(tu.input || {});
+        if (result.ok) toolActions.push({ type: 'task_added', text: result.text });
+        payload = result.ok ? { ok: true, message: `Added "${result.text}" to today's tasks.` } : { ok: false, message: result.error };
+      } else if (tu.name === 'log_expense') {
+        const result = logEdExpense(tu.input || {});
+        if (result.ok) toolActions.push({ type: 'expense_logged', txn: result.txn });
+        payload = result.ok ? { ok: true, message: `Logged $${result.txn.amount.toFixed(2)} (${result.txn.category}).` } : { ok: false, message: result.error };
       }
       toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: JSON.stringify(payload) });
     }
@@ -479,6 +615,10 @@ app.post('/api/chat', async (req, res) => {
       { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
       QUEUE_CHANGE_TOOL,
       REMOVE_QUEUED_CHANGE_TOOL,
+      SAVE_MEMORY_TOOL,
+      FORGET_MEMORY_TOOL,
+      ADD_TASK_TOOL,
+      LOG_EXPENSE_TOOL,
     ];
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages);
     saveConversation(message, responseText);

@@ -613,3 +613,18 @@ Design research: Real-Time Revision Delivery: Auto-Reload & Live Refresh for Des
 **Pages created:** [[2026-08-12-design-research-a-smart-tile-hierarchy-with-variable-siz]]
 
 Design research: Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs (3 findings)
+
+## [2026-08-12] note | Mission Control — queue overhaul, Smart Tile + auto-reload shipped, ED gets memory and real tools
+
+**Operation:** note
+**Pages updated:** [[2026-08-12-design-research-a-smart-tile-hierarchy-with-variable-siz]], [[2026-08-12-design-research-auto-reloading-or-auto-refreshing-design]]
+
+Ran the two pending change requests plus a broader queue/ED pass, all at the user's direction (not an unattended queue run):
+
+- **Change Queue UI overhaul**: modal now shows full description + implementation notes per item (expand/collapse), a cancel button per pending row, pending/done sections, and a full-screen mobile layout. Backend now stores each request's description/details directly in app-data.json instead of only in the debounced .md file, so a spec can never again be lost to a restart racing the GitHub write (see the ghPut bug fixed in b468642, which is exactly how these two requests' original spec text was lost).
+- **Smart Tile Hierarchy** (Design Lab, resolved thread): GIL WALLET now uses a bento grid — hero tile for period spent, secondary REMAINING tile, category tiles sized/sorted by spend — on both desktop and mobile.
+- **Auto-reload for Design Lab** (ED chat): combined all 3 of Red's unrated candidate designs for this — live-polling dot, fade-in on new content, and a pause control — since the user asked for all three rather than picking one.
+- Both change-requests/*.md files were reconstructed (their original content had been lost to the same ghPut bug) and flipped to status: done alongside the app-data.json queue entries.
+- **ED now has persistent cross-session memory** (save_memory/forget_memory tools, backed by a new edMemory field, read into every system prompt) and two new action tools (add_task, log_expense) so it can act on direct requests instead of only talking.
+
+No code has been pushed to the `app` remote yet — pending the user's review of a local preview.
