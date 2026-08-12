@@ -344,6 +344,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-revisions-1786514873667",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "findingTitle": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
+      "findingDescription": "Award small coin micro-rewards (+5 GIL) for each transaction logged or habit checked, with amount and category each selected via independent scroll wheels—one for coin value, one for the reward category (Training / Social / Gear / etc.). This keeps the immediate dopamine hit of logging tied directly to spending visibility, while letting players customize reward granularity and type in the same gesture.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Make the money denominations go to .01",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786514873667",
       "findingIndex": 0,
       "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
       "findingTitle": "Category Labels on Donut Slices",
@@ -747,11 +758,11 @@
       "source_title": "Guul Games: Gamification in Habit Tracking Apps",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
       "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;font-family:VT323,monospace;max-width:320px;'><div style='font-size:14px;font-weight:bold;margin-bottom:12px;'>Log Transaction</div><div style='display:flex;gap:12px;margin-bottom:16px;'><div style='flex:1;'><label style='display:block;font-size:11px;color:#8fd6ff;margin-bottom:6px;'>Amount (GIL)</label><div style='background:#12253c;border-radius:8px;padding:8px;text-align:center;font-size:16px;border:2px solid #ff8a63;'>+10</div><div style='font-size:9px;color:#8fd6ff;text-align:center;margin-top:4px;'>↑ scroll ↓</div></div><div style='flex:1;'><label style='display:block;font-size:11px;color:#8fd6ff;margin-bottom:6px;'>Category</label><div style='background:#12253c;border-radius:8px;padding:8px;text-align:center;font-size:13px;border:2px solid #ff8a63;'>Training</div><div style='font-size:9px;color:#8fd6ff;text-align:center;margin-top:4px;'>↑ scroll ↓</div></div></div><div style='background:#1e3a5f;padding:10px;border-radius:6px;font-size:12px;margin-bottom:10px;text-align:center;color:#7fffb0;'>💰 Logged: Expense (–$45)</div><button style='width:100%;padding:10px;background:#ff8a63;color:#0a1929;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;'>Confirm & Earn</button></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 1,
       "lastRating": 4,
       "lastRatingLabel": "Just one more tweak",
-      "lastComment": "Make amount and category separate with a apple like scroll wheel the category",
+      "lastComment": "Make the money denominations go to .01",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
