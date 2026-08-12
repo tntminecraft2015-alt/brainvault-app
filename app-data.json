@@ -279,6 +279,13 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-smart-tile-hierarchy-variable-size-cards",
+      "date": "2026-08-12",
+      "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "status": "pending",
+      "source": "Design Lab"
+    },
+    {
       "id": "2026-08-11-archive-and-remove-all-current-red-desig",
       "date": "2026-08-11",
       "title": "Archive and remove all current Red designs from Mission Control",
@@ -308,6 +315,28 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category-Coded Donut Chart with Drill-Down Tap",
+      "findingDescription": "Visual spending breakdowns through a colorful category-based chart make financial data easier to digest. Rather than force users to scan rows, show a donut/ring chart where each color maps to a category (food=#ff8a63, transport=#66c8ff, etc.—reuse Mission Control's palette). Tapping a slice reveals that category's recent transactions below. This taps into immediate pattern recognition and lets users spot overspend at a glance. Pairs well with the hierarchy card above.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Bits poking out of pie graph telling you what type is",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "findingIndex": 0,
+      "threadId": "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards",
+      "findingTitle": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "findingDescription": "Unlike equal-width card layouts, a bento grid uses tile size to signal importance—hero KPIs anchor top-left in large tiles, category breakdowns sit in smaller secondary tiles. This F-pattern scanning guides attention without labels, letting users grasp financial health in under 5 seconds. Apply to Mission Control's GIL WALLET: make the month's budget total a 2-column card, shrink daily/weekly totals to 1-column tiles, and nest category breakdown (food, transport, etc.) as mini-cards within the g",
+      "rating": 5,
+      "ratingLabel": "Got it",
+      "comment": "",
+      "date": "2026-08-12"
+    },
     {
       "id": "2026-08-12-design-research-revisions-1786508962559",
       "findingIndex": 0,
@@ -615,10 +644,10 @@
       "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
       "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px\">\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px\">\n    <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;grid-column:span 2\">\n      <div style=\"font-size:12px;color:#8fd6ff\">MONTHLY TOTAL</div>\n      <div style=\"font-size:24px;font-weight:bold;color:#7fffb0;margin-top:4px\">$1,240</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">FOOD</div>\n      <div style=\"font-size:16px;color:#ff8a63;margin-top:4px\">$340</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">TRANSPORT</div>\n      <div style=\"font-size:16px;color:#66c8ff;margin-top:4px\">$180</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">SAVINGS</div>\n      <div style=\"font-size:16px;color:#7fffb0;margin-top:4px\">$450</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">OTHER</div>\n      <div style=\"font-size:16px;color:#ff8080;margin-top:4px\">$270</div>\n    </div>\n  </div>\n  <div style=\"font-size:12px;color:#8fd6ff;text-align:center\">↓ Hero card large, categories small</div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "resolved",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 5,
+      "lastRatingLabel": "Got it",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
@@ -631,11 +660,11 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px;text-align:center\">\n  <div style=\"font-size:12px;color:#8fd6ff;margin-bottom:12px\">WHERE YOUR MONEY GOES</div>\n  <div style=\"position:relative;width:140px;height:140px;margin:0 auto 16px;background:conic-gradient(#ff8a63 0% 30%, #66c8ff 30% 50%, #7fffb0 50% 70%, #ff8080 70% 100%);border-radius:50%;display:flex;align-items:center;justify-content:center\">\n    <div style=\"width:110px;height:110px;background:#0a1929;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8fd6ff\">100%</div>\n  </div>\n  <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;text-align:left\">\n    <div style=\"display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px\">\n      <span>🍔 Food</span><span style=\"color:#ff8a63\">30%</span>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px\">\n      <span>🚗 Transport</span><span style=\"color:#66c8ff\">20%</span>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;font-size:11px\">\n      <span>💰 Savings</span><span style=\"color:#7fffb0\">40%</span>\n    </div>\n  </div>\n  <div style=\"font-size:11px;color:#8fd6ff;margin-top:12px\">Tap a slice → see recent txns</div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
-      "lastComment": "",
+      "lastRating": 4,
+      "lastRatingLabel": "Just one more tweak",
+      "lastComment": "Bits poking out of pie graph telling you what type is",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
