@@ -995,6 +995,8 @@ function buildSlideshowHtml(id, topic, result) {
         if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
         lockRateRow(i, '✓ Got it! Queued for Claude Code');
         if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\\'t rework this one');
       } else if (f.threadId) {
         lockRateRow(i, '✓ Thanks — Red is working on a revision (you\\'ll see it once a couple more are ready)');
       } else {
@@ -1326,9 +1328,11 @@ app.post('/api/design-research/:id/rate', (req, res) => {
       thread.lastRatingLabel = RATING_LABELS[ratingNum - 1] || '';
       thread.lastComment     = String(comment || '').slice(0, 500);
       thread.updatedDate     = today();
-      thread.status          = ratingNum === 5 ? 'resolved' : 'generating';
+      // Rating 1 ("Not even close") means the idea is wrong entirely — discard it
+      // for good instead of feeding it back into a revision loop.
+      thread.status          = ratingNum === 5 ? 'resolved' : (ratingNum === 1 ? 'discarded' : 'generating');
       saveAppData(data);
-      if (ratingNum !== 5) generateThreadRevision(threadId).catch(err => console.error('generateThreadRevision error:', err.message));
+      if (ratingNum !== 5 && ratingNum !== 1) generateThreadRevision(threadId).catch(err => console.error('generateThreadRevision error:', err.message));
     } else {
       saveAppData(data);
     }

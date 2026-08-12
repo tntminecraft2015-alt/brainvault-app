@@ -119,11 +119,6 @@
     .stat-time   { font-size:28px; line-height:1; }
     .stat-date   { font-family:'Press Start 2P',monospace; font-size:6px; margin-top:2px; opacity:.7; }
     .stat-streak { font-size:20px; line-height:1; }
-    .stat-lv     { font-family:'Press Start 2P',monospace; font-size:5px; opacity:.7; margin-top:3px; }
-    .pixel-bar   { height:4px; background:var(--darker); margin-top:4px; }
-    .pixel-bar-fill { height:100%; background:var(--accent); transition:width .4s; }
-    .mob-home-card .pixel-bar { border-radius:var(--r-pill); overflow:hidden; }
-    .mob-home-card .pixel-bar-fill { border-radius:var(--r-pill); }
 
     /* Month grid */
     .cal-section  { flex:1; min-height:0; padding:8px; display:flex; flex-direction:column; }
@@ -395,10 +390,6 @@
       }
       .mob-home-streak-num {
         font-family:'VT323',monospace; font-size:42px; line-height:1; color:var(--fg);
-      }
-      .mob-home-lv {
-        font-family:'Press Start 2P',monospace; font-size:7px;
-        opacity:.6; margin-top:4px; margin-bottom:8px;
       }
       .mob-home-next-time  { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--accent); margin-bottom:5px; }
       .mob-home-next-title { font-family:'VT323',monospace; font-size:26px; line-height:1.2; }
@@ -852,12 +843,6 @@
     .budget-limit-inp { font-family:'Press Start 2P',monospace; font-size:7px; width:80px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--accent); padding:4px 6px; }
     .budget-empty { font-family:'VT323',monospace; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
 
-    /* ── LEVEL UP FLASH ── */
-    @keyframes lvFlashBg  { 0%,100%{opacity:0;} 15%,45%{opacity:1;} 30%{opacity:0;} }
-    @keyframes lvFlashTxt { 0%{transform:scale(.5);opacity:0;} 35%{transform:scale(1.15);opacity:1;} 65%{transform:scale(1);} 100%{opacity:0;transform:translateY(-24px);} }
-    .lv-up-overlay { position:fixed;inset:0;z-index:600;pointer-events:none;background:rgba(255,255,255,.82);animation:lvFlashBg 1.1s ease-out forwards;display:flex;align-items:center;justify-content:center; }
-    .lv-up-text    { font-family:'Press Start 2P',monospace;font-size:18px;color:#0D1A10;text-align:center;line-height:2.2;animation:lvFlashTxt 1.1s ease-out forwards; }
-
     /* ── POKÉDEX BOTTOM SHEET ── */
     @keyframes pdxUp   { from{transform:translateY(100%);} to{transform:translateY(0);} }
     .pdx-sheet-bg  { position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.65);backdrop-filter:blur(5px); }
@@ -916,8 +901,6 @@
         <div class="box-b stat-box-streak">
           <div class="stat-label px">STREAK</div>
           <div class="stat-streak" id="streakVal">0 <span style="font-size:10px;opacity:.7;">DAYS</span></div>
-          <div class="stat-lv px" id="streakLv">LV.1</div>
-          <div class="pixel-bar"><div class="pixel-bar-fill" id="xpBar" style="width:0%;"></div></div>
         </div>
       </div>
       <div class="box-b cal-section">
@@ -1056,10 +1039,8 @@
         </div>
 
         <div class="mc-card">
-          <div class="mob-home-card-label">LEVEL</div>
+          <div class="mob-home-card-label">STREAK</div>
           <div class="mob-home-streak-num" id="mobStreakVal" style="font-size:34px;">0 <span style="font-size:14px;opacity:.7;">DAYS</span></div>
-          <div class="mob-home-lv" id="mobStreakLv">LV.1</div>
-          <div class="pixel-bar" style="height:6px;"><div class="pixel-bar-fill" id="mobXpBar" style="width:0%;"></div></div>
         </div>
 
         <div class="mc-card" onclick="goToMobTab('gil')" style="cursor:pointer;">
@@ -1581,17 +1562,6 @@ function playSfx(n){
   else if(n==='xp')       {b(880,'sine',.06,.1);}
 }
 
-// ── XP / LEVEL ──
-function calcTotalXp(){ return (APP.currentStreak||0)*33+(APP.questXp||0); }
-function calcLevel()  { return Math.floor(calcTotalXp()/100)+1; }
-let _prevLevel=1;
-function triggerLevelUp(lv){
-  playSfx('levelup');
-  const el=document.createElement('div');el.className='lv-up-overlay';
-  el.innerHTML=`<div class="lv-up-text">✦ LEVEL UP! ✦<br><span style="font-size:11px;color:var(--accent);">▶ LV.${lv}</span></div>`;
-  document.body.appendChild(el);setTimeout(()=>el.remove(),1300);
-}
-
 // ── POKÉDEX TYPE COLORS ──
 const TYPE_COLORS={normal:'#9199a1',fire:'#ff9c54',water:'#4d90d5',electric:'#f4d23c',grass:'#63bb5b',ice:'#74cec0',fighting:'#ce4069',poison:'#ab6ac8',ground:'#d97746',flying:'#89aae3',psychic:'#f97176',bug:'#90c12c',rock:'#c7b78b',ghost:'#5269ac',dragon:'#0a6dc4',dark:'#5a5366',steel:'#5a8ea1',fairy:'#ec8fe6'};
 
@@ -1838,13 +1808,8 @@ updateClock(); setInterval(updateClock,10000);
 // ── STREAK DISPLAY ──
 function updateStreakDisplay(){
   const s=APP.currentStreak||0;
-  const totalXp=calcTotalXp();
-  const lv=Math.floor(totalXp/100)+1;
-  const xp=totalXp%100;
-  [['streakVal','streakLv','xpBar'],['mobStreakVal','mobStreakLv','mobXpBar']].forEach(([sv,sl,xb])=>{
+  ['streakVal','mobStreakVal'].forEach(sv=>{
     const el=document.getElementById(sv); if(el)el.innerHTML=`${s} <span style="font-size:10px;opacity:.7;">DAYS</span>`;
-    const ll=document.getElementById(sl); if(ll)ll.textContent=`LV.${lv}`;
-    const xel=document.getElementById(xb); if(xel)xel.style.width=xp+'%';
   });
 }
 
@@ -1868,7 +1833,6 @@ async function loadData(){
     APP.caughtPoke     = APP.caughtPoke     || {};
     APP.savings        = APP.savings        || {name:'',target:0,current:0};
     applyTheme(APP.theme);
-    _prevLevel = calcLevel();
     renderAll();
   } catch(e) {
     console.warn('Server offline, using empty state');
@@ -2435,8 +2399,6 @@ function toggleTask(i){
   patchData({questXp:APP.questXp});
   saveTasks(); renderTasks(); renderMobTasks();
   updateStreakDisplay();
-  const newLv=calcLevel();
-  if(newLv>_prevLevel){_prevLevel=newLv;triggerLevelUp(newLv);}else{_prevLevel=newLv;}
 }
 function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderTasks(); renderMobTasks(); }
 
