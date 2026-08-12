@@ -39,6 +39,8 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-12-design-research-revisions-1786515023845]] — 2 ideas Red reworked based on your feedback.
+- [[2026-08-12-design-research-revisions-1786514974095]] — 2 ideas Red reworked based on your feedback.
 - [[2026-08-12-design-research-budget-tracker-designs]] — Modern budget trackers solve overwhelm through intelligent visual hierarchy, bento-grid tile sizing, and transaction tagging. Three patterns
 - [[daily-tasks-2026-08-12]] — Quest log for 2026-08-12
 - [[2026-08-12-design-research-revisions-1786508962559]] — 2 ideas Red reworked based on your feedback.
