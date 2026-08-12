@@ -344,6 +344,15 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-unified-quest-calendar-sync-with-dual-vi",
+      "date": "2026-08-12",
+      "title": "Unified Quest/Calendar Sync with Dual Views",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants quests and calendar events to be deeply integrated so that adding a task creates a calendar event and vice versa, keeping them synced. The quest view should show a filtered, daily-focused UI of today's items (tasks + events combined), while the calendar view shows the full month with all items visible across dates.",
+      "details": "**Behavior:**\n- When a task is added to quests, automatically create a corresponding calendar event on that date\n- When a calendar event is added, automatically create a corresponding task in the quest list\n- Both should reference each other so they update/delete together\n- Editing one should update the other\n\n**Quest View (Daily):**\n- Show today's tasks and calendar events in a unified list\n- Display both kinds of items in a single scrollable interface\n- Keep the existing quest UI styling but include event items alongside tasks\n\n**Calendar View (Monthly):**\n- Show the full month grid as it does now\n- Display all tasks and events across all dates in the month\n- Both should be visually represented on the calendar tiles\n\n**Implementation notes:**\n- Add a `linkedEventId` field to tasks and `linkedTaskId` field to events in localStorage to maintain the sync relationship\n- Update `addTask()` and `addDayEvent()` to create the paired item\n- Update `deleteTask()` and `deleteDayEv()` to remove both linked items\n- Filter quest view to show only today's date using existing date logic\n- Ensure calendar rendering includes both event and task data"
+    },
+    {
       "id": "2026-08-12-budget-tracker-overhaul-vision-coordinat",
       "date": "2026-08-12",
       "title": "Budget Tracker Overhaul: Vision & Coordination",
