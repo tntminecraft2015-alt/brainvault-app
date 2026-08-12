@@ -248,6 +248,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "date": "2026-08-12",
+      "topic": "auto-reloading or auto-refreshing design revisions in the Design Lab slideshow when Red finishes reworking a rated idea, so the user does not have to manually reopen it",
+      "title": "Real-Time Revision Delivery: Auto-Reload & Live Refresh for Design Lab Slideshows",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": false
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786515122903",
       "date": "2026-08-12",
       "topic": "",
@@ -840,6 +849,54 @@
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
+    },
+    "thread-1786517286745-0-event-driven-soft-refresh-with-connectio": {
+      "id": "thread-1786517286745-0-event-driven-soft-refresh-with-connectio",
+      "title": "Event-Driven Soft Refresh with Connection Status Badge",
+      "description": "Detect when data arrives and trigger a refresh only when needed, rather than constant polling. When Red finishes a revision, the server emits a lightweight event; the client polls short intervals only while the slideshow modal is open. A small \"●\" badge in the modal header animates to signal the refresh is live, never blocking the user's view of the current slide. Pairs well with Mission Control's retro aesthetic via simple dot/pulse animations in the accent color.",
+      "source_title": "Microsoft Fabric Real-Time Dashboards",
+      "source_url": "https://community.fabric.microsoft.com/t5/Fabric-Updates-Blog/Live-refresh-for-Real-Time-Dashboards-Generally-Available/ba-p/5194911",
+      "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n    <span style=\"color: #dfeeff; font-size: 14px;\">REVISION 2 — ACTIVE</span>\n    <span style=\"display: inline-block; width: 8px; height: 8px; background: #7fffb0; border-radius: 50%; animation: pulse 1.2s infinite;\"></span>\n  </div>\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 12px;\">\n    <div style=\"color: #8fd6ff; font-size: 11px; margin-bottom: 6px; opacity: 0.8;\">FINDING UPDATED</div>\n    <div style=\"color: #7fffb0; font-size: 13px; font-weight: bold;\">\"Category Labels on Donut\"</div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 11px; line-height: 1.4; opacity: 0.9;\">Tap to view revised mockup. Your rating will update the history.</div>\n  <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }</style>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design"
+    },
+    "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti": {
+      "id": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
+      "title": "Seamless Fade-and-Replace Slide Transition on Revision",
+      "description": "While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.",
+      "source_title": "Animated Slideshow Carousel Transitions",
+      "source_url": "https://www.presentation-process.com/animated-slideshow-in-powerpoint.html",
+      "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"margin-bottom: 12px;\">\n    <div style=\"color: #dfeeff; font-size: 12px; margin-bottom: 8px;\">● LOADING REVISION...</div>\n    <div style=\"background: #12253c; height: 120px; border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.4s ease forwards 0.2s; color: #8fd6ff; font-size: 13px; border: 1px solid #1e3a5f;\">\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 11px; margin-bottom: 6px;\">ENHANCED MOCKUP</div>\n        <div style=\"color: #7fffb0; font-size: 14px;\">↻</div>\n      </div>\n    </div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 10px; opacity: 0.6;\">Changes visible in 0.6s • Pause on click to keep reading</div>\n  <style>@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }</style>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design"
+    },
+    "thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa": {
+      "id": "thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa",
+      "title": "Pause-on-Interact with Manual Refresh Fallback",
+      "description": "Provide flexibility: if you're investigating a specific data point and don't want visuals to change, pause live refresh. While paused, no automated refreshes occur; when ready, resume to return to real-time monitoring. A small pause button (⏸) in the slideshow footer stops incoming revisions mid-read; tapping resume or navigating to the next finding auto-restarts polling. Prevents frustration when user is comparing the old mockup to feedback notes. Low-friction, respects user agency—very on-brand for a personal dashboard.",
+      "source_title": "Microsoft Fabric Live Refresh Controls",
+      "source_url": "https://learn.microsoft.com/en-us/fabric/real-time-intelligence/dashboard-live-refresh",
+      "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #1e3a5f;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; color: #dfeeff; font-size: 11px;\">\n      <span>LIVE UPDATES: ON</span>\n      <button style=\"background: #ff8a63; border: 1px solid #ff8a63; color: #0a1929; padding: 4px 10px; font-family: VT323; cursor: pointer; font-size: 10px; border-radius: 4px;\">⏸ PAUSE</button>\n    </div>\n  </div>\n  <div style=\"background: #1e3a5f; padding: 10px; border-radius: 6px; text-align: center; color: #8fd6ff; font-size: 10px; opacity: 0.85;\">\n    New revision arriving... • Click PAUSE to review in place\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design"
     }
   },
   "designArchive": [
