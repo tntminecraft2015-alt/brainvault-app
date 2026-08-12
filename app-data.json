@@ -248,6 +248,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "date": "2026-08-12",
+      "topic": "Budget tracker designs",
+      "title": "Budget Dashboard Clarity: Hierarchy, Visual Grouping & Micro-Rewards",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": true
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786508962559",
       "date": "2026-08-12",
       "topic": "",
@@ -598,6 +607,54 @@
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards": {
+      "id": "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards",
+      "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "description": "Unlike equal-width card layouts, a bento grid uses tile size to signal importance—hero KPIs anchor top-left in large tiles, category breakdowns sit in smaller secondary tiles. This F-pattern scanning guides attention without labels, letting users grasp financial health in under 5 seconds. Apply to Mission Control's GIL WALLET: make the month's budget total a 2-column card, shrink daily/weekly totals to 1-column tiles, and nest category breakdown (food, transport, etc.) as mini-cards within the grid flow. Reduces scan time and the feeling of 'too much data'.",
+      "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
+      "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px\">\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px\">\n    <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;grid-column:span 2\">\n      <div style=\"font-size:12px;color:#8fd6ff\">MONTHLY TOTAL</div>\n      <div style=\"font-size:24px;font-weight:bold;color:#7fffb0;margin-top:4px\">$1,240</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">FOOD</div>\n      <div style=\"font-size:16px;color:#ff8a63;margin-top:4px\">$340</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">TRANSPORT</div>\n      <div style=\"font-size:16px;color:#66c8ff;margin-top:4px\">$180</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">SAVINGS</div>\n      <div style=\"font-size:16px;color:#7fffb0;margin-top:4px\">$450</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">OTHER</div>\n      <div style=\"font-size:16px;color:#ff8080;margin-top:4px\">$270</div>\n    </div>\n  </div>\n  <div style=\"font-size:12px;color:#8fd6ff;text-align:center\">↓ Hero card large, categories small</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
+    },
+    "thread-1786514464358-1-category-coded-donut-chart-with-drill-do": {
+      "id": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "title": "Category-Coded Donut Chart with Drill-Down Tap",
+      "description": "Visual spending breakdowns through a colorful category-based chart make financial data easier to digest. Rather than force users to scan rows, show a donut/ring chart where each color maps to a category (food=#ff8a63, transport=#66c8ff, etc.—reuse Mission Control's palette). Tapping a slice reveals that category's recent transactions below. This taps into immediate pattern recognition and lets users spot overspend at a glance. Pairs well with the hierarchy card above.",
+      "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
+      "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px;text-align:center\">\n  <div style=\"font-size:12px;color:#8fd6ff;margin-bottom:12px\">WHERE YOUR MONEY GOES</div>\n  <div style=\"position:relative;width:140px;height:140px;margin:0 auto 16px;background:conic-gradient(#ff8a63 0% 30%, #66c8ff 30% 50%, #7fffb0 50% 70%, #ff8080 70% 100%);border-radius:50%;display:flex;align-items:center;justify-content:center\">\n    <div style=\"width:110px;height:110px;background:#0a1929;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8fd6ff\">100%</div>\n  </div>\n  <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;text-align:left\">\n    <div style=\"display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px\">\n      <span>🍔 Food</span><span style=\"color:#ff8a63\">30%</span>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;margin-bottom:8px;font-size:11px\">\n      <span>🚗 Transport</span><span style=\"color:#66c8ff\">20%</span>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;font-size:11px\">\n      <span>💰 Savings</span><span style=\"color:#7fffb0\">40%</span>\n    </div>\n  </div>\n  <div style=\"font-size:11px;color:#8fd6ff;margin-top:12px\">Tap a slice → see recent txns</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
+    },
+    "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-": {
+      "id": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "title": "Entry-Level Micro-Rewards: Coins-for-Log (Not Deferred Savings)",
+      "description": "Apps that have solved motivation problems do it by making the checking-in behavior immediately rewarding in its own right, rather than as a means to the deferred reward of established habits. Habitica does this by directly connecting task completion to character progression. Rather than rely on \"save $X by month end,\" award small coin micro-rewards (+5 GIL) for each transaction logged or category checked—exactly what Mission Control's quest/XP system already does. Earn coins for completing habits and redeem them for personalized rewards you set yourself. This binds spending visibility to dopamine immediately, fighting overwhelm.",
+      "source_title": "Guul Games: Gamification in Habit Tracking Apps",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px\">\n  <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;margin-bottom:12px\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px\">\n      <span style=\"font-size:11px;color:#8fd6ff\">LOG A TRANSACTION</span>\n      <span style=\"background:#ff8a63;color:#0a1929;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:bold\">+5 GIL</span>\n    </div>\n    <div style=\"font-size:10px;color:#8fd6ff;margin-bottom:8px\">Today (3/5 logged)</div>\n    <input type=\"text\" placeholder=\"$ amount, category...\" style=\"width:100%;padding:8px;border:1px solid #1e3a5f;border-radius:4px;background:#0a1929;color:#dfeeff;font-family:VT323;font-size:10px;box-sizing:border-box\">\n  </div>\n  <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center;font-size:11px;margin-bottom:8px\">\n      <span>Today's GIL earned</span>\n      <span style=\"color:#7fffb0;font-weight:bold\">+15 GIL</span>\n    </div>\n    <div style=\"display:flex;justify-content:space-between;align-items:center;font-size:11px\">\n      <span>This week total</span>\n      <span style=\"color:#7fffb0;font-weight:bold\">+85 GIL</span>\n    </div>\n  </div>\n  <div style=\"font-size:11px;color:#8fd6ff;margin-top:12px;text-align:center\">Instant feedback, not deferred reward</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
     }
   },
   "designArchive": [
