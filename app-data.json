@@ -329,6 +329,13 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-add-ded-design-agent-to-brainvault",
+      "date": "2026-08-12",
+      "title": "Add Ded (Design Agent) to BrainVault",
+      "status": "pending",
+      "source": "ED chat"
+    },
+    {
       "id": "2026-08-12-auto-reload-design-revisions-in-design-l",
       "date": "2026-08-12",
       "title": "Auto-reload design revisions in Design Lab",
