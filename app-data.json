@@ -388,6 +388,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 1,
+      "threadId": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
+      "findingTitle": "Seamless Fade-and-Replace Slide Transition on Revision",
+      "findingDescription": "While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
       "findingIndex": 0,
       "threadId": "thread-1786517286745-0-event-driven-soft-refresh-with-connectio",
       "findingTitle": "Event-Driven Soft Refresh with Connection Status Badge",
@@ -889,10 +900,10 @@
       "source_title": "Animated Slideshow Carousel Transitions",
       "source_url": "https://www.presentation-process.com/animated-slideshow-in-powerpoint.html",
       "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"margin-bottom: 12px;\">\n    <div style=\"color: #dfeeff; font-size: 12px; margin-bottom: 8px;\">● LOADING REVISION...</div>\n    <div style=\"background: #12253c; height: 120px; border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.4s ease forwards 0.2s; color: #8fd6ff; font-size: 13px; border: 1px solid #1e3a5f;\">\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 11px; margin-bottom: 6px;\">ENHANCED MOCKUP</div>\n        <div style=\"color: #7fffb0; font-size: 14px;\">↻</div>\n      </div>\n    </div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 10px; opacity: 0.6;\">Changes visible in 0.6s • Pause on click to keep reading</div>\n  <style>@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }</style>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
