@@ -41,7 +41,7 @@ async function ghGet(ghPath) {
   return r.ok ? r.json() : null;
 }
 
-async function ghPut(ghPath, content) {
+async function ghPut(ghPath, content, isRetry = false) {
   const body = { message: `sync: ${ghPath}`, content: Buffer.from(content).toString('base64') };
   if (shaStore[ghPath]) body.sha = shaStore[ghPath];
   const r = await fetch(`${GH_API}/${ghPath}`, {
@@ -49,8 +49,43 @@ async function ghPut(ghPath, content) {
     headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
     body:    JSON.stringify(body),
   });
-  const data = r.ok ? await r.json() : null;
+  if (!r.ok) {
+    const errBody = await r.text().catch(() => '');
+    // 409/422 = sha mismatch (our cached sha is stale, usually because another write to this
+    // same path landed since we last fetched it). Previously this failure was silently
+    // swallowed — fileStore already had the new content, so the app believed the save had
+    // succeeded while GitHub never actually got it. Refetch the real sha and retry once.
+    if (!isRetry && (r.status === 409 || r.status === 422)) {
+      console.error(`ghPut sha conflict on ${ghPath} (${r.status}) — refetching sha and retrying once`);
+      const fresh = await ghGet(ghPath);
+      if (fresh?.sha) { shaStore[ghPath] = fresh.sha; return ghPut(ghPath, content, true); }
+    }
+    console.error(`ghPut failed for ${ghPath}: ${r.status} ${errBody}`);
+    return;
+  }
+  const data = await r.json();
   if (data?.content?.sha) shaStore[ghPath] = data.content.sha;
+}
+
+async function ghDelete(ghPath) {
+  let sha = shaStore[ghPath];
+  if (!sha) {
+    const meta = await ghGet(ghPath);
+    if (!meta) return true; // nothing on GitHub at this path — already effectively deleted
+    sha = meta.sha;
+  }
+  const r = await fetch(`${GH_API}/${ghPath}`, {
+    method:  'DELETE',
+    headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ message: `remove: ${ghPath}`, sha }),
+  });
+  if (!r.ok) {
+    console.error(`ghDelete failed for ${ghPath}: ${r.status} ${await r.text().catch(() => '')}`);
+    return false;
+  }
+  delete fileStore[ghPath];
+  delete shaStore[ghPath];
+  return true;
 }
 
 async function loadDir(dir) {
@@ -111,6 +146,22 @@ function writeVault(rel, content) {
     const full = path.join(VAULT, rel);
     fs.mkdirSync(path.dirname(full), { recursive: true });
     fs.writeFileSync(full, content, 'utf8');
+  }
+}
+
+async function deleteVault(rel) {
+  if (USE_GITHUB) {
+    clearTimeout(writeQueue[rel]); // cancel any pending debounced write racing the delete
+    delete writeQueue[rel];
+    return ghDelete(rel);
+  }
+  try {
+    const full = path.join(VAULT, rel);
+    if (fs.existsSync(full)) fs.unlinkSync(full);
+    return true;
+  } catch (err) {
+    console.error(`deleteVault failed for ${rel}:`, err.message);
+    return false;
   }
 }
 
@@ -226,11 +277,20 @@ function buildSystemPrompt(userMessage) {
     }
   }
 
+  const pending = (getAppData().changeRequests || []).filter(r => r.status === 'pending');
+  const pendingText = pending.length
+    ? pending.map(r => `- id: ${r.id} | title: "${r.title}" | queued via ${r.source} on ${r.date}`).join('\n')
+    : '(queue is empty)';
+
   const persona = `You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have three jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, and (3) take requests to change Mission Control itself (the app's UI/behavior). Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. Be concise — this is a chat window, not an essay. You are a separate persona from Red, who only runs design research for the app itself.
+
+Be honest about what you can and can't actually do. Your only real actions are the two tools below (queue_code_change, remove_queued_change) plus web search — you cannot edit code, you cannot directly delete or modify anything else, and you have no memory beyond this conversation's history. Never say you've done something (queued a change, removed a change, changed a setting, etc.) unless you actually called the matching tool and it returned success in this same turn. If the user asks whether you can do something, or asks you to do something you have no tool for, say plainly that you can't and explain what your real options are (e.g. queuing it as a change request instead) — don't guess or role-play compliance.
 
 For job (1), when asked about Mission Control's own current features or behavior, trust the LIVE APP FACTS section below (auto-extracted from the real file just now) over anything that sounds outdated in the wiki context — the wiki design doc is hand-maintained and can lag behind the actual app.
 
-For job (3): you cannot edit code yourself. When the user clearly asks for a change to Mission Control (new feature, tweak, fix, visual change, etc.), call the queue_code_change tool with a precise, implementation-ready spec instead of trying to describe how you'd do it in prose. Use the LIVE APP FACTS below to ground that spec in what actually exists (real CSS variables, real function names) instead of guessing. This queues the request to a file that the user's Claude Code session will read and implement later. After calling it, confirm briefly to the user that it's queued — don't restate the whole spec back to them. Only call this tool for actual Mission Control app changes, never for wiki/vault content changes (those go through the normal ingest workflow) and never speculatively.`;
+For job (3): you cannot edit code yourself. When the user clearly asks for a change to Mission Control (new feature, tweak, fix, visual change, etc.), call the queue_code_change tool with a precise, implementation-ready spec instead of trying to describe how you'd do it in prose. Use the LIVE APP FACTS below to ground that spec in what actually exists (real CSS variables, real function names) instead of guessing. This queues the request to a file that the user's Claude Code session will read and implement later. After calling it, confirm briefly to the user that it's queued — don't restate the whole spec back to them. Only call this tool for actual Mission Control app changes, never for wiki/vault content changes (those go through the normal ingest workflow) and never speculatively.
+
+If the user asks to cancel, remove, undo, or discard a queued request, use the remove_queued_change tool with the exact id from the PENDING CHANGE QUEUE below — never claim you removed something without calling the tool. If nothing in the queue matches what they described, say so plainly and ask them to clarify which one they mean rather than guessing or picking one arbitrarily.`;
 
   const parts = [
     persona,
@@ -238,6 +298,7 @@ For job (3): you cannot edit code yourself. When the user clearly asks for a cha
     '# WIKI INDEX\n' + indexMd,
     '# OVERVIEW\n' + overviewMd,
     '# LIVE APP FACTS (auto-extracted just now from the real mission-control.html)\n' + buildLiveAppFacts(),
+    '# PENDING CHANGE QUEUE (things already queued for Claude Code — use exact ids for remove_queued_change)\n' + pendingText,
   ];
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
@@ -337,10 +398,37 @@ ${details || ''}
   return { id, title: safeTitle };
 }
 
+const REMOVE_QUEUED_CHANGE_TOOL = {
+  name: 'remove_queued_change',
+  description: 'Cancel and permanently delete a pending Mission Control change request. Use ONLY when the user clearly asks to cancel, remove, undo, or discard a specific queued request that appears in the PENDING CHANGE QUEUE context below. Never call this speculatively, never for requests already marked done, and never claim you removed something without actually calling this tool.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      id: { type: 'string', description: 'The exact id of the pending change request to remove, copied exactly from the PENDING CHANGE QUEUE list, e.g. "2026-08-12-add-ded-design-agent-to-brainvault".' },
+    },
+    required: ['id'],
+  },
+};
+
+async function removeQueuedChange({ id }) {
+  if (!id || !/^[a-z0-9-]+$/.test(id)) return { ok: false, error: 'Invalid id' };
+  const data = getAppData();
+  data.changeRequests = data.changeRequests || [];
+  const idx = data.changeRequests.findIndex(r => r.id === id && r.status === 'pending');
+  if (idx === -1) return { ok: false, error: 'No pending change request with that id (it may already be done, or the id is wrong)' };
+  const [removed] = data.changeRequests.splice(idx, 1);
+  saveAppData(data);
+  await deleteVault(`change-requests/${id}.md`);
+  appendLog('note', `Mission Control change request removed via ${removed.source || 'ED chat'}: ${removed.title}`, [], []);
+  return { ok: true, id, title: removed.title };
+}
+
+const CLIENT_TOOL_NAMES = ['queue_code_change', 'remove_queued_change'];
+
 async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
   let finalText = '';
   let usage = null;
-  let queuedChange = null;
+  const toolActions = [];
   for (let round = 0; round < maxRounds; round++) {
     const resp = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
@@ -353,22 +441,29 @@ async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
     const textBlocks = stripCiteTags(resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n\n'));
     if (textBlocks) finalText = textBlocks;
 
-    const clientToolUses = resp.content.filter(b => b.type === 'tool_use' && b.name === 'queue_code_change');
+    const clientToolUses = resp.content.filter(b => b.type === 'tool_use' && CLIENT_TOOL_NAMES.includes(b.name));
     if (resp.stop_reason !== 'tool_use' || !clientToolUses.length) break;
 
     messages.push({ role: 'assistant', content: resp.content });
-    const toolResults = clientToolUses.map(tu => {
-      const result = queueCodeChange(tu.input || {});
-      queuedChange = result;
-      return {
-        type: 'tool_result',
-        tool_use_id: tu.id,
-        content: JSON.stringify({ ok: true, id: result.id, message: `Queued as change-requests/${result.id}.md — Claude Code will pick this up next session.` }),
-      };
-    });
+    const toolResults = [];
+    for (const tu of clientToolUses) {
+      let payload;
+      if (tu.name === 'queue_code_change') {
+        const result = queueCodeChange(tu.input || {});
+        toolActions.push({ type: 'queued', id: result.id, title: result.title });
+        payload = { ok: true, id: result.id, message: `Queued as change-requests/${result.id}.md — Claude Code will pick this up next session.` };
+      } else if (tu.name === 'remove_queued_change') {
+        const result = await removeQueuedChange(tu.input || {});
+        if (result.ok) toolActions.push({ type: 'removed', id: result.id, title: result.title });
+        payload = result.ok
+          ? { ok: true, message: `Removed change-requests/${result.id}.md and its queue entry.` }
+          : { ok: false, message: result.error };
+      }
+      toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: JSON.stringify(payload) });
+    }
     messages.push({ role: 'user', content: toolResults });
   }
-  return { text: finalText || '(no response text)', usage, queuedChange };
+  return { text: finalText || '(no response text)', usage, toolActions };
 }
 
 app.post('/api/chat', async (req, res) => {
@@ -383,10 +478,11 @@ app.post('/api/chat', async (req, res) => {
     const tools = [
       { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
       QUEUE_CHANGE_TOOL,
+      REMOVE_QUEUED_CHANGE_TOOL,
     ];
-    const { text: responseText, usage, queuedChange } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages);
+    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages);
     saveConversation(message, responseText);
-    res.json({ response: responseText, tokens: usage, queuedChange: queuedChange ? { id: queuedChange.id, title: queuedChange.title } : null });
+    res.json({ response: responseText, tokens: usage, toolActions });
   } catch (err) {
     console.error('Claude API error:', err.status, err.message);
     const msg = String(err.message || '');
@@ -732,7 +828,7 @@ async function runDesignResearch(topic) {
   const mcPage = readWiki('entities/mission-control.md');
   const focus  = (topic || '').trim();
 
-  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). You are a separate persona from ED, the chat assistant elsewhere in the app: ED answers questions about the vault, Red's only job is running design research and reporting back findings. Its current design is documented below.
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). You are a separate persona from ED, the chat assistant elsewhere in the app: ED answers questions about the vault, Red's only job is running design research and reporting back findings. Treat presentation as part of the design work, not an afterthought — a finding only counts as done when its mockup is understandable at a glance, not just conceptually sound. Its current design is documented below.
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
@@ -754,13 +850,7 @@ Respond with ONLY a fenced \`\`\`json code block (no other prose before or after
   "title": "short title for this research run",
   "summary": "2-3 sentence overview of what you found",
   "findings": [
-    {
-      "title": "short name of the pattern/idea",
-      "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
-      "source_title": "name of the site/app it's drawn from",
-      "source_url": "https://...",
-      "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines and visually representative, not just a text description."
-    }
+    ${FINDING_JSON_SCHEMA}
   ]
 }
 Produce exactly 3 findings. Keep everything concise — this is a budget-conscious run.`;
@@ -792,7 +882,7 @@ const FINDING_JSON_SCHEMA = `{
   "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
   "source_title": "name of the site/app it's drawn from",
   "source_url": "https://...",
-  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines and visually representative, not just a text description."
+  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box."
 }`;
 
 // Produces one revised finding for an open thread, per the tier rules: rating 1 switches
@@ -823,7 +913,7 @@ async function runSingleFindingRevision(thread) {
   // real duplicate risk — ratings 3-4 are anchored to one known idea, keep them lean/cheap.
   const knownWork = useSearch ? `\n\n# ALREADY QUEUED OR PROPOSED (avoid duplicating these)\n${buildKnownWorkDigest()}` : '';
 
-  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback.
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback. Treat presentation as part of the design work, not an afterthought — the mockup should be understandable at a glance, not just conceptually sound.
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
@@ -1278,6 +1368,18 @@ app.post('/api/change-requests', (req, res) => {
       details,
       source: 'Design Lab',
     });
+    res.json({ ok: true, id: result.id, title: result.title });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/api/change-requests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).json({ error: 'Invalid id' });
+    const result = await removeQueuedChange({ id });
+    if (!result.ok) return res.status(404).json({ error: result.error });
     res.json({ ok: true, id: result.id, title: result.title });
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -2935,7 +2935,14 @@ async function sendChatCommon(msg, scrollId, btnId){
       appendChatMsg('claude',d.response,scrollId);
       chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response});
       if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-      if(d.queuedChange){ showToast(`Queued for Claude Code: "${d.queuedChange.title}" ◆`); refreshChangeQueueBadge(); }
+      (d.toolActions||[]).forEach(a=>{
+        if(a.type==='queued')  showToast(`Queued for Claude Code: "${a.title}" ◆`);
+        if(a.type==='removed') showToast(`Removed from queue: "${a.title}" ◆`);
+      });
+      if((d.toolActions||[]).length){
+        if(document.getElementById('changeQueueModal')?.classList.contains('active')) await loadChangeQueueList();
+        else refreshChangeQueueBadge();
+      }
     }
   } catch(e){ hideTyping(scrollId); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),scrollId); }
   document.getElementById(btnId)?.removeAttribute('disabled');

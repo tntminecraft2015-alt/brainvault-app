@@ -1,5 +1,18 @@
 # Log
 
+## [2026-08-12] note | Mission Control — ED gets a real removal tool, fixed a live data-loss bug, closed out Red's clarity request
+
+**Operation:** note
+**Pages updated:** [[mission-control]]
+
+User asked ED to remove something from the queue; ED claimed it did, but had no tool for that — a hallucinated action. Investigating turned up a real bug: `ghPut()` silently discarded failed GitHub writes on a sha conflict (no error, no retry), which had already caused `app-data.json`'s `changeRequests` list and the actual `change-requests/*.md` files to drift out of sync under concurrent live activity — one item existed only as a file, others only as list entries. Also solved the "Ded" mystery: a real queued item, "Add Ded (Design Agent) to BrainVault," which the user explicitly does not want implemented.
+
+Fixed `ghPut()` (log + auto-retry-once on 409/422), added `ghDelete()`/`deleteVault()` (no delete primitive existed before), and added `removeQueuedChange()` restricted to pending items only. Gave ED a real `remove_queued_change` tool plus visibility into the current pending queue (with exact ids) so it can reference items accurately, added a `DELETE /api/change-requests/:id` REST route as a non-chat path, and generalized `runChatTurn`'s tool loop (previously hardcoded to only recognize `queue_code_change`) to dispatch across both tools. Updated ED's persona to never claim an action succeeded unless a tool call actually returned success in that same turn, and to say plainly when it can't do something — directly addressing the hallucination. Updated `mission-control.html` to match the new `toolActions` response shape and fully refresh the Change Queue modal's list (not just the badge) when open.
+
+Implemented the one queue item with a real spec — "Improve Red's design presentation clarity and visual quality" — by strengthening Red's shared mockup-generation instructions (visual hierarchy, purposeful color/typography, 5-second scannability) and marking its file done. The other two pending items ("Auto-reload design revisions in Design Lab," "Smart Tile Hierarchy") had lost their real spec content to the same `ghPut` bug — per the user's instruction, didn't reconstruct them from title alone; instead queued fresh, focused Red research runs on both topics so real findings exist for the user to review and accept properly this time.
+
+Verified everything with syntax checks on both files, plus isolated logic tests (no real API calls or live writes): `ghPut`'s retry logic against a mocked `fetch` across three scenarios, `removeQueuedChange` against a scratch local-mode copy across six scenarios, and `runChatTurn`'s dispatch against a mocked Anthropic client across three scenarios. A Plan agent validated the design before implementation, and the user reviewed the full plan (code already written, live actions pending) via plan mode before I proceeded to commit/push/execute the live steps.
+
 ## [2026-08-12] note | Mission Control — ED now gets live app facts too
 
 **Operation:** note

@@ -1,5 +1,5 @@
 ---
-status: pending
+status: done
 title: "Improve Red's design presentation clarity and visual quality"
 date: "2026-08-12"
 requested_via: "ED chat"

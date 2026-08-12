@@ -37,6 +37,17 @@ Follow-up pass, same day, mobile only:
 
 Previously only Red's research prompt included `buildLiveAppFacts()` (a fresh regex-extraction of real CSS variables, class-name-prefix inventory, and function names straight from `mission-control.html`) — ED's chat context (`buildSystemPrompt()` in `server.js`) only ever saw wiki pages, never the actual code. ED now gets the same `buildLiveAppFacts()` block on every chat turn, with persona instructions to trust it over anything stale-sounding in the wiki context, and to ground any `queue_code_change` spec in the real function/CSS-variable names instead of guessing. This page (the one you're reading) is still separately included via ED's keyword-matched "relevant wiki pages" lookup, same as before — the live-facts addition is on top of that, not a replacement for it.
 
+## 2026-08-12 update #4: ED can now remove queued changes, a real data-loss bug got fixed, Red's mockups got a clarity bar
+
+Prompted by the user asking ED to remove a queued item — ED claimed it did, but had no tool to actually do that, so it was hallucinating a successful action. Investigating also surfaced a real, live data-corruption bug: `ghPut()` (the function that commits any vault file write to GitHub in cloud mode) silently discarded failed writes on a sha conflict — no error, no retry — so `data.changeRequests` (the badge/list) and the actual `change-requests/*.md` files had drifted out of sync with each other under concurrent live activity.
+
+- **Fixed `ghPut()`**: failures are now logged, and a 409/422 sha conflict triggers one automatic refetch-and-retry.
+- **Added `ghDelete()`/`deleteVault()`** (no delete primitive existed before) and **`removeQueuedChange({id})`**, which deletes both the change-request file and its list entry, restricted to `status: pending` items only.
+- **ED got a real `remove_queued_change` tool**, plus a `# PENDING CHANGE QUEUE` context block listing current pending items with their exact ids so it can reference one accurately instead of guessing. There's also a `DELETE /api/change-requests/:id` REST route now, so removal isn't chat-only.
+- **ED's persona was updated for honesty**: it's now explicitly instructed to never claim it did something (queued, removed, changed a setting) unless a tool call actually succeeded in that same turn, and to say plainly when it can't do something rather than role-play compliance. This directly targets the hallucination that started this.
+- **`runChatTurn`'s tool loop was generalized** — it used to hardcode recognition of only `queue_code_change`; it now dispatches by name across both tools and returns a `toolActions` array (was a single `queuedChange`). `mission-control.html`'s chat handler was updated to match, and now fully re-renders the Change Queue modal's list (not just the badge count) if it happens to be open when a removal comes through chat.
+- **Implemented the "Improve Red's design presentation clarity and visual quality" queue item**: Red's shared mockup instructions (used by both a fresh research run and a revision) now explicitly require strong visual hierarchy, purposeful color/typography, obvious grouping, and 5-second scannability — not just "visually representative." Also consolidated a pre-existing duplicate schema string between the two functions into one shared constant while touching this.
+
 ## Purpose
 
 Personal daily ops HUD: track todos, upcoming reminders, the weekly schedule, and a full monthly calendar — all in one place, styled as a JRPG battle menu.
