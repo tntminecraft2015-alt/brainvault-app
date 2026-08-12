@@ -599,3 +599,17 @@ Chat session on 2026-08-12
 **Operation:** note
 
 Mission Control change request removed via ED chat: Add Ded (Design Agent) to BrainVault
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-12-design-research-auto-reloading-or-auto-refreshing-design]]
+
+Design research: Real-Time Revision Delivery: Auto-Reload & Live Refresh for Design Lab Slideshows (3 findings)
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-12-design-research-a-smart-tile-hierarchy-with-variable-siz]]
+
+Design research: Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs (3 findings)
