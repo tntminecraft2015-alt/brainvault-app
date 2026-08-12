@@ -33,6 +33,10 @@ Follow-up pass, same day, mobile only:
 - Home's **STREAK card was removed** from the bento grid (GIL WALLET and POKÉDEX were reordered to pair up so there's no layout gap); the desktop header's separate streak stat box is untouched. The freed space went to a taller quest list (`max-height` 260px → 380px).
 - The quest time field is now a **custom scroll-wheel picker** (hour / minute in 15-min increments / AM-PM, iOS-style, built with native CSS `scroll-snap`) on mobile only — tapping the 🕐 trigger on either add-row opens it. Desktop's quick-add still uses a plain native `<input type="time">` behind its toggle button; it was not changed.
 
+## 2026-08-12 update #3: ED now gets the same live-code grounding Red does
+
+Previously only Red's research prompt included `buildLiveAppFacts()` (a fresh regex-extraction of real CSS variables, class-name-prefix inventory, and function names straight from `mission-control.html`) — ED's chat context (`buildSystemPrompt()` in `server.js`) only ever saw wiki pages, never the actual code. ED now gets the same `buildLiveAppFacts()` block on every chat turn, with persona instructions to trust it over anything stale-sounding in the wiki context, and to ground any `queue_code_change` spec in the real function/CSS-variable names instead of guessing. This page (the one you're reading) is still separately included via ED's keyword-matched "relevant wiki pages" lookup, same as before — the live-facts addition is on top of that, not a replacement for it.
+
 ## Purpose
 
 Personal daily ops HUD: track todos, upcoming reminders, the weekly schedule, and a full monthly calendar — all in one place, styled as a JRPG battle menu.

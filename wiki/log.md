@@ -1,5 +1,12 @@
 # Log
 
+## [2026-08-12] note | Mission Control — ED now gets live app facts too
+
+**Operation:** note
+**Pages updated:** [[mission-control]]
+
+User asked whether ED can see the app's actual code, same as Red. It couldn't — `buildSystemPrompt()` (ED's chat context in `server.js`) only ever read wiki pages, never `mission-control.html` itself, unlike Red's research prompt which already called `buildLiveAppFacts()` (a compact regex-extraction of real CSS vars, class-name-prefix inventory, and function names) on every run. Added the same `buildLiveAppFacts()` block to ED's context, with persona instructions to trust it over stale-sounding wiki text and to ground `queue_code_change` specs in real function/CSS-variable names. Verified by patching a scratch copy of `server.js` to skip `main()` (so nothing starts listening or calls the Anthropic API) and calling `buildSystemPrompt()` directly — confirmed the LIVE APP FACTS section is present and its function list includes `openTimeWheel`, proving it reads the real, current file rather than a stale cache.
+
 ## [2026-08-12] note | Mission Control — timeline section + streak card removed, custom time-wheel picker
 
 **Operation:** note
