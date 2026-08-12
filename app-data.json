@@ -202,7 +202,7 @@
       "shiny": false
     },
     "255": {
-      "count": 1,
+      "count": 2,
       "firstCaught": "2026-08-11",
       "shiny": true
     },
@@ -247,6 +247,16 @@
     }
   ],
   "designResearch": [
+    {
+      "id": "2026-08-12-design-research-revisions-1786515122903",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "Revisions: \"Category Labels on Donut Slices (Enhanced)\", \"Entry-Level Micro-Rewards: Coins…",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": false
+    },
     {
       "id": "2026-08-12-design-research-revisions-1786515023845",
       "date": "2026-08-12",
@@ -806,7 +816,7 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;max-width:280px'><h3 style='color:#dfeeff;margin:0 0 12px 0;font-size:14px'>BUDGET BREAKDOWN</h3><svg viewBox='0 0 200 200' style='width:100%;margin-bottom:12px'><circle cx='100' cy='100' r='70' fill='none' stroke='#1e3a5f' stroke-width='20'/><circle cx='100' cy='100' r='70' fill='none' stroke='#ff8a63' stroke-width='20' stroke-dasharray='31.4 125.6' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='70' fill='none' stroke='#7fffb0' stroke-width='20' stroke-dasharray='18.84 125.6' stroke-dashoffset='-31.4' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='70' fill='none' stroke='#66c8ff' stroke-width='20' stroke-dasharray='75.36 125.6' stroke-dashoffset='-50.24' transform='rotate(-90 100 100)'/><text x='145' y='95' font-size='11' font-weight='bold' fill='#0a1929' font-family='VT323' text-anchor='middle' style='background:#ff8a63;padding:2px 4px'>FOOD</text><text x='100' y='175' font-size='11' font-weight='bold' fill='#0a1929' text-anchor='middle' style='background:#7fffb0;padding:2px 4px;font-family:VT323'>TRANSIT</text><text x='40' y='110' font-size='11' font-weight='bold' fill='#fff' text-anchor='middle' style='background:#66c8ff;padding:2px 4px;font-family:VT323'>UTILITIES</text></svg><div style='font-size:12px;color:#8fd6ff;text-align:center'>Labels pop from chart—no legend needed</div></div>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 5,
       "lastRating": 4,
       "lastRatingLabel": "Just one more tweak",
@@ -818,12 +828,12 @@
     "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-": {
       "id": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
       "title": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
-      "description": "Award fractional GIL coins instantly when players log a transaction or check a habit, with both reward amount and category selected via independent scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivation.",
+      "description": "Award fractional GIL coins instantly when players log a transaction or check a habit, with reward amount and category selected via two compact side-by-side scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivation.",
       "source_title": "Guul Games: Gamification in Habit Tracking Apps",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
-      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;font-family:VT323;max-width:280px\"><div style=\"font-size:12px;margin-bottom:12px;color:#8fd6ff\">LOG TRANSACTION</div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">REWARD AMOUNT</div><div style=\"display:flex;justify-content:center;gap:8px;font-size:14px;font-weight:bold;color:#ff8a63\">0 . 5 0 ▲</div></div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">CATEGORY</div><div style=\"text-align:center;font-size:13px\">EXPENSE ▲</div></div><button style=\"width:100%;background:#ff8a63;color:#0a1929;border:none;padding:8px;border-radius:6px;font-family:VT323;cursor:pointer;font-weight:bold\">CONFIRM +0.50 GIL</button><div style=\"margin-top:8px;text-align:center;font-size:11px;color:#7fffb0\">+0.50 GIL ✓</div></div>",
-      "status": "generating",
-      "revisionCount": 3,
+      "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:10px;font-family:'VT323',monospace;color:#dfeeff;max-width:320px;\"><div style=\"font-size:12px;font-weight:bold;margin-bottom:12px;\">⚡ REWARD LOGGED</div><div style=\"display:flex;gap:8px;margin-bottom:12px;\"><div style=\"flex:1;background:#12253c;border-radius:6px;padding:8px;text-align:center;border:2px solid #ff8a63;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:4px;\">AMOUNT</div><div style=\"font-size:14px;font-weight:bold;color:#7fffb0;\">0.50</div><div style=\"font-size:9px;color:#8fd6ff;\">GIL</div></div><div style=\"flex:1;background:#12253c;border-radius:6px;padding:8px;text-align:center;border:2px solid #ff8a63;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:4px;\">CATEGORY</div><div style=\"font-size:12px;font-weight:bold;color:#66c8ff;\">Habit</div><div style=\"font-size:9px;color:#8fd6ff;\">spin→pick</div></div></div><div style=\"background:#1e3a5f;padding:8px;border-radius:4px;font-size:11px;text-align:center;color:#7fffb0;\">✓ +0.50 GIL (Habit logged)</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 4,
       "lastRating": 4,
       "lastRatingLabel": "Just one more tweak",
       "lastComment": "Side by side and smaller boxes",
