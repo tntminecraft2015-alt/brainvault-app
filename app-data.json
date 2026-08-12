@@ -289,6 +289,13 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-auto-reload-design-revisions-in-design-l",
+      "date": "2026-08-12",
+      "title": "Auto-reload design revisions in Design Lab",
+      "status": "pending",
+      "source": "ED chat"
+    },
+    {
       "id": "2026-08-12-smart-tile-hierarchy-variable-size-cards",
       "date": "2026-08-12",
       "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
