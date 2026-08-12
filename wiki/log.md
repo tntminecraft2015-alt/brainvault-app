@@ -593,3 +593,9 @@ Mission Control change requested via ED chat: Auto-reload design revisions in De
 **Pages created:** [[chat-2026-08-12]]
 
 Chat session on 2026-08-12
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change request removed via ED chat: Add Ded (Design Agent) to BrainVault
