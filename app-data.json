@@ -353,6 +353,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-revisions-1786514974095",
+      "findingIndex": 0,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category Labels on Donut Slices",
+      "findingDescription": "Place category name labels directly on the outer edge of each donut slice in matching category colors, positioned tangent to the slice perimeter. This eliminates the separate legend entirely, lets users read spending instantly without cross-referencing, and works at a glance even on mobile where legend boxes steal screen space.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786514873667",
       "findingIndex": 1,
       "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
@@ -752,7 +763,7 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<svg viewBox='0 0 240 240' style='width:240px;height:240px;background:#0a1929'><defs><style>.slice-label{font-family:VT323;font-size:11px;font-weight:bold;text-anchor:middle;fill:#dfeeff}</style></defs><circle cx='120' cy='120' r='75' fill='none' stroke='#12253c' stroke-width='28'/><circle cx='120' cy='120' r='90' fill='none' stroke='url(#grad)' stroke-width='3' stroke-dasharray='70.65 282.6' stroke-dashoffset='0'/><circle cx='120' cy='120' r='90' fill='none' stroke='url(#grad2)' stroke-width='3' stroke-dasharray='56.52 282.6' stroke-dashoffset='-70.65'/><circle cx='120' cy='120' r='90' fill='none' stroke='url(#grad3)' stroke-width='3' stroke-dasharray='84.78 282.6' stroke-dashoffset='-127.17'/><circle cx='120' cy='120' r='90' fill='none' stroke='url(#grad4)' stroke-width='3' stroke-dasharray='70.65 282.6' stroke-dashoffset='-211.95'/><defs><linearGradient id='grad' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#ff8a63;stop-opacity:1'/></linearGradient><linearGradient id='grad2' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#66c8ff;stop-opacity:1'/></linearGradient><linearGradient id='grad3' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#7fffb0;stop-opacity:1'/></linearGradient><linearGradient id='grad4' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:#1e3a5f;stop-opacity:1'/></linearGradient></defs><text x='205' y='115' class='slice-label' style='fill:#ff8a63'>Food</text><text x='120' y='210' class='slice-label' style='fill:#66c8ff'>Transport</text><text x='45' y='160' class='slice-label' style='fill:#7fffb0'>Health</text><text x='75' y='40' class='slice-label' style='fill:#1e3a5f'>Bills</text></svg>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 3,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
