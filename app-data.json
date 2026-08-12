@@ -387,6 +387,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 0,
+      "threadId": "thread-1786517286745-0-event-driven-soft-refresh-with-connectio",
+      "findingTitle": "Event-Driven Soft Refresh with Connection Status Badge",
+      "findingDescription": "Detect when data arrives and trigger a refresh only when needed, rather than constant polling. When Red finishes a revision, the server emits a lightweight event; the client polls short intervals only while the slideshow modal is open. A small \"●\" badge in the modal header animates to signal the refresh is live, never blocking the user's view of the current slide. Pairs well with Mission Control's retro aesthetic via simple dot/pulse animations in the accent color.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786515023845",
       "findingIndex": 1,
       "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
@@ -862,10 +873,10 @@
       "source_title": "Microsoft Fabric Real-Time Dashboards",
       "source_url": "https://community.fabric.microsoft.com/t5/Fabric-Updates-Blog/Live-refresh-for-Real-Time-Dashboards-Generally-Available/ba-p/5194911",
       "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n    <span style=\"color: #dfeeff; font-size: 14px;\">REVISION 2 — ACTIVE</span>\n    <span style=\"display: inline-block; width: 8px; height: 8px; background: #7fffb0; border-radius: 50%; animation: pulse 1.2s infinite;\"></span>\n  </div>\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 12px;\">\n    <div style=\"color: #8fd6ff; font-size: 11px; margin-bottom: 6px; opacity: 0.8;\">FINDING UPDATED</div>\n    <div style=\"color: #7fffb0; font-size: 13px; font-weight: bold;\">\"Category Labels on Donut\"</div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 11px; line-height: 1.4; opacity: 0.9;\">Tap to view revised mockup. Your rating will update the history.</div>\n  <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }</style>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
