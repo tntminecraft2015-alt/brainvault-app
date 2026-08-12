@@ -364,6 +364,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-revisions-1786515023845",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "findingTitle": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
+      "findingDescription": "Award fractional GIL coins instantly when players log a transaction or check a habit, with both reward amount and category selected via independent scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivation.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Side by side and smaller boxes",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786515023845",
       "findingIndex": 0,
       "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
       "findingTitle": "Category Labels on Donut Slices",
@@ -811,11 +822,11 @@
       "source_title": "Guul Games: Gamification in Habit Tracking Apps",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;font-family:VT323;max-width:280px\"><div style=\"font-size:12px;margin-bottom:12px;color:#8fd6ff\">LOG TRANSACTION</div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">REWARD AMOUNT</div><div style=\"display:flex;justify-content:center;gap:8px;font-size:14px;font-weight:bold;color:#ff8a63\">0 . 5 0 ▲</div></div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">CATEGORY</div><div style=\"text-align:center;font-size:13px\">EXPENSE ▲</div></div><button style=\"width:100%;background:#ff8a63;color:#0a1929;border:none;padding:8px;border-radius:6px;font-family:VT323;cursor:pointer;font-weight:bold\">CONFIRM +0.50 GIL</button><div style=\"margin-top:8px;text-align:center;font-size:11px;color:#7fffb0\">+0.50 GIL ✓</div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 3,
-      "lastRating": 3,
-      "lastRatingLabel": "Almost there",
-      "lastComment": "",
+      "lastRating": 4,
+      "lastRatingLabel": "Just one more tweak",
+      "lastComment": "Side by side and smaller boxes",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
