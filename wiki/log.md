@@ -560,3 +560,16 @@ Mission Control change requested via Design Lab: Smart Tile Hierarchy: Variable-
 **Pages created:** [[2026-08-12-design-research-revisions-1786514575356]]
 
 Design research: Revisions: "Competence Over Points: Mastery-Proof Dashboard Pattern", "Category Labels on … (2 findings)
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Auto-reload design revisions in Design Lab
+
+## [2026-08-12] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-12]]
+
+Chat session on 2026-08-12
