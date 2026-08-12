@@ -334,6 +334,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-revisions-1786514575356",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category Labels on Donut Slices",
+      "findingDescription": "Add short category name labels directly on or just outside each donut slice, eliminating the need for a separate legend. Each label sits flush with its slice in the matching category color, making the chart instantly readable without forcing users to cross-reference a legend or tap to learn what each color means.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Go back to original picture just with labels on the edge of each color",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786514575356",
       "findingIndex": 0,
       "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
       "findingTitle": "Competence Over Points: Mastery-Proof Dashboard Pattern",
@@ -699,11 +710,11 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style='background:#0a1929;padding:20px;font-family:VT323,monospace;color:#dfeeff;border-radius:10px;max-width:320px'><h3 style='margin:0 0 15px;font-size:14px;letter-spacing:1px'>SPENDING BY CATEGORY</h3><svg viewBox='0 0 160 160' style='width:140px;height:140px;margin:0 auto;display:block'><circle cx='80' cy='80' r='50' fill='none' stroke='#12253c' stroke-width='20'/><circle cx='80' cy='80' r='50' fill='none' stroke='#ff8a63' stroke-width='20' stroke-dasharray='31.4 125.6' stroke-dashoffset='0'/><circle cx='80' cy='80' r='50' fill='none' stroke='#66c8ff' stroke-width='20' stroke-dasharray='50.3 125.6' stroke-dashoffset='-31.4'/><circle cx='80' cy='80' r='50' fill='none' stroke='#7fffb0' stroke-width='20' stroke-dasharray='25.1 125.6' stroke-dashoffset='-81.7'/><text x='115' y='65' font-size='10' fill='#ff8a63' font-weight='bold'>FOOD</text><text x='95' y='125' font-size='10' fill='#66c8ff' font-weight='bold'>TRANSPORT</text><text x='35' y='100' font-size='10' fill='#7fffb0' font-weight='bold'>OTHER</text></svg><div style='margin-top:12px;font-size:11px;text-align:center;color:#8fd6ff'>$1,240 total</div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 1,
       "lastRating": 4,
       "lastRatingLabel": "Just one more tweak",
-      "lastComment": "Bits poking out of pie graph telling you what type is",
+      "lastComment": "Go back to original picture just with labels on the edge of each color",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
