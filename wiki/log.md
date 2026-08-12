@@ -553,3 +553,10 @@ Design research: Budget Dashboard Clarity: Hierarchy, Visual Grouping & Micro-Re
 **Operation:** note
 
 Mission Control change requested via Design Lab: Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-12-design-research-revisions-1786514575356]]
+
+Design research: Revisions: "Competence Over Points: Mastery-Proof Dashboard Pattern", "Category Labels on … (2 findings)
