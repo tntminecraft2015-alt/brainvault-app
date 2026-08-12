@@ -259,8 +259,28 @@
       }
     }
   ],
-  "designResearch": [],
-  "lastDesignResearchAutoRun": "2026-08-11",
+  "designResearch": [
+    {
+      "id": "2026-08-12-design-research-revisions-1786508962559",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "Revisions: \"Identity Alignment Over Loss Aversion: Autonomy-First Motivation via Mastery F…",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": true
+    },
+    {
+      "id": "2026-08-12-design-research-daily",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "General Improvements: Cognitive Load Reduction, Minimal Gamification Depth, Responsive Modular Architecture",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": true
+    }
+  ],
+  "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
       "id": "2026-08-11-archive-and-remove-all-current-red-desig",
@@ -292,6 +312,39 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-12-design-research-revisions-1786508962559",
+      "findingIndex": 0,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Identity Alignment Over Loss Aversion: Autonomy-First Motivation via Mastery Feedback",
+      "findingDescription": "When a platform aligns with a user's self-concept, it strengthens intrinsic motivation and persistence. Instead of streaks that punish missing days, Mission Control could reframe daily todo completion as evidence of a chosen identity (e.g., 'organized practitioner', 'focused builder') and highlight *genuine progress toward mastery* via contextual feedback tied to task tags and historical patterns—showing which work modes compound or conflict, what times of day yield depth. This shifts motivation",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-daily",
+      "findingIndex": 2,
+      "threadId": "thread-1786508871900-2-responsive-modular-architecture-bento-hi",
+      "findingTitle": "Responsive Modular Architecture: Bento Hierarchy Scaled for Mobile Native",
+      "findingDescription": "In 2026, bento box UI moved beyond static landing pages into dashboards, mobile apps, and widget-style system surfaces with interactive states and real-time data making the grid feel alive. Mission Control's mobile 5-tab nav already leans modular; extend this by ensuring card sizes adapt not just to screen size but to content priority. On desktop, the left Todos card dominates (larger area weight); on mobile, each tab becomes a self-contained bento micro-layout (todos ≈ schedule ≈ reminders). Ma",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-daily",
+      "findingIndex": 1,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity",
+      "findingDescription": "Habitica demonstrates that punishment alongside reward (anticipated loss) motivates harder than pure rewards, but apps like Tick Tick prove that <i>minimal</i> gamification (just streaks + a clean counter, no confetti) outperforms feature-heavy systems. Mission Control's rank badges and XP pops already exist; lean into streaks as the primary motivator (visual fill on a calendar tile, color warmth on success), drop cosmetic celebration effects, and reserve rank-ups for genuine difficulty threshol",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
     {
       "id": "2026-08-11-design-research-revisions-1786428538705",
       "findingIndex": 1,
@@ -510,7 +563,56 @@
       "date": "2026-08-11"
     }
   ],
-  "designThreads": {},
+  "designThreads": {
+    "thread-1786508871900-0-cognitive-load-reduction-via-strategic-w": {
+      "id": "thread-1786508871900-0-cognitive-load-reduction-via-strategic-w",
+      "title": "Cognitive Load Reduction via Strategic Whitespace & Hierarchy Encoding",
+      "description": "Modern dashboards lean on breathing room and clear content hierarchy rather than cramming every pixel. Instead of showing all todos/reminders at once, use whitespace as a design tool—enlarge primary content blocks (anchor cards), shrink secondary info, and let empty space guide eye flow. This pairs naturally with Mission Control's existing bento structure: make the current 'Todos' card larger (span 2 rows), reduce reminder detail in the right panel, and reserve micro-interactions (XP pops, rank badges) as earned attention-getters, not defaults.",
+      "source_title": "Dashboard Design Trends 2026: Which Ones Actually Matter",
+      "source_url": "https://fuselabcreative.com/top-dashboard-design-trends-2025/",
+      "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;'>\n    <div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f; min-height: 180px; display: flex; flex-direction: column; gap: 8px;'>\n      <div style='color: #7fffb0; font-size: 12px; font-weight: bold;'>TODAY (3)</div>\n      <div style='flex: 1; border-top: 1px solid #1e3a5f; padding-top: 8px;'>\n        <div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'>✓ Review PR</div>\n        <div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'>○ Design mockups</div>\n      </div>\n    </div>\n    <div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f;'>\n      <div style='color: #66c8ff; font-size: 12px; font-weight: bold;'>NEXT REMINDER</div>\n      <div style='color: #dfeeff; font-size: 14px; margin-top: 12px;'>Team standup @ 2pm</div>\n      <div style='color: #8fd6ff; font-size: 11px; margin-top: 4px;'>conference room</div>\n    </div>\n  </div>\n  <div style='color: #8fd6ff; font-size: 10px; text-align: center; margin-top: 16px;'>spacious layout reduces fatigue</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786508871900-1-restraint-in-gamification-motivation-via": {
+      "id": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "title": "Competence Over Points: Mastery-Proof Dashboard Pattern",
+      "description": "The gamified productivity category is converging with identity design — not task counts but skill proof. Mission Control could show \"competence anchors\" (time-of-day proficiency, task-mode synergies, depth vs. speed trade-offs) as contextual mastery evidence tied to historical patterns, replacing generic streak punishment. Systems with great Competence but no Autonomy create a golden cage; the magic happens when all three (Competence, Autonomy, Relatedness) are present at once.",
+      "source_title": "10 Best Gamified Productivity Apps Ranked 2026 / Gamification Hub SDT Guide",
+      "source_url": "https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;font-family:VT323;padding:16px;border-radius:10px;max-width:280px\">\n  <div style=\"font-size:12px;font-weight:bold;color:#66c8ff;margin-bottom:12px\">MASTERY PROFILE</div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#7fffb0\">○ Deep Work</span> 9am–12pm (62% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#ff8a63\">○ Admin</span> 2pm–4pm (78% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#dfeeff\">Insight: Deep Work → Admin</span><br><span style=\"font-size:10px;color:#8fd6ff\">compounding habit (4 days)</span>\n  </div>\n</div>",
+      "status": "ready_to_ship",
+      "revisionCount": 2,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786508871900-2-responsive-modular-architecture-bento-hi": {
+      "id": "thread-1786508871900-2-responsive-modular-architecture-bento-hi",
+      "title": "Reveal-on-Scroll Layering: Contextual Information Surfaces as Users Engage",
+      "description": "Reveal-on-scroll surfaces secondary details as the user scrolls through each section rather than exposing all data upfront, reducing initial cognitive load while preserving power-user depth. Applied to Mission Control: todos show only rank + checkbox initially; scroll reveals XP values and edit affordances. On mobile tabs, each section (tasks, schedule, reminders) hides metadata until scroll, creating a natural funnel from headline to detail without tab proliferation or modal sprawl.",
+      "source_title": "Progressive Disclosure in Mobile UX: Reduce User Overload",
+      "source_url": "https://www.digia.tech/post/progressive-disclosure-mobile-ux/",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;font-family:VT323;padding:20px;border-radius:14px;max-width:320px;overflow:hidden;border:3px solid #12253c;\"><div style=\"margin-bottom:16px;\"><div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;\"><span style=\"font-size:14px;font-weight:bold;\">Daily Todos</span><span style=\"font-size:12px;color:#ff8a63;\">S</span></div><div style=\"background:#1e3a5f;padding:10px;border-radius:10px;margin-bottom:8px;font-size:12px;\">✓ Design research pass</div><div style=\"background:#1e3a5f;padding:10px;border-radius:10px;margin-bottom:8px;font-size:12px;\">✓ Fix mobile nav</div></div><div style=\"font-size:10px;color:#8fd6ff;text-align:center;border-top:1px solid #12253c;padding-top:10px;\">↓ scroll for XP & details ↓</div><div style=\"margin-top:12px;background:#12253c;padding:10px;border-radius:6px;font-size:11px;opacity:0.7;\"><div>+50 XP • Edit / Archive</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 1,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    }
+  },
   "designArchive": [
     {
       "title": "Rank-Locked Celebration Bursts with Staggered Easing Curves",

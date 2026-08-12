@@ -39,6 +39,9 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-12-design-research-revisions-1786508962559]] — 2 ideas Red reworked based on your feedback.
+- [[chat-2026-08-12]] — Claude conversation log for 2026-08-12
+- [[2026-08-12-design-research-daily]] — Current 2026 trends emphasize reducing visual clutter through generous whitespace and clear hierarchy, designing gamification as intrinsic m
 - [[2026-08-11-design-research-revisions-1786428352137]] — 2 ideas Red reworked based on your feedback.
 - [[2026-08-11-design-research-revisions-1786428311937]] — 2 ideas Red reworked based on your feedback.
 - [[2026-08-11-design-research-revisions-1786428260206]] — 2 ideas Red reworked based on your feedback.

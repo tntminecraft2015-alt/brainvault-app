@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Cognitive Load Reduction, Minimal Gamification Depth, Responsive Modular Architecture</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Cognitive Load Reduction, Minimal Gamification Depth, Responsive Modular Architecture</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Current 2026 trends emphasize reducing visual clutter through generous whitespace and clear hierarchy, designing gamification as intrinsic motivation (not cosmetic), and using responsive bento-grid thinking to scale gracefully across devices. Mission Control already nails the JRPG aesthetic; these findings suggest ways to preserve it while making the HUD feel less dense and more purposeful.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Cognitive Load Reduction via Strategic Whitespace &amp; Hierarchy Encoding</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Modern dashboards lean on breathing room and clear content hierarchy rather than cramming every pixel. Instead of showing all todos/reminders at once, use whitespace as a design tool—enlarge primary content blocks (anchor cards), shrink secondary info, and let empty space guide eye flow. This pairs naturally with Mission Control's existing bento structure: make the current 'Todos' card larger (span 2 rows), reduce reminder detail in the right panel, and reserve micro-interactions (XP pops, rank badges) as earned attention-getters, not defaults.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://fuselabcreative.com/top-dashboard-design-trends-2025/" target="_blank" rel="noopener" style="color:#ff8a63;">Dashboard Design Trends 2026: Which Ones Actually Matter</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'&gt;
+  &lt;div style='display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;'&gt;
+    &lt;div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f; min-height: 180px; display: flex; flex-direction: column; gap: 8px;'&gt;
+      &lt;div style='color: #7fffb0; font-size: 12px; font-weight: bold;'&gt;TODAY (3)&lt;/div&gt;
+      &lt;div style='flex: 1; border-top: 1px solid #1e3a5f; padding-top: 8px;'&gt;
+        &lt;div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'&gt;✓ Review PR&lt;/div&gt;
+        &lt;div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'&gt;○ Design mockups&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f;'&gt;
+      &lt;div style='color: #66c8ff; font-size: 12px; font-weight: bold;'&gt;NEXT REMINDER&lt;/div&gt;
+      &lt;div style='color: #dfeeff; font-size: 14px; margin-top: 12px;'&gt;Team standup @ 2pm&lt;/div&gt;
+      &lt;div style='color: #8fd6ff; font-size: 11px; margin-top: 4px;'&gt;conference room&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style='color: #8fd6ff; font-size: 10px; text-align: center; margin-top: 16px;'&gt;spacious layout reduces fatigue&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habitica demonstrates that punishment alongside reward (anticipated loss) motivates harder than pure rewards, but apps like Tick Tick prove that &lt;i&gt;minimal&lt;/i&gt; gamification (just streaks + a clean counter, no confetti) outperforms feature-heavy systems. Mission Control's rank badges and XP pops already exist; lean into streaks as the primary motivator (visual fill on a calendar tile, color warmth on success), drop cosmetic celebration effects, and reserve rank-ups for genuine difficulty thresholds. This respects user focus while keeping intrinsic motivation sharp.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://trophy.so/blog/productivity-gamification-examples" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification Productivity Apps: 8 Examples Analyzed (2026)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'&gt;
+  &lt;div style='margin-bottom: 16px;'&gt;
+    &lt;div style='color: #ff8a63; font-size: 12px; font-weight: bold; margin-bottom: 8px;'&gt;AUG 2026 STREAK&lt;/div&gt;
+    &lt;div style='display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;'&gt;
+      &lt;div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0a1929; font-size: 10px; font-weight: bold;'&gt;M&lt;/div&gt;
+      &lt;div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'&gt;&lt;/div&gt;
+      &lt;div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'&gt;&lt;/div&gt;
+      &lt;div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'&gt;&lt;/div&gt;
+      &lt;div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'&gt;&lt;/div&gt;
+      &lt;div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'&gt;&lt;/div&gt;
+      &lt;div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'&gt;&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style='color: #dfeeff; font-size: 13px;'&gt;5-day streak active&lt;/div&gt;
+  &lt;div style='color: #ff8a63; font-size: 11px; margin-top: 8px;'&gt;⚠ Weekend break risk&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Responsive Modular Architecture: Bento Hierarchy Scaled for Mobile Native</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">In 2026, bento box UI moved beyond static landing pages into dashboards, mobile apps, and widget-style system surfaces with interactive states and real-time data making the grid feel alive. Mission Control's mobile 5-tab nav already leans modular; extend this by ensuring card sizes adapt not just to screen size but to content priority. On desktop, the left Todos card dominates (larger area weight); on mobile, each tab becomes a self-contained bento micro-layout (todos ≈ schedule ≈ reminders). Maintain Mission Control's dark cyan palette and Press Start/VT323 fonts as your token system across all breakpoints.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://peterdraw.studio/blog/bento-grid-layou" target="_blank" rel="noopener" style="color:#ff8a63;">Bento Grid Layout: A Modular Approach to Modern UX</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'&gt;
+  &lt;div style='margin-bottom: 12px;'&gt;
+    &lt;div style='color: #66c8ff; font-size: 10px; font-weight: bold;'&gt;DESKTOP (3-col)&lt;/div&gt;
+    &lt;div style='display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 6px;'&gt;
+      &lt;div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 120px;'&gt;Todos (large)&lt;/div&gt;
+      &lt;div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'&gt;Schedule&lt;/div&gt;
+      &lt;div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'&gt;Reminders&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div&gt;
+    &lt;div style='color: #66c8ff; font-size: 10px; font-weight: bold;'&gt;MOBILE (tab-based)&lt;/div&gt;
+    &lt;div style='display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 6px;'&gt;
+      &lt;div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 100px;'&gt;[TAB 1] Todos&lt;/div&gt;
+      &lt;div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'&gt;[TAB 2] Schedule+Reminders&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-12-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Cognitive Load Reduction via Strategic Whitespace & Hierarchy Encoding","description":"Modern dashboards lean on breathing room and clear content hierarchy rather than cramming every pixel. Instead of showing all todos/reminders at once, use whitespace as a design tool—enlarge primary content blocks (anchor cards), shrink secondary info, and let empty space guide eye flow. This pairs naturally with Mission Control's existing bento structure: make the current 'Todos' card larger (span 2 rows), reduce reminder detail in the right panel, and reserve micro-interactions (XP pops, rank badges) as earned attention-getters, not defaults.","source_title":"Dashboard Design Trends 2026: Which Ones Actually Matter","source_url":"https://fuselabcreative.com/top-dashboard-design-trends-2025/","threadId":"thread-1786508871900-0-cognitive-load-reduction-via-strategic-w"},{"title":"Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity","description":"Habitica demonstrates that punishment alongside reward (anticipated loss) motivates harder than pure rewards, but apps like Tick Tick prove that <i>minimal</i> gamification (just streaks + a clean counter, no confetti) outperforms feature-heavy systems. Mission Control's rank badges and XP pops already exist; lean into streaks as the primary motivator (visual fill on a calendar tile, color warmth on success), drop cosmetic celebration effects, and reserve rank-ups for genuine difficulty thresholds. This respects user focus while keeping intrinsic motivation sharp.","source_title":"Gamification Productivity Apps: 8 Examples Analyzed (2026)","source_url":"https://trophy.so/blog/productivity-gamification-examples","threadId":"thread-1786508871900-1-restraint-in-gamification-motivation-via"},{"title":"Responsive Modular Architecture: Bento Hierarchy Scaled for Mobile Native","description":"In 2026, bento box UI moved beyond static landing pages into dashboards, mobile apps, and widget-style system surfaces with interactive states and real-time data making the grid feel alive. Mission Control's mobile 5-tab nav already leans modular; extend this by ensuring card sizes adapt not just to screen size but to content priority. On desktop, the left Todos card dominates (larger area weight); on mobile, each tab becomes a self-contained bento micro-layout (todos ≈ schedule ≈ reminders). Maintain Mission Control's dark cyan palette and Press Start/VT323 fonts as your token system across all breakpoints.","source_title":"Bento Grid Layout: A Modular Approach to Modern UX","source_url":"https://peterdraw.studio/blog/bento-grid-layou","threadId":"thread-1786508871900-2-responsive-modular-architecture-bento-hi"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
