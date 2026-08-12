@@ -343,6 +343,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-revisions-1786514873667",
+      "findingIndex": 0,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category Labels on Donut Slices",
+      "findingDescription": "Place category name labels directly on the outer edge of each donut slice in matching category colors, eliminating the need for a separate legend. Labels sit flush with their slice perimeter, making spending categories instantly recognizable without cross-referencing or tap-to-reveal interactions.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786514575356",
       "findingIndex": 1,
       "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
@@ -720,11 +731,11 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;text-align:center;width:280px;margin:0 auto'><div style='position:relative;width:160px;height:160px;margin:0 auto 20px;background:conic-gradient(#ff8a63 0deg 90deg, #7fffb0 90deg 180deg, #66c8ff 180deg 270deg, #f0a020 270deg 360deg);border-radius:50%;display:flex;align-items:center;justify-content:center'><div style='width:120px;height:120px;background:#0a1929;border-radius:50%'></div><span style='position:absolute;top:8px;right:45px;color:#ff8a63;font-size:11px;font-weight:bold'>Food</span><span style='position:absolute;bottom:25px;right:8px;color:#7fffb0;font-size:11px;font-weight:bold'>Transport</span><span style='position:absolute;bottom:25px;left:8px;color:#66c8ff;font-size:11px;font-weight:bold'>Utilities</span><span style='position:absolute;top:25px;left:25px;color:#f0a020;font-size:11px;font-weight:bold'>Other</span></div><div style='color:#dfeeff;font-size:13px;margin-top:10px'>Monthly Breakdown</div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 2,
-      "lastRating": 4,
-      "lastRatingLabel": "Just one more tweak",
-      "lastComment": "Go back to original picture just with labels on the edge of each color",
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
+      "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
