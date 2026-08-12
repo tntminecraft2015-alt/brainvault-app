@@ -47,13 +47,15 @@
       "text": "Laundry",
       "done": false,
       "rank": "B",
-      "doneDate": null
+      "doneDate": null,
+      "date": "2026-08-12"
     },
     {
       "text": "Clean Room",
       "done": false,
       "rank": "B",
-      "doneDate": null
+      "doneDate": null,
+      "date": "2026-08-12"
     }
   ],
   "streakDays": [],
