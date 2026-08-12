@@ -259,8 +259,18 @@
       }
     }
   ],
-  "designResearch": [],
-  "lastDesignResearchAutoRun": "2026-08-11",
+  "designResearch": [
+    {
+      "id": "2026-08-12-design-research-daily",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "General Improvements: Cognitive Load Reduction, Minimal Gamification Depth, Responsive Modular Architecture",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": true
+    }
+  ],
+  "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
       "id": "2026-08-11-archive-and-remove-all-current-red-desig",
@@ -510,7 +520,56 @@
       "date": "2026-08-11"
     }
   ],
-  "designThreads": {},
+  "designThreads": {
+    "thread-1786508871900-0-cognitive-load-reduction-via-strategic-w": {
+      "id": "thread-1786508871900-0-cognitive-load-reduction-via-strategic-w",
+      "title": "Cognitive Load Reduction via Strategic Whitespace & Hierarchy Encoding",
+      "description": "Modern dashboards lean on breathing room and clear content hierarchy rather than cramming every pixel. Instead of showing all todos/reminders at once, use whitespace as a design tool—enlarge primary content blocks (anchor cards), shrink secondary info, and let empty space guide eye flow. This pairs naturally with Mission Control's existing bento structure: make the current 'Todos' card larger (span 2 rows), reduce reminder detail in the right panel, and reserve micro-interactions (XP pops, rank badges) as earned attention-getters, not defaults.",
+      "source_title": "Dashboard Design Trends 2026: Which Ones Actually Matter",
+      "source_url": "https://fuselabcreative.com/top-dashboard-design-trends-2025/",
+      "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;'>\n    <div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f; min-height: 180px; display: flex; flex-direction: column; gap: 8px;'>\n      <div style='color: #7fffb0; font-size: 12px; font-weight: bold;'>TODAY (3)</div>\n      <div style='flex: 1; border-top: 1px solid #1e3a5f; padding-top: 8px;'>\n        <div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'>✓ Review PR</div>\n        <div style='color: #dfeeff; font-size: 14px; margin: 4px 0;'>○ Design mockups</div>\n      </div>\n    </div>\n    <div style='background: #12253c; padding: 20px; border-radius: 10px; border: 2px solid #1e3a5f;'>\n      <div style='color: #66c8ff; font-size: 12px; font-weight: bold;'>NEXT REMINDER</div>\n      <div style='color: #dfeeff; font-size: 14px; margin-top: 12px;'>Team standup @ 2pm</div>\n      <div style='color: #8fd6ff; font-size: 11px; margin-top: 4px;'>conference room</div>\n    </div>\n  </div>\n  <div style='color: #8fd6ff; font-size: 10px; text-align: center; margin-top: 16px;'>spacious layout reduces fatigue</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786508871900-1-restraint-in-gamification-motivation-via": {
+      "id": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "title": "Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity",
+      "description": "Habitica demonstrates that punishment alongside reward (anticipated loss) motivates harder than pure rewards, but apps like Tick Tick prove that <i>minimal</i> gamification (just streaks + a clean counter, no confetti) outperforms feature-heavy systems. Mission Control's rank badges and XP pops already exist; lean into streaks as the primary motivator (visual fill on a calendar tile, color warmth on success), drop cosmetic celebration effects, and reserve rank-ups for genuine difficulty thresholds. This respects user focus while keeping intrinsic motivation sharp.",
+      "source_title": "Gamification Productivity Apps: 8 Examples Analyzed (2026)",
+      "source_url": "https://trophy.so/blog/productivity-gamification-examples",
+      "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='margin-bottom: 16px;'>\n    <div style='color: #ff8a63; font-size: 12px; font-weight: bold; margin-bottom: 8px;'>AUG 2026 STREAK</div>\n    <div style='display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;'>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0a1929; font-size: 10px; font-weight: bold;'>M</div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'></div>\n      <div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'></div>\n    </div>\n  </div>\n  <div style='color: #dfeeff; font-size: 13px;'>5-day streak active</div>\n  <div style='color: #ff8a63; font-size: 11px; margin-top: 8px;'>⚠ Weekend break risk</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786508871900-2-responsive-modular-architecture-bento-hi": {
+      "id": "thread-1786508871900-2-responsive-modular-architecture-bento-hi",
+      "title": "Responsive Modular Architecture: Bento Hierarchy Scaled for Mobile Native",
+      "description": "In 2026, bento box UI moved beyond static landing pages into dashboards, mobile apps, and widget-style system surfaces with interactive states and real-time data making the grid feel alive. Mission Control's mobile 5-tab nav already leans modular; extend this by ensuring card sizes adapt not just to screen size but to content priority. On desktop, the left Todos card dominates (larger area weight); on mobile, each tab becomes a self-contained bento micro-layout (todos ≈ schedule ≈ reminders). Maintain Mission Control's dark cyan palette and Press Start/VT323 fonts as your token system across all breakpoints.",
+      "source_title": "Bento Grid Layout: A Modular Approach to Modern UX",
+      "source_url": "https://peterdraw.studio/blog/bento-grid-layou",
+      "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='margin-bottom: 12px;'>\n    <div style='color: #66c8ff; font-size: 10px; font-weight: bold;'>DESKTOP (3-col)</div>\n    <div style='display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 6px;'>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 120px;'>Todos (large)</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>Schedule</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>Reminders</div>\n    </div>\n  </div>\n  <div>\n    <div style='color: #66c8ff; font-size: 10px; font-weight: bold;'>MOBILE (tab-based)</div>\n    <div style='display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 6px;'>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 100px;'>[TAB 1] Todos</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>[TAB 2] Schedule+Reminders</div>\n    </div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-daily"
+    }
+  },
   "designArchive": [
     {
       "title": "Rank-Locked Celebration Bursts with Staggered Easing Curves",
