@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Real-Time Revision Delivery: Auto-Reload &amp; Live Refresh for Design Lab Slideshows</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Real-Time Revision Delivery: Auto-Reload &amp; Live Refresh for Design Lab Slideshows</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Research surfaces three patterns for keeping design research slideshows live without manual reopen: event-driven polling (similar to how dashboard monitoring works), graceful fade-and-replace transitions (inspired by modern carousel design), and a pause-on-interact mechanic borrowed from real-time financial dashboards. Each pattern respects the JRPG aesthetic while reducing friction between Red's rework and user review.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: auto-reloading or auto-refreshing design revisions in the Design Lab slideshow when Red finishes reworking a rated idea, so the user does not have to manually reopen it</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Event-Driven Soft Refresh with Connection Status Badge</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Detect when data arrives and trigger a refresh only when needed, rather than constant polling. When Red finishes a revision, the server emits a lightweight event; the client polls short intervals only while the slideshow modal is open. A small "●" badge in the modal header animates to signal the refresh is live, never blocking the user's view of the current slide. Pairs well with Mission Control's retro aesthetic via simple dot/pulse animations in the accent color.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://community.fabric.microsoft.com/t5/Fabric-Updates-Blog/Live-refresh-for-Real-Time-Dashboards-Generally-Available/ba-p/5194911" target="_blank" rel="noopener" style="color:#ff8a63;">Microsoft Fabric Real-Time Dashboards</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;&quot;&gt;
+  &lt;div style=&quot;display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;&quot;&gt;
+    &lt;span style=&quot;color: #dfeeff; font-size: 14px;&quot;&gt;REVISION 2 — ACTIVE&lt;/span&gt;
+    &lt;span style=&quot;display: inline-block; width: 8px; height: 8px; background: #7fffb0; border-radius: 50%; animation: pulse 1.2s infinite;&quot;&gt;&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;background: #12253c; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 12px;&quot;&gt;
+    &lt;div style=&quot;color: #8fd6ff; font-size: 11px; margin-bottom: 6px; opacity: 0.8;&quot;&gt;FINDING UPDATED&lt;/div&gt;
+    &lt;div style=&quot;color: #7fffb0; font-size: 13px; font-weight: bold;&quot;&gt;&quot;Category Labels on Donut&quot;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;color: #dfeeff; font-size: 11px; line-height: 1.4; opacity: 0.9;&quot;&gt;Tap to view revised mockup. Your rating will update the history.&lt;/div&gt;
+  &lt;style&gt;@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }&lt;/style&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Seamless Fade-and-Replace Slide Transition on Revision</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.presentation-process.com/animated-slideshow-in-powerpoint.html" target="_blank" rel="noopener" style="color:#ff8a63;">Animated Slideshow Carousel Transitions</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;&quot;&gt;
+  &lt;div style=&quot;margin-bottom: 12px;&quot;&gt;
+    &lt;div style=&quot;color: #dfeeff; font-size: 12px; margin-bottom: 8px;&quot;&gt;● LOADING REVISION...&lt;/div&gt;
+    &lt;div style=&quot;background: #12253c; height: 120px; border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.4s ease forwards 0.2s; color: #8fd6ff; font-size: 13px; border: 1px solid #1e3a5f;&quot;&gt;
+      &lt;div style=&quot;text-align: center;&quot;&gt;
+        &lt;div style=&quot;font-size: 11px; margin-bottom: 6px;&quot;&gt;ENHANCED MOCKUP&lt;/div&gt;
+        &lt;div style=&quot;color: #7fffb0; font-size: 14px;&quot;&gt;↻&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;color: #dfeeff; font-size: 10px; opacity: 0.6;&quot;&gt;Changes visible in 0.6s • Pause on click to keep reading&lt;/div&gt;
+  &lt;style&gt;@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }&lt;/style&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Pause-on-Interact with Manual Refresh Fallback</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Provide flexibility: if you're investigating a specific data point and don't want visuals to change, pause live refresh. While paused, no automated refreshes occur; when ready, resume to return to real-time monitoring. A small pause button (⏸) in the slideshow footer stops incoming revisions mid-read; tapping resume or navigating to the next finding auto-restarts polling. Prevents frustration when user is comparing the old mockup to feedback notes. Low-friction, respects user agency—very on-brand for a personal dashboard.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://learn.microsoft.com/en-us/fabric/real-time-intelligence/dashboard-live-refresh" target="_blank" rel="noopener" style="color:#ff8a63;">Microsoft Fabric Live Refresh Controls</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;&quot;&gt;
+  &lt;div style=&quot;background: #12253c; padding: 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #1e3a5f;&quot;&gt;
+    &lt;div style=&quot;display: flex; justify-content: space-between; align-items: center; color: #dfeeff; font-size: 11px;&quot;&gt;
+      &lt;span&gt;LIVE UPDATES: ON&lt;/span&gt;
+      &lt;button style=&quot;background: #ff8a63; border: 1px solid #ff8a63; color: #0a1929; padding: 4px 10px; font-family: VT323; cursor: pointer; font-size: 10px; border-radius: 4px;&quot;&gt;⏸ PAUSE&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;background: #1e3a5f; padding: 10px; border-radius: 6px; text-align: center; color: #8fd6ff; font-size: 10px; opacity: 0.85;&quot;&gt;
+    New revision arriving... • Click PAUSE to review in place
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Event-Driven Soft Refresh with Connection Status Badge","description":"Detect when data arrives and trigger a refresh only when needed, rather than constant polling. When Red finishes a revision, the server emits a lightweight event; the client polls short intervals only while the slideshow modal is open. A small \"●\" badge in the modal header animates to signal the refresh is live, never blocking the user's view of the current slide. Pairs well with Mission Control's retro aesthetic via simple dot/pulse animations in the accent color.","source_title":"Microsoft Fabric Real-Time Dashboards","source_url":"https://community.fabric.microsoft.com/t5/Fabric-Updates-Blog/Live-refresh-for-Real-Time-Dashboards-Generally-Available/ba-p/5194911","threadId":"thread-1786517286745-0-event-driven-soft-refresh-with-connectio"},{"title":"Seamless Fade-and-Replace Slide Transition on Revision","description":"While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.","source_title":"Animated Slideshow Carousel Transitions","source_url":"https://www.presentation-process.com/animated-slideshow-in-powerpoint.html","threadId":"thread-1786517286746-1-seamless-fade-and-replace-slide-transiti"},{"title":"Pause-on-Interact with Manual Refresh Fallback","description":"Provide flexibility: if you're investigating a specific data point and don't want visuals to change, pause live refresh. While paused, no automated refreshes occur; when ready, resume to return to real-time monitoring. A small pause button (⏸) in the slideshow footer stops incoming revisions mid-read; tapping resume or navigating to the next finding auto-restarts polling. Prevents frustration when user is comparing the old mockup to feedback notes. Low-friction, respects user agency—very on-brand for a personal dashboard.","source_title":"Microsoft Fabric Live Refresh Controls","source_url":"https://learn.microsoft.com/en-us/fabric/real-time-intelligence/dashboard-live-refresh","threadId":"thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    document.getElementById('nextBtn').disabled = cur === total - 1;
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
