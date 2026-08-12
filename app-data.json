@@ -388,6 +388,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 2,
+      "threadId": "thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa",
+      "findingTitle": "Pause-on-Interact with Manual Refresh Fallback",
+      "findingDescription": "Provide flexibility: if you're investigating a specific data point and don't want visuals to change, pause live refresh. While paused, no automated refreshes occur; when ready, resume to return to real-time monitoring. A small pause button (⏸) in the slideshow footer stops incoming revisions mid-read; tapping resume or navigating to the next finding auto-restarts polling. Prevents frustration when user is comparing the old mockup to feedback notes. Low-friction, respects user agency—very on-bran",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
       "findingIndex": 1,
       "threadId": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
       "findingTitle": "Seamless Fade-and-Replace Slide Transition on Revision",
@@ -916,10 +927,10 @@
       "source_title": "Microsoft Fabric Live Refresh Controls",
       "source_url": "https://learn.microsoft.com/en-us/fabric/real-time-intelligence/dashboard-live-refresh",
       "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #1e3a5f;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; color: #dfeeff; font-size: 11px;\">\n      <span>LIVE UPDATES: ON</span>\n      <button style=\"background: #ff8a63; border: 1px solid #ff8a63; color: #0a1929; padding: 4px 10px; font-family: VT323; cursor: pointer; font-size: 10px; border-radius: 4px;\">⏸ PAUSE</button>\n    </div>\n  </div>\n  <div style=\"background: #1e3a5f; padding: 10px; border-radius: 6px; text-align: center; color: #8fd6ff; font-size: 10px; opacity: 0.85;\">\n    New revision arriving... • Click PAUSE to review in place\n  </div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
