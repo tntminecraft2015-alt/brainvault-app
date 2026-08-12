@@ -42,22 +42,7 @@
       }
     ]
   },
-  "tasks": [
-    {
-      "text": "Laundry",
-      "done": false,
-      "rank": "B",
-      "doneDate": null,
-      "date": "2026-08-12"
-    },
-    {
-      "text": "Clean Room",
-      "done": false,
-      "rank": "B",
-      "doneDate": null,
-      "date": "2026-08-12"
-    }
-  ],
+  "tasks": [],
   "streakDays": [],
   "timelineChecks": {
     "2026-05-14": {
@@ -263,6 +248,35 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-12-design-research-revisions-1786514873667",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "Revisions: \"Category Labels on Donut Slices\", \"Entry-Level Micro-Rewards: Coins-for-Log (D…",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": true
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786514575356",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "Revisions: \"Competence Over Points: Mastery-Proof Dashboard Pattern\", \"Category Labels on …",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": true
+    },
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "date": "2026-08-12",
+      "topic": "Budget tracker designs",
+      "title": "Budget Dashboard Clarity: Hierarchy, Visual Grouping & Micro-Rewards",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": true
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786508962559",
       "date": "2026-08-12",
       "topic": "",
@@ -284,6 +298,20 @@
   ],
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
+    {
+      "id": "2026-08-12-auto-reload-design-revisions-in-design-l",
+      "date": "2026-08-12",
+      "title": "Auto-reload design revisions in Design Lab",
+      "status": "pending",
+      "source": "ED chat"
+    },
+    {
+      "id": "2026-08-12-smart-tile-hierarchy-variable-size-cards",
+      "date": "2026-08-12",
+      "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "status": "pending",
+      "source": "Design Lab"
+    },
     {
       "id": "2026-08-11-archive-and-remove-all-current-red-desig",
       "date": "2026-08-11",
@@ -314,6 +342,61 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-12-design-research-revisions-1786514575356",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category Labels on Donut Slices",
+      "findingDescription": "Add short category name labels directly on or just outside each donut slice, eliminating the need for a separate legend. Each label sits flush with its slice in the matching category color, making the chart instantly readable without forcing users to cross-reference a legend or tap to learn what each color means.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Go back to original picture just with labels on the edge of each color",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786514575356",
+      "findingIndex": 0,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Competence Over Points: Mastery-Proof Dashboard Pattern",
+      "findingDescription": "The gamified productivity category is converging with identity design — not task counts but skill proof. Mission Control could show \"competence anchors\" (time-of-day proficiency, task-mode synergies, depth vs. speed trade-offs) as contextual mastery evidence tied to historical patterns, replacing generic streak punishment. Systems with great Competence but no Autonomy create a golden cage; the magic happens when all three (Competence, Autonomy, Relatedness) are present at once.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "findingIndex": 2,
+      "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "findingTitle": "Entry-Level Micro-Rewards: Coins-for-Log (Not Deferred Savings)",
+      "findingDescription": "Apps that have solved motivation problems do it by making the checking-in behavior immediately rewarding in its own right, rather than as a means to the deferred reward of established habits. Habitica does this by directly connecting task completion to character progression. Rather than rely on \"save $X by month end,\" award small coin micro-rewards (+5 GIL) for each transaction logged or category checked—exactly what Mission Control's quest/XP system already does. Earn coins for completing habit",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Make amount and category separate with a apple like scroll wheel the category",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category-Coded Donut Chart with Drill-Down Tap",
+      "findingDescription": "Visual spending breakdowns through a colorful category-based chart make financial data easier to digest. Rather than force users to scan rows, show a donut/ring chart where each color maps to a category (food=#ff8a63, transport=#66c8ff, etc.—reuse Mission Control's palette). Tapping a slice reveals that category's recent transactions below. This taps into immediate pattern recognition and lets users spot overspend at a glance. Pairs well with the hierarchy card above.",
+      "rating": 4,
+      "ratingLabel": "Just one more tweak",
+      "comment": "Bits poking out of pie graph telling you what type is",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-budget-tracker-designs",
+      "findingIndex": 0,
+      "threadId": "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards",
+      "findingTitle": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "findingDescription": "Unlike equal-width card layouts, a bento grid uses tile size to signal importance—hero KPIs anchor top-left in large tiles, category breakdowns sit in smaller secondary tiles. This F-pattern scanning guides attention without labels, letting users grasp financial health in under 5 seconds. Apply to Mission Control's GIL WALLET: make the month's budget total a 2-column card, shrink daily/weekly totals to 1-column tiles, and nest category breakdown (food, transport, etc.) as mini-cards within the g",
+      "rating": 5,
+      "ratingLabel": "Got it",
+      "comment": "",
+      "date": "2026-08-12"
+    },
     {
       "id": "2026-08-12-design-research-revisions-1786508962559",
       "findingIndex": 0,
@@ -589,10 +672,10 @@
       "source_title": "10 Best Gamified Productivity Apps Ranked 2026 / Gamification Hub SDT Guide",
       "source_url": "https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;font-family:VT323;padding:16px;border-radius:10px;max-width:280px\">\n  <div style=\"font-size:12px;font-weight:bold;color:#66c8ff;margin-bottom:12px\">MASTERY PROFILE</div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#7fffb0\">○ Deep Work</span> 9am–12pm (62% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#ff8a63\">○ Admin</span> 2pm–4pm (78% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#dfeeff\">Insight: Deep Work → Admin</span><br><span style=\"font-size:10px;color:#8fd6ff\">compounding habit (4 days)</span>\n  </div>\n</div>",
-      "status": "ready_to_ship",
+      "status": "discarded",
       "revisionCount": 2,
-      "lastRating": 2,
-      "lastRatingLabel": "Kind of",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
@@ -613,6 +696,54 @@
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-daily"
+    },
+    "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards": {
+      "id": "thread-1786514464358-0-smart-tile-hierarchy-variable-size-cards",
+      "title": "Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs",
+      "description": "Unlike equal-width card layouts, a bento grid uses tile size to signal importance—hero KPIs anchor top-left in large tiles, category breakdowns sit in smaller secondary tiles. This F-pattern scanning guides attention without labels, letting users grasp financial health in under 5 seconds. Apply to Mission Control's GIL WALLET: make the month's budget total a 2-column card, shrink daily/weekly totals to 1-column tiles, and nest category breakdown (food, transport, etc.) as mini-cards within the grid flow. Reduces scan time and the feeling of 'too much data'.",
+      "source_title": "Bento Grid Dashboard Design: Complete Guide 2026",
+      "source_url": "https://www.orbix.studio/blogs/bento-grid-dashboard-design-aesthetics",
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:16px;font-family:VT323;border-radius:10px;max-width:380px\">\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px\">\n    <div style=\"background:#12253c;border-radius:8px;padding:12px;border:1px solid #1e3a5f;grid-column:span 2\">\n      <div style=\"font-size:12px;color:#8fd6ff\">MONTHLY TOTAL</div>\n      <div style=\"font-size:24px;font-weight:bold;color:#7fffb0;margin-top:4px\">$1,240</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">FOOD</div>\n      <div style=\"font-size:16px;color:#ff8a63;margin-top:4px\">$340</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">TRANSPORT</div>\n      <div style=\"font-size:16px;color:#66c8ff;margin-top:4px\">$180</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">SAVINGS</div>\n      <div style=\"font-size:16px;color:#7fffb0;margin-top:4px\">$450</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:8px;padding:10px;border:1px solid #1e3a5f\">\n      <div style=\"font-size:10px;color:#8fd6ff\">OTHER</div>\n      <div style=\"font-size:16px;color:#ff8080;margin-top:4px\">$270</div>\n    </div>\n  </div>\n  <div style=\"font-size:12px;color:#8fd6ff;text-align:center\">↓ Hero card large, categories small</div>\n</div>",
+      "status": "resolved",
+      "revisionCount": 0,
+      "lastRating": 5,
+      "lastRatingLabel": "Got it",
+      "lastComment": "",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
+    },
+    "thread-1786514464358-1-category-coded-donut-chart-with-drill-do": {
+      "id": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "title": "Category Labels on Donut Slices",
+      "description": "Place category name labels directly on the outer edge of each donut slice in matching category colors, eliminating the need for a separate legend. Labels sit flush with their slice perimeter, making spending categories instantly recognizable without cross-referencing or tap-to-reveal interactions.",
+      "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
+      "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
+      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;text-align:center;width:280px;margin:0 auto'><div style='position:relative;width:160px;height:160px;margin:0 auto 20px;background:conic-gradient(#ff8a63 0deg 90deg, #7fffb0 90deg 180deg, #66c8ff 180deg 270deg, #f0a020 270deg 360deg);border-radius:50%;display:flex;align-items:center;justify-content:center'><div style='width:120px;height:120px;background:#0a1929;border-radius:50%'></div><span style='position:absolute;top:8px;right:45px;color:#ff8a63;font-size:11px;font-weight:bold'>Food</span><span style='position:absolute;bottom:25px;right:8px;color:#7fffb0;font-size:11px;font-weight:bold'>Transport</span><span style='position:absolute;bottom:25px;left:8px;color:#66c8ff;font-size:11px;font-weight:bold'>Utilities</span><span style='position:absolute;top:25px;left:25px;color:#f0a020;font-size:11px;font-weight:bold'>Other</span></div><div style='color:#dfeeff;font-size:13px;margin-top:10px'>Monthly Breakdown</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 2,
+      "lastRating": 4,
+      "lastRatingLabel": "Just one more tweak",
+      "lastComment": "Go back to original picture just with labels on the edge of each color",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
+    },
+    "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-": {
+      "id": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "title": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
+      "description": "Award small coin micro-rewards (+5 GIL) for each transaction logged or habit checked, with amount and category each selected via independent scroll wheels—one for coin value, one for the reward category (Training / Social / Gear / etc.). This keeps the immediate dopamine hit of logging tied directly to spending visibility, while letting players customize reward granularity and type in the same gesture.",
+      "source_title": "Guul Games: Gamification in Habit Tracking Apps",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;font-family:VT323,monospace;max-width:320px;'><div style='font-size:14px;font-weight:bold;margin-bottom:12px;'>Log Transaction</div><div style='display:flex;gap:12px;margin-bottom:16px;'><div style='flex:1;'><label style='display:block;font-size:11px;color:#8fd6ff;margin-bottom:6px;'>Amount (GIL)</label><div style='background:#12253c;border-radius:8px;padding:8px;text-align:center;font-size:16px;border:2px solid #ff8a63;'>+10</div><div style='font-size:9px;color:#8fd6ff;text-align:center;margin-top:4px;'>↑ scroll ↓</div></div><div style='flex:1;'><label style='display:block;font-size:11px;color:#8fd6ff;margin-bottom:6px;'>Category</label><div style='background:#12253c;border-radius:8px;padding:8px;text-align:center;font-size:13px;border:2px solid #ff8a63;'>Training</div><div style='font-size:9px;color:#8fd6ff;text-align:center;margin-top:4px;'>↑ scroll ↓</div></div></div><div style='background:#1e3a5f;padding:10px;border-radius:6px;font-size:12px;margin-bottom:10px;text-align:center;color:#7fffb0;'>💰 Logged: Expense (–$45)</div><button style='width:100%;padding:10px;background:#ff8a63;color:#0a1929;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:12px;'>Confirm & Earn</button></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 1,
+      "lastRating": 4,
+      "lastRatingLabel": "Just one more tweak",
+      "lastComment": "Make amount and category separate with a apple like scroll wheel the category",
+      "createdDate": "2026-08-12",
+      "updatedDate": "2026-08-12",
+      "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
     }
   },
   "designArchive": [
