@@ -1,5 +1,17 @@
 # Log
 
+## [2026-08-12] note | Mission Control — timeline section + streak card removed, custom time-wheel picker
+
+**Operation:** note
+**Pages updated:** [[mission-control]]
+
+Follow-up to the same-day quest/calendar merge, per direct user feedback after trying it:
+1. Removed the Cal tab's "TODAY'S TIMELINE" section from mobile entirely (a separate, older recurring-daily-routine feature, not part of the quest system) — freed up room on the Cal tab. Desktop's equivalent "Weekly Schedule" panel and the underlying `data.schedule` are untouched.
+2. Removed the STREAK card from Home's bento grid (desktop's separate header streak stat is untouched); reordered GIL WALLET/POKÉDEX to avoid a layout gap; increased the quest list's max-height to use the freed space.
+3. Replaced the plain time input for quests with a custom iOS-style scroll-wheel time picker (hour/15-min-increment-minute/AM-PM) on mobile, built with native CSS scroll-snap. Desktop's quick-add keeps its original native time input.
+
+Asked clarifying questions before touching anything (which "add mission" section, whether "streak section" meant the Home card, dropdown vs. custom wheel picker, time increment) rather than guessing from the shorthand request. Verified with a syntax check, div/CSS-brace balance check, a duplicate-id sweep, a leftover-reference sweep, and an isolated test of the 12h/24h wheel time-conversion math (including midnight/noon edge cases) before reporting back for push approval.
+
 ## [2026-08-12] note | Mission Control — Design Lab discard fix, level counter removed, quests merged into calendar
 
 **Operation:** note

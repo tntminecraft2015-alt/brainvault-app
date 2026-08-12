@@ -281,6 +281,25 @@
     .modal-btn.ok::before { color:var(--green); }
     .modal-btn.ok:hover { background:rgba(127,255,176,.06); }
     .modal-btn.sm { flex:0; padding:6px 14px; }
+    .time-wheel-modal { width:280px; }
+    .wheel-row { position:relative; display:flex; justify-content:center; gap:6px; height:180px; margin-bottom:4px; }
+    .wheel-col {
+      width:74px; height:180px; overflow-y:scroll; scroll-snap-type:y mandatory;
+      scrollbar-width:none; -ms-overflow-style:none;
+    }
+    .wheel-col::-webkit-scrollbar { display:none; }
+    .wheel-item {
+      height:44px; display:flex; align-items:center; justify-content:center;
+      font-family:'VT323',monospace; font-size:26px; color:rgba(223,238,255,.35);
+      scroll-snap-align:center; transition:color .1s,opacity .1s; user-select:none;
+    }
+    .wheel-item.sel { color:var(--accent); font-size:30px; }
+    .wheel-pad { height:68px; flex-shrink:0; }
+    .wheel-center-line {
+      position:absolute; left:0; right:0; top:50%; height:44px; transform:translateY(-50%);
+      background:rgba(255,138,99,.08); border-top:1px solid rgba(255,138,99,.35); border-bottom:1px solid rgba(255,138,99,.35);
+      pointer-events:none;
+    }
     .dev-list  { max-height:160px; overflow-y:auto; margin-bottom:10px; }
     .dev-item  { display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid rgba(223,238,255,.07); font-size:14px; }
     .dev-item:last-child { border-bottom:none; }
@@ -444,36 +463,9 @@
         display:flex; gap:6px; align-items:center; flex-wrap:wrap; flex-shrink:0;
       }
 
-      /* ── Timeline tab ── */
-      .mob-tl-list { flex:none; }
-      .mob-tl-row  { display:flex; gap:8px; align-items:center; padding:10px 8px; margin-bottom:3px; background:rgba(223,238,255,.035); border-radius:var(--r-md); }
-      .mob-tl-row:last-child { margin-bottom:0; }
-      .mob-tl-bar  { width:3px; align-self:stretch; flex-shrink:0; background:var(--fg-faint); }
-      .mob-tl-bar.next { background:var(--accent); box-shadow:0 0 5px var(--accent); }
-      .mob-tl-chk  { width:40px; height:40px; flex-shrink:0; background:var(--bg); box-shadow:inset 0 0 0 2px var(--fg); border:none; border-radius:var(--r-sm); cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; transition:background .1s,transform .12s; }
-      .mob-tl-chk:active { transform:scale(1.15); }
-      .mob-tl-chk.done   { background:var(--accent); }
-      .mob-tl-chk-x      { width:18px; height:18px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
-      .mob-tl-chk.done .mob-tl-chk-x { display:block; }
-      .mob-tl-info { flex:1; }
-      .mob-tl-time  { font-family:'Press Start 2P',monospace; font-size:7px; opacity:.6; margin-bottom:3px; }
-      .mob-tl-title { font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
-      .mob-tl-next  { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent); animation:blink 1s steps(2) infinite; margin-top:2px; }
-      .mob-tl-row-actions { display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
-      .mob-tl-action-btn {
-        background:none; border:none; color:rgba(223,238,255,.5); font-size:14px; cursor:pointer;
-        width:32px; height:32px; display:flex; align-items:center; justify-content:center;
-        border-radius:var(--r-sm); transition:background .1s, color .1s;
-      }
-      .mob-tl-action-btn:active { background:rgba(223,238,255,.08); color:var(--fg); }
-      .mob-tl-prog  { flex-shrink:0; padding-top:10px; border-top:1px solid rgba(223,238,255,.1); margin-top:6px; }
-      .mob-sp-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.6; margin-bottom:5px; display:flex; justify-content:space-between; }
-      .mob-sp-bar   { height:8px; background:var(--darker); position:relative; border-radius:var(--r-pill); overflow:hidden; }
-      .mob-sp-fill  { height:100%; background:var(--accent); transition:width .4s; border-radius:var(--r-pill); }
-      .mob-sp-thresh { position:absolute; top:0; bottom:0; width:2px; background:var(--green); left:75%; }
 
       /* ── Quests (Home card + Cal tab section) ── */
-      .mob-quest-list { max-height:260px; overflow-y:auto; min-height:0; position:relative; }
+      .mob-quest-list { max-height:380px; overflow-y:auto; min-height:0; position:relative; }
       .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 8px; margin-bottom:3px; background:rgba(223,238,255,.035); border-radius:var(--r-md); }
       .mob-task-row:last-child { margin-bottom:0; }
       .mob-task-row.done { opacity:.4; }
@@ -496,9 +488,13 @@
       .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; min-height:44px; outline:none; border-radius:var(--r-md); }
       .mob-inp::placeholder { color:rgba(223,238,255,.25); }
       .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; min-height:44px; appearance:none; text-align:center; border-radius:var(--r-md); }
-      .mob-time-toggle { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:rgba(223,238,255,.6); font-size:16px; width:44px; min-height:44px; flex-shrink:0; cursor:pointer; border-radius:var(--r-md); }
-      .mob-time-toggle.on { color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
-      .mob-quest-time-inp { color-scheme:dark; }
+      .mob-time-trigger {
+        background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:rgba(223,238,255,.6);
+        font-family:'Press Start 2P',monospace; font-size:9px; padding:0 10px; min-width:44px; min-height:44px; flex-shrink:0;
+        cursor:pointer; border-radius:var(--r-md); white-space:nowrap;
+      }
+      .mob-time-trigger.set { color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+      .mob-time-trigger.required { box-shadow:inset 0 0 0 1px rgba(232,93,58,.6); }
       .mob-add-btn  {
         background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
         font-family:'Press Start 2P',monospace; font-size:11px; padding:0 18px; min-height:44px; min-width:44px;
@@ -565,7 +561,6 @@
       .mob-home-clock { font-size:90px; }
       .mob-day-cell   { min-height:50px; font-size:17px; }
       .mob-dot-sq     { width:5px; height:5px; }
-      .mob-tl-title   { font-size:25px; }
       .mob-task-label { font-size:24px; }
       .mob-nav-btn .nav-icon { font-size:22px; }
       .mob-nav-btn    { font-size:5px; padding:10px 2px 8px; }
@@ -577,9 +572,6 @@
       .mob-chat-msgs .chat-msg-who { font-size:7px; }
       .mob-inp  { font-size:22px; padding:10px 12px; }
       .mob-task-row { padding:12px 0; }
-      .mob-tl-row   { padding:12px 0; }
-      .mob-tl-chk   { width:44px; height:44px; }
-      .mob-tl-chk-x { width:20px; height:20px; }
       .mob-pix-check { width:44px; height:44px; }
       .mob-pix-x     { width:20px; height:20px; }
       .mob-rank-badge { font-size:9px; width:24px; padding:4px 2px; }
@@ -1046,22 +1038,24 @@
           <div class="mob-quest-list" id="mobHomeQuestList"></div>
           <div class="mob-add-row">
             <select id="mobHomeRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobHome')"><option value="S">S</option><option value="B" selected>B</option></select>
-            <button type="button" class="mob-time-toggle" id="mobHomeTimeToggle" onclick="toggleQuestTime('mobHome')" title="Set a start time">🕐</button>
-            <input type="time" class="mob-inp mob-quest-time-inp" id="mobHomeTimeSel" style="display:none;width:100px;color-scheme:dark;flex:none;">
+            <button type="button" class="mob-time-trigger" id="mobHomeTimeSel" onclick="openTimeWheel('mobHome')">🕐</button>
             <input type="text" class="mob-inp" id="mobHomeTaskInp" placeholder="New quest...">
             <button class="mob-add-btn" onclick="addMobTask()">+</button>
           </div>
-        </div>
-
-        <div class="mc-card">
-          <div class="mob-home-card-label">STREAK</div>
-          <div class="mob-home-streak-num" id="mobStreakVal" style="font-size:34px;">0 <span style="font-size:14px;opacity:.7;">DAYS</span></div>
         </div>
 
         <div class="mc-card" onclick="goToMobTab('gil')" style="cursor:pointer;">
           <div class="mob-home-card-label">GIL WALLET</div>
           <div class="mob-home-streak-num" id="mobHomeGilAmt" style="font-size:30px;">$0</div>
           <button class="mob-home-link">Open GIL →</button>
+        </div>
+
+        <div class="mc-card" onclick="openPokedexModal()" style="cursor:pointer;">
+          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>POKÉDEX</span>
+            <span class="mob-home-count-pill" id="mobHomeDexCount">0/0</span>
+          </div>
+          <div class="mob-home-poke-preview" id="mobHomeDexPreview"></div>
         </div>
 
         <div class="mc-card span-2" onclick="goToMobTab('claude')" style="cursor:pointer;">
@@ -1073,15 +1067,7 @@
           <button class="mob-home-link">Open ED + Wiki →</button>
         </div>
 
-        <div class="mc-card" onclick="openPokedexModal()" style="cursor:pointer;">
-          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>POKÉDEX</span>
-            <span class="mob-home-count-pill" id="mobHomeDexCount">0/0</span>
-          </div>
-          <div class="mob-home-poke-preview" id="mobHomeDexPreview"></div>
-        </div>
-
-        <div class="mc-card" onclick="goToMobTab('cal')" style="cursor:pointer;">
+        <div class="mc-card span-2" onclick="goToMobTab('cal')" style="cursor:pointer;">
           <div class="mob-home-card-label">NEXT UP</div>
           <div class="mob-home-next-time" id="mobHomeNextTime">—</div>
           <div class="mob-home-next-title" id="mobHomeNextTitle">—</div>
@@ -1120,32 +1106,11 @@
       <div class="mob-quest-list" id="mobCalQuestList"></div>
       <div class="mob-add-row">
         <select id="mobCalRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobCal')"><option value="S">S</option><option value="B" selected>B</option></select>
-        <button type="button" class="mob-time-toggle" id="mobCalTimeToggle" onclick="toggleQuestTime('mobCal')" title="Set a start time">🕐</button>
-        <input type="time" class="mob-inp mob-quest-time-inp" id="mobCalTimeSel" style="display:none;width:100px;color-scheme:dark;flex:none;">
+        <button type="button" class="mob-time-trigger" id="mobCalTimeSel" onclick="openTimeWheel('mobCal')">🕐</button>
         <input type="text" class="mob-inp" id="mobCalTaskInp" placeholder="New quest...">
         <button class="mob-add-btn" onclick="addQuestFromRow('mobCal', selectedKey)">+</button>
       </div>
 
-      <div class="mob-tl-section-hd">
-        <span>⏰ TODAY'S TIMELINE</span>
-        <span class="blink" style="color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;">● LIVE</span>
-      </div>
-      <div class="mob-tl-list" id="mobTimelineList"></div>
-      <div class="mob-tl-prog">
-        <div class="mob-sp-label">
-          <span>DAILY COMPLETION</span>
-          <span id="mobTlPct">0%</span>
-        </div>
-        <div class="mob-sp-bar">
-          <div class="mob-sp-fill" id="mobTlFill" style="width:0%;"></div>
-          <div class="mob-sp-thresh"></div>
-        </div>
-      </div>
-      <div class="mob-add-row">
-        <input type="time" class="mob-inp" id="mobSchedTime" style="width:100px;color-scheme:dark;flex:none;">
-        <input type="text" class="mob-inp" id="mobSchedTitle" placeholder="Add mission...">
-        <button class="mob-add-btn" onclick="addSchedItem()">+</button>
-      </div>
     </div>
 
     <!-- BUDGET tab -->
@@ -1354,6 +1319,23 @@
       <select id="editMissKind" class="m-sel"><option value="focus">Focus</option><option value="training">Training</option><option value="routine">Routine</option><option value="errand">Errand</option><option value="meeting">Meeting</option><option value="social">Social</option></select>
     </div>
     <div class="modal-btns"><button class="modal-btn ok" onclick="saveEditMission()">Save</button><button class="modal-btn" onclick="closeModal('editMissionModal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- QUEST TIME WHEEL MODAL -->
+<div class="overlay" id="timeWheelModal">
+  <div class="modal time-wheel-modal">
+    <div class="modal-title">◆ SET TIME</div>
+    <div class="wheel-row">
+      <div class="wheel-col" id="wheelHour"></div>
+      <div class="wheel-col" id="wheelMin"></div>
+      <div class="wheel-col" id="wheelAmPm"></div>
+      <div class="wheel-center-line"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn sm" onclick="clearTimeWheel()">CLEAR</button>
+      <button class="modal-btn ok" onclick="confirmTimeWheel()">SET</button>
+    </div>
   </div>
 </div>
 
@@ -1813,12 +1795,11 @@ function updateClock(){
 }
 updateClock(); setInterval(updateClock,10000);
 
-// ── STREAK DISPLAY ──
+// ── STREAK DISPLAY (desktop header stat box only — Home's mobile streak card was removed) ──
 function updateStreakDisplay(){
   const s=APP.currentStreak||0;
-  ['streakVal','mobStreakVal'].forEach(sv=>{
-    const el=document.getElementById(sv); if(el)el.innerHTML=`${s} <span style="font-size:10px;opacity:.7;">DAYS</span>`;
-  });
+  const el=document.getElementById('streakVal');
+  if(el) el.innerHTML=`${s} <span style="font-size:10px;opacity:.7;">DAYS</span>`;
 }
 
 // ── LOAD DATA FROM SERVER ──
@@ -2373,47 +2354,136 @@ function addTaskCommon(text, rank, date, time){
 }
 // Element ids differ per surface (desktop panel has no prefix; mobile Home/Cal do) —
 // looked up explicitly rather than string-concatenated, since desktop's ids predate this convention.
+// Desktop keeps a native <input type="time"> behind a show/hide toggle; mobile uses the
+// scroll-wheel picker below, so its "time" element is a button storing the value in data-time.
 const QUEST_ROW_IDS={
-  '':       {rank:'rankSel',        time:'timeSel',        toggle:'timeToggle',        inp:'taskInp'},
-  mobHome:  {rank:'mobHomeRankSel', time:'mobHomeTimeSel', toggle:'mobHomeTimeToggle', inp:'mobHomeTaskInp'},
-  mobCal:   {rank:'mobCalRankSel',  time:'mobCalTimeSel',  toggle:'mobCalTimeToggle',  inp:'mobCalTaskInp'},
+  '':       {rank:'rankSel',        time:'timeSel',        toggle:'timeToggle', inp:'taskInp'},
+  mobHome:  {rank:'mobHomeRankSel', time:'mobHomeTimeSel', inp:'mobHomeTaskInp'},
+  mobCal:   {rank:'mobCalRankSel',  time:'mobCalTimeSel',  inp:'mobCalTaskInp'},
 };
+function getRowTime(prefix){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return'';
+  const el=document.getElementById(ids.time); if(!el)return'';
+  return prefix===''? (el.value||'') : (el.dataset.time||'');
+}
+function setRowTime(prefix, val){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const el=document.getElementById(ids.time); if(!el)return;
+  if(prefix===''){ el.value=val||''; return; }
+  el.dataset.time=val||'';
+  const rank=document.getElementById(ids.rank)?.value;
+  if(val){ el.textContent=fmtTime(val); el.classList.add('set'); el.classList.remove('required'); }
+  else   { el.textContent='🕐'; el.classList.remove('set'); el.classList.toggle('required', rank==='S'); }
+}
 function addTask(){ addQuestFromRow('', TODAY()); }
 function addMobTask(){ addQuestFromRow('mobHome', TODAY()); }
 function addQuestFromRow(prefix, date){
   const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
   const inp=document.getElementById(ids.inp);
   const rank=document.getElementById(ids.rank).value;
-  const timeEl=document.getElementById(ids.time);
   const txt=inp?.value.trim(); if(!txt){showToast('Enter quest text');return;}
-  const time=timeEl?.value||'';
+  const time=getRowTime(prefix);
   if(rank==='S' && !time){ showToast('S-rank quests need a time'); return; }
   addTaskCommon(txt,rank,date,time||null);
   inp.value=''; resetQuestAddRow(prefix);
 }
 function resetQuestAddRow(prefix){
-  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
-  const timeEl=document.getElementById(ids.time);
-  const toggleBtn=document.getElementById(ids.toggle);
-  if(timeEl){ timeEl.value=''; timeEl.style.display='none'; }
-  if(toggleBtn) toggleBtn.classList.remove('on');
+  if(prefix===''){
+    const ids=QUEST_ROW_IDS[''];
+    const timeEl=document.getElementById(ids.time);
+    const toggleBtn=document.getElementById(ids.toggle);
+    if(timeEl){ timeEl.value=''; timeEl.style.display='none'; }
+    if(toggleBtn) toggleBtn.classList.remove('on');
+  } else {
+    setRowTime(prefix, '');
+  }
 }
 function onQuestRankChange(prefix){
-  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
-  const rank=document.getElementById(ids.rank).value;
-  const timeEl=document.getElementById(ids.time);
-  const toggleBtn=document.getElementById(ids.toggle);
-  if(!timeEl)return;
-  if(rank==='S'){ timeEl.style.display=''; if(toggleBtn) toggleBtn.style.display='none'; }
-  else { if(toggleBtn) toggleBtn.style.display=''; if(!(toggleBtn&&toggleBtn.classList.contains('on'))) timeEl.style.display='none'; }
+  if(prefix===''){
+    const ids=QUEST_ROW_IDS[''];
+    const rank=document.getElementById(ids.rank).value;
+    const timeEl=document.getElementById(ids.time);
+    const toggleBtn=document.getElementById(ids.toggle);
+    if(!timeEl)return;
+    if(rank==='S'){ timeEl.style.display=''; if(toggleBtn) toggleBtn.style.display='none'; }
+    else { if(toggleBtn) toggleBtn.style.display=''; if(!(toggleBtn&&toggleBtn.classList.contains('on'))) timeEl.style.display='none'; }
+  } else {
+    setRowTime(prefix, getRowTime(prefix)); // refresh the trigger's placeholder/required styling for the new rank
+  }
 }
 function toggleQuestTime(prefix){
-  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids || !ids.toggle)return;
   const timeEl=document.getElementById(ids.time);
   const btn=document.getElementById(ids.toggle);
   const show=timeEl.style.display==='none';
   timeEl.style.display=show?'':'none';
   if(btn) btn.classList.toggle('on', show);
+}
+
+// ── QUEST TIME WHEEL (mobile scroll-wheel picker, 15-min increments) ──
+const WHEEL_HOURS=[1,2,3,4,5,6,7,8,9,10,11,12];
+const WHEEL_MINS=['00','15','30','45'];
+const WHEEL_AMPM=['AM','PM'];
+let timeWheelPrefix=null;
+
+function buildWheelCol(el, items, selectedIdx){
+  const pad='<div class="wheel-pad"></div>';
+  el.innerHTML = pad + items.map((v,i)=>`<div class="wheel-item${i===selectedIdx?' sel':''}" data-i="${i}">${v}</div>`).join('') + pad;
+  el.onscroll = ()=>highlightWheelCenter(el);
+  requestAnimationFrame(()=>{
+    const item=el.children[selectedIdx+1];
+    if(item) el.scrollTop = item.offsetTop - el.clientHeight/2 + item.clientHeight/2;
+  });
+}
+function highlightWheelCenter(el){
+  const target=el.scrollTop+el.clientHeight/2;
+  let best=null, bestDist=Infinity;
+  [...el.children].forEach(child=>{
+    if(!child.classList.contains('wheel-item'))return;
+    const center=child.offsetTop+child.clientHeight/2;
+    const dist=Math.abs(center-target);
+    if(dist<bestDist){bestDist=dist; best=child;}
+  });
+  el.querySelectorAll('.wheel-item.sel').forEach(c=>c.classList.remove('sel'));
+  if(best) best.classList.add('sel');
+}
+function openTimeWheel(prefix){
+  timeWheelPrefix=prefix;
+  const cur=getRowTime(prefix);
+  let h=9, m='00', ap='AM';
+  if(cur){
+    const [hh,mm]=cur.split(':');
+    const hn=Number(hh);
+    ap = hn>=12?'PM':'AM';
+    h  = hn%12||12;
+    m  = mm;
+  }
+  openModal('timeWheelModal');
+  requestAnimationFrame(()=>{
+    buildWheelCol(document.getElementById('wheelHour'), WHEEL_HOURS, WHEEL_HOURS.indexOf(h));
+    buildWheelCol(document.getElementById('wheelMin'), WHEEL_MINS, WHEEL_MINS.indexOf(m));
+    buildWheelCol(document.getElementById('wheelAmPm'), WHEEL_AMPM, WHEEL_AMPM.indexOf(ap));
+  });
+}
+function getWheelSelected(el, items){
+  const sel=el.querySelector('.wheel-item.sel');
+  return sel ? items[Number(sel.dataset.i)] : items[0];
+}
+function confirmTimeWheel(){
+  if(!timeWheelPrefix)return;
+  const h12=getWheelSelected(document.getElementById('wheelHour'), WHEEL_HOURS);
+  const mm =getWheelSelected(document.getElementById('wheelMin'), WHEEL_MINS);
+  const ap =getWheelSelected(document.getElementById('wheelAmPm'), WHEEL_AMPM);
+  let h24=h12%12; if(ap==='PM') h24+=12;
+  setRowTime(timeWheelPrefix, `${String(h24).padStart(2,'0')}:${mm}`);
+  closeModal('timeWheelModal');
+  timeWheelPrefix=null;
+}
+function clearTimeWheel(){
+  if(!timeWheelPrefix)return;
+  setRowTime(timeWheelPrefix, '');
+  closeModal('timeWheelModal');
+  timeWheelPrefix=null;
 }
 function toggleTask(i){
   const t=(APP.tasks||[])[i]; if(!t)return;

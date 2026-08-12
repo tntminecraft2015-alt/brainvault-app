@@ -26,7 +26,12 @@ The mobile bottom nav is **Home / Cal / Gil / ED** — the separate TASKS tab wa
 - The Home screen's numeric **LEVEL counter was removed** (dead code and its XP-bar/level-up-flash cleaned out too) — Home now just shows the day streak, no level number. A gamification replacement is intentionally not yet decided; see the Design Lab research run titled "Streaks Over Points: Grace-Based Motivation + Collectible Unlocks" for candidate directions.
 - Rating a Design Lab finding **"Not even close" now permanently discards it** — no revision gets generated (previously any non-5 rating triggered a rework loop). The feedback is still recorded so future research steers away from similar ideas.
 
----
+## 2026-08-12 update #2: timeline section and Home's streak card removed, custom scroll-wheel time picker
+
+Follow-up pass, same day, mobile only:
+- The Cal tab's separate "TODAY'S TIMELINE" block (the older fixed daily-routine feature — header, list, daily-completion progress bar, and its "Add mission..." row) was **removed from mobile entirely**, including its dead CSS. This was a *different* feature from quests (a recurring same-every-day schedule, e.g. "6am Morning Routine"), not something quests replaced — it's just gone from the phone UI now to make room. The underlying `data.schedule` and its desktop "Weekly Schedule" panel are untouched and still fully functional; only the mobile Cal tab's copy of this UI was deleted.
+- Home's **STREAK card was removed** from the bento grid (GIL WALLET and POKÉDEX were reordered to pair up so there's no layout gap); the desktop header's separate streak stat box is untouched. The freed space went to a taller quest list (`max-height` 260px → 380px).
+- The quest time field is now a **custom scroll-wheel picker** (hour / minute in 15-min increments / AM-PM, iOS-style, built with native CSS `scroll-snap`) on mobile only — tapping the 🕐 trigger on either add-row opens it. Desktop's quick-add still uses a plain native `<input type="time">` behind its toggle button; it was not changed.
 
 ## Purpose
 
