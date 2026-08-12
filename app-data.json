@@ -42,22 +42,7 @@
       }
     ]
   },
-  "tasks": [
-    {
-      "text": "Laundry",
-      "done": false,
-      "rank": "B",
-      "doneDate": null,
-      "date": "2026-08-12"
-    },
-    {
-      "text": "Clean Room",
-      "done": false,
-      "rank": "B",
-      "doneDate": null,
-      "date": "2026-08-12"
-    }
-  ],
+  "tasks": [],
   "streakDays": [],
   "timelineChecks": {
     "2026-05-14": {
