@@ -1,5 +1,20 @@
 # Log
 
+## [2026-08-12] note | Mission Control — Design Lab discard fix, level counter removed, quests merged into calendar
+
+**Operation:** note
+**Pages updated:** [[mission-control]]
+
+Implemented directly (not via the change-request queue) at the user's request, step by step with confirmation before each push:
+1. Rating a Design Lab finding "Not even close" now permanently discards it instead of queuing a revision.
+2. Set up a daily Claude cloud routine that pings the live Render URL each morning so Red's existing daily auto-research actually fires on Render's free tier (which sleeps when idle) without the user opening the app.
+3. Removed the Home screen's numeric LEVEL counter (and dead code/CSS behind it — level-up flash, XP bar, calcLevel/triggerLevelUp); kicked off a Red research run scoped to gamification alternatives ("Streaks Over Points: Grace-Based Motivation + Collectible Unlocks") for the user to pick a replacement direction from.
+4. Merged quests into the calendar on mobile: quests now carry a real date + optional time (S-rank requires a time, B-rank optional via a toggle), stay pinned to the day they were added (no more daily reset/purge), and are manageable inline from both the Home card and a new Cal tab section. The mobile TASKS tab and its nav button were removed (5 tabs → 4: Home/Cal/Gil/ED). Desktop's quest panel was left as-is visually but switched to show only today's quests so it stays in sync with the same underlying data.
+
+Updated [[mission-control]] with a dated changelog note so Red's research context reflects the new layout. Full diff pushed to the `app` remote (Render) after each step, with a local syntax/logic check run before every push.
+
+---
+
 ## [2026-05-14] note | Cloud Deployment Setup
 
 **Operation:** note

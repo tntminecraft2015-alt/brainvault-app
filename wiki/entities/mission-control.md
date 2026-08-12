@@ -2,7 +2,7 @@
 type: entity
 entity_type: project
 title: "Mission Control Dashboard"
-last_updated: "2026-08-10"
+last_updated: "2026-08-12"
 tags: [dashboard, tools, obsidian, html, personal-ops]
 ---
 
@@ -12,6 +12,19 @@ A single-file HTML dashboard (`mission-control.html`) backed by an Express serve
 
 > [!note] Page is stale in places
 > Most of this page (Layout, localStorage Keys section) still describes the original browser-only build from 2026-05-13. Sections below marked with a date have been updated since; the rest reflects the vault as of the 2026-05-13 build and hasn't been re-audited against the current `mission-control.html` (now containing a merged mobile 5-tab redesign, ED chat, push notifications, wiki browse, and the Design Lab below). Worth a full re-sync next session.
+
+---
+
+## 2026-08-12 update: mobile nav is now 4 tabs, quests merged into the calendar
+
+The mobile bottom nav is **Home / Cal / Gil / ED** — the separate TASKS tab was removed. Quests (still ranked S/B, same XP values `S=50, B=15`) now carry a real `date` and optional `time` field instead of resetting daily:
+- **S-rank quests require a time** and behave like a planned calendar event for that day.
+- **B-rank quests only require a date**; time is optional via a small clock-icon toggle next to the add row.
+- A quest **stays pinned to the date it was added for** — it does not roll forward if left unchecked, and does not get purged after completion. Viewing a past or future day on the calendar shows exactly what was planned/done that day.
+- Quests are fully manageable (add / check / delete) directly from the Home card ("TODAY'S QUESTS", today only) and from the Cal tab's new "🎯 QUESTS" section (whichever day is selected on the month grid) — no dedicated tab needed anymore.
+- The desktop dashboard's quest panel was **not redesigned**, but was changed to show only today's quests (previously showed all quests undated) so it stays in sync with the same underlying data mobile now uses. Desktop's quick-add row gained the same optional time field for S-rank quests.
+- The Home screen's numeric **LEVEL counter was removed** (dead code and its XP-bar/level-up-flash cleaned out too) — Home now just shows the day streak, no level number. A gamification replacement is intentionally not yet decided; see the Design Lab research run titled "Streaks Over Points: Grace-Based Motivation + Collectible Unlocks" for candidate directions.
+- Rating a Design Lab finding **"Not even close" now permanently discards it** — no revision gets generated (previously any non-5 rating triggered a rework loop). The feedback is still recorded so future research steers away from similar ideas.
 
 ---
 

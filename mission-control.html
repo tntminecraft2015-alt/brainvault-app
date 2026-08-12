@@ -221,6 +221,9 @@
     .xp-pop     { position:absolute; top:0; left:50%; font-family:'Press Start 2P',monospace; font-size:8px; pointer-events:none; white-space:nowrap; z-index:5; animation:xppop 900ms ease-out forwards; }
     .task-add   { margin-top:5px; display:flex; gap:3px; flex-shrink:0; }
     .rank-sel   { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); font-family:'Press Start 2P',monospace; font-size:7px; padding:0 4px; cursor:pointer; width:34px; appearance:none; text-align:center; }
+    .quest-time { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); flex-shrink:0; white-space:nowrap; }
+    .time-toggle { opacity:.6; transition:opacity .15s,color .15s; }
+    .time-toggle:hover, .time-toggle.on { opacity:1; color:var(--accent); }
 
     /* Chat */
     .chat-scroll { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:6px; padding:4px 0; }
@@ -469,8 +472,8 @@
       .mob-sp-fill  { height:100%; background:var(--accent); transition:width .4s; border-radius:var(--r-pill); }
       .mob-sp-thresh { position:absolute; top:0; bottom:0; width:2px; background:var(--green); left:75%; }
 
-      /* ── Tasks tab ── */
-      .mob-task-list { flex:1; overflow-y:auto; min-height:0; position:relative; }
+      /* ── Quests (Home card + Cal tab section) ── */
+      .mob-quest-list { max-height:260px; overflow-y:auto; min-height:0; position:relative; }
       .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 8px; margin-bottom:3px; background:rgba(223,238,255,.035); border-radius:var(--r-md); }
       .mob-task-row:last-child { margin-bottom:0; }
       .mob-task-row.done { opacity:.4; }
@@ -482,6 +485,7 @@
       .mob-rank-badge { font-family:'Press Start 2P',monospace; font-size:8px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; border-radius:var(--r-pill); }
       .mob-rank-badge.compact { opacity:.55; }
       .mob-xp-chip { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); flex-shrink:0; }
+      .mob-quest-time { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(223,238,255,.55); flex-shrink:0; white-space:nowrap; }
       .mob-task-label { flex:1; font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
       .mob-task-row.done .mob-task-label { text-decoration:line-through; }
       .mob-task-del  { background:none; border:none; color:rgba(223,238,255,.45); font-size:18px; cursor:pointer; padding:6px; flex-shrink:0; }
@@ -492,6 +496,9 @@
       .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; min-height:44px; outline:none; border-radius:var(--r-md); }
       .mob-inp::placeholder { color:rgba(223,238,255,.25); }
       .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; min-height:44px; appearance:none; text-align:center; border-radius:var(--r-md); }
+      .mob-time-toggle { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:rgba(223,238,255,.6); font-size:16px; width:44px; min-height:44px; flex-shrink:0; cursor:pointer; border-radius:var(--r-md); }
+      .mob-time-toggle.on { color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
+      .mob-quest-time-inp { color-scheme:dark; }
       .mob-add-btn  {
         background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
         font-family:'Press Start 2P',monospace; font-size:11px; padding:0 18px; min-height:44px; min-width:44px;
@@ -973,7 +980,9 @@
           </div>
           <div class="quest-scroll" id="questScroll"></div>
           <div class="task-add">
-            <select id="rankSel" class="rank-sel"><option value="S">S</option><option value="B" selected>B</option></select>
+            <select id="rankSel" class="rank-sel" onchange="onQuestRankChange('')"><option value="S">S</option><option value="B" selected>B</option></select>
+            <button type="button" class="mini-btn time-toggle" id="timeToggle" onclick="toggleQuestTime('')" title="Set a start time">🕐</button>
+            <input type="time" class="mini-inp mini-inp-time" id="timeSel" style="display:none;">
             <input type="text" class="mini-inp" id="taskInp" placeholder="New quest...">
             <button class="mini-btn" onclick="addTask()">+</button>
           </div>
@@ -1034,8 +1043,14 @@
             <span>TODAY'S QUESTS</span>
             <span class="mob-home-count-pill" id="mobHomeQuestCount">0/0</span>
           </div>
-          <div id="mobHomeQuestPreview"></div>
-          <button class="mob-home-link" onclick="goToMobTab('tasks')">View all quests →</button>
+          <div class="mob-quest-list" id="mobHomeQuestList"></div>
+          <div class="mob-add-row">
+            <select id="mobHomeRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobHome')"><option value="S">S</option><option value="B" selected>B</option></select>
+            <button type="button" class="mob-time-toggle" id="mobHomeTimeToggle" onclick="toggleQuestTime('mobHome')" title="Set a start time">🕐</button>
+            <input type="time" class="mob-inp mob-quest-time-inp" id="mobHomeTimeSel" style="display:none;width:100px;color-scheme:dark;flex:none;">
+            <input type="text" class="mob-inp" id="mobHomeTaskInp" placeholder="New quest...">
+            <button class="mob-add-btn" onclick="addMobTask()">+</button>
+          </div>
         </div>
 
         <div class="mc-card">
@@ -1100,6 +1115,18 @@
       <div class="mob-day-event-list" id="mobDayEventList"></div>
 
       <div class="mob-tl-section-hd">
+        <span id="mobCalQuestHd">🎯 QUESTS</span>
+      </div>
+      <div class="mob-quest-list" id="mobCalQuestList"></div>
+      <div class="mob-add-row">
+        <select id="mobCalRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobCal')"><option value="S">S</option><option value="B" selected>B</option></select>
+        <button type="button" class="mob-time-toggle" id="mobCalTimeToggle" onclick="toggleQuestTime('mobCal')" title="Set a start time">🕐</button>
+        <input type="time" class="mob-inp mob-quest-time-inp" id="mobCalTimeSel" style="display:none;width:100px;color-scheme:dark;flex:none;">
+        <input type="text" class="mob-inp" id="mobCalTaskInp" placeholder="New quest...">
+        <button class="mob-add-btn" onclick="addQuestFromRow('mobCal', selectedKey)">+</button>
+      </div>
+
+      <div class="mob-tl-section-hd">
         <span>⏰ TODAY'S TIMELINE</span>
         <span class="blink" style="color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;">● LIVE</span>
       </div>
@@ -1118,22 +1145,6 @@
         <input type="time" class="mob-inp" id="mobSchedTime" style="width:100px;color-scheme:dark;flex:none;">
         <input type="text" class="mob-inp" id="mobSchedTitle" placeholder="Add mission...">
         <button class="mob-add-btn" onclick="addSchedItem()">+</button>
-      </div>
-    </div>
-
-    <!-- TASKS tab -->
-    <div class="mob-tab-pane" id="mobTabTasks">
-      <div class="mob-tab-hd">
-        <span>✅ QUESTS</span>
-        <span id="mobTaskCount" style="font-family:'Press Start 2P',monospace;font-size:7px;opacity:.5;">0/0</span>
-      </div>
-      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 10px;">
-        <div class="mob-task-list" id="mobTaskList"></div>
-      </div>
-      <div class="mob-add-row">
-        <select id="mobRankSel" class="mob-rank-sel"><option value="S">S</option><option value="B" selected>B</option></select>
-        <input type="text" class="mob-inp" id="mobTaskInp" placeholder="New quest...">
-        <button class="mob-add-btn" onclick="addMobTask()">+</button>
       </div>
     </div>
 
@@ -1201,9 +1212,6 @@
     </button>
     <button class="mob-nav-btn" data-tab="cal" onclick="switchMobTab('cal',this)">
       <span class="nav-icon">📅</span><span>CAL</span>
-    </button>
-    <button class="mob-nav-btn" data-tab="tasks" onclick="switchMobTab('tasks',this)">
-      <span class="nav-icon">✅</span><span>TASKS</span>
     </button>
     <button class="mob-nav-btn" data-tab="gil" onclick="switchMobTab('gil',this)">
       <span class="nav-icon">💰</span><span>GIL</span>
@@ -1878,21 +1886,17 @@ function goToMobTab(tab){
 }
 
 function renderMobHomeQuests(){
-  const tasks=getTasks();
-  const done=tasks.filter(t=>t.done).length;
-  const ce=document.getElementById('mobHomeQuestCount'); if(ce)ce.textContent=`${done}/${tasks.length}`;
-  const el=document.getElementById('mobHomeQuestPreview'); if(!el)return;
-  if(!tasks.length){ el.innerHTML='<div class="empty">No quests — add one on the Tasks tab</div>'; return; }
-  el.innerHTML=tasks.map((t,i)=>{
-    const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
-    const isS=rank==='S'; const xp=RANK_XP[rank]||RANK_XP.B;
-    return`<div class="mob-task-row${t.done?' done':''}">
-      <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
-      <div class="mob-rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
-      <div class="mob-task-label">${esc(t.text)}</div>
-      ${isS?`<div class="mob-xp-chip">+${xp}</div>`:''}
-    </div>`;
-  }).slice(0,5).join('');
+  const tasks=getTasksForDate(TODAY());
+  const ce=document.getElementById('mobHomeQuestCount'); if(ce)ce.textContent=`${tasks.filter(t=>t.done).length}/${tasks.length}`;
+  renderTasksInto(document.getElementById('mobHomeQuestList'), tasks, true);
+}
+
+function renderMobCalQuests(){
+  const key=selectedKey||TODAY();
+  const d=new Date(key+'T00:00:00');
+  const hd=document.getElementById('mobCalQuestHd'); if(hd)hd.textContent=`🎯 QUESTS — ${MONTHS_S[d.getMonth()]} ${d.getDate()}`;
+  const tasks=getTasksForDate(key);
+  renderTasksInto(document.getElementById('mobCalQuestList'), tasks, true);
 }
 
 function renderMobHomeGil(){
@@ -2039,7 +2043,7 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
       const tint=KIND_COLORS[evs[0].kind||'focus']||'var(--fg)';
       btn.style.background=hexAlpha(tint, Math.min(.12+evs.length*.06, .4));
     }
-    btn.onclick=()=>{ selectedKey=key; renderMonthGrid(); renderMobMonthGrid(); renderDaySummary(); renderMobDaySummary(); openDayModal(key,dt); };
+    btn.onclick=()=>{ selectedKey=key; renderMonthGrid(); renderMobMonthGrid(); renderDaySummary(); renderMobDaySummary(); renderMobCalQuests(); openDayModal(key,dt); };
     gridEl.appendChild(btn);
   });
   renderDaySummaryInto(selKey, summaryEl, isMob);
@@ -2299,49 +2303,50 @@ function saveEditEvent(){
 }
 
 // ══════════════════════════════════════════════════════════════
-// TASKS  (flat array, persist until deleted)
-// S = removed from log the day after completion; B = resets each day
+// QUESTS  (flat array, each pinned to a real date; stays put once set)
+// S = planned event, requires a time; B = to-do, time optional
 // ══════════════════════════════════════════════════════════════
 function migrateTasks(){
   // Convert old per-day object format to flat array
-  if(Array.isArray(APP.tasks)) return;
-  const flat=[];
-  for(const [date, arr] of Object.entries(APP.tasks||{})){
-    (arr||[]).forEach(t=>flat.push({...t,rank:t.rank==='S'?'S':'B',doneDate:t.done?date:null}));
+  if(!Array.isArray(APP.tasks)){
+    const flat=[];
+    for(const [date, arr] of Object.entries(APP.tasks||{})){
+      (arr||[]).forEach(t=>flat.push({...t,rank:t.rank==='S'?'S':'B',date}));
+    }
+    APP.tasks=flat;
   }
-  APP.tasks=flat;
+  // Legacy quests predate dated scheduling — pin them to today so nothing goes missing
+  let changed=false;
+  (APP.tasks||[]).forEach(t=>{ if(!t.date){ t.date=TODAY(); changed=true; } });
+  if(changed) patchData({tasks:APP.tasks});
 }
 
-function getTasks(){
+function getTasksForDate(dateStr){
   migrateTasks();
-  const today=TODAY();
-  let changed=false;
-  // Remove S-tier quests completed on a previous day
-  const before=(APP.tasks||[]).length;
-  APP.tasks=(APP.tasks||[]).filter(t=>!(t.rank==='S' && t.done && t.doneDate && t.doneDate!==today));
-  if(APP.tasks.length!==before) changed=true;
-  // Reset B-tier done if doneDate isn't today
-  (APP.tasks||[]).forEach(t=>{
-    if(t.rank==='B' && t.done && t.doneDate!==today){ t.done=false; t.doneDate=null; changed=true; }
-  });
-  if(changed) patchData({tasks:APP.tasks});
-  return APP.tasks||[];
+  const forDate=(APP.tasks||[]).filter(t=>t.date===dateStr);
+  const s=forDate.filter(t=>t.rank==='S').sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  const b=forDate.filter(t=>t.rank!=='S');
+  return [...s, ...b];
 }
 
 function saveTasks(){ patchData({tasks:APP.tasks}); }
 
 function renderTasksInto(el, tasks, isMob){
   if(!el)return;
-  const done=tasks.filter(t=>t.done).length;
-  const countId=isMob?'mobTaskCount':'taskCountDisp';
-  const ce=document.getElementById(countId); if(ce)ce.textContent=`${done}/${tasks.length}`;
-  if(!tasks.length){el.innerHTML='<div class="empty">No quests — add one below</div>';return;}
-  el.innerHTML=tasks.map((t,i)=>{
+  if(!isMob){
+    const done=tasks.filter(t=>t.done).length;
+    const ce=document.getElementById('taskCountDisp'); if(ce)ce.textContent=`${done}/${tasks.length}`;
+  }
+  if(!tasks.length){el.innerHTML='<div class="empty">No quests for this day — add one below</div>';return;}
+  el.innerHTML=tasks.map(t=>{
+    const i=APP.tasks.indexOf(t);
     const rank=t.rank||'B'; const col=RANK_COLORS[rank]||RANK_COLORS.B;
     const isS=rank==='S'; const xp=RANK_XP[rank]||RANK_XP.B;
+    const timeChip=t.time?`<span class="${isMob?'mob-quest-time':'quest-time'}">${fmtTime(t.time)}</span>`:'';
     if(isMob) return`<div class="mob-task-row${t.done?' done':''}">
       <button class="mob-pix-check" onclick="toggleTask(${i})"><div class="mob-pix-x"></div></button>
       <div class="mob-rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
+      ${timeChip}
       <div class="mob-task-label">${esc(t.text)}</div>
       ${isS?`<div class="mob-xp-chip">+${xp}</div>`:''}
       <button class="mob-task-del" onclick="deleteTask(${i})">✕</button>
@@ -2349,6 +2354,7 @@ function renderTasksInto(el, tasks, isMob){
     return`<div class="task-row${t.done?' done':''}">
       <button class="pix-check" onclick="toggleTask(${i})"><div class="pix-x"></div></button>
       <div class="rank-badge${isS?'':' compact'}" style="background:${col};">${rank}</div>
+      ${timeChip}
       <div class="task-label">${esc(t.text)}</div>
       <div class="xp-chip${isS?' always':''}">+${xp}</div>
       <button class="task-del" onclick="deleteTask(${i})">✕</button>
@@ -2356,31 +2362,64 @@ function renderTasksInto(el, tasks, isMob){
   }).join('');
 }
 
-function renderTasks(){ const tasks=getTasks(); renderTasksInto(document.getElementById('questScroll'),tasks,false); }
-function renderMobTasks(){ const tasks=getTasks(); renderTasksInto(document.getElementById('mobTaskList'),tasks,true); renderMobHomeQuests(); }
+function renderTasks(){ const tasks=getTasksForDate(TODAY()); renderTasksInto(document.getElementById('questScroll'),tasks,false); }
+function renderMobTasks(){ renderMobHomeQuests(); renderMobCalQuests(); }
 
-function addTaskCommon(text, rank){
+function addTaskCommon(text, rank, date, time){
   if(!Array.isArray(APP.tasks)) APP.tasks=[];
-  APP.tasks.push({text,done:false,rank,doneDate:null});
+  APP.tasks.push({text,done:false,rank,date:date||TODAY(),time:time||null});
   saveTasks(); renderTasks(); renderMobTasks();
   showXpPop(RANK_XP[rank]||15, RANK_COLORS[rank]||RANK_COLORS.B);
 }
-function addTask(){
-  const inp=document.getElementById('taskInp'); const rank=document.getElementById('rankSel').value;
-  const txt=inp?.value.trim(); if(!txt)return; inp.value='';
-  addTaskCommon(txt,rank);
+// Element ids differ per surface (desktop panel has no prefix; mobile Home/Cal do) —
+// looked up explicitly rather than string-concatenated, since desktop's ids predate this convention.
+const QUEST_ROW_IDS={
+  '':       {rank:'rankSel',        time:'timeSel',        toggle:'timeToggle',        inp:'taskInp'},
+  mobHome:  {rank:'mobHomeRankSel', time:'mobHomeTimeSel', toggle:'mobHomeTimeToggle', inp:'mobHomeTaskInp'},
+  mobCal:   {rank:'mobCalRankSel',  time:'mobCalTimeSel',  toggle:'mobCalTimeToggle',  inp:'mobCalTaskInp'},
+};
+function addTask(){ addQuestFromRow('', TODAY()); }
+function addMobTask(){ addQuestFromRow('mobHome', TODAY()); }
+function addQuestFromRow(prefix, date){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const inp=document.getElementById(ids.inp);
+  const rank=document.getElementById(ids.rank).value;
+  const timeEl=document.getElementById(ids.time);
+  const txt=inp?.value.trim(); if(!txt){showToast('Enter quest text');return;}
+  const time=timeEl?.value||'';
+  if(rank==='S' && !time){ showToast('S-rank quests need a time'); return; }
+  addTaskCommon(txt,rank,date,time||null);
+  inp.value=''; resetQuestAddRow(prefix);
 }
-function addMobTask(){
-  const inp=document.getElementById('mobTaskInp'); const rank=document.getElementById('mobRankSel').value;
-  const txt=inp?.value.trim(); if(!txt)return; inp.value='';
-  addTaskCommon(txt,rank);
+function resetQuestAddRow(prefix){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const timeEl=document.getElementById(ids.time);
+  const toggleBtn=document.getElementById(ids.toggle);
+  if(timeEl){ timeEl.value=''; timeEl.style.display='none'; }
+  if(toggleBtn) toggleBtn.classList.remove('on');
+}
+function onQuestRankChange(prefix){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const rank=document.getElementById(ids.rank).value;
+  const timeEl=document.getElementById(ids.time);
+  const toggleBtn=document.getElementById(ids.toggle);
+  if(!timeEl)return;
+  if(rank==='S'){ timeEl.style.display=''; if(toggleBtn) toggleBtn.style.display='none'; }
+  else { if(toggleBtn) toggleBtn.style.display=''; if(!(toggleBtn&&toggleBtn.classList.contains('on'))) timeEl.style.display='none'; }
+}
+function toggleQuestTime(prefix){
+  const ids=QUEST_ROW_IDS[prefix]; if(!ids)return;
+  const timeEl=document.getElementById(ids.time);
+  const btn=document.getElementById(ids.toggle);
+  const show=timeEl.style.display==='none';
+  timeEl.style.display=show?'':'none';
+  if(btn) btn.classList.toggle('on', show);
 }
 function toggleTask(i){
-  const tasks=APP.tasks||[]; const t=tasks[i]; if(!t)return;
+  const t=(APP.tasks||[])[i]; if(!t)return;
   if(!APP.questXp) APP.questXp=0;
   const xpAmt=RANK_XP[t.rank||'B']||15;
   t.done=!t.done;
-  t.doneDate=t.done?TODAY():null;
   if(t.done){
     APP.questXp+=xpAmt;
     playSfx('check');
@@ -2743,7 +2782,7 @@ function showCompletePoke(rank){
 }
 
 function showXpPop(amount,color){
-  ['questScroll','mobTaskList'].forEach(id=>{
+  ['questScroll','mobHomeQuestList','mobCalQuestList'].forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
     const p=document.createElement('div'); p.className='xp-pop'; p.textContent=`+${amount} XP`; p.style.color=color;
     el.style.position='relative'; el.appendChild(p); setTimeout(()=>p.remove(),900);
@@ -2763,14 +2802,13 @@ function switchTab(tab){
 }
 
 function switchMobTab(tab, btn){
-  const map={home:'mobTabHome',cal:'mobTabCal',tasks:'mobTabTasks',gil:'mobTabGil',claude:'mobTabClaude'};
+  const map={home:'mobTabHome',cal:'mobTabCal',gil:'mobTabGil',claude:'mobTabClaude'};
   document.querySelectorAll('.mob-tab-pane').forEach(p=>p.classList.remove('active'));
   const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   if(tab==='claude')setTimeout(()=>document.getElementById('mobChatInp')?.focus(),60);
-  if(tab==='tasks')   { renderMobTasks(); }
-  if(tab==='cal')     { renderMobMonthGrid(); renderMobTimeline(); }
+  if(tab==='cal')     { renderMobMonthGrid(); renderMobTimeline(); renderMobCalQuests(); }
   if(tab==='home')    { renderMobHomeTeasers(); }
 }
 
@@ -3130,7 +3168,8 @@ function showToast(msg){ const el=document.getElementById('toast'); el.textConte
 
 // ── INPUT HANDLERS ──
 document.getElementById('taskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
-document.getElementById('mobTaskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addMobTask();});
+document.getElementById('mobHomeTaskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addMobTask();});
+document.getElementById('mobCalTaskInp')?.addEventListener('keydown',e=>{if(e.key==='Enter')addQuestFromRow('mobCal', selectedKey);});
 document.getElementById('schedTitle')?.addEventListener('keydown',e=>{if(e.key==='Enter')addSchedItem();});
 document.getElementById('mobSchedTitle')?.addEventListener('keydown',e=>{if(e.key==='Enter')addSchedItem();});
 
