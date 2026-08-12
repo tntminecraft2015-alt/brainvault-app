@@ -303,6 +303,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-daily",
+      "findingIndex": 1,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity",
+      "findingDescription": "Habitica demonstrates that punishment alongside reward (anticipated loss) motivates harder than pure rewards, but apps like Tick Tick prove that <i>minimal</i> gamification (just streaks + a clean counter, no confetti) outperforms feature-heavy systems. Mission Control's rank badges and XP pops already exist; lean into streaks as the primary motivator (visual fill on a calendar tile, color warmth on success), drop cosmetic celebration effects, and reserve rank-ups for genuine difficulty threshol",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-11-design-research-revisions-1786428538705",
       "findingIndex": 1,
       "threadId": "thread-1786428178060-1-streaks-with-confetti-micro-animation-on",
@@ -544,10 +555,10 @@
       "source_title": "Gamification Productivity Apps: 8 Examples Analyzed (2026)",
       "source_url": "https://trophy.so/blog/productivity-gamification-examples",
       "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='margin-bottom: 16px;'>\n    <div style='color: #ff8a63; font-size: 12px; font-weight: bold; margin-bottom: 8px;'>AUG 2026 STREAK</div>\n    <div style='display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;'>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #0a1929; font-size: 10px; font-weight: bold;'>M</div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #7fffb0; width: 28px; height: 28px; border-radius: 4px;'></div>\n      <div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'></div>\n      <div style='background: #1e3a5f; width: 28px; height: 28px; border-radius: 4px; border: 1px solid #66c8ff;'></div>\n    </div>\n  </div>\n  <div style='color: #dfeeff; font-size: 13px;'>5-day streak active</div>\n  <div style='color: #ff8a63; font-size: 11px; margin-top: 8px;'>⚠ Weekend break risk</div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
