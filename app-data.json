@@ -333,6 +333,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-revisions-1786514575356",
+      "findingIndex": 0,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Competence Over Points: Mastery-Proof Dashboard Pattern",
+      "findingDescription": "The gamified productivity category is converging with identity design — not task counts but skill proof. Mission Control could show \"competence anchors\" (time-of-day proficiency, task-mode synergies, depth vs. speed trade-offs) as contextual mastery evidence tied to historical patterns, replacing generic streak punishment. Systems with great Competence but no Autonomy create a golden cage; the magic happens when all three (Competence, Autonomy, Relatedness) are present at once.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-12-design-research-budget-tracker-designs",
       "findingIndex": 2,
       "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
@@ -640,10 +651,10 @@
       "source_title": "10 Best Gamified Productivity Apps Ranked 2026 / Gamification Hub SDT Guide",
       "source_url": "https://yukaichou.com/lifestyle-gamification/best-gamified-productivity-apps/",
       "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;font-family:VT323;padding:16px;border-radius:10px;max-width:280px\">\n  <div style=\"font-size:12px;font-weight:bold;color:#66c8ff;margin-bottom:12px\">MASTERY PROFILE</div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#7fffb0\">○ Deep Work</span> 9am–12pm (62% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;margin-bottom:8px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#ff8a63\">○ Admin</span> 2pm–4pm (78% done)\n  </div>\n  <div style=\"background:#12253c;padding:8px;border-radius:6px;font-size:11px;line-height:1.5\">\n    <span style=\"color:#dfeeff\">Insight: Deep Work → Admin</span><br><span style=\"font-size:10px;color:#8fd6ff\">compounding habit (4 days)</span>\n  </div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 2,
-      "lastRating": 2,
-      "lastRatingLabel": "Kind of",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
