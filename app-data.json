@@ -304,6 +304,17 @@
   "designFeedback": [
     {
       "id": "2026-08-12-design-research-daily",
+      "findingIndex": 2,
+      "threadId": "thread-1786508871900-2-responsive-modular-architecture-bento-hi",
+      "findingTitle": "Responsive Modular Architecture: Bento Hierarchy Scaled for Mobile Native",
+      "findingDescription": "In 2026, bento box UI moved beyond static landing pages into dashboards, mobile apps, and widget-style system surfaces with interactive states and real-time data making the grid feel alive. Mission Control's mobile 5-tab nav already leans modular; extend this by ensuring card sizes adapt not just to screen size but to content priority. On desktop, the left Todos card dominates (larger area weight); on mobile, each tab becomes a self-contained bento micro-layout (todos ≈ schedule ≈ reminders). Ma",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-daily",
       "findingIndex": 1,
       "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
       "findingTitle": "Restraint in Gamification: Motivation via Loss Aversion + Streak Simplicity",
@@ -571,10 +582,10 @@
       "source_title": "Bento Grid Layout: A Modular Approach to Modern UX",
       "source_url": "https://peterdraw.studio/blog/bento-grid-layou",
       "mockup_html": "<div style='background: #0a1929; font-family: VT323, monospace; padding: 16px; border-radius: 10px;'>\n  <div style='margin-bottom: 12px;'>\n    <div style='color: #66c8ff; font-size: 10px; font-weight: bold;'>DESKTOP (3-col)</div>\n    <div style='display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; margin-top: 6px;'>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 120px;'>Todos (large)</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>Schedule</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>Reminders</div>\n    </div>\n  </div>\n  <div>\n    <div style='color: #66c8ff; font-size: 10px; font-weight: bold;'>MOBILE (tab-based)</div>\n    <div style='display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 6px;'>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f; min-height: 100px;'>[TAB 1] Todos</div>\n      <div style='background: #12253c; padding: 12px; border-radius: 8px; border: 1px solid #1e3a5f;'>[TAB 2] Schedule+Reminders</div>\n    </div>\n  </div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
