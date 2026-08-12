@@ -248,6 +248,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-12-design-research-revisions-1786515023845",
+      "date": "2026-08-12",
+      "topic": "",
+      "title": "Revisions: \"Category Labels on Donut Slices\", \"Entry-Level Micro-Rewards: Coins-for-Log (D…",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": true
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786514974095",
       "date": "2026-08-12",
       "topic": "",
@@ -774,7 +784,7 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;width:280px'><svg viewBox='0 0 200 200' style='width:100%;margin-bottom:10px'><circle cx='100' cy='100' r='60' fill='none' stroke='#7fffb0' stroke-width='20' stroke-dasharray='37.7 125.6' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='60' fill='none' stroke='#ff8a63' stroke-width='20' stroke-dasharray='62.8 125.6' stroke-dashoffset='-37.7' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='60' fill='none' stroke='#66c8ff' stroke-width='20' stroke-dasharray='25.1 125.6' stroke-dashoffset='-100.5' transform='rotate(-90 100 100)'/><text x='155' y='85' font-size='11' fill='#7fffb0' font-weight='bold'>Food</text><text x='100' y='155' font-size='11' fill='#ff8a63' font-weight='bold'>Transport</text><text x='60' y='110' font-size='11' fill='#66c8ff' font-weight='bold'>Utilities</text></svg><div style='font-size:13px;color:#dfeeff'>Food: $420 | Transport: $280 | Utilities: $140</div></div>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 4,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
@@ -786,12 +796,12 @@
     "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-": {
       "id": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
       "title": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
-      "description": "Award small coin micro-rewards for each transaction logged or habit checked, with amount and category each selected via independent scroll wheels. The coin value wheel now displays denominations down to .01 GIL (5.00, 2.50, 1.00, 0.50, 0.25, 0.10, 0.05, 0.01), letting players calibrate reward granularity precisely. This keeps the immediate dopamine hit of logging tied directly to spending visibility while supporting fractional rewards.",
+      "description": "Award fractional GIL coins instantly when players log a transaction or check a habit, with both reward amount and category selected via independent scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivation.",
       "source_title": "Guul Games: Gamification in Habit Tracking Apps",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
-      "mockup_html": "<div style=\"background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff;max-width:320px;\"><div style=\"text-align:center;margin-bottom:16px;\"><span style=\"color:#ff8a63;font-size:12px;font-weight:bold;\">COIN REWARD</span></div><div style=\"display:flex;gap:12px;justify-content:center;align-items:center;margin-bottom:16px;\"><div style=\"text-align:center;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:8px;\">AMOUNT</div><div style=\"background:#12253c;border:2px solid #ff8a63;border-radius:6px;padding:8px;width:60px;text-align:center;font-size:14px;color:#7fffb0;\">0.50</div></div><div style=\"font-size:12px;color:#ff8a63;\">GIL</div><div style=\"text-align:center;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:8px;\">TYPE</div><div style=\"background:#12253c;border:2px solid #ff8a63;border-radius:6px;padding:8px;width:80px;text-align:center;font-size:12px;color:#66c8ff;\">Training</div></div></div><div style=\"font-size:11px;color:#8fd6ff;text-align:center;margin-top:12px;\">↻ spin each wheel independently</div></div>",
-      "status": "generating",
-      "revisionCount": 2,
+      "mockup_html": "<div style=\"background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;font-family:VT323;max-width:280px\"><div style=\"font-size:12px;margin-bottom:12px;color:#8fd6ff\">LOG TRANSACTION</div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">REWARD AMOUNT</div><div style=\"display:flex;justify-content:center;gap:8px;font-size:14px;font-weight:bold;color:#ff8a63\">0 . 5 0 ▲</div></div><div style=\"background:#12253c;padding:12px;border-radius:8px;margin-bottom:10px\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:6px\">CATEGORY</div><div style=\"text-align:center;font-size:13px\">EXPENSE ▲</div></div><button style=\"width:100%;background:#ff8a63;color:#0a1929;border:none;padding:8px;border-radius:6px;font-family:VT323;cursor:pointer;font-weight:bold\">CONFIRM +0.50 GIL</button><div style=\"margin-top:8px;text-align:center;font-size:11px;color:#7fffb0\">+0.50 GIL ✓</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 3,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
       "lastComment": "",
