@@ -540,3 +540,16 @@ Tasks synced for 2026-08-12: 0/2 complete
 **Pages created:** [[daily-tasks-2026-08-12]]
 
 Tasks synced for 2026-08-12: 0/0 complete
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-12-design-research-budget-tracker-designs]]
+
+Design research: Budget Dashboard Clarity: Hierarchy, Visual Grouping & Micro-Rewards (3 findings)
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via Design Lab: Smart Tile Hierarchy: Variable-Size Cards for Financial KPIs
