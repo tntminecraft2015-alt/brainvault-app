@@ -313,6 +313,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-12-design-research-revisions-1786508962559",
+      "findingIndex": 0,
+      "threadId": "thread-1786508871900-1-restraint-in-gamification-motivation-via",
+      "findingTitle": "Identity Alignment Over Loss Aversion: Autonomy-First Motivation via Mastery Feedback",
+      "findingDescription": "When a platform aligns with a user's self-concept, it strengthens intrinsic motivation and persistence. Instead of streaks that punish missing days, Mission Control could reframe daily todo completion as evidence of a chosen identity (e.g., 'organized practitioner', 'focused builder') and highlight *genuine progress toward mastery* via contextual feedback tied to task tags and historical patterns—showing which work modes compound or conflict, what times of day yield depth. This shifts motivation",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
       "id": "2026-08-12-design-research-daily",
       "findingIndex": 2,
       "threadId": "thread-1786508871900-2-responsive-modular-architecture-bento-hi",
@@ -576,10 +587,10 @@
       "source_title": "Digital tracking, gamification, social media, and AI: How technology influences motivation - Wiley Consumer Psychology Review (2026)",
       "source_url": "https://myscp.onlinelibrary.wiley.com/doi/10.1002/arcp.70004",
       "mockup_html": "<style>body{background:#0a1929;font-family:VT323;margin:0;padding:16px;color:#dfeeff}.id-card{background:#12253c;border:2px solid #ff8a63;border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:inset 0 0 0 1px #ff8a63}.id-stat{font-size:12px;color:#8fd6ff;margin:4px 0}.id-tag{display:inline-block;background:#1e3a5f;color:#66c8ff;padding:2px 6px;border-radius:6px;font-size:10px;margin-right:4px;margin-top:4px}.progress-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px}.progress-bar{flex:1;height:8px;background:#1e3a5f;border-radius:4px;overflow:hidden}.progress-fill{height:100%;background:#7fffb0;width:72%}.meta{font-size:9px;color:rgba(223,238,255,0.45);margin-top:4px}</style><div class='id-card'><strong>You this week</strong><div class='id-stat'>→ Pattern: depth mode (morning focus blocks)</div><div class='id-stat'>✓ Consistency: 5 of 7 days</div><div class='id-tag'>focus</div><div class='id-tag'>solo-work</div><div class='progress-row'><span>Mastery signal:</span><div class='progress-bar'><div class='progress-fill'></div></div></div><div class='meta'>Similar pattern compounds: +3% average task completion depth when paired with 'no-meeting mornings'</div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 1,
-      "lastRating": 1,
-      "lastRatingLabel": "Not even close",
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
