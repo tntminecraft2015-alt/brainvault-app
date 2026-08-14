@@ -170,9 +170,11 @@ Produce a lint report. Fix obvious structural issues (orphans, missing links). F
 
 Mission Control (`mission-control.html` + `server.js`) is a separate app living in this same repo, pushed to the `app` remote (see "Mission Control git remotes" — not the wiki). Neither ED (chat assistant) nor Red (design researcher) can edit code themselves, so both queue requests instead of acting on them directly, via `change-requests/*.md` (frontmatter `status: pending`, `requested_via: "ED chat"` or `"Design Lab"`):
 - **ED** writes a full spec (what was asked + implementation notes) when the human asks it for a Mission Control change mid-conversation.
-- **Red** — from the Design Lab slideshow, the human can hit "+ QUEUE THIS DESIGN" on any finding to queue that design idea as-is (title/description/source), no LLM spec-writing involved.
+- **Red** — from the Design Lab slideshow, rating a finding "Got it ✓" auto-queues that finding as-is: title/description/source, plus Red's own mockup HTML embedded as a fenced code block under "Red's mockup for this finding" in the Implementation notes — treat that mockup as the concrete visual reference (real colors, real layout), not just the prose above it.
 
 Both log a `note` entry in `wiki/log.md` when queued.
+
+**Two places hold the same queue, and they can drift — `app-data.json`'s `changeRequests` array is authoritative for status; the `.md` file is a disposable, human-readable mirror of one request's spec.** The app's own UI (Change Queue modal, ED's pending-queue context) reads only from `app-data.json`, so if you flip a `.md` file's frontmatter without also updating its array entry, the app will keep showing it as pending forever.
 
 **This is a pull queue, not an auto-run one — do not implement pending requests just because a session started.** At the start of a session it's fine to check what's waiting and mention the count/titles to the human, but only implement when the human explicitly says to run the queue (e.g. "run the queue," "do the queued changes"):
 ```
@@ -180,9 +182,9 @@ grep -l "status: pending" change-requests/*.md
 ```
 
 When told to run the queue, for each pending request:
-1. Read the file — it has a "What the user asked for" section (intent) and an "Implementation notes" section (spec).
+1. Read the file — it has a "What the user asked for" section (intent) and an "Implementation notes" section (spec, plus Red's mockup HTML if it came from Design Lab).
 2. Implement the change in `mission-control.html` / `server.js`.
-3. Flip the file's frontmatter to `status: done` (or delete it — either is fine, the file is disposable once implemented).
+3. Mark it done in **both** places, together, as one step: delete the `change-requests/<id>.md` file, and in `app-data.json` find the matching entry in `changeRequests` (same `id`) and set its `status` to `"done"`. Skipping either half leaves the queue in a state that contradicts itself.
 4. Ask the human before pushing to the `app` remote (pushing deploys live to Render).
 
 Don't treat these specs as gospel — both ED and Red are Haiku-model agents improvising from one conversation or one finding, not a design doc; use judgment same as any other feature request.
