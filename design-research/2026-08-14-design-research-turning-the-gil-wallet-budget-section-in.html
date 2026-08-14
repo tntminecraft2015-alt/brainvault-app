@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Banking-App Money Tracker: Multi-Account Architecture, Bill Reminders &amp; Spending Trends</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Banking-App Money Tracker: Multi-Account Architecture, Bill Reminders &amp; Spending Trends</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">A 2026-grade finance dashboard handles four core surfaces: a balance/net-worth view with KPIs, a cash flow/income-vs-expenses view, a transactions/accounts feed, and a budgets/goals view. Mission Control can level up its GIL WALLET by adopting real banking-app patterns: multi-account support with balance display, institution name, account type indicator, and connection status separates a toy demo from a template you can actually ship. These three findings combine visual hierarchy, gamified bill tracking, and trend charts—all styled as JRPG battle-menu cards.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: turning the GIL WALLET budget section into a full banking-app style money tracker: multiple accounts with individual balances, recurring bill reminders, spending trend charts over time, and multiple s</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Stacked Account Cards with Quick-Glance Balances</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">A mobile view stacks summary cards in a single column, perfect for a quick scroll, while a web view expands into a multi-column layout, showing more detailed charts side-by-side. Each account becomes a bento card showing type icon (checking, savings, credit), current balance in large type, and a small sparkline trending this month. Tapping opens a detail view with recent txns and recurring bills tied to that account.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://market.gluestack.io/blog/personal-finance-dashboard" target="_blank" rel="noopener" style="color:#ff8a63;">Build a Production-Ready Personal Finance Dashboard</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; padding: 20px; font-family: 'VT323', monospace; color: #dfeeff; border: 3px solid #1a2533; border-radius: 10px;&quot;&gt;&lt;div style=&quot;display: grid; gap: 12px; grid-template-columns: 1fr 1fr;&quot;&gt;&lt;div style=&quot;background: #12253c; padding: 14px; border: 2px solid #ff8a63; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(255,138,99,0.3);&quot;&gt;&lt;div style=&quot;font-size: 9px; color: #8fd6ff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;&quot;&gt;Checking&lt;/div&gt;&lt;div style=&quot;font-size: 18px; font-weight: bold; color: #7fffb0; margin-bottom: 6px;&quot;&gt;$2,847.32&lt;/div&gt;&lt;div style=&quot;height: 20px; background: #0c1422; border-radius: 3px; overflow: hidden;&quot;&gt;&lt;div style=&quot;width: 68%; height: 100%; background: linear-gradient(90deg, #66c8ff, #ff8a63); opacity: 0.8;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background: #12253c; padding: 14px; border: 2px solid #66c8ff; border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(102,200,255,0.3);&quot;&gt;&lt;div style=&quot;font-size: 9px; color: #8fd6ff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;&quot;&gt;Savings&lt;/div&gt;&lt;div style=&quot;font-size: 18px; font-weight: bold; color: #7fffb0; margin-bottom: 6px;&quot;&gt;$5,120.00&lt;/div&gt;&lt;div style=&quot;height: 20px; background: #0c1422; border-radius: 3px; overflow: hidden;&quot;&gt;&lt;div style=&quot;width: 85%; height: 100%; background: linear-gradient(90deg, #66c8ff, #66c8ff); opacity: 0.8;&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;margin-top: 8px; font-size: 7px; color: #8fd6ff; text-transform: uppercase; letter-spacing: 0.5px;&quot;&gt;💰 TOTAL NET WORTH: $7,967.32&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Bill Reminders Panel: Color-Coded by Due Date + Recurring Badge</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Bills Organizer &amp; Reminder has dashboard-style views that allow you quickly see approaching bills, and it sends payment reminders for upcoming bills before due date. A collapsible "ALL RECURRING BILLS" section shows an overdue/this-week/next-month grouping. Each bill is a small rank-badge-style row: red accent if due within 3 days, yellow if this week, green if next 30 days. Tap to toggle paid/skip, long-press to edit.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://apps.apple.com/us/app/bills-organizer-reminder/id1352782733" target="_blank" rel="noopener" style="color:#ff8a63;">Bills Organizer &amp; Reminder - App Store</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; padding: 16px; font-family: 'VT323', monospace; color: #dfeeff; border: 3px solid #1a2533; border-radius: 10px;&quot;&gt;&lt;div style=&quot;margin-bottom: 8px; font-size: 9px; text-transform: uppercase; color: #8fd6ff; letter-spacing: 1px;&quot;&gt;ALL RECURRING BILLS&lt;/div&gt;&lt;div style=&quot;display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;&quot;&gt;&lt;div style=&quot;background: #12253c; padding: 8px 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ff8080;&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;div style=&quot;font-size: 12px; font-weight: bold;&quot;&gt;Netflix&lt;/div&gt;&lt;div style=&quot;font-size: 8px; color: #8fd6ff;&quot;&gt;Due in 2d&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #ff8080; font-weight: bold;&quot;&gt;$15.99&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background: #12253c; padding: 8px 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #ffb566;&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;div style=&quot;font-size: 12px; font-weight: bold;&quot;&gt;Rent&lt;/div&gt;&lt;div style=&quot;font-size: 8px; color: #8fd6ff;&quot;&gt;Due Sun&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #ffb566; font-weight: bold;&quot;&gt;$1,200&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background: #12253c; padding: 8px 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #7fffb0;&quot;&gt;&lt;div style=&quot;flex: 1;&quot;&gt;&lt;div style=&quot;font-size: 12px; font-weight: bold;&quot;&gt;Insurance&lt;/div&gt;&lt;div style=&quot;font-size: 8px; color: #8fd6ff;&quot;&gt;Due 14 Aug&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 11px; color: #7fffb0; font-weight: bold;&quot;&gt;$87.50&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 8px; text-align: center; color: #8fd6ff; text-transform: uppercase;&quot;&gt;✓ mark paid · ↻ skip · ⊕ add&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Spending Trend Chart: Line Graph with Category Breakdown Toggle</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Customizable charts reveal where money's going—whether tracking spending trends, income, or net worth over time, reports help turn raw data into insights you can act on. A compact line chart shows 12-week spend trend; tapping it expands to show category breakdown (pie or bar). Fits as a tall bento card in the GIL WALLET tab. Color-codes by category (Groceries=green, Subscriptions=blue, etc.) matching existing kind-chip system.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.monarch.com/" target="_blank" rel="noopener" style="color:#ff8a63;">Track, Budget, Plan and Manage Money in One Place | Monarch</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background: #0a1929; padding: 16px; font-family: 'VT323', monospace; color: #dfeeff; border: 3px solid #1a2533; border-radius: 10px;&quot;&gt;&lt;div style=&quot;margin-bottom: 10px; font-size: 9px; text-transform: uppercase; color: #8fd6ff; letter-spacing: 1px;&quot;&gt;SPENDING TRENDS&lt;/div&gt;&lt;svg viewBox=&quot;0 0 160 80&quot; style=&quot;width: 100%; height: 100px; background: #12253c; border-radius: 6px; padding: 8px; box-sizing: border-box;&quot;&gt;&lt;polyline points=&quot;10,60 30,55 50,45 70,50 90,35 110,40 130,25 150,30&quot; fill=&quot;none&quot; stroke=&quot;#66c8ff&quot; stroke-width=&quot;2&quot; vector-effect=&quot;non-scaling-stroke&quot;/&gt;&lt;circle cx=&quot;10&quot; cy=&quot;60&quot; r=&quot;2&quot; fill=&quot;#ff8a63&quot;/&gt;&lt;circle cx=&quot;150&quot; cy=&quot;30&quot; r=&quot;2&quot; fill=&quot;#ff8a63&quot;/&gt;&lt;/svg&gt;&lt;div style=&quot;display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; font-size: 8px;&quot;&gt;&lt;div style=&quot;background: #1e3a5f; padding: 6px; border-radius: 4px; border-left: 3px solid #7fffb0;&quot;&gt;&lt;div style=&quot;color: #8fd6ff;&quot;&gt;Groceries&lt;/div&gt;&lt;div style=&quot;font-size: 10px; color: #7fffb0; font-weight: bold;&quot;&gt;$342&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;background: #1e3a5f; padding: 6px; border-radius: 4px; border-left: 3px solid #66c8ff;&quot;&gt;&lt;div style=&quot;color: #8fd6ff;&quot;&gt;Subscriptions&lt;/div&gt;&lt;div style=&quot;font-size: 10px; color: #66c8ff; font-weight: bold;&quot;&gt;$58&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-14-design-research-turning-the-gil-wallet-budget-section-in";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Stacked Account Cards with Quick-Glance Balances","description":"A mobile view stacks summary cards in a single column, perfect for a quick scroll, while a web view expands into a multi-column layout, showing more detailed charts side-by-side. Each account becomes a bento card showing type icon (checking, savings, credit), current balance in large type, and a small sparkline trending this month. Tapping opens a detail view with recent txns and recurring bills tied to that account.","source_title":"Build a Production-Ready Personal Finance Dashboard","source_url":"https://market.gluestack.io/blog/personal-finance-dashboard","threadId":"thread-1786679563492-0-stacked-account-cards-with-quick-glance-"},{"title":"Bill Reminders Panel: Color-Coded by Due Date + Recurring Badge","description":"Bills Organizer & Reminder has dashboard-style views that allow you quickly see approaching bills, and it sends payment reminders for upcoming bills before due date. A collapsible \"ALL RECURRING BILLS\" section shows an overdue/this-week/next-month grouping. Each bill is a small rank-badge-style row: red accent if due within 3 days, yellow if this week, green if next 30 days. Tap to toggle paid/skip, long-press to edit.","source_title":"Bills Organizer & Reminder - App Store","source_url":"https://apps.apple.com/us/app/bills-organizer-reminder/id1352782733","threadId":"thread-1786679563492-1-bill-reminders-panel-color-coded-by-due-"},{"title":"Spending Trend Chart: Line Graph with Category Breakdown Toggle","description":"Customizable charts reveal where money's going—whether tracking spending trends, income, or net worth over time, reports help turn raw data into insights you can act on. A compact line chart shows 12-week spend trend; tapping it expands to show category breakdown (pie or bar). Fits as a tall bento card in the GIL WALLET tab. Color-codes by category (Groceries=green, Subscriptions=blue, etc.) matching existing kind-chip system.","source_title":"Track, Budget, Plan and Manage Money in One Place | Monarch","source_url":"https://www.monarch.com/","threadId":"thread-1786679563492-2-spending-trend-chart-line-graph-with-cat"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
