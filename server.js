@@ -288,7 +288,9 @@ function buildSystemPrompt(userMessage) {
     ? memory.map(m => `- id: ${m.id} | [${m.date}] ${m.text}`).join('\n')
     : '(nothing remembered yet)';
 
-  const persona = `You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have four jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, (3) take requests to change Mission Control itself (the app's UI/behavior), and (4) act on real requests using your action tools (add_task, log_expense) instead of just talking about them. Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. Be concise — this is a chat window, not an essay. You are a separate persona from Red, who only runs design research for the app itself.
+  const persona = `You are ED. Read this first, it governs every reply you write, before anything else in this prompt: you talk to the user like a coworker who sits near them — lighthearted, casual, low-effort banter, not an assistant delivering a briefing. Real chat messages are short. Most of your replies should be ONE TO THREE SENTENCES. A reply that's a single sentence, or even just "yep, on it" or "lol fair," is a complete, good reply — you do not need to add context, caveats, or a follow-up offer to every message. Do not write multi-paragraph replies unless the user explicitly asks for something long-form (a spec, a list, a full explanation) — a quick question gets a quick answer, not full coverage of the topic from every angle. No headers, no bullet-point walls, no "let me know if you'd like more detail" tacked onto the end. If you catch yourself writing a third paragraph, stop and cut it down. This is a hard standing rule, not one preference among several to balance.
+
+You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have four jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, (3) take requests to change Mission Control itself (the app's UI/behavior), and (4) act on real requests using your action tools (add_task, log_expense) instead of just talking about them. Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. You are a separate persona from Red, who only runs design research for the app itself.
 
 Be honest about what you can and can't actually do. Your only real actions are the tools below plus web search — you cannot edit code, and you cannot directly delete or modify anything you don't have a tool for. Never say you've done something (queued a change, removed a change, added a task, logged an expense, remembered something, etc.) unless you actually called the matching tool and it returned success in this same turn. If the user asks whether you can do something, or asks you to do something you have no tool for, say plainly that you can't and explain what your real options are (e.g. queuing it as a change request instead) — don't guess or role-play compliance.
 
@@ -354,6 +356,7 @@ app.post('/api/data', (req, res) => {
     if (patch.questXp        !== undefined) data.questXp        = patch.questXp;
     if (patch.caughtPoke     !== undefined) data.caughtPoke     = patch.caughtPoke;
     if (patch.savings        !== undefined) data.savings        = patch.savings;
+    if (patch.savingsGoals   !== undefined) data.savingsGoals   = patch.savingsGoals;
     const date = req.body._date || today();
     recalcStreak(data, date);
     saveAppData(data);
@@ -512,7 +515,7 @@ function addEdTask({ text, rank }) {
 }
 
 // Mirrors BUDGET_CATS keys in mission-control.html — keep in sync if that list changes.
-const BUDGET_CATEGORY_KEYS = ['food', 'rent', 'transport', 'fun', 'health', 'income', 'other'];
+const BUDGET_CATEGORY_KEYS = ['food', 'rent', 'transport', 'fun', 'health', 'income', 'savings', 'other'];
 
 const LOG_EXPENSE_TOOL = {
   name: 'log_expense',
@@ -911,6 +914,21 @@ function buildLiveAppFacts() {
   for (const m of scriptBlocks.matchAll(/function\s+([a-zA-Z0-9_]+)\s*\(/g)) funcNames.add(m[1]);
   const funcList = [...funcNames].sort().join(', ');
 
+  // Literal UI copy pulled straight from the real markup, so Red reuses the app's actual
+  // words (e.g. "GIL WALLET", "REMAINING") instead of inventing new names for the same thing.
+  const vocab = new Set();
+  const copyPatterns = [
+    /<button[^>]*>\s*([^<{][^<]{1,39})\s*<\/button>/g,
+    /class="[^"]*(?:label|title|kicker|tab-txt|m-label)[^"]*"[^>]*>\s*([A-Za-z][^<{]{1,39})\s*</g,
+  ];
+  for (const re of copyPatterns) {
+    for (const m of html.matchAll(re)) {
+      const t = m[1].replace(/\s+/g, ' ').trim();
+      if (t && /[a-zA-Z]{2,}/.test(t)) vocab.add(t);
+    }
+  }
+  const vocabList = [...vocab].slice(0, 80).join(' · ');
+
   return `Current CSS custom properties (use these exact values, not whatever the design doc above says):
 ${cssVars}
 
@@ -918,7 +936,20 @@ CSS class-name groups present in the real file (prefix(count) — tells you what
 ${classInventory}
 
 Client-side function names already defined (self-documenting — don't propose something that duplicates one of these):
-${funcList}`;
+${funcList}
+
+Real UI copy/terminology already used in the live app (reuse these exact words/labels for existing concepts instead of inventing new ones — e.g. if the app already says "GIL WALLET" or "REMAINING", say that, don't rename it):
+${vocabList || '(none extracted)'}`;
+}
+
+// Pulls the live :root hex values as a flat "--var: #hex" list, for embedding real current
+// colors into mockup instructions instead of a fixed palette that can drift from reality.
+function extractLiveHexPalette() {
+  const html = readVault('mission-control.html');
+  const rootMatch = html && html.match(/:root\s*\{([\s\S]*?)\}/);
+  if (!rootMatch) return 'bg: #0a1929, surface: #12253c, darker: #1e3a5f, fg: #dfeeff, accent: #ff8a63';
+  const pairs = [...rootMatch[1].matchAll(/(--[a-zA-Z0-9-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g)].map(m => `${m[1]}: ${m[2]}`);
+  return pairs.length ? pairs.join(', ') : 'bg: #0a1929, surface: #12253c, darker: #1e3a5f, fg: #dfeeff, accent: #ff8a63';
 }
 
 // What's already been asked for, queued, implemented, or researched before — so Red
@@ -990,7 +1021,7 @@ Respond with ONLY a fenced \`\`\`json code block (no other prose before or after
   "title": "short title for this research run",
   "summary": "2-3 sentence overview of what you found",
   "findings": [
-    ${FINDING_JSON_SCHEMA}
+    ${buildFindingSchema()}
   ]
 }
 Produce exactly 3 findings. Keep everything concise — this is a budget-conscious run.`;
@@ -1017,13 +1048,16 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
   return parsed;
 }
 
-const FINDING_JSON_SCHEMA = `{
+function buildFindingSchema() {
+  const palette = extractLiveHexPalette();
+  return `{
   "title": "short name of the pattern/idea",
   "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
   "source_title": "name of the site/app it's drawn from",
   "source_url": "https://...",
-  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own palette using these hardcoded hex values: bg #0a1929, surface #12253c, darker #1e3a5f, fg #dfeeff, accent #ff8a63, green #7fffb0. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box."
+  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own look. This mockup renders in an isolated sandboxed iframe with no access to the real site's stylesheet, so hardcode these CURRENT real hex values pulled live from the app right now (do not invent or approximate different ones): ${palette}. Reuse the app's real class-naming conventions and its exact terminology/wording from the LIVE APP FACTS section above (its UI copy list and CSS class-name groups) instead of inventing new labels or class names for things that already exist. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box."
 }`;
+}
 
 // Produces one revised finding for an open thread, per the tier rules: rating 1 switches
 // direction entirely (fresh search), rating 2 refines the same direction (fresh search),
@@ -1070,7 +1104,7 @@ ${thread.source_url ? `Source: ${thread.source_title || thread.source_url} (${th
 ${instruction}
 
 Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema — produce exactly ONE revised finding:
-${FINDING_JSON_SCHEMA}
+${buildFindingSchema()}
 Keep it concise — this is a budget-conscious run.`;
 
   const resp = await anthropic.messages.create({
@@ -1186,7 +1220,7 @@ function buildSlideshowHtml(id, topic, result) {
   <div class="nav">
     <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
     <div class="dots" id="dots"></div>
-    <button id="nextBtn" onclick="go(1)">NEXT ▶</button>
+    <button id="nextBtn" onclick="next()">NEXT ▶</button>
   </div>
 <script>
   const RESEARCH_ID = ${JSON.stringify(id)};
@@ -1194,6 +1228,7 @@ function buildSlideshowHtml(id, topic, result) {
   const FINDINGS = ${JSON.stringify(result.findings.map(f => ({
     title: f.title || '', description: f.description || '',
     source_title: f.source_title || '', source_url: f.source_url || '',
+    mockup_html: f.mockup_html || '',
     threadId: f.threadId || null,
   })))};
 
@@ -1222,7 +1257,7 @@ function buildSlideshowHtml(id, topic, result) {
         const qr = await fetch('/api/change-requests', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url }),
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
         });
         const qd = await qr.json();
         if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
@@ -1276,9 +1311,18 @@ function buildSlideshowHtml(id, topic, result) {
     document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
     document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
     document.getElementById('prevBtn').disabled = cur === 0;
-    document.getElementById('nextBtn').disabled = cur === total - 1;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
   }
   function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
   document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
   let touchX = null;
   document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
@@ -1489,6 +1533,37 @@ app.get('/api/design-research', (req, res) => {
   res.json({ runs: data.designResearch || [] });
 });
 
+// Surfaces what Red actually sees/has learned — the same feedback digest and known-work
+// history injected into its own prompts — so the user can check it's really progressing,
+// not just talking about it.
+app.get('/api/design-research/learnings', (req, res) => {
+  const data = getAppData();
+  const feedback = data.designFeedback || [];
+  const ratingCounts = [0, 0, 0, 0, 0];
+  feedback.forEach(f => { if (Number.isInteger(f.rating) && f.rating >= 1 && f.rating <= 5) ratingCounts[f.rating - 1]++; });
+
+  const threads = Object.values(data.designThreads || {});
+  const statusCounts = {};
+  threads.forEach(t => { statusCounts[t.status] = (statusCounts[t.status] || 0) + 1; });
+
+  const runs = (data.designResearch || []);
+  const recentRuns = runs.slice(0, 12).map(r => ({ id: r.id, date: r.date, title: r.title, topic: r.topic || null, isRevision: !!r.isRevision }));
+
+  res.json({
+    ok: true,
+    totalRuns: runs.length,
+    totalFeedback: feedback.length,
+    ratingLabels: RATING_LABELS,
+    ratingCounts,
+    statusCounts,
+    threadCount: threads.length,
+    recentFeedback: feedback.slice(0, 15).map(f => ({ title: f.findingTitle, ratingLabel: f.ratingLabel, comment: f.comment || null, date: f.date })),
+    recentRuns,
+    calibrationDigest: buildFeedbackDigest(),
+    knownWorkDigest: buildKnownWorkDigest(),
+  });
+});
+
 app.get('/api/change-requests', (req, res) => {
   const data = getAppData();
   res.json({ requests: data.changeRequests || [] });
@@ -1497,11 +1572,13 @@ app.get('/api/change-requests', (req, res) => {
 // Queues a Design Lab finding directly — no LLM call, the finding text IS the spec.
 app.post('/api/change-requests', (req, res) => {
   try {
-    const { title, description, source_title, source_url } = req.body || {};
+    const { title, description, source_title, source_url, mockup_html } = req.body || {};
     if (!title) return res.status(400).json({ error: 'Missing title' });
-    const details = source_url
-      ? `${description || ''}\n\nSource: [${source_title || source_url}](${source_url})`
-      : (description || '');
+    const sourceLine = source_url ? `\n\nSource: [${source_title || source_url}](${source_url})` : '';
+    const mockupBlock = mockup_html
+      ? `\n\nRed's mockup for this finding — treat this as the concrete visual reference, not just the prose above:\n\`\`\`html\n${mockup_html}\n\`\`\``
+      : '';
+    const details = `${description || ''}${sourceLine}${mockupBlock}`;
     const result = queueCodeChange({
       title,
       description: 'Liked this Design Lab finding from Red and queued it for implementation.',
