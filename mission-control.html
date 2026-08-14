@@ -15,6 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chrono-node@2/dist/chrono.min.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    button, input, select, textarea { font:inherit; color:inherit; }
 
     :root {
       --bezel:      #1a2533;
@@ -37,7 +38,7 @@
       --r-pill:     999px;
     }
 
-    html, body { width:100%; height:100%; background:#000; overflow:hidden; image-rendering:pixelated; }
+    html, body { width:100%; height:100%; background:#000; color:var(--fg); overflow:hidden; image-rendering:pixelated; }
     .px { font-family:'Press Start 2P',ui-monospace,monospace; letter-spacing:1px; }
 
     @keyframes blink      { 50%{ opacity:0; } }
@@ -464,9 +465,10 @@
     .cq-row-head:hover, .cq-row-head:active { background:rgba(223,238,255,.06); }
     .cq-row-title { display:flex; align-items:center; gap:7px; min-width:0; flex:1; }
     .cq-src-icon  { flex-shrink:0; font-size:15px; }
-    .cq-title-text{ font-family:'VT323',monospace; font-size:18px; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .cq-row-meta  { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-    .cq-date      { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
+    .cq-title-text{ font-family:'VT323',monospace; font-size:19px; line-height:1.25; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cq-row-preview{ font-family:'VT323',monospace; font-size:15px; line-height:1.3; color:var(--fg-dim); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .cq-row-meta  { display:flex; align-items:center; gap:8px; flex-shrink:0; align-self:flex-start; }
+    .cq-date      { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); }
     .cq-status    { font-family:'Press Start 2P',monospace; font-size:5px; padding:3px 6px; border-radius:var(--r-pill); white-space:nowrap; }
     .cq-status.pending { color:var(--accent); background:rgba(255,138,99,.14); }
     .cq-status.done    { color:var(--green); background:rgba(127,255,176,.12); }
@@ -476,7 +478,7 @@
     .cq-row.open .cq-row-detail { max-height:700px; padding:0 10px 12px; }
     .cq-detail-desc  { font-family:'VT323',monospace; font-size:16px; line-height:1.4; color:var(--fg); opacity:.9; margin-bottom:8px; white-space:pre-wrap; }
     .cq-detail-label { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); margin-bottom:4px; letter-spacing:1px; }
-    .cq-detail-notes { font-family:'VT323',monospace; font-size:15px; line-height:1.4; opacity:.75; margin-bottom:10px; white-space:pre-wrap; }
+    .cq-detail-notes { font-family:'VT323',monospace; font-size:15px; line-height:1.4; opacity:.88; margin-bottom:10px; white-space:pre-wrap; }
     .cq-detail-footer{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
     .cq-detail-path  { font-family:monospace; font-size:11px; opacity:.4; }
     .cq-cancel-btn   { font-family:'Press Start 2P',monospace; font-size:6px; background:none; border:1px solid rgba(255,64,64,.35); color:#ff8a8a; padding:6px 10px; border-radius:var(--r-sm); cursor:pointer; transition:background .1s,border-color .1s; }
@@ -495,6 +497,7 @@
       #changeQueueModal .key-info { font-size:16px; line-height:1.4; }
       #changeQueueModal #cqList { flex:1; max-height:none; }
       #changeQueueModal .cq-title-text  { font-size:21px; }
+      #changeQueueModal .cq-row-preview{ font-size:16px; }
       #changeQueueModal .cq-detail-desc { font-size:18px; }
       #changeQueueModal .cq-detail-notes{ font-size:17px; }
       #changeQueueModal .cq-row-head    { padding:14px 12px; min-height:44px; }
@@ -1287,14 +1290,14 @@ const KIND_POKE_TYPE = {
   routine: { label:'NORMAL',  icon:'⭐' },
 };
 const BUDGET_CATS = {
-  food:      { icon:'🍖', label:'PROVISIONS' },
-  rent:      { icon:'🏠', label:'SHELTER'    },
-  transport: { icon:'⚡', label:'TRAVEL'     },
-  fun:       { icon:'🎮', label:'RECREATION' },
-  health:    { icon:'💊', label:'RECOVERY'   },
-  income:    { icon:'💰', label:'GIL IN'     },
-  savings:   { icon:'🎯', label:'VAULT'      },
-  other:     { icon:'⭐', label:'MISC'       },
+  food:      { icon:'🍖', label:'PROVISIONS', color:'#ff8a63' },
+  rent:      { icon:'🏠', label:'SHELTER',    color:'#66c8ff' },
+  transport: { icon:'⚡', label:'TRAVEL',     color:'#7fffb0' },
+  fun:       { icon:'🎮', label:'RECREATION', color:'#c792ea' },
+  health:    { icon:'💊', label:'RECOVERY',   color:'#ff8080' },
+  income:    { icon:'💰', label:'GIL IN',     color:'#7fffb0' },
+  savings:   { icon:'🎯', label:'VAULT',      color:'#ffd166' },
+  other:     { icon:'⭐', label:'MISC',       color:'#9aa5b1' },
 };
 const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTHS_S    = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
@@ -1906,8 +1909,32 @@ function parseQuickAdd(){
   document.getElementById('devTitle').focus();
 }
 function onNotifyToggle(prefix){ const on=document.getElementById(prefix+'Notify').checked; document.getElementById(prefix+'NotifyLead').style.display=on?'':'none'; }
-function addDayEvent(){ const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;} if(!APP.events[dayModalDate])APP.events[dayModalDate]=[]; const notify=document.getElementById('devNotify').checked; APP.events[dayModalDate].push({title,time:document.getElementById('devTime').value,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('devNotifyLead').value,10):null}); patchData({events:APP.events}); renderDevList(dayModalDate); renderMobMonthGrid(); ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; showToast('Event added ◆'); }
-function deleteDayEv(key,idx){ if(APP.events[key]){APP.events[key].splice(idx,1);if(!APP.events[key].length)delete APP.events[key];} patchData({events:APP.events}); renderDevList(key); renderMobMonthGrid(); }
+function addDayEvent(){
+  const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;}
+  if(!APP.events[dayModalDate])APP.events[dayModalDate]=[];
+  const notify=document.getElementById('devNotify').checked;
+  const time=document.getElementById('devTime').value;
+  const ev={id:genLinkId(),title,time,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('devNotifyLead').value,10):null};
+  APP.events[dayModalDate].push(ev);
+  if(!Array.isArray(APP.tasks)) APP.tasks=[];
+  const task={id:genLinkId(),text:title,done:false,rank:'B',date:dayModalDate,time:time||null,linkedEventId:ev.id};
+  APP.tasks.push(task);
+  ev.linkedTaskId=task.id;
+  patchData({events:APP.events, tasks:APP.tasks});
+  renderDevList(dayModalDate); renderMobMonthGrid(); renderMobTasks();
+  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; showToast('Event added ◆');
+}
+function deleteDayEv(key,idx){
+  if(!APP.events[key])return;
+  const ev=APP.events[key][idx];
+  APP.events[key].splice(idx,1); if(!APP.events[key].length)delete APP.events[key];
+  patchData({events:APP.events});
+  if(ev?.linkedTaskId && Array.isArray(APP.tasks)){
+    const ti=APP.tasks.findIndex(t=>t.id===ev.linkedTaskId);
+    if(ti>-1){ APP.tasks.splice(ti,1); saveTasks(); renderMobTasks(); }
+  }
+  renderDevList(key); renderMobMonthGrid();
+}
 
 // ══════════════════════════════════════════════════════════════
 // TIMELINE + STREAK
@@ -2039,8 +2066,15 @@ function saveEditEvent(){
   const title=document.getElementById('editEvTitle').value.trim();
   if(!title){showToast('Enter event title');return;}
   const notify=document.getElementById('editEvNotify').checked;
-  APP.events[editEvKey][editEvIdx]={title,time:document.getElementById('editEvTime').value,location:document.getElementById('editEvLoc').value.trim(),kind:document.getElementById('editEvKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('editEvNotifyLead').value,10):null};
+  const prev=APP.events[editEvKey][editEvIdx];
+  const time=document.getElementById('editEvTime').value;
+  const ev={id:prev?.id||genLinkId(),title,time,location:document.getElementById('editEvLoc').value.trim(),kind:document.getElementById('editEvKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('editEvNotifyLead').value,10):null,linkedTaskId:prev?.linkedTaskId};
+  APP.events[editEvKey][editEvIdx]=ev;
   patchData({events:APP.events});
+  if(ev.linkedTaskId && Array.isArray(APP.tasks)){
+    const t=APP.tasks.find(x=>x.id===ev.linkedTaskId);
+    if(t){ t.text=title; t.time=time||null; saveTasks(); renderMobTasks(); }
+  }
   renderDevList(editEvKey); renderMobMonthGrid();
   closeModal('editEventModal'); showToast('Event updated ◆');
 }
@@ -2107,10 +2141,22 @@ function renderTasksInto(el, tasks, isMob){
 
 function renderMobTasks(){ renderMobHomeQuests(); renderMobCalQuests(); }
 
+// Quests and calendar events auto-link on creation (a new task gets a matching
+// calendar event and vice versa) so the daily quest list and the month grid
+// both show the full picture without needing two separate things kept in sync by hand.
+function genLinkId(){ return Date.now()+Math.floor(Math.random()*1000); }
+
 function addTaskCommon(text, rank, date, time){
   if(!Array.isArray(APP.tasks)) APP.tasks=[];
-  APP.tasks.push({text,done:false,rank,date:date||TODAY(),time:time||null});
-  saveTasks(); renderMobTasks();
+  const d=date||TODAY();
+  const task={id:genLinkId(),text,done:false,rank,date:d,time:time||null};
+  APP.tasks.push(task);
+  if(!APP.events) APP.events={};
+  if(!APP.events[d]) APP.events[d]=[];
+  const ev={id:genLinkId(),title:text,time:time||'',location:'',kind:'focus',notify:false,notifyLeadMin:null,linkedTaskId:task.id};
+  APP.events[d].push(ev);
+  task.linkedEventId=ev.id;
+  saveTasks(); patchData({events:APP.events}); renderMobTasks(); renderMobMonthGrid();
   showXpPop(RANK_XP[rank]||15, RANK_COLORS[rank]||RANK_COLORS.B);
 }
 // Element ids differ per surface (desktop panel has no prefix; mobile Home/Cal do) —
@@ -2270,7 +2316,17 @@ function toggleTask(i){
   saveTasks(); renderMobTasks();
   updateStreakDisplay();
 }
-function deleteTask(i){ if(!APP.tasks)return; APP.tasks.splice(i,1); saveTasks(); renderMobTasks(); }
+function deleteTask(i){
+  if(!APP.tasks)return;
+  const t=APP.tasks[i];
+  APP.tasks.splice(i,1);
+  saveTasks();
+  if(t?.linkedEventId && APP.events?.[t.date]){
+    const idx=APP.events[t.date].findIndex(e=>e.id===t.linkedEventId);
+    if(idx>-1){ APP.events[t.date].splice(idx,1); if(!APP.events[t.date].length) delete APP.events[t.date]; patchData({events:APP.events}); }
+  }
+  renderMobTasks(); renderMobMonthGrid();
+}
 
 // Stats rendering — mobile HOME card + desktop STATS tab
 function buildStatsHTML(sorted, max, compact){
@@ -2711,17 +2767,63 @@ function buildTrendsSvg(){
   }).join('');
   return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;overflow:visible;" role="img" aria-label="Spending per period, last ${periods.length} periods">${bars}</svg>`;
 }
+// Donut with labels tangent to each slice, so the category split reads at a glance
+// with no separate legend to cross-reference — colors come from BUDGET_CATS.
+function buildCategoryDonutSvg(cats){
+  if(!cats.length) return '<div class="empty">No spending this period yet.</div>';
+  const total=cats.reduce((s,c)=>s+c.amt,0);
+  if(total<=0) return '<div class="empty">No spending this period yet.</div>';
+  const size=220, cx=size/2, cy=size/2, r=68, thickness=30;
+  const C=2*Math.PI*r;
+  let cum=0;
+  const segs=cats.map(c=>{
+    const frac=c.amt/total;
+    const dash=frac*C;
+    const offset=C-cum*C;
+    cum+=frac;
+    const midAngle=(cum-frac/2)*2*Math.PI-Math.PI/2;
+    const labelR=r+26;
+    const lx=cx+Math.cos(midAngle)*labelR;
+    const ly=cy+Math.sin(midAngle)*labelR;
+    const pct=Math.round(frac*100);
+    const labelText=`${c.label} ${pct}%`;
+    const labelW=Math.max(46,labelText.length*6.4+12);
+    return {c,dash,offset,lx,ly,labelW,labelText,pct};
+  });
+  const ring=segs.map(s=>
+    `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.c.color}" stroke-width="${thickness}"
+      stroke-dasharray="${s.dash.toFixed(2)} ${(C-s.dash).toFixed(2)}" stroke-dashoffset="${s.offset.toFixed(2)}"
+      transform="rotate(-90 ${cx} ${cy})"><title>${esc(s.c.label)}: $${s.c.amt.toFixed(2)} (${s.pct}%)</title></circle>`
+  ).join('');
+  const labels=segs.filter(s=>s.pct>=5).map(s=>
+    `<g>
+      <rect x="${(s.lx-s.labelW/2).toFixed(1)}" y="${(s.ly-10).toFixed(1)}" width="${s.labelW.toFixed(1)}" height="20" rx="10" fill="${s.c.color}" stroke="var(--bg)" stroke-width="2"></rect>
+      <text x="${s.lx.toFixed(1)}" y="${(s.ly+4).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff" stroke="var(--bg)" stroke-width="3" paint-order="stroke fill" font-family="monospace">${esc(s.labelText)}</text>
+    </g>`
+  ).join('');
+  return `<svg viewBox="0 0 ${size} ${size}" style="width:100%;max-width:280px;height:auto;display:block;margin:0 auto;overflow:visible;" role="img" aria-label="Spending by category this period">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--fg-faint)" stroke-width="${thickness}"></circle>
+    ${ring}
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="11" fill="var(--fg-dim)" font-family="monospace">SPENT</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="15" fill="var(--fg)" font-family="monospace" font-weight="bold">$${total.toFixed(0)}</text>
+    ${labels}
+  </svg>`;
+}
 function buildTrendsHTML(){
   const periods=periodTrends(6);
   const total=periods.reduce((s,p)=>s+p.spent,0);
   const avg=total/periods.length;
+  const {txns}=budgetPeriodTotals();
+  const cats=categoryBreakdown(txns);
   return `
     <div class="m-label" style="margin-bottom:8px;">SPEND PER ${APP.budget?.mode==='weekly'?'WEEK':'MONTH'} (LAST ${periods.length})</div>
     <div class="bento-tile" style="margin-bottom:10px;">${buildTrendsSvg()}</div>
-    <div class="bento-grid">
+    <div class="bento-grid" style="margin-bottom:10px;">
       <div class="bento-tile"><div class="bento-label">AVG PER PERIOD</div><div class="bento-val expense">-$${avg.toFixed(2)}</div></div>
       <div class="bento-tile"><div class="bento-label">TOTAL, ${periods.length} PERIODS</div><div class="bento-val expense">-$${total.toFixed(2)}</div></div>
-    </div>`;
+    </div>
+    <div class="m-label" style="margin-bottom:8px;">BY CATEGORY, THIS PERIOD</div>
+    <div class="bento-tile">${buildCategoryDonutSvg(cats)}</div>`;
 }
 
 function dueBillsBannerHtml(){
@@ -3199,7 +3301,10 @@ function cqRowHtml(r){
       <div class="cq-row-head" onclick="toggleCqDetail('${esc(r.id)}')">
         <div class="cq-row-title">
           <span class="cq-src-icon">${srcIcon}</span>
-          <span class="cq-title-text">${esc(r.title)}</span>
+          <div style="min-width:0;flex:1;">
+            <div class="cq-title-text">${esc(r.title)}</div>
+            ${desc?`<div class="cq-row-preview">${esc(desc)}</div>`:''}
+          </div>
         </div>
         <div class="cq-row-meta">
           <span class="cq-date">${esc(r.date)}</span>
