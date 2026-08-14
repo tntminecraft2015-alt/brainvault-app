@@ -628,3 +628,22 @@ Ran the two pending change requests plus a broader queue/ED pass, all at the use
 - **ED now has persistent cross-session memory** (save_memory/forget_memory tools, backed by a new edMemory field, read into every system prompt) and two new action tools (add_task, log_expense) so it can act on direct requests instead of only talking.
 
 No code has been pushed to the `app` remote yet — pending the user's review of a local preview.
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via Design Lab: Category Labels on Donut Slices (Enhanced)
+
+## [2026-08-12] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-12]]
+
+Chat session on 2026-08-12
+
+## [2026-08-12] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Budget Tracker Overhaul: Vision & Coordination

@@ -139,7 +139,8 @@
         "type": "income"
       }
     ],
-    "mode": "weekly"
+    "mode": "weekly",
+    "weeklyLimit": 12
   },
   "theme": {
     "preset": "Cyan",
@@ -165,6 +166,11 @@
       "count": 2,
       "firstCaught": "2026-05-14",
       "shiny": true
+    },
+    "113": {
+      "count": 1,
+      "firstCaught": "2026-08-12",
+      "shiny": false
     },
     "132": {
       "count": 2,
@@ -197,7 +203,7 @@
       "shiny": false
     },
     "252": {
-      "count": 2,
+      "count": 3,
       "firstCaught": "2026-05-15",
       "shiny": false
     },
@@ -254,7 +260,7 @@
       "title": "Real-Time Revision Delivery: Auto-Reload & Live Refresh for Design Lab Slideshows",
       "findingsCount": 3,
       "auto": false,
-      "viewed": false
+      "viewed": true
     },
     {
       "id": "2026-08-12-design-research-revisions-1786515122903",
@@ -264,7 +270,7 @@
       "findingsCount": 2,
       "auto": true,
       "isRevision": true,
-      "viewed": false
+      "viewed": true
     },
     {
       "id": "2026-08-12-design-research-revisions-1786515023845",
@@ -338,6 +344,42 @@
   "lastDesignResearchAutoRun": "2026-08-12",
   "changeRequests": [
     {
+      "id": "2026-08-12-unified-quest-calendar-sync-with-dual-vi",
+      "date": "2026-08-12",
+      "title": "Unified Quest/Calendar Sync with Dual Views",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants quests and calendar events to be deeply integrated so that adding a task creates a calendar event and vice versa, keeping them synced. The quest view should show a filtered, daily-focused UI of today's items (tasks + events combined), while the calendar view shows the full month with all items visible across dates.",
+      "details": "**Behavior:**\n- When a task is added to quests, automatically create a corresponding calendar event on that date\n- When a calendar event is added, automatically create a corresponding task in the quest list\n- Both should reference each other so they update/delete together\n- Editing one should update the other\n\n**Quest View (Daily):**\n- Show today's tasks and calendar events in a unified list\n- Display both kinds of items in a single scrollable interface\n- Keep the existing quest UI styling but include event items alongside tasks\n\n**Calendar View (Monthly):**\n- Show the full month grid as it does now\n- Display all tasks and events across all dates in the month\n- Both should be visually represented on the calendar tiles\n\n**Implementation notes:**\n- Add a `linkedEventId` field to tasks and `linkedTaskId` field to events in localStorage to maintain the sync relationship\n- Update `addTask()` and `addDayEvent()` to create the paired item\n- Update `deleteTask()` and `deleteDayEv()` to remove both linked items\n- Filter quest view to show only today's date using existing date logic\n- Ensure calendar rendering includes both event and task data"
+    },
+    {
+      "id": "2026-08-12-budget-tracker-overhaul-vision-coordinat",
+      "date": "2026-08-12",
+      "title": "Budget Tracker Overhaul: Vision & Coordination",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants a comprehensive overhaul of the budget tracker that encompasses visual redesign, interaction patterns, data visualization, and gamification — all three coordinating under one vision. The two existing queued items (Coins-for-Log Micro-Rewards and Category Labels on Donut Slices) should be implemented as separate tasks but aligned to serve this overarching vision, not replace it.",
+      "details": "This is a coordination spec, not an implementation task yet. Before Claude Code implements any budget changes, read this first:\n\n**Vision:** Transform the budget tracker from a transaction logger into an engaging, gamified financial dashboard that rewards tracking, visualizes spending at a glance, and makes category breakdowns intuitive.\n\n**Scope (all four areas):**\n1. **Visual redesign** — Layout, spacing, hierarchy, use of the bento-grid tile system already in the codebase\n2. **Interaction patterns** — How users add/edit transactions; quick-add workflows; category selection\n3. **Data visualization** — Enhance charts, breakdowns, period comparisons; make data scannable\n4. **Gamification** — Micro-rewards (coins-for-logging), progress indicators, streaks, visual feedback\n\n**Alignment with existing queue:**\n- `Entry-Level Micro-Rewards: Coins-for-Log` — implement this as specified; it serves the gamification pillar\n- `Category Labels on Donut Slices (Enhanced)` — implement this as specified; it serves the visualization pillar\n\n**Implementation order:** Do NOT start until user explicitly approves this vision. When approved, clarify with user whether to run the two existing items first, or whether this vision spec requires changes to them before implementation."
+    },
+    {
+      "id": "2026-08-12-entry-level-micro-rewards-coins-for-log-",
+      "date": "2026-08-12",
+      "title": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
+      "status": "pending",
+      "source": "Design Lab",
+      "description": "Liked this Design Lab finding from Red and queued it for implementation.",
+      "details": "Award fractional GIL coins instantly when players log a transaction or check a habit, with reward amount and category selected via two compact side-by-side scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivation.\n\nSource: [Guul Games: Gamification in Habit Tracking Apps](https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results)"
+    },
+    {
+      "id": "2026-08-12-category-labels-on-donut-slices-enhanced",
+      "date": "2026-08-12",
+      "title": "Category Labels on Donut Slices (Enhanced)",
+      "status": "pending",
+      "source": "Design Lab",
+      "description": "Liked this Design Lab finding from Red and queued it for implementation.",
+      "details": "Place category names directly on the outer edge of each donut slice in high-contrast colored bands with white text, positioned tangent to the slice perimeter. This eliminates the separate legend entirely—users read spending instantly at a glance without cross-referencing. The enhanced label bands use dark backgrounds and bold typography to stand out sharply from the pie chart, making them scannable even on mobile.\n\nSource: [Budget Tracker App UI/UX Design by Cansaas Agency](https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design)"
+    },
+    {
       "id": "2026-08-12-auto-reload-design-revisions-in-design-l",
       "date": "2026-08-12",
       "title": "Auto-reload design revisions in Design Lab",
@@ -385,6 +427,61 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-08-12-design-research-revisions-1786515122903",
+      "findingIndex": 1,
+      "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
+      "findingTitle": "Entry-Level Micro-Rewards: Coins-for-Log (Dual Scroll Wheels)",
+      "findingDescription": "Award fractional GIL coins instantly when players log a transaction or check a habit, with reward amount and category selected via two compact side-by-side scroll wheels—no manual input, just spin-to-pick. The amount wheel spans 5.00 down to 0.01 GIL, letting you calibrate rewards by frequency: daily check = 0.10, weekly milestone = 0.50, big win = 2.50. This ties immediate dopamine (coin pop, wallet flash) directly to the act of logging, reinforcing visibility without requiring external motivat",
+      "rating": 5,
+      "ratingLabel": "Got it",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-revisions-1786515122903",
+      "findingIndex": 0,
+      "threadId": "thread-1786514464358-1-category-coded-donut-chart-with-drill-do",
+      "findingTitle": "Category Labels on Donut Slices (Enhanced)",
+      "findingDescription": "Place category names directly on the outer edge of each donut slice in high-contrast colored bands with white text, positioned tangent to the slice perimeter. This eliminates the separate legend entirely—users read spending instantly at a glance without cross-referencing. The enhanced label bands use dark backgrounds and bold typography to stand out sharply from the pie chart, making them scannable even on mobile.",
+      "rating": 5,
+      "ratingLabel": "Got it",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 2,
+      "threadId": "thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa",
+      "findingTitle": "Pause-on-Interact with Manual Refresh Fallback",
+      "findingDescription": "Provide flexibility: if you're investigating a specific data point and don't want visuals to change, pause live refresh. While paused, no automated refreshes occur; when ready, resume to return to real-time monitoring. A small pause button (⏸) in the slideshow footer stops incoming revisions mid-read; tapping resume or navigating to the next finding auto-restarts polling. Prevents frustration when user is comparing the old mockup to feedback notes. Low-friction, respects user agency—very on-bran",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 1,
+      "threadId": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
+      "findingTitle": "Seamless Fade-and-Replace Slide Transition on Revision",
+      "findingDescription": "While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-12"
+    },
+    {
+      "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
+      "findingIndex": 0,
+      "threadId": "thread-1786517286745-0-event-driven-soft-refresh-with-connectio",
+      "findingTitle": "Event-Driven Soft Refresh with Connection Status Badge",
+      "findingDescription": "Detect when data arrives and trigger a refresh only when needed, rather than constant polling. When Red finishes a revision, the server emits a lightweight event; the client polls short intervals only while the slideshow modal is open. A small \"●\" badge in the modal header animates to signal the refresh is live, never blocking the user's view of the current slide. Pairs well with Mission Control's retro aesthetic via simple dot/pulse animations in the accent color.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-12"
+    },
     {
       "id": "2026-08-12-design-research-revisions-1786515023845",
       "findingIndex": 1,
@@ -829,11 +926,11 @@
       "source_title": "Budget Tracker App UI/UX Design by Cansaas Agency",
       "source_url": "https://contra.com/p/vk67o2ZR-budget-tracker-app-uiux-design",
       "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;max-width:280px'><h3 style='color:#dfeeff;margin:0 0 12px 0;font-size:14px'>BUDGET BREAKDOWN</h3><svg viewBox='0 0 200 200' style='width:100%;margin-bottom:12px'><circle cx='100' cy='100' r='70' fill='none' stroke='#1e3a5f' stroke-width='20'/><circle cx='100' cy='100' r='70' fill='none' stroke='#ff8a63' stroke-width='20' stroke-dasharray='31.4 125.6' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='70' fill='none' stroke='#7fffb0' stroke-width='20' stroke-dasharray='18.84 125.6' stroke-dashoffset='-31.4' transform='rotate(-90 100 100)'/><circle cx='100' cy='100' r='70' fill='none' stroke='#66c8ff' stroke-width='20' stroke-dasharray='75.36 125.6' stroke-dashoffset='-50.24' transform='rotate(-90 100 100)'/><text x='145' y='95' font-size='11' font-weight='bold' fill='#0a1929' font-family='VT323' text-anchor='middle' style='background:#ff8a63;padding:2px 4px'>FOOD</text><text x='100' y='175' font-size='11' font-weight='bold' fill='#0a1929' text-anchor='middle' style='background:#7fffb0;padding:2px 4px;font-family:VT323'>TRANSIT</text><text x='40' y='110' font-size='11' font-weight='bold' fill='#fff' text-anchor='middle' style='background:#66c8ff;padding:2px 4px;font-family:VT323'>UTILITIES</text></svg><div style='font-size:12px;color:#8fd6ff;text-align:center'>Labels pop from chart—no legend needed</div></div>",
-      "status": "awaiting_rating",
+      "status": "resolved",
       "revisionCount": 5,
-      "lastRating": 4,
-      "lastRatingLabel": "Just one more tweak",
-      "lastComment": "Make the labels stand out from the pie chart and make ur slideshow look better and more polished",
+      "lastRating": 5,
+      "lastRatingLabel": "Got it",
+      "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
@@ -845,11 +942,11 @@
       "source_title": "Guul Games: Gamification in Habit Tracking Apps",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
       "mockup_html": "<div style=\"background:#0a1929;padding:16px;border-radius:10px;font-family:'VT323',monospace;color:#dfeeff;max-width:320px;\"><div style=\"font-size:12px;font-weight:bold;margin-bottom:12px;\">⚡ REWARD LOGGED</div><div style=\"display:flex;gap:8px;margin-bottom:12px;\"><div style=\"flex:1;background:#12253c;border-radius:6px;padding:8px;text-align:center;border:2px solid #ff8a63;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:4px;\">AMOUNT</div><div style=\"font-size:14px;font-weight:bold;color:#7fffb0;\">0.50</div><div style=\"font-size:9px;color:#8fd6ff;\">GIL</div></div><div style=\"flex:1;background:#12253c;border-radius:6px;padding:8px;text-align:center;border:2px solid #ff8a63;\"><div style=\"font-size:10px;color:#8fd6ff;margin-bottom:4px;\">CATEGORY</div><div style=\"font-size:12px;font-weight:bold;color:#66c8ff;\">Habit</div><div style=\"font-size:9px;color:#8fd6ff;\">spin→pick</div></div></div><div style=\"background:#1e3a5f;padding:8px;border-radius:4px;font-size:11px;text-align:center;color:#7fffb0;\">✓ +0.50 GIL (Habit logged)</div></div>",
-      "status": "awaiting_rating",
+      "status": "resolved",
       "revisionCount": 4,
-      "lastRating": 4,
-      "lastRatingLabel": "Just one more tweak",
-      "lastComment": "Side by side and smaller boxes",
+      "lastRating": 5,
+      "lastRatingLabel": "Got it",
+      "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-budget-tracker-designs"
@@ -861,10 +958,10 @@
       "source_title": "Microsoft Fabric Real-Time Dashboards",
       "source_url": "https://community.fabric.microsoft.com/t5/Fabric-Updates-Blog/Live-refresh-for-Real-Time-Dashboards-Generally-Available/ba-p/5194911",
       "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n    <span style=\"color: #dfeeff; font-size: 14px;\">REVISION 2 — ACTIVE</span>\n    <span style=\"display: inline-block; width: 8px; height: 8px; background: #7fffb0; border-radius: 50%; animation: pulse 1.2s infinite;\"></span>\n  </div>\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 12px;\">\n    <div style=\"color: #8fd6ff; font-size: 11px; margin-bottom: 6px; opacity: 0.8;\">FINDING UPDATED</div>\n    <div style=\"color: #7fffb0; font-size: 13px; font-weight: bold;\">\"Category Labels on Donut\"</div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 11px; line-height: 1.4; opacity: 0.9;\">Tap to view revised mockup. Your rating will update the history.</div>\n  <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }</style>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
@@ -872,15 +969,15 @@
     },
     "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti": {
       "id": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
-      "title": "Seamless Fade-and-Replace Slide Transition on Revision",
-      "description": "While one box shrinks and gets ready to leave, the next box enters the scene, creating a constant loop of boxes entering and exiting continuously. When a revision loads, fade out the old finding card (200ms) and fade in the new one from behind it. The mockup itself (the HTML sandbox iframe) cross-fades instead of hard-reloading, preserving scroll position if the user is mid-read. Feels alive without breaking JRPG aesthetic; uses Mission Control's accent/green palette for the fade pulse.",
+      "title": "Crossfade Card Swap with Mockup Persistence",
+      "description": "When a Design Lab finding gets revised, the old card fades out (150ms) while the new card fades in simultaneously, maintaining visual continuity. The iframe mockup beneath cross-fades rather than reloading, preserving scroll position so readers mid-inspection don't lose their place. This creates a sense of seamless update without jolting the viewer—alive but restrained, fitting the JRPG aesthetic of gradual state shifts.",
       "source_title": "Animated Slideshow Carousel Transitions",
       "source_url": "https://www.presentation-process.com/animated-slideshow-in-powerpoint.html",
-      "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"margin-bottom: 12px;\">\n    <div style=\"color: #dfeeff; font-size: 12px; margin-bottom: 8px;\">● LOADING REVISION...</div>\n    <div style=\"background: #12253c; height: 120px; border-radius: 6px; display: flex; align-items: center; justify-content: center; opacity: 0; animation: fadeIn 0.4s ease forwards 0.2s; color: #8fd6ff; font-size: 13px; border: 1px solid #1e3a5f;\">\n      <div style=\"text-align: center;\">\n        <div style=\"font-size: 11px; margin-bottom: 6px;\">ENHANCED MOCKUP</div>\n        <div style=\"color: #7fffb0; font-size: 14px;\">↻</div>\n      </div>\n    </div>\n  </div>\n  <div style=\"color: #dfeeff; font-size: 10px; opacity: 0.6;\">Changes visible in 0.6s • Pause on click to keep reading</div>\n  <style>@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }</style>\n</div>",
-      "status": "awaiting_rating",
-      "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "mockup_html": "<style>body{margin:0;background:#0a1929;font-family:VT323,monospace;color:#dfeeff;padding:20px;}.card{background:#12253c;border:2px solid #ff8a63;border-radius:10px;padding:16px;margin-bottom:16px;opacity:1;transition:opacity 150ms ease-in-out;}.card.fade-out{opacity:0;}.card.fade-in{opacity:1;animation:fadeInCard 150ms ease-in-out;}.iframe-wrap{background:#1e3a5f;border:2px solid #7fffb0;border-radius:10px;height:120px;overflow:hidden;position:relative;margin-top:12px;}.iframe-wrap iframe{width:100%;height:100%;border:none;opacity:1;transition:opacity 150ms ease-in-out;}.iframe-wrap iframe.fade-out{opacity:0;}.iframe-wrap iframe.fade-in{animation:fadeInFrame 150ms ease-in-out;}.label{font-size:8px;text-transform:uppercase;color:#8fd6ff;letter-spacing:1px;margin-bottom:6px;}.title{font-size:14px;color:#ff8a63;margin:0;}.desc{font-size:12px;color:#dfeeff;margin:6px 0 0 0;line-height:1.3;}@keyframes fadeInCard{from{opacity:0;}to{opacity:1;}}@keyframes fadeInFrame{from{opacity:0;}to{opacity:1;}}</style><div class='card'><div class='label'>Finding #2</div><h2 class='title'>Crossfade Update</h2><p class='desc'>Old card fades. New card enters. Scroll preserved.</p><div class='iframe-wrap'><iframe src='about:blank'></iframe></div></div>",
+      "status": "ready_to_ship",
+      "revisionCount": 1,
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
@@ -893,10 +990,10 @@
       "source_title": "Microsoft Fabric Live Refresh Controls",
       "source_url": "https://learn.microsoft.com/en-us/fabric/real-time-intelligence/dashboard-live-refresh",
       "mockup_html": "<div style=\"background: #0a1929; border: 3px solid #1a2533; padding: 16px; font-family: VT323; border-radius: 10px; max-width: 320px;\">\n  <div style=\"background: #12253c; padding: 12px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #1e3a5f;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; color: #dfeeff; font-size: 11px;\">\n      <span>LIVE UPDATES: ON</span>\n      <button style=\"background: #ff8a63; border: 1px solid #ff8a63; color: #0a1929; padding: 4px 10px; font-family: VT323; cursor: pointer; font-size: 10px; border-radius: 4px;\">⏸ PAUSE</button>\n    </div>\n  </div>\n  <div style=\"background: #1e3a5f; padding: 10px; border-radius: 6px; text-align: center; color: #8fd6ff; font-size: 10px; opacity: 0.85;\">\n    New revision arriving... • Click PAUSE to review in place\n  </div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
