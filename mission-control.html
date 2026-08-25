@@ -12,7 +12,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chrono-node@2/dist/chrono.min.js" defer></script>
+  <script type="module">
+    // chrono-node@2 dropped its UMD/browser bundle (cjs+esm only), so a plain <script src>
+    // throws "exports is not defined" — load it as a real ES module instead and expose it
+    // as window.chrono so the rest of the app's plain <script> code can keep calling
+    // chrono.parse(...) synchronously once it's ready.
+    import('https://cdn.jsdelivr.net/npm/chrono-node@2/+esm').then(mod => { window.chrono = mod; });
+  </script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     button, input, select, textarea { font:inherit; color:inherit; }
@@ -295,7 +301,7 @@
 
 
       /* ── Quests (Home card + Cal tab section) ── */
-      .mob-quest-list { max-height:380px; overflow-y:auto; min-height:0; position:relative; }
+      .mob-quest-list { max-height:380px; overflow-y:auto; flex-shrink:0; position:relative; }
       .mob-task-row  { display:flex; align-items:center; gap:10px; padding:10px 8px; margin-bottom:3px; background:rgba(223,238,255,.035); border-radius:var(--r-md); }
       .mob-task-row:last-child { margin-bottom:0; }
       .mob-task-row.done { opacity:.4; }
@@ -2066,9 +2072,11 @@ function resolveQuickAddTitle(){
       const parsedKey=dateKey(dt);
       if(parsedKey!==dayModalDate){
         dayModalDate=parsedKey;
-        document.getElementById('dayModalTitle').textContent=`${MONTHS_S[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+        const mon=MONTHS_S[dt.getMonth()], d=dt.getDate(), yr=dt.getFullYear();
+        document.getElementById('dayModalTitle').textContent=`${mon} ${d}, ${yr}`;
+        document.getElementById('pdxDateLabel').textContent=`${mon} ${String(d).padStart(2,'0')} ${yr}`;
         renderDevList(dayModalDate);
-        showToast(`Targeting ${MONTHS_S[dt.getMonth()]} ${dt.getDate()} ◆`);
+        showToast(`Targeting ${mon} ${d} ◆`);
       }
       return;
     }

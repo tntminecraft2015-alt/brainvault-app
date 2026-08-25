@@ -1656,6 +1656,7 @@ async function generateThreadRevision(threadId) {
     t.source_title  = revised.source_title || '';
     t.source_url    = revised.source_url || '';
     t.mockup_html   = revised.mockup_html || '';
+    t.mc_relevance  = revised.mc_relevance || '';
     t.revisionCount = (t.revisionCount || 0) + 1;
     t.status        = 'ready_to_ship';
     t.updatedDate   = today();
@@ -1686,10 +1687,11 @@ async function maybeShipRevisionBundle() {
   for (const group of groups) {
     const date = today();
     const id   = uniqueDesignResearchId(data, `${date}-design-research-revisions-${Date.now()}`);
+    const groupOpenTopic = group.every(tid => threads[tid].openTopic);
     const findings = group.map(tid => {
       const t = threads[tid];
       return {
-        title: t.title, description: t.description, source_title: t.source_title, source_url: t.source_url, mockup_html: t.mockup_html,
+        title: t.title, description: t.description, source_title: t.source_title, source_url: t.source_url, mockup_html: t.mockup_html, mc_relevance: t.mc_relevance || '',
         threadId: tid,
         revisionInfo: { revisionCount: t.revisionCount, previousRatingLabel: t.lastRatingLabel, previousComment: t.lastComment },
       };
@@ -1705,7 +1707,7 @@ async function maybeShipRevisionBundle() {
     };
     const html = buildSlideshowHtml(id, '', result);
     writeVault(`design-research/${id}.html`, html);
-    saveDesignResearchWiki(id, date, '', result);
+    saveDesignResearchWiki(id, date, '', result, groupOpenTopic);
     data.designResearch = data.designResearch || [];
     data.designResearch.unshift({ id, date, topic: '', title: result.title, findingsCount: findings.length, auto: true, isRevision: true, viewed: false });
     data.designResearch = data.designResearch.slice(0, 30);
