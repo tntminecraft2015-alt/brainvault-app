@@ -176,10 +176,16 @@ Both log a `note` entry in `wiki/log.md` when queued.
 
 **Two places hold the same queue, and they can drift — `app-data.json`'s `changeRequests` array is authoritative for status; the `.md` file is a disposable, human-readable mirror of one request's spec.** The app's own UI (Change Queue modal, ED's pending-queue context) reads only from `app-data.json`, so if you flip a `.md` file's frontmatter without also updating its array entry, the app will keep showing it as pending forever.
 
-**This is a pull queue, not an auto-run one — do not implement pending requests just because a session started.** At the start of a session it's fine to check what's waiting and mention the count/titles to the human, but only implement when the human explicitly says to run the queue (e.g. "run the queue," "do the queued changes"):
+**Persistence:** on Render, `app-data.json` and `change-requests/*.md` are written straight to the `brainvault-vault` GitHub repo via the GitHub API (see `USE_GITHUB` in `server.js`), not to local disk — so items survive Render spin-down/cold-start and redeploys, and nothing auto-clears a pending item on any schedule. It only disappears when you (or ED, via its remove-request tool) explicitly mark it done/removed. (A past bug where a GitHub write could silently fail on a sha conflict — making a live-added item vanish on the next cold start — was fixed in commit `b468642` and is live.) The one real way to lose queue items is pushing a **stale local** `app-data.json`/`change-requests/` over `vault master` and clobbering items ED/Red added live since your last pull — so always `git pull vault master` first, below.
+
+**This is a pull queue, not an auto-run one — do not implement pending requests just because a session started.** To connect to the *real* current queue (not a possibly-stale local copy), pull from the vault remote first, then check:
 ```
+git pull vault master
 grep -l "status: pending" change-requests/*.md
 ```
+For a quick check from anywhere without git (e.g. from your phone), the live API always reflects the true current state: `https://brainvault-app.onrender.com/api/change-requests`.
+
+At the start of a session it's fine to check what's waiting and mention the count/titles to the human, but only implement when the human explicitly says to run the queue (e.g. "run the queue," "do the queued changes").
 
 When told to run the queue, for each pending request:
 1. Read the file — it has a "What the user asked for" section (intent) and an "Implementation notes" section (spec, plus Red's mockup HTML if it came from Design Lab).
