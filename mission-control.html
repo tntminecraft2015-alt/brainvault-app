@@ -1218,6 +1218,7 @@
       <button class="budget-type-btn income" data-type="income" onclick="setMoneyPadType('income')">+ INCOME</button>
     </div>
     <div class="moneypad-chips" id="moneyPadChips"></div>
+    <input id="moneyPadNote" class="m-inp" type="text" placeholder="Note (optional)" style="margin:8px 0;">
     <div class="moneypad-grid" id="moneyPadGrid"></div>
     <div class="modal-btns">
       <button class="modal-btn sm" onclick="closeModal('moneyPadModal')">CANCEL</button>
@@ -1229,7 +1230,14 @@
 <!-- EDIT EVENT MODAL -->
 <div class="overlay" id="editEventModal">
   <div class="modal">
-    <div class="modal-title">✎ EDIT EVENT</div>
+    <div class="modal-title" id="editEvModalTitle">✎ EDIT EVENT</div>
+    <div class="m-field" id="editEvScopeRow" style="display:none;">
+      <div class="m-label">Apply to</div>
+      <div style="display:flex;gap:14px;font-size:13px;color:var(--fg);">
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="editEvScope" value="occurrence" checked> Just this occurrence</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="editEvScope" value="series"> Whole series</label>
+      </div>
+    </div>
     <div class="m-field"><div class="m-label">Title</div><input id="editEvTitle" class="m-inp" type="text"></div>
     <div class="m-2col m-field">
       <div><div class="m-label">Time</div><input id="editEvTime" class="m-inp" type="time"></div>
@@ -1457,7 +1465,7 @@ function playSfx(n){
 const TYPE_COLORS={normal:'#9199a1',fire:'#ff9c54',water:'#4d90d5',electric:'#f4d23c',grass:'#63bb5b',ice:'#74cec0',fighting:'#ce4069',poison:'#ab6ac8',ground:'#d97746',flying:'#89aae3',psychic:'#f97176',bug:'#90c12c',rock:'#c7b78b',ghost:'#5269ac',dragon:'#0a6dc4',dark:'#5a5366',steel:'#5a8ea1',fairy:'#ec8fe6'};
 
 // ── APP STATE (mirrored from server) ──
-let APP = { schedule:[], events:{}, tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[],mode:'monthly'}, questXp:0, caughtPoke:{}, savings:{name:'',target:0,current:0} };
+let APP = { schedule:[], events:{}, recurringEvents:[], tasks:[], streakDays:[], timelineChecks:{}, currentStreak:0, theme:{}, budget:{monthlyLimit:2000,transactions:[],mode:'monthly'}, questXp:0, caughtPoke:{}, savings:{name:'',target:0,current:0} };
 
 // ── UTILS ──
 const pad     = n => String(n).padStart(2,'0');
@@ -1704,6 +1712,7 @@ async function loadData(){
     APP = d;
     if(!Array.isArray(APP.tasks)) APP.tasks=[];
     APP.events         = APP.events         || {};
+    APP.recurringEvents = Array.isArray(APP.recurringEvents) ? APP.recurringEvents : [];
     APP.schedule       = APP.schedule       || [];
     APP.timelineChecks = APP.timelineChecks || {};
     APP.streakDays     = APP.streakDays     || [];
@@ -1953,7 +1962,7 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
   cells.forEach(d=>{
     if(d===null){gridEl.appendChild(document.createElement('div'));return;}
     const dt=new Date(year,month,d); const key=dateKey(dt);
-    const evs=(APP.events||{})[key]||[];
+    const evs=eventsForDate(key);
     const isToday=key===todayK, isSel=key===selKey;
     const btn=document.createElement('button');
     btn.className=(isMob?'mob-day-cell':'day-cell')+(isToday?' today':'')+(isSel?' sel':'');
@@ -1983,7 +1992,7 @@ function renderMobWeekStrip(){
   for(let i=0;i<7;i++){
     const d=new Date(sun); d.setDate(sun.getDate()+i);
     const key=dateKey(d);
-    const evs=(APP.events||{})[key]||[];
+    const evs=eventsForDate(key);
     const isToday=key===todayK, isSel=key===selectedKey;
     const btn=document.createElement('button');
     btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
@@ -2000,7 +2009,7 @@ function renderMobDaySummary(){
 function renderDaySummaryInto(key,el,isMob){
   if(!el)return;
   const d=new Date(key+'T00:00:00');
-  const evs=(APP.events||{})[key]||[];
+  const evs=eventsForDate(key);
   const pt = k => KIND_POKE_TYPE[k]||KIND_POKE_TYPE.routine;
   const chip = (e)=>`<span class="kind-type-chip" style="background:${KIND_COLORS[e.kind||'focus']||'#666'};">${pt(e.kind||'focus').icon} ${(e.kind||'').toUpperCase()}</span>`;
   el.innerHTML=`<span style="font-family:'Inter',sans-serif;font-size:${isMob?'7':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
@@ -2025,19 +2034,29 @@ function renderDaySummaryInto(key,el,isMob){
 
 function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 function renderDevList(key){
-  const evs=(APP.events||{})[key]||[];
+  const oneoff=((APP.events||{})[key]||[]).map((e,i)=>({e,oneoffIdx:i}));
+  const recurring=(APP.recurringEvents||[]).filter(rec=>occursOn(rec,key)).map(rec=>({e:occurrenceForDate(rec,key),oneoffIdx:null}));
+  const rows=oneoff.concat(recurring);
   const el=document.getElementById('devList'); if(!el)return;
-  if(!evs.length){el.innerHTML='<div class="dev-empty" style="font-size:16px;color:var(--fg);opacity:.55;">No encounters yet</div>';return;}
-  el.innerHTML=evs.map((e,i)=>{
+  if(!rows.length){el.innerHTML='<div class="dev-empty" style="font-size:16px;color:var(--fg);opacity:.55;">No encounters yet</div>';return;}
+  el.innerHTML=rows.map(({e,oneoffIdx})=>{
     const kc=KIND_COLORS[e.kind||'focus']||'var(--fg)';
     const pt=KIND_POKE_TYPE[e.kind||'focus']||KIND_POKE_TYPE.routine;
+    const editBtn=oneoffIdx!=null
+      ?`<button class="dev-del" onclick="openEditEvent('${key}',${oneoffIdx})" title="Edit" style="font-size:13px;">✎</button>`
+      :`<button class="dev-del" onclick="editRecurringOccurrence('${key}','${e.recurringId}')" title="Edit" style="font-size:13px;">✎</button>`;
+    const delBtn=oneoffIdx!=null
+      ?`<button class="dev-del" onclick="deleteDayEv('${key}',${oneoffIdx})" style="font-size:13px;">✕</button>`
+      :`<button class="dev-del" onclick="deleteRecurringOccurrence('${key}','${e.recurringId}')" style="font-size:13px;">✕</button>`;
+    const recBadge=oneoffIdx==null?`<span title="Recurring" style="opacity:.6;font-size:13px;">🔁</span>`:'';
     return`<div class="dev-item">
       <div class="dev-dot" style="background:${kc};width:8px;height:8px;flex-shrink:0;"></div>
       <span class="dev-time">${e.time?fmtTime(e.time):'—'}</span>
+      ${recBadge}
       <span style="flex:1;font-size:16px;color:var(--fg);font-family:'Inter',sans-serif;;font-weight:600">${esc(e.title)}</span>
       <span style="font-family:'Inter',sans-serif;font-size:10.5px;background:${kc};color:#fff;padding:2px 4px;flex-shrink:0;">${pt.icon} ${(e.kind||'').toUpperCase()}</span>
-      <button class="dev-del" onclick="openEditEvent('${key}',${i})" title="Edit" style="font-size:13px;">✎</button>
-      <button class="dev-del" onclick="deleteDayEv('${key}',${i})" style="font-size:13px;">✕</button>
+      ${editBtn}
+      ${delBtn}
     </div>`;
   }).join('');
 }
@@ -2084,6 +2103,54 @@ function resolveQuickAddTitle(){
   document.getElementById('devTitle').value=text;
   document.getElementById('devKind').value=guessEventKind(text);
 }
+// ── RECURRING EVENTS (created via ED chat) ──
+// Templates in APP.recurringEvents are expanded into virtual occurrences at render time,
+// never written into APP.events. Mirrors occursOn/occurrenceForDate in server.js — keep in sync.
+function daysBetweenDates(aStr,bStr){ return Math.round((new Date(bStr+'T00:00:00')-new Date(aStr+'T00:00:00'))/86400000); }
+function occursOn(rec,dateStr){
+  if(dateStr<rec.startDate)return false;
+  if(rec.endDate && dateStr>rec.endDate)return false;
+  const exc=(rec.exceptions||{})[dateStr];
+  if(exc && exc.skip)return false;
+  const interval=rec.interval||1;
+  if(rec.freq==='daily') return daysBetweenDates(rec.startDate,dateStr)%interval===0;
+  if(rec.freq==='weekly'){
+    const dow=new Date(dateStr+'T00:00:00').getDay();
+    if(!(rec.daysOfWeek||[]).includes(dow))return false;
+    const mondayOf=d=>{const nd=new Date(d+'T00:00:00');nd.setDate(nd.getDate()-((nd.getDay()+6)%7));return nd;};
+    const weeksDiff=Math.round((mondayOf(dateStr)-mondayOf(rec.startDate))/(7*86400000));
+    return weeksDiff>=0 && weeksDiff%interval===0;
+  }
+  if(rec.freq==='monthly'){
+    const d=new Date(dateStr+'T00:00:00'), s=new Date(rec.startDate+'T00:00:00');
+    if(d.getDate()!==rec.dayOfMonth)return false;
+    const monthsDiff=(d.getFullYear()-s.getFullYear())*12+(d.getMonth()-s.getMonth());
+    return monthsDiff>=0 && monthsDiff%interval===0;
+  }
+  return false;
+}
+function occurrenceForDate(rec,dateStr){
+  const exc=(rec.exceptions||{})[dateStr]||{};
+  return {
+    id:`rec-${rec.id}-${dateStr}`,
+    title:exc.title||rec.title,
+    time:exc.time!==undefined?exc.time:rec.time,
+    location:exc.location!==undefined?exc.location:rec.location,
+    kind:exc.kind||rec.kind||'focus',
+    notify:exc.notify!==undefined?exc.notify:rec.notify,
+    notifyLeadMin:exc.notifyLeadMin!==undefined?exc.notifyLeadMin:rec.notifyLeadMin,
+    recurring:true, recurringId:rec.id,
+  };
+}
+// Single source of truth for "what's on this day" — one-off events plus expanded recurring
+// occurrences. All calendar rendering (month grid, week strip, day summary, day modal) reads
+// through this instead of APP.events directly, so recurring events show up everywhere real ones do.
+function eventsForDate(key){
+  const oneoff=(APP.events||{})[key]||[];
+  const recurring=(APP.recurringEvents||[]).filter(rec=>occursOn(rec,key)).map(rec=>occurrenceForDate(rec,key));
+  return oneoff.concat(recurring);
+}
+
 function quickAddDayEvent(){
   resolveQuickAddTitle();
   addDayEvent();
@@ -2235,10 +2302,12 @@ function saveEditMission(){
 }
 
 // Edit event in calendar
-let editEvKey='', editEvIdx=-1;
+let editEvKey='', editEvIdx=-1, editEvMode='oneoff', editEvRecurringId=null;
 function openEditEvent(key,idx){
-  editEvKey=key; editEvIdx=idx;
+  editEvKey=key; editEvIdx=idx; editEvMode='oneoff'; editEvRecurringId=null;
   const ev=(APP.events[key]||[])[idx]; if(!ev)return;
+  document.getElementById('editEvModalTitle').textContent='✎ EDIT EVENT';
+  document.getElementById('editEvScopeRow').style.display='none';
   document.getElementById('editEvTitle').value=ev.title||'';
   document.getElementById('editEvTime').value=ev.time||'';
   document.getElementById('editEvLoc').value=ev.location||'';
@@ -2248,13 +2317,64 @@ function openEditEvent(key,idx){
   document.getElementById('editEvNotifyLead').style.display=ev.notify?'':'none';
   openModal('editEventModal');
 }
+// Edit one occurrence of a recurring series (created via ED chat, or here). The scope radio
+// decides whether saveEditEvent() writes a per-date exception or mutates the series template.
+function editRecurringOccurrence(date,recurringId){
+  const rec=(APP.recurringEvents||[]).find(r=>r.id===recurringId); if(!rec)return;
+  editEvKey=date; editEvIdx=-1; editEvMode='recurring'; editEvRecurringId=recurringId;
+  const occ=occurrenceForDate(rec,date);
+  document.getElementById('editEvModalTitle').textContent='✎ EDIT RECURRING EVENT';
+  document.getElementById('editEvScopeRow').style.display='';
+  document.querySelectorAll('input[name="editEvScope"]').forEach(r=>r.checked=(r.value==='occurrence'));
+  document.getElementById('editEvTitle').value=occ.title||'';
+  document.getElementById('editEvTime').value=occ.time||'';
+  document.getElementById('editEvLoc').value=occ.location||'';
+  document.getElementById('editEvKind').value=occ.kind||'focus';
+  document.getElementById('editEvNotify').checked=!!occ.notify;
+  document.getElementById('editEvNotifyLead').value=occ.notifyLeadMin||30;
+  document.getElementById('editEvNotifyLead').style.display=occ.notify?'':'none';
+  openModal('editEventModal');
+}
+function deleteRecurringOccurrence(date,recurringId){
+  const rec=(APP.recurringEvents||[]).find(r=>r.id===recurringId); if(!rec)return;
+  const wholeSeries=confirm(`Delete the WHOLE recurring series "${rec.title}"?\n\nOK = delete the whole series.\nCancel = delete just this one occurrence (${date}).`);
+  if(wholeSeries){
+    APP.recurringEvents=APP.recurringEvents.filter(r=>r.id!==recurringId);
+  } else {
+    rec.exceptions=rec.exceptions||{};
+    rec.exceptions[date]={skip:true};
+  }
+  patchData({recurringEvents:APP.recurringEvents});
+  renderDevList(date); renderMobMonthGrid();
+  showToast(wholeSeries?'Series deleted ◆':'Occurrence deleted ◆');
+}
 function saveEditEvent(){
   const title=document.getElementById('editEvTitle').value.trim();
   if(!title){showToast('Enter event title');return;}
   const notify=document.getElementById('editEvNotify').checked;
-  const prev=APP.events[editEvKey][editEvIdx];
   const time=document.getElementById('editEvTime').value;
-  const ev={id:prev?.id||genLinkId(),title,time,location:document.getElementById('editEvLoc').value.trim(),kind:document.getElementById('editEvKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('editEvNotifyLead').value,10):null,linkedTaskId:prev?.linkedTaskId};
+  const location=document.getElementById('editEvLoc').value.trim();
+  const kind=document.getElementById('editEvKind').value;
+  const notifyLeadMin=notify?parseInt(document.getElementById('editEvNotifyLead').value,10):null;
+
+  if(editEvMode==='recurring'){
+    const rec=(APP.recurringEvents||[]).find(r=>r.id===editEvRecurringId); if(!rec)return;
+    const scope=document.querySelector('input[name="editEvScope"]:checked')?.value||'occurrence';
+    const fields={title,time,location,kind,notify,notifyLeadMin};
+    if(scope==='series'){
+      Object.assign(rec,fields);
+    } else {
+      rec.exceptions=rec.exceptions||{};
+      rec.exceptions[editEvKey]=fields;
+    }
+    patchData({recurringEvents:APP.recurringEvents});
+    renderDevList(editEvKey); renderMobMonthGrid();
+    closeModal('editEventModal'); showToast(scope==='series'?'Series updated ◆':'Occurrence updated ◆');
+    return;
+  }
+
+  const prev=APP.events[editEvKey][editEvIdx];
+  const ev={id:prev?.id||genLinkId(),title,time,location,kind,notify,notifyLeadMin,linkedTaskId:prev?.linkedTaskId};
   APP.events[editEvKey][editEvIdx]=ev;
   patchData({events:APP.events});
   if(ev.linkedTaskId && Array.isArray(APP.tasks)){
@@ -2615,7 +2735,7 @@ function commitTransaction({amount, category, note, type, accountId}){
 }
 
 // ── QUICK MONEY PAD (fast card add/subtract) ──
-let _moneyPadAcctId=null, _moneyPadAmt='', _moneyPadCat=null, _moneyPadType='expense';
+let _moneyPadAcctId=null, _moneyPadAmt='', _moneyPadCat=null, _moneyPadType='expense', _moneyPadEditId=null;
 
 function setMoneyPadType(type){
   _moneyPadType=type;
@@ -2628,10 +2748,33 @@ function openMoneyPad(accountId, type){
   _moneyPadAcctId=accountId;
   _moneyPadAmt='';
   _moneyPadCat=null;
+  _moneyPadEditId=null;
   setMoneyPadType(type);
   const acct=(APP.budget?.accounts||[]).find(a=>a.id===accountId);
   const titleEl=document.getElementById('moneyPadTitle');
   if(titleEl) titleEl.textContent=`◆ ${acct?acct.name.toUpperCase():'GIL'}`;
+  const noteEl=document.getElementById('moneyPadNote');
+  if(noteEl) noteEl.value='';
+  renderMoneyPadDisplay();
+  renderMoneyPadChips();
+  buildMoneyPadGrid();
+  openModal('moneyPadModal');
+}
+
+// Edit an existing logged transaction in place — no correction marker, no edit history,
+// matches how ED's own log_expense edits happen (see server.js logEdExpense).
+function openMoneyPadEdit(id){
+  const txn=(APP.budget?.transactions||[]).find(t=>t.id===id);
+  if(!txn)return;
+  _moneyPadAcctId=txn.accountId;
+  _moneyPadAmt=String(txn.amount);
+  _moneyPadCat=txn.category;
+  _moneyPadEditId=txn.id;
+  setMoneyPadType(txn.type);
+  const titleEl=document.getElementById('moneyPadTitle');
+  if(titleEl) titleEl.textContent='✎ EDIT';
+  const noteEl=document.getElementById('moneyPadNote');
+  if(noteEl) noteEl.value=(BUDGET_CATS[txn.category]?.label===txn.note)?'':txn.note;
   renderMoneyPadDisplay();
   renderMoneyPadChips();
   buildMoneyPadGrid();
@@ -2672,8 +2815,24 @@ function confirmMoneyPad(){
   const amt=parseFloat(_moneyPadAmt);
   if(isNaN(amt)||amt<=0){showToast('Enter a valid amount');return;}
   const cat=_moneyPadCat||'other';
-  commitTransaction({amount:amt, category:cat, note:BUDGET_CATS[cat]?.label||cat, type:_moneyPadType, accountId:_moneyPadAcctId});
+  const note=document.getElementById('moneyPadNote')?.value.trim();
+  if(_moneyPadEditId!=null){
+    updateTransaction(_moneyPadEditId, {amount:amt, category:cat, note:note||BUDGET_CATS[cat]?.label||cat, type:_moneyPadType});
+  } else {
+    commitTransaction({amount:amt, category:cat, note:note||BUDGET_CATS[cat]?.label||cat, type:_moneyPadType, accountId:_moneyPadAcctId});
+  }
   closeModal('moneyPadModal');
+}
+
+// Updates a logged transaction in place — silent, no correction marker or edit-history trail,
+// so trends recompute clean the same as if it had always been logged this way.
+function updateTransaction(id, {amount, category, note, type}){
+  const txn=(APP.budget?.transactions||[]).find(t=>t.id===id);
+  if(!txn)return;
+  txn.amount=amount; txn.category=category; txn.note=note; txn.type=type;
+  patchData({budget:APP.budget});
+  renderBudget();
+  showToast('Updated ◆');
 }
 
 function deleteTxn(id){
@@ -2681,6 +2840,7 @@ function deleteTxn(id){
   APP.budget.transactions=APP.budget.transactions.filter(t=>t.id!==id);
   patchData({budget:APP.budget});
   renderBudget();
+  showToast('Deleted ◆');
 }
 
 function setBudgetLimit(val){
@@ -3140,11 +3300,11 @@ function buildMobBudgetGilHTML(){
     const cat=BUDGET_CATS[t.category]||BUDGET_CATS.other;
     const color=t.type==='income'?'var(--green)':'var(--red)';
     const sign=t.type==='income'?'+':'-';
-    return`<div class="budget-txn">
+    return`<div class="budget-txn" onclick="openMoneyPadEdit(${t.id})" style="cursor:pointer;">
       <span class="budget-txn-icon" style="background:${hexAlpha(cat.color,.15)};">${cat.icon}</span>
       <span class="budget-txn-note">${esc(t.note)}</span>
       <span class="budget-txn-amt" style="color:${color};">${sign}$${t.amount.toFixed(2)}</span>
-      <button class="budget-txn-del" onclick="deleteTxn(${t.id})" title="Delete" style="font-size:16px;opacity:1;">✕</button>
+      <button class="budget-txn-del" onclick="event.stopPropagation();deleteTxn(${t.id})" title="Delete" style="font-size:16px;opacity:1;">✕</button>
     </div>`;
   }).join(''):`<div class="budget-empty">No transactions this week.</div>`;
   return`
@@ -3291,12 +3451,17 @@ async function sendChatCommon(msg, scrollId, btnId){
         if(a.type==='memory_forgotten')  showToast(`ED forgot that ◆`);
         if(a.type==='task_added')        showToast(`Added task: "${a.text}" ◆`);
         if(a.type==='expense_logged')    showToast(`Logged $${a.txn.amount.toFixed(2)} (${a.txn.category}) ◆`);
+        if(a.type==='calendar_event_added')   showToast(`Added "${a.title}" to your calendar ◆`);
+        if(a.type==='calendar_event_edited')  showToast(`Calendar event updated ◆`);
+        if(a.type==='calendar_event_deleted') showToast(`Calendar event deleted ◆`);
       });
       if((d.toolActions||[]).some(a=>a.type==='queued'||a.type==='removed')){
         if(document.getElementById('changeQueueModal')?.classList.contains('active')) await loadChangeQueueList();
         else refreshChangeQueueBadge();
       }
-      if((d.toolActions||[]).some(a=>a.type==='task_added'||a.type==='expense_logged')) await loadData();
+      const calendarChanged=(d.toolActions||[]).some(a=>a.type.startsWith('calendar_event_'));
+      if((d.toolActions||[]).some(a=>a.type==='task_added'||a.type==='expense_logged')||calendarChanged) await loadData();
+      if(calendarChanged && document.getElementById('dayModal')?.classList.contains('active')) renderDevList(dayModalDate);
     }
   } catch(e){ hideTyping(scrollId); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),scrollId); }
   document.getElementById(btnId)?.removeAttribute('disabled');

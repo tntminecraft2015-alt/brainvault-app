@@ -242,7 +242,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [], redMemory: [] };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, recurringEvents: [], tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [], redMemory: [] };
 }
 
 function saveAppData(data) {
@@ -326,12 +326,14 @@ For job (3): you cannot edit code yourself. When the user clearly asks for a cha
 
 If the user asks to cancel, remove, undo, or discard a queued request, use the remove_queued_change tool with the exact id from the PENDING CHANGE QUEUE below — never claim you removed something without calling the tool. If nothing in the queue matches what they described, say so plainly and ask them to clarify which one they mean rather than guessing or picking one arbitrarily.
 
-For job (4): when the user clearly asks you to add/log/remember a to-do or an expense right now (e.g. "add 'call the vet' to my tasks", "log $12 for lunch"), call add_task or log_expense instead of just acknowledging in prose — a personal assistant that only talks and never acts isn't useful. Don't call these speculatively or infer them from unrelated chat.
+For job (4): when the user clearly asks you to add/log/remember a to-do or an expense right now (e.g. "add 'call the vet' to my tasks", "log $12 for lunch"), call add_task or log_expense instead of just acknowledging in prose — a personal assistant that only talks and never acts isn't useful. Don't call these speculatively or infer them from unrelated chat. The same goes for calendar events: when the user asks to add/schedule/cancel/move something (e.g. "add a meeting Tuesday at 2pm", "gym every Monday at 6am", "move dentist to Friday", "cancel my haircut"), use add_calendar_event / edit_calendar_event / delete_calendar_event. Resolve relative dates ("Tuesday", "next week", "tomorrow") yourself against the CURRENT DATE below before calling the tool — always pass a real YYYY-MM-DD, never the relative phrase. If editing or deleting a recurring event and the user didn't say whether they mean just one occurrence or the whole series, ask before calling the tool rather than guessing.
 
 You also have persistent memory across every conversation, not just this one — the WHAT ED REMEMBERS section below is durable notes you've saved about the user over time (preferences, ongoing projects, recurring context, things they've corrected you on). Actually use it: let it shape how you answer instead of just restating it back. When you learn something durable and reusable in this conversation — a preference, a standing fact about their life/projects, a correction to how you should behave — call save_memory to write it down in your own words, concisely. Don't save one-off ephemeral chat content (e.g. "user asked what time it is"), don't save duplicates of what's already in the list below, and don't narrate that you're saving something unless it's naturally relevant. If a memory turns out to be wrong or the user tells you to forget something, call forget_memory with its exact id from the list below.`;
 
+  const weekday = new Date(today() + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long' });
   const parts = [
     persona,
+    `# CURRENT DATE\nToday is ${today()} (${weekday}). Resolve every relative date ("tomorrow", "Tuesday", "next week") against this before calling a calendar tool.`,
     '# BRAINVAULT SCHEMA (CLAUDE.md)\n' + claudeMd,
     '# WIKI INDEX\n' + indexMd,
     '# OVERVIEW\n' + overviewMd,
@@ -375,6 +377,7 @@ app.post('/api/data', (req, res) => {
     const patch = req.body;
     if (patch.schedule       !== undefined) data.schedule       = patch.schedule;
     if (patch.events         !== undefined) data.events         = patch.events;
+    if (patch.recurringEvents !== undefined) data.recurringEvents = patch.recurringEvents;
     if (patch.tasks          !== undefined) data.tasks          = patch.tasks;
     if (patch.timelineChecks !== undefined) data.timelineChecks = patch.timelineChecks;
     if (patch.theme          !== undefined) data.theme          = patch.theme;
@@ -608,6 +611,247 @@ function addEdTask({ text, rank }) {
   return { ok: true, text: clean };
 }
 
+// ── CALENDAR EVENTS (via ED chat) ──────────────────────────────────────────────
+// Mirrors KIND_COLORS keys in mission-control.html — keep in sync if that list changes.
+const EVENT_KIND_KEYS = ['training', 'meeting', 'focus', 'social', 'errand', 'routine'];
+
+// Recurring events are stored as templates (data.recurringEvents) and expanded into
+// virtual occurrences at read time — never materialized into data.events. Mirrors the
+// client-side occursOn/occurrenceForDate in mission-control.html — keep both in sync.
+function daysBetweenDates(aStr, bStr) {
+  return Math.round((new Date(bStr + 'T00:00:00') - new Date(aStr + 'T00:00:00')) / 86400000);
+}
+function occursOn(rec, dateStr) {
+  if (dateStr < rec.startDate) return false;
+  if (rec.endDate && dateStr > rec.endDate) return false;
+  const exc = (rec.exceptions || {})[dateStr];
+  if (exc && exc.skip) return false;
+  const interval = rec.interval || 1;
+  if (rec.freq === 'daily') return daysBetweenDates(rec.startDate, dateStr) % interval === 0;
+  if (rec.freq === 'weekly') {
+    const dow = new Date(dateStr + 'T00:00:00').getDay();
+    if (!(rec.daysOfWeek || []).includes(dow)) return false;
+    const mondayOf = d => { const nd = new Date(d + 'T00:00:00'); nd.setDate(nd.getDate() - ((nd.getDay() + 6) % 7)); return nd; };
+    const weeksDiff = Math.round((mondayOf(dateStr) - mondayOf(rec.startDate)) / (7 * 86400000));
+    return weeksDiff >= 0 && weeksDiff % interval === 0;
+  }
+  if (rec.freq === 'monthly') {
+    const d = new Date(dateStr + 'T00:00:00'), s = new Date(rec.startDate + 'T00:00:00');
+    if (d.getDate() !== rec.dayOfMonth) return false;
+    const monthsDiff = (d.getFullYear() - s.getFullYear()) * 12 + (d.getMonth() - s.getMonth());
+    return monthsDiff >= 0 && monthsDiff % interval === 0;
+  }
+  return false;
+}
+function occurrenceForDate(rec, dateStr) {
+  const exc = (rec.exceptions || {})[dateStr] || {};
+  return {
+    id: `rec-${rec.id}-${dateStr}`,
+    title: exc.title || rec.title,
+    time: exc.time !== undefined ? exc.time : rec.time,
+    location: exc.location !== undefined ? exc.location : rec.location,
+    kind: exc.kind || rec.kind || 'focus',
+    notify: exc.notify !== undefined ? exc.notify : rec.notify,
+    notifyLeadMin: exc.notifyLeadMin !== undefined ? exc.notifyLeadMin : rec.notifyLeadMin,
+    recurring: true,
+    recurringId: rec.id,
+  };
+}
+
+// Finds events (one-off and recurring occurrences) matching a title substring, optionally
+// narrowed to one date. Shared by edit/delete so both give the same "which one?" behavior.
+function findCalendarMatches(data, titleSearch, dateFilter) {
+  const q = String(titleSearch || '').toLowerCase().trim();
+  const matches = [];
+  for (const [date, evs] of Object.entries(data.events || {})) {
+    if (dateFilter && date !== dateFilter) continue;
+    evs.forEach((ev, idx) => {
+      if (ev.title.toLowerCase().includes(q)) matches.push({ kind: 'oneoff', date, idx, ev });
+    });
+  }
+  for (const rec of (data.recurringEvents || [])) {
+    if (!rec.title.toLowerCase().includes(q)) continue;
+    if (dateFilter) {
+      if (occursOn(rec, dateFilter)) matches.push({ kind: 'recurring', date: dateFilter, rec });
+    } else {
+      matches.push({ kind: 'recurring', date: null, rec });
+    }
+  }
+  return matches;
+}
+
+function describeMatch(m) {
+  if (m.kind === 'oneoff') return `"${m.ev.title}" on ${m.date}${m.ev.time ? ' at ' + m.ev.time : ''}`;
+  return `"${m.rec.title}" (recurring, ${m.rec.freq}${m.date ? ', occurrence on ' + m.date : ''})`;
+}
+
+const ADD_CALENDAR_EVENT_TOOL = {
+  name: 'add_calendar_event',
+  description: 'Create a calendar event — a one-time event on a specific date, or a recurring one (e.g. "gym every Monday at 6am", "rent due the 1st of every month"). Use ONLY when the user clearly asks to add/create/schedule something right now.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      title:    { type: 'string', description: 'Event title, e.g. "Gym" or "Dentist appointment".' },
+      date:     { type: 'string', description: 'YYYY-MM-DD. For a one-time event, the day it happens. For a recurring event, the day the recurrence starts from (default: today).' },
+      time:     { type: 'string', description: '24h HH:MM, e.g. "18:00". Omit if no specific time.' },
+      location: { type: 'string', description: 'Optional location.' },
+      kind:     { type: 'string', enum: EVENT_KIND_KEYS, description: 'Category for calendar color-coding. Default "focus" if unclear.' },
+      recurrence: {
+        type: 'object',
+        description: 'Omit entirely for a one-time event.',
+        properties: {
+          freq:        { type: 'string', enum: ['daily', 'weekly', 'monthly'] },
+          daysOfWeek:  { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 }, description: 'Weekly only. 0=Sunday...6=Saturday.' },
+          dayOfMonth:  { type: 'integer', minimum: 1, maximum: 31, description: 'Monthly only.' },
+          interval:    { type: 'integer', minimum: 1, description: 'Every N days/weeks/months. Default 1.' },
+          endDate:     { type: 'string', description: 'YYYY-MM-DD, optional. Omit for "forever".' },
+        },
+        required: ['freq'],
+      },
+    },
+    required: ['title'],
+  },
+};
+
+function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
+  const cleanTitle = String(title || '').trim().slice(0, 120);
+  if (!cleanTitle) return { ok: false, error: 'Empty title' };
+  const evKind = EVENT_KIND_KEYS.includes(kind) ? kind : 'focus';
+  const data = getAppData();
+
+  if (recurrence && recurrence.freq) {
+    if (!['daily', 'weekly', 'monthly'].includes(recurrence.freq)) return { ok: false, error: 'Invalid recurrence.freq' };
+    const rec = {
+      id: `rec-${Date.now()}`,
+      title: cleanTitle,
+      time: time || null,
+      location: String(location || '').trim().slice(0, 120),
+      kind: evKind,
+      notify: false, notifyLeadMin: null,
+      freq: recurrence.freq,
+      daysOfWeek: recurrence.freq === 'weekly' ? (Array.isArray(recurrence.daysOfWeek) && recurrence.daysOfWeek.length ? recurrence.daysOfWeek : [new Date((date || today()) + 'T00:00:00').getDay()]) : null,
+      dayOfMonth: recurrence.freq === 'monthly' ? (recurrence.dayOfMonth || new Date((date || today()) + 'T00:00:00').getDate()) : null,
+      interval: recurrence.interval || 1,
+      startDate: date || today(),
+      endDate: recurrence.endDate || null,
+      exceptions: {},
+    };
+    if (!Array.isArray(data.recurringEvents)) data.recurringEvents = [];
+    data.recurringEvents.push(rec);
+    saveAppData(data);
+    return { ok: true, recurring: true, rec };
+  }
+
+  const d = date || today();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return { ok: false, error: 'Invalid date, expected YYYY-MM-DD' };
+  if (!data.events) data.events = {};
+  if (!data.events[d]) data.events[d] = [];
+  const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: false, notifyLeadMin: null };
+  data.events[d].push(ev);
+  saveAppData(data);
+  syncEvents(data.events);
+  return { ok: true, recurring: false, date: d, ev };
+}
+
+const EDIT_CALENDAR_EVENT_TOOL = {
+  name: 'edit_calendar_event',
+  description: 'Change the title/time/location/kind (or, for a one-off event, the date) of an existing calendar event that is still happening. Do NOT use this to cancel/skip/delete an event — use delete_calendar_event for that, even for one occurrence of a series; pushing the time to some "out of the way" value is not a cancellation and leaves a real, wrong event on the calendar. Find the event by title_search (matched against existing titles) and optionally a date to narrow it down. If it turns out to be part of a recurring series and the user didn\'t specify a date/occasion, ask them in your reply whether they mean just one occurrence or the whole series, then call this again with scope and date set — don\'t guess.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      title_search: { type: 'string', description: 'Text to match against the event\'s current title.' },
+      date:         { type: 'string', description: 'YYYY-MM-DD. Narrows to one event/occurrence; required when scope is "occurrence" on a recurring series.' },
+      scope:        { type: 'string', enum: ['occurrence', 'series'], description: 'For recurring events only: change just the one occurrence on `date`, or the whole series. Default "series".' },
+      new_title:    { type: 'string' },
+      new_date:     { type: 'string', description: 'YYYY-MM-DD. Only valid for a one-off event (moves it to a new day) — a recurring series\' schedule cannot be moved this way, only its time/title/location/kind.' },
+      new_time:     { type: 'string', description: '24h HH:MM.' },
+      new_location: { type: 'string' },
+      new_kind:     { type: 'string', enum: EVENT_KIND_KEYS },
+    },
+    required: ['title_search'],
+  },
+};
+
+function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, new_time, new_location, new_kind }) {
+  const data = getAppData();
+  const matches = findCalendarMatches(data, title_search, date);
+  if (!matches.length) return { ok: false, error: 'No matching event found' };
+  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Ask the user which one, or narrow with a date.` };
+
+  const m = matches[0];
+  const fields = {};
+  if (new_title !== undefined)    fields.title = String(new_title).trim().slice(0, 120);
+  if (new_time !== undefined)     fields.time = new_time;
+  if (new_location !== undefined) fields.location = String(new_location).trim().slice(0, 120);
+  if (new_kind !== undefined && EVENT_KIND_KEYS.includes(new_kind)) fields.kind = new_kind;
+
+  if (m.kind === 'oneoff') {
+    Object.assign(m.ev, fields);
+    if (new_date !== undefined && /^\d{4}-\d{2}-\d{2}$/.test(new_date) && new_date !== m.date) {
+      data.events[m.date] = data.events[m.date].filter(e => e !== m.ev);
+      if (!data.events[m.date].length) delete data.events[m.date];
+      if (!data.events[new_date]) data.events[new_date] = [];
+      data.events[new_date].push(m.ev);
+    }
+    saveAppData(data);
+    syncEvents(data.events);
+    return { ok: true, message: `Updated "${m.ev.title}".` };
+  }
+
+  // recurring
+  if (scope === 'occurrence') {
+    if (!m.date) return { ok: false, error: 'A date is required to edit a single occurrence of a recurring event.' };
+    m.rec.exceptions = m.rec.exceptions || {};
+    m.rec.exceptions[m.date] = { ...m.rec.exceptions[m.date], ...fields };
+    saveAppData(data);
+    return { ok: true, message: `Updated the ${m.date} occurrence of "${m.rec.title}".` };
+  }
+  Object.assign(m.rec, fields);
+  saveAppData(data);
+  return { ok: true, message: `Updated the whole "${m.rec.title}" series.` };
+}
+
+const DELETE_CALENDAR_EVENT_TOOL = {
+  name: 'delete_calendar_event',
+  description: 'Delete/cancel/skip/remove an existing calendar event so it no longer happens. Use this — not edit_calendar_event — for ANY phrasing that means "make this not happen": "delete", "cancel", "skip", "remove", "I\'m not doing X anymore", "take X off my calendar". Never simulate a cancellation by editing the time/title instead — that leaves a real (wrong) event on the calendar and misleads the user about what happened. Find it by title_search and optionally a date. If it\'s part of a recurring series and the user didn\'t specify which, ask in your reply whether to delete just one occurrence or the whole series, then call again with scope and date set.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      title_search: { type: 'string', description: 'Text to match against the event\'s title.' },
+      date:         { type: 'string', description: 'YYYY-MM-DD. Narrows to one event/occurrence; required when scope is "occurrence".' },
+      scope:        { type: 'string', enum: ['occurrence', 'series'], description: 'For recurring events only. Default "series".' },
+    },
+    required: ['title_search'],
+  },
+};
+
+function deleteEdCalendarEvent({ title_search, date, scope }) {
+  const data = getAppData();
+  const matches = findCalendarMatches(data, title_search, date);
+  if (!matches.length) return { ok: false, error: 'No matching event found' };
+  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Ask the user which one, or narrow with a date.` };
+
+  const m = matches[0];
+  if (m.kind === 'oneoff') {
+    data.events[m.date] = data.events[m.date].filter(e => e !== m.ev);
+    if (!data.events[m.date].length) delete data.events[m.date];
+    saveAppData(data);
+    syncEvents(data.events);
+    return { ok: true, message: `Deleted "${m.ev.title}" on ${m.date}.` };
+  }
+
+  if (scope === 'occurrence') {
+    if (!m.date) return { ok: false, error: 'A date is required to delete a single occurrence of a recurring event.' };
+    m.rec.exceptions = m.rec.exceptions || {};
+    m.rec.exceptions[m.date] = { skip: true };
+    saveAppData(data);
+    return { ok: true, message: `Deleted the ${m.date} occurrence of "${m.rec.title}".` };
+  }
+  data.recurringEvents = (data.recurringEvents || []).filter(r => r.id !== m.rec.id);
+  saveAppData(data);
+  return { ok: true, message: `Deleted the whole "${m.rec.title}" series.` };
+}
+
 // Mirrors BUDGET_CATS keys in mission-control.html — keep in sync if that list changes.
 const BUDGET_CATEGORY_KEYS = ['food', 'rent', 'transport', 'fun', 'health', 'income', 'savings', 'other'];
 
@@ -679,6 +923,23 @@ const ED_TOOL_HANDLERS = {
     const result = logEdExpense(input);
     if (result.ok) toolActions.push({ type: 'expense_logged', txn: result.txn });
     return result.ok ? { ok: true, message: `Logged $${result.txn.amount.toFixed(2)} (${result.txn.category}).` } : { ok: false, message: result.error };
+  },
+  add_calendar_event: (input, toolActions) => {
+    const result = addEdCalendarEvent(input);
+    if (result.ok) toolActions.push({ type: 'calendar_event_added', title: (result.ev || result.rec).title });
+    return result.ok
+      ? { ok: true, message: result.recurring ? `Created recurring event "${result.rec.title}" (${result.rec.freq}).` : `Added "${result.ev.title}" on ${result.date}.` }
+      : { ok: false, message: result.error };
+  },
+  edit_calendar_event: (input, toolActions) => {
+    const result = editEdCalendarEvent(input);
+    if (result.ok) toolActions.push({ type: 'calendar_event_edited' });
+    return result.ok ? { ok: true, message: result.message } : { ok: false, message: result.error };
+  },
+  delete_calendar_event: (input, toolActions) => {
+    const result = deleteEdCalendarEvent(input);
+    if (result.ok) toolActions.push({ type: 'calendar_event_deleted' });
+    return result.ok ? { ok: true, message: result.message } : { ok: false, message: result.error };
   },
 };
 
@@ -756,6 +1017,9 @@ app.post('/api/chat', async (req, res) => {
       FORGET_MEMORY_TOOL,
       ADD_TASK_TOOL,
       LOG_EXPENSE_TOOL,
+      ADD_CALENDAR_EVENT_TOOL,
+      EDIT_CALENDAR_EVENT_TOOL,
+      DELETE_CALENDAR_EVENT_TOOL,
     ];
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages, ED_TOOL_HANDLERS);
     saveConversation(message, responseText);
@@ -1083,6 +1347,11 @@ function updateIndex() {
 function escHtml(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function stripCiteTags(s) { return String(s == null ? '' : s).replace(/<\/?cite[^>]*>/gi, ''); }
 function escAttr(s) { return escHtml(s).replace(/"/g,'&quot;'); }
+// JSON.stringify'd content embedded inline inside a <script> block. Red's mockup_html
+// routinely contains a literal "</script>" (its own demo markup) — the HTML parser closes
+// the *real* surrounding <script> tag the instant it sees that substring, dumping everything
+// after it onto the page as visible text. Escaping every "<" as < prevents that.
+function jsonForScript(obj) { return JSON.stringify(obj).replace(/</g, '\\u003c'); }
 function slugifyTopic(s) {
   return (s || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40);
 }
@@ -1448,9 +1717,9 @@ function buildSlideshowHtml(id, topic, result) {
     <button id="nextBtn" onclick="next()">NEXT ▶</button>
   </div>
 <script>
-  const RESEARCH_ID = ${JSON.stringify(id)};
-  const RATING_LABELS = ${JSON.stringify(RATING_LABELS)};
-  const FINDINGS = ${JSON.stringify(result.findings.map(f => ({
+  const RESEARCH_ID = ${jsonForScript(id)};
+  const RATING_LABELS = ${jsonForScript(RATING_LABELS)};
+  const FINDINGS = ${jsonForScript(result.findings.map(f => ({
     title: f.title || '', description: f.description || '',
     source_title: f.source_title || '', source_url: f.source_url || '',
     mockup_html: f.mockup_html || '',
@@ -1905,7 +2174,18 @@ async function checkReminders() {
 
   const now = new Date();
   let changed = false;
-  for (const [date, evs] of Object.entries(data.events || {})) {
+
+  // Recurring events are never in data.events — expand today's (and, for late-night events
+  // with a long lead time, tomorrow's) occurrences so they get reminders like one-off events do.
+  const eventsByDate = { ...(data.events || {}) };
+  for (const offset of [0, 1]) {
+    const d = new Date(now); d.setDate(d.getDate() + offset);
+    const dateStr = d.toISOString().split('T')[0];
+    const occs = (data.recurringEvents || []).filter(rec => occursOn(rec, dateStr)).map(rec => occurrenceForDate(rec, dateStr));
+    if (occs.length) eventsByDate[dateStr] = [...(eventsByDate[dateStr] || []), ...occs];
+  }
+
+  for (const [date, evs] of Object.entries(eventsByDate)) {
     for (const ev of evs) {
       if (!ev.time || !ev.notify || !ev.notifyLeadMin) continue;
       const evDt = new Date(`${date}T${ev.time}:00`);
