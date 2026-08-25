@@ -148,11 +148,17 @@
     "accounts": [
       {
         "id": "general",
-        "name": "General",
+        "name": "Card 1",
+        "icon": "💳"
+      },
+      {
+        "id": "card2",
+        "name": "Card 2",
         "icon": "💰"
       }
     ],
-    "recurring": []
+    "recurring": [],
+    "lastAccountId": "general"
   },
   "theme": {
     "preset": "Cyan",
@@ -266,6 +272,15 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-25-design-research-daily",
+      "date": "2026-08-25",
+      "topic": "",
+      "title": "General Improvements: Visual Clarity, Habit Durability, & Context-Aware Micro-Feedback",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false
+    },
+    {
       "id": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design",
       "date": "2026-08-12",
       "topic": "auto-reloading or auto-refreshing design revisions in the Design Lab slideshow when Red finishes reworking a rated idea, so the user does not have to manually reopen it",
@@ -353,7 +368,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-08-12",
+  "lastDesignResearchAutoRun": "2026-08-25",
   "changeRequests": [
     {
       "id": "2026-08-12-improve-change-queue-ui-dropdown-text-re",
@@ -1019,6 +1034,54 @@
       "createdDate": "2026-08-12",
       "updatedDate": "2026-08-12",
       "originResearchId": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design"
+    },
+    "thread-1787674819824-0-cognitive-hierarchy-via-whitespace-scale": {
+      "id": "thread-1787674819824-0-cognitive-hierarchy-via-whitespace-scale",
+      "title": "Cognitive Hierarchy via Whitespace & Scale Encoding",
+      "description": "Dashboards in 2025–26 achieve clarity by using varied card sizes and deliberate spacing to signal content priority, not just visual arrangement. Mission Control's bento grid is strong; the gap is intentional whitespace rhythm (typically 12–24px gaps) and size-graded cards (hero/primary/secondary tiers). This lets users find what matters in seconds without scanning prose or relying on color alone, directly addressing research showing shorter attention spans and faster decision windows.",
+      "source_title": "Top UI/UX Design Trends Dominating Products in 2026",
+      "source_url": "https://www.sanjaydey.com/ui-ux-design-trends-2026/",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-hero{background:#12253c;border-radius:10px;padding:20px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 2;}\n    .mc-primary{background:#12253c;border-radius:10px;padding:16px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 1;}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;}\n    .mc-stat{font-size:24px;font-weight:bold;color:#ff8a63;}\n    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}\n  </style>\n  <div class=\"mc-hero\">\n    <div class=\"mc-label\">→ TODAY'S XP TOTAL</div>\n    <div class=\"mc-stat\">+125 XP</div>\n    <div style=\"font-size:12px;margin-top:8px;color:#8fd6ff\">3 quests checked • 1 new log</div>\n  </div>\n  <div class=\"grid-2\">\n    <div class=\"mc-primary\">\n      <div class=\"mc-label\">STREAK</div>\n      <div class=\"mc-stat\">12 DAYS</div>\n    </div>\n    <div class=\"mc-primary\">\n      <div class=\"mc-label\">NEXT UP</div>\n      <div style=\"font-size:14px;margin-top:8px\">Morning Routine (6:30am)</div>\n    </div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-25",
+      "updatedDate": "2026-08-25",
+      "originResearchId": "2026-08-25-design-research-daily"
+    },
+    "thread-1787674819824-1-predictive-feedback-over-reactive-points": {
+      "id": "thread-1787674819824-1-predictive-feedback-over-reactive-points",
+      "title": "Predictive Feedback Over Reactive Points (Leading Indicators)",
+      "description": "Research shows gamified apps see 52% Day-30 dropout, primarily due to novelty fade and external-motivation dependency. Habit formation takes 66+ days; apps that show users what they *can still influence today* (leading indicators like 'complete 2 more quests for streak bonus' or 'aim for 3 S-ranks this week') retain 17% better than apps showing only past completions. This reframes Mission Control's XP system from transaction-feedback to trajectory feedback, keeping motivation intrinsic rather than point-dependent.",
+      "source_title": "Gamification in Habit Tracking: Does It Work? (Research + Real User Data)",
+      "source_url": "https://www.cohorty.app/blog/gamification-in-habit-tracking-does-it-work-research-real-user-data",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-card{background:#12253c;border-radius:10px;padding:16px;border:2px solid #1e3a5f;margin-bottom:16px;}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}\n    .mc-goal{font-size:12px;color:#7fffb0;margin:8px 0;}\n    .mc-progress{background:#1e3a5f;border-radius:6px;height:8px;width:100%;margin-top:6px;overflow:hidden;}\n    .mc-bar{background:#7fffb0;height:100%;width:60%;}\n  </style>\n  <div class=\"mc-card\">\n    <div class=\"mc-label\">⚡ TODAY'S TRAJECTORY</div>\n    <div style=\"font-size:13px;margin-bottom:12px\">Complete 1 more S-rank quest</div>\n    <div class=\"mc-progress\"><div class=\"mc-bar\"></div></div>\n    <div class=\"mc-goal\">→ +2 daily bonus XP available</div>\n  </div>\n  <div class=\"mc-card\">\n    <div class=\"mc-label\">🎯 THIS WEEK</div>\n    <div style=\"font-size:13px\">6 of 10 S-ranks logged</div>\n    <div class=\"mc-progress\" style=\"width:100%;\"><div class=\"mc-bar\" style=\"width:60%;\"></div></div>\n    <div class=\"mc-goal\">→ Complete 4 more for streak shield (miss 1 day penalty-free)</div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-25",
+      "updatedDate": "2026-08-25",
+      "originResearchId": "2026-08-25-design-research-daily"
+    },
+    "thread-1787674819824-2-neumorphic-depth-as-affordance-layer-not": {
+      "id": "thread-1787674819824-2-neumorphic-depth-as-affordance-layer-not",
+      "title": "Neumorphic Depth as Affordance Layer (Not Decoration)",
+      "description": "Retro-gaming UI and modern dashboard design are converging on neumorphism used solely for interactive affordance—not visual flourish. Soft shadow-highlights on buttons, toggles, and clickable cards signal 'tap me' without bloating contrast or breaking accessibility. Mission Control's JRPG borders already use hard shadows; adding subtle inner-shadow depth to quest checkboxes and time-wheel tiles grounds interactivity in tactile feedback cues, making the UI feel responsive without abandoning the existing dark cyan aesthetic.",
+      "source_title": "Neumorphism vs Glassmorphism: 2026 Modern UI Design Trends",
+      "source_url": "https://zignuts.com/blog/neumorphism-vs-glassmorphism",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-tile{background:#12253c;border:2px solid #1e3a5f;border-radius:10px;padding:14px;margin-bottom:12px;cursor:pointer;transition:box-shadow 0.15s;box-shadow:inset 0 2px 4px rgba(15,59,102,0.4),inset 0 -1px 2px rgba(0,0,0,0.5);}\n    .mc-tile:hover{box-shadow:inset 0 2px 6px rgba(15,59,102,0.6),inset 0 -1px 3px rgba(0,0,0,0.6),0 4px 8px rgba(0,0,0,0.3);}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:6px;}\n    .mc-text{font-size:13px;}\n    .mc-check{width:18px;height:18px;border:2px solid #66c8ff;border-radius:4px;background:#0a1929;display:inline-block;margin-right:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.6);vertical-align:middle;}\n  </style>\n  <div class=\"mc-tile\">\n    <div class=\"mc-label\">TODAY'S QUESTS</div>\n    <div style=\"margin-top:10px;\">\n      <span class=\"mc-check\"></span><span class=\"mc-text\" style=\"color:#7fffb0;\">Morning Routine</span>\n    </div>\n    <div style=\"margin-top:8px;\">\n      <span class=\"mc-check\"></span><span class=\"mc-text\">Focus Block (2h)</span>\n    </div>\n  </div>\n  <p style=\"font-size:10px;color:#8fd6ff;margin-top:16px;font-family:'Press Start 2P',cursive;\">← Inset shadows show depth; hover brightens to signal tap-ready</p>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-25",
+      "updatedDate": "2026-08-25",
+      "originResearchId": "2026-08-25-design-research-daily"
     }
   },
   "designArchive": [

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Visual Clarity, Habit Durability, &amp; Context-Aware Micro-Feedback</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Visual Clarity, Habit Durability, &amp; Context-Aware Micro-Feedback</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Research into dashboard trends, gamification psychology, and retro-UI cohesion reveals three opportunities: stronger visual hierarchy and whitespace to cut cognitive load without abandoning the JRPG aesthetic; a shift from transaction-heavy gamification (points/XP decay risk) to predictive feedback that shows what users can still influence today; and intentional use of neumorphic depth cues on interactive elements to signal affordance without relying on decorative skeuomorphism.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Cognitive Hierarchy via Whitespace &amp; Scale Encoding</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Dashboards in 2025–26 achieve clarity by using varied card sizes and deliberate spacing to signal content priority, not just visual arrangement. Mission Control's bento grid is strong; the gap is intentional whitespace rhythm (typically 12–24px gaps) and size-graded cards (hero/primary/secondary tiers). This lets users find what matters in seconds without scanning prose or relying on color alone, directly addressing research showing shorter attention spans and faster decision windows.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.sanjaydey.com/ui-ux-design-trends-2026/" target="_blank" rel="noopener" style="color:#ff8a63;">Top UI/UX Design Trends Dominating Products in 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;style&gt;
+    .mc-hero{background:#12253c;border-radius:10px;padding:20px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 2;}
+    .mc-primary{background:#12253c;border-radius:10px;padding:16px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 1;}
+    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;}
+    .mc-stat{font-size:24px;font-weight:bold;color:#ff8a63;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  &lt;/style&gt;
+  &lt;div class=&quot;mc-hero&quot;&gt;
+    &lt;div class=&quot;mc-label&quot;&gt;→ TODAY'S XP TOTAL&lt;/div&gt;
+    &lt;div class=&quot;mc-stat&quot;&gt;+125 XP&lt;/div&gt;
+    &lt;div style=&quot;font-size:12px;margin-top:8px;color:#8fd6ff&quot;&gt;3 quests checked • 1 new log&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;grid-2&quot;&gt;
+    &lt;div class=&quot;mc-primary&quot;&gt;
+      &lt;div class=&quot;mc-label&quot;&gt;STREAK&lt;/div&gt;
+      &lt;div class=&quot;mc-stat&quot;&gt;12 DAYS&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;mc-primary&quot;&gt;
+      &lt;div class=&quot;mc-label&quot;&gt;NEXT UP&lt;/div&gt;
+      &lt;div style=&quot;font-size:14px;margin-top:8px&quot;&gt;Morning Routine (6:30am)&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Predictive Feedback Over Reactive Points (Leading Indicators)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Research shows gamified apps see 52% Day-30 dropout, primarily due to novelty fade and external-motivation dependency. Habit formation takes 66+ days; apps that show users what they *can still influence today* (leading indicators like 'complete 2 more quests for streak bonus' or 'aim for 3 S-ranks this week') retain 17% better than apps showing only past completions. This reframes Mission Control's XP system from transaction-feedback to trajectory feedback, keeping motivation intrinsic rather than point-dependent.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.cohorty.app/blog/gamification-in-habit-tracking-does-it-work-research-real-user-data" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification in Habit Tracking: Does It Work? (Research + Real User Data)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;style&gt;
+    .mc-card{background:#12253c;border-radius:10px;padding:16px;border:2px solid #1e3a5f;margin-bottom:16px;}
+    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+    .mc-goal{font-size:12px;color:#7fffb0;margin:8px 0;}
+    .mc-progress{background:#1e3a5f;border-radius:6px;height:8px;width:100%;margin-top:6px;overflow:hidden;}
+    .mc-bar{background:#7fffb0;height:100%;width:60%;}
+  &lt;/style&gt;
+  &lt;div class=&quot;mc-card&quot;&gt;
+    &lt;div class=&quot;mc-label&quot;&gt;⚡ TODAY'S TRAJECTORY&lt;/div&gt;
+    &lt;div style=&quot;font-size:13px;margin-bottom:12px&quot;&gt;Complete 1 more S-rank quest&lt;/div&gt;
+    &lt;div class=&quot;mc-progress&quot;&gt;&lt;div class=&quot;mc-bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;mc-goal&quot;&gt;→ +2 daily bonus XP available&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;mc-card&quot;&gt;
+    &lt;div class=&quot;mc-label&quot;&gt;🎯 THIS WEEK&lt;/div&gt;
+    &lt;div style=&quot;font-size:13px&quot;&gt;6 of 10 S-ranks logged&lt;/div&gt;
+    &lt;div class=&quot;mc-progress&quot; style=&quot;width:100%;&quot;&gt;&lt;div class=&quot;mc-bar&quot; style=&quot;width:60%;&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;mc-goal&quot;&gt;→ Complete 4 more for streak shield (miss 1 day penalty-free)&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Neumorphic Depth as Affordance Layer (Not Decoration)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Retro-gaming UI and modern dashboard design are converging on neumorphism used solely for interactive affordance—not visual flourish. Soft shadow-highlights on buttons, toggles, and clickable cards signal 'tap me' without bloating contrast or breaking accessibility. Mission Control's JRPG borders already use hard shadows; adding subtle inner-shadow depth to quest checkboxes and time-wheel tiles grounds interactivity in tactile feedback cues, making the UI feel responsive without abandoning the existing dark cyan aesthetic.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://zignuts.com/blog/neumorphism-vs-glassmorphism" target="_blank" rel="noopener" style="color:#ff8a63;">Neumorphism vs Glassmorphism: 2026 Modern UI Design Trends</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;style&gt;
+    .mc-tile{background:#12253c;border:2px solid #1e3a5f;border-radius:10px;padding:14px;margin-bottom:12px;cursor:pointer;transition:box-shadow 0.15s;box-shadow:inset 0 2px 4px rgba(15,59,102,0.4),inset 0 -1px 2px rgba(0,0,0,0.5);}
+    .mc-tile:hover{box-shadow:inset 0 2px 6px rgba(15,59,102,0.6),inset 0 -1px 3px rgba(0,0,0,0.6),0 4px 8px rgba(0,0,0,0.3);}
+    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:6px;}
+    .mc-text{font-size:13px;}
+    .mc-check{width:18px;height:18px;border:2px solid #66c8ff;border-radius:4px;background:#0a1929;display:inline-block;margin-right:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.6);vertical-align:middle;}
+  &lt;/style&gt;
+  &lt;div class=&quot;mc-tile&quot;&gt;
+    &lt;div class=&quot;mc-label&quot;&gt;TODAY'S QUESTS&lt;/div&gt;
+    &lt;div style=&quot;margin-top:10px;&quot;&gt;
+      &lt;span class=&quot;mc-check&quot;&gt;&lt;/span&gt;&lt;span class=&quot;mc-text&quot; style=&quot;color:#7fffb0;&quot;&gt;Morning Routine&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;margin-top:8px;&quot;&gt;
+      &lt;span class=&quot;mc-check&quot;&gt;&lt;/span&gt;&lt;span class=&quot;mc-text&quot;&gt;Focus Block (2h)&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;p style=&quot;font-size:10px;color:#8fd6ff;margin-top:16px;font-family:'Press Start 2P',cursive;&quot;&gt;← Inset shadows show depth; hover brightens to signal tap-ready&lt;/p&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-25-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Cognitive Hierarchy via Whitespace & Scale Encoding","description":"Dashboards in 2025–26 achieve clarity by using varied card sizes and deliberate spacing to signal content priority, not just visual arrangement. Mission Control's bento grid is strong; the gap is intentional whitespace rhythm (typically 12–24px gaps) and size-graded cards (hero/primary/secondary tiers). This lets users find what matters in seconds without scanning prose or relying on color alone, directly addressing research showing shorter attention spans and faster decision windows.","source_title":"Top UI/UX Design Trends Dominating Products in 2026","source_url":"https://www.sanjaydey.com/ui-ux-design-trends-2026/","mockup_html":"<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-hero{background:#12253c;border-radius:10px;padding:20px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 2;}\n    .mc-primary{background:#12253c;border-radius:10px;padding:16px;margin-bottom:24px;border:2px solid #1e3a5f;grid-column:span 1;}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:8px;letter-spacing:1px;}\n    .mc-stat{font-size:24px;font-weight:bold;color:#ff8a63;}\n    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;}\n  </style>\n  <div class=\"mc-hero\">\n    <div class=\"mc-label\">→ TODAY'S XP TOTAL</div>\n    <div class=\"mc-stat\">+125 XP</div>\n    <div style=\"font-size:12px;margin-top:8px;color:#8fd6ff\">3 quests checked • 1 new log</div>\n  </div>\n  <div class=\"grid-2\">\n    <div class=\"mc-primary\">\n      <div class=\"mc-label\">STREAK</div>\n      <div class=\"mc-stat\">12 DAYS</div>\n    </div>\n    <div class=\"mc-primary\">\n      <div class=\"mc-label\">NEXT UP</div>\n      <div style=\"font-size:14px;margin-top:8px\">Morning Routine (6:30am)</div>\n    </div>\n  </div>\n</div>","threadId":"thread-1787674819824-0-cognitive-hierarchy-via-whitespace-scale"},{"title":"Predictive Feedback Over Reactive Points (Leading Indicators)","description":"Research shows gamified apps see 52% Day-30 dropout, primarily due to novelty fade and external-motivation dependency. Habit formation takes 66+ days; apps that show users what they *can still influence today* (leading indicators like 'complete 2 more quests for streak bonus' or 'aim for 3 S-ranks this week') retain 17% better than apps showing only past completions. This reframes Mission Control's XP system from transaction-feedback to trajectory feedback, keeping motivation intrinsic rather than point-dependent.","source_title":"Gamification in Habit Tracking: Does It Work? (Research + Real User Data)","source_url":"https://www.cohorty.app/blog/gamification-in-habit-tracking-does-it-work-research-real-user-data","mockup_html":"<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-card{background:#12253c;border-radius:10px;padding:16px;border:2px solid #1e3a5f;margin-bottom:16px;}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}\n    .mc-goal{font-size:12px;color:#7fffb0;margin:8px 0;}\n    .mc-progress{background:#1e3a5f;border-radius:6px;height:8px;width:100%;margin-top:6px;overflow:hidden;}\n    .mc-bar{background:#7fffb0;height:100%;width:60%;}\n  </style>\n  <div class=\"mc-card\">\n    <div class=\"mc-label\">⚡ TODAY'S TRAJECTORY</div>\n    <div style=\"font-size:13px;margin-bottom:12px\">Complete 1 more S-rank quest</div>\n    <div class=\"mc-progress\"><div class=\"mc-bar\"></div></div>\n    <div class=\"mc-goal\">→ +2 daily bonus XP available</div>\n  </div>\n  <div class=\"mc-card\">\n    <div class=\"mc-label\">🎯 THIS WEEK</div>\n    <div style=\"font-size:13px\">6 of 10 S-ranks logged</div>\n    <div class=\"mc-progress\" style=\"width:100%;\"><div class=\"mc-bar\" style=\"width:60%;\"></div></div>\n    <div class=\"mc-goal\">→ Complete 4 more for streak shield (miss 1 day penalty-free)</div>\n  </div>\n</div>","threadId":"thread-1787674819824-1-predictive-feedback-over-reactive-points"},{"title":"Neumorphic Depth as Affordance Layer (Not Decoration)","description":"Retro-gaming UI and modern dashboard design are converging on neumorphism used solely for interactive affordance—not visual flourish. Soft shadow-highlights on buttons, toggles, and clickable cards signal 'tap me' without bloating contrast or breaking accessibility. Mission Control's JRPG borders already use hard shadows; adding subtle inner-shadow depth to quest checkboxes and time-wheel tiles grounds interactivity in tactile feedback cues, making the UI feel responsive without abandoning the existing dark cyan aesthetic.","source_title":"Neumorphism vs Glassmorphism: 2026 Modern UI Design Trends","source_url":"https://zignuts.com/blog/neumorphism-vs-glassmorphism","mockup_html":"<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <style>\n    .mc-tile{background:#12253c;border:2px solid #1e3a5f;border-radius:10px;padding:14px;margin-bottom:12px;cursor:pointer;transition:box-shadow 0.15s;box-shadow:inset 0 2px 4px rgba(15,59,102,0.4),inset 0 -1px 2px rgba(0,0,0,0.5);}\n    .mc-tile:hover{box-shadow:inset 0 2px 6px rgba(15,59,102,0.6),inset 0 -1px 3px rgba(0,0,0,0.6),0 4px 8px rgba(0,0,0,0.3);}\n    .mc-label{font-size:9px;font-family:'Press Start 2P',cursive;color:#8fd6ff;text-transform:uppercase;margin-bottom:6px;}\n    .mc-text{font-size:13px;}\n    .mc-check{width:18px;height:18px;border:2px solid #66c8ff;border-radius:4px;background:#0a1929;display:inline-block;margin-right:8px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.6);vertical-align:middle;}\n  </style>\n  <div class=\"mc-tile\">\n    <div class=\"mc-label\">TODAY'S QUESTS</div>\n    <div style=\"margin-top:10px;\">\n      <span class=\"mc-check\"></span><span class=\"mc-text\" style=\"color:#7fffb0;\">Morning Routine</span>\n    </div>\n    <div style=\"margin-top:8px;\">\n      <span class=\"mc-check\"></span><span class=\"mc-text\">Focus Block (2h)</span>\n    </div>\n  </div>\n  <p style=\"font-size:10px;color:#8fd6ff;margin-top:16px;font-family:'Press Start 2P',cursive;\">← Inset shadows show depth; hover brightens to signal tap-ready</p>\n</div>","threadId":"thread-1787674819824-2-neumorphic-depth-as-affordance-layer-not"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>

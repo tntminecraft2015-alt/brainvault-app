@@ -675,3 +675,10 @@ Tasks synced for 2026-08-14: 0/2 complete
 **Pages created:** [[daily-tasks-2026-08-14]]
 
 Tasks synced for 2026-08-14: 0/0 complete
+
+## [2026-08-25] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-25-design-research-daily]]
+
+Design research: General Improvements: Visual Clarity, Habit Durability, & Context-Aware Micro-Feedback (3 findings)

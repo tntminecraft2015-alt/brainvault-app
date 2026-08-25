@@ -540,8 +540,13 @@ function logEdExpense({ amount, category, note, type }) {
   if (!data.budget) data.budget = { monthlyLimit: 2000, transactions: [], mode: 'monthly' };
   if (!Array.isArray(data.budget.transactions)) data.budget.transactions = [];
   const txnType = type === 'income' ? 'income' : 'expense';
-  const txn = { id: Date.now(), date: today(), amount: amt, category: cat, note: String(note || '').trim().slice(0, 120) || cat, type: txnType };
+  const accts = Array.isArray(data.budget.accounts) ? data.budget.accounts : [];
+  const acctId = accts.some(a => a.id === data.budget.lastAccountId)
+    ? data.budget.lastAccountId
+    : (accts[0]?.id || 'general');
+  const txn = { id: Date.now(), date: today(), amount: amt, category: cat, note: String(note || '').trim().slice(0, 120) || cat, type: txnType, accountId: acctId };
   data.budget.transactions.unshift(txn);
+  data.budget.lastAccountId = acctId;
   saveAppData(data);
   return { ok: true, txn };
 }
