@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="BrainVault">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chrono-node@2/dist/chrono.min.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -38,8 +38,7 @@
       --r-pill:     999px;
     }
 
-    html, body { width:100%; height:100%; background:#000; color:var(--fg); overflow:hidden; image-rendering:pixelated; }
-    .px { font-family:'Press Start 2P',ui-monospace,monospace; letter-spacing:1px; }
+    html, body { width:100%; height:100%; background:#000; color:var(--fg); overflow:hidden; image-rendering:pixelated; font-family:'Inter',sans-serif; }
 
     @keyframes blink      { 50%{ opacity:0; } }
     @keyframes march      { to { transform:translateX(-50%); } }
@@ -54,8 +53,8 @@
       transition:opacity .4s;
     }
     #bootOverlay.fade { opacity:0; pointer-events:none; }
-    .boot-title  { font-family:'Press Start 2P',monospace; font-size:16px; letter-spacing:4px; color:var(--fg); animation:blink .7s steps(2) infinite; }
-    .boot-sub    { font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:2px; color:var(--fg-dim); }
+    .boot-title  { font-family:'Inter',sans-serif; font-size:17px; color:var(--fg); animation:blink .7s steps(2) infinite; }
+    .boot-sub    { font-family:'Inter',sans-serif; font-size:11px; color:var(--fg-dim); }
     .boot-blocks { display:flex; gap:4px; margin-top:4px; }
     .boot-block  { width:10px; height:10px; background:var(--fg); opacity:.12; }
 
@@ -63,13 +62,13 @@
        SHARED UI PRIMITIVES (used by the app shell, now mobile-only always)
     ══════════════════════════════════════ */
 
-    .cal-nav-btn  { background:none; border:none; color:inherit; cursor:pointer; font-family:'Press Start 2P',monospace; font-size:7px; opacity:.7; padding:0 3px; transition:opacity .1s; }
+    .cal-nav-btn  { background:none; border:none; color:inherit; cursor:pointer; font-family:'Inter',sans-serif; font-size:11px; opacity:.7; padding:0 3px; transition:opacity .1s; }
     .cal-nav-btn:hover { opacity:1; color:var(--accent); }
 
-    .mini-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:14px; padding:4px 7px; outline:none; }
+    .mini-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:14px; padding:4px 7px; outline:none; }
     .mini-inp::placeholder { color:rgba(223,238,255,.25); }
     .mini-inp-time { width:68px; color-scheme:dark; cursor:pointer; }
-    .mini-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--accent); font-family:'Press Start 2P',monospace; font-size:9px; padding:0 8px; cursor:pointer; transition:background .1s; }
+    .mini-btn  { background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--accent); font-family:'Inter',sans-serif; font-size:12px; padding:0 8px; cursor:pointer; transition:background .1s; }
     .mini-btn:hover { background:var(--bg); }
 
     .server-dot { width:6px; height:6px; border-radius:50%; background:#555; flex-shrink:0; transition:background .3s; }
@@ -78,7 +77,7 @@
 
     /* Chat bubbles (rendered into #mobChatMsgs) */
     .chat-msg     { display:flex; flex-direction:column; gap:2px; }
-    .chat-msg-who { font-family:'Press Start 2P',monospace; font-size:5px; opacity:.55; padding:0 4px; }
+    .chat-msg-who { font-family:'Inter',sans-serif; font-size:9.5px; opacity:.55; padding:0 4px; }
     .chat-msg-who.you    { color:var(--accent); align-self:flex-end; }
     .chat-msg-who.claude { color:var(--fg); }
     .chat-msg-who.sys    { color:rgba(223,238,255,.35); }
@@ -95,14 +94,14 @@
     /* Modals */
     .overlay   { display:none; position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:100; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
     .overlay.active { display:flex; }
-    .modal { background:var(--surface); box-shadow:inset 0 0 0 3px rgba(223,238,255,.4),inset 0 0 0 5px var(--surface),inset 0 0 0 7px rgba(223,238,255,.1); padding:22px 20px; width:460px; max-width:94vw; }
-    .modal-title { font-family:'Press Start 2P',monospace; font-size:8px; letter-spacing:2px; color:var(--fg); margin-bottom:14px; padding-bottom:10px; border-bottom:2px solid rgba(223,238,255,.1); }
-    .m-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.55; margin-bottom:3px; text-transform:uppercase; }
+    .modal { background:var(--surface); box-shadow:0 0 0 1px rgba(223,238,255,.12); border-radius:var(--r-lg); padding:22px 20px; width:460px; max-width:94vw; }
+    .modal-title { font-family:'Inter',sans-serif; font-weight:700; font-size:14px; color:var(--fg); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(223,238,255,.1); }
+    .m-label { font-family:'Inter',sans-serif; font-size:10.5px; opacity:.55; margin-bottom:3px; text-transform:uppercase; }
     .m-field { margin-bottom:6px; }
-    .m-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:6px 9px; outline:none; }
+    .m-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:16px; padding:6px 9px; outline:none; }
     .m-inp::placeholder { color:rgba(223,238,255,.25); }
     .m-inp:focus { box-shadow:inset 0 0 0 1px rgba(223,238,255,.45); }
-    .m-sel   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:6px 9px; cursor:pointer; color-scheme:dark; }
+    .m-sel   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:16px; padding:6px 9px; cursor:pointer; color-scheme:dark; }
     .m-2col  { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
     .ev-more-toggle { background:none; border:none; color:var(--accent2); font-family:'Inter',sans-serif; font-size:11px; font-weight:600; padding:4px 2px; cursor:pointer; text-align:left; }
     .ev-more-wrap { display:none; flex-direction:column; gap:8px; }
@@ -114,9 +113,9 @@
     .notify-thumb  { position:absolute; top:2px; left:2px; width:13px; height:13px; border-radius:50%; background:var(--fg); opacity:.5; transition:transform .15s, background .15s, opacity .15s; }
     .notify-toggle input:checked + .notify-track { background:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
     .notify-toggle input:checked + .notify-track .notify-thumb { transform:translateX(15px); background:#fff; opacity:1; }
-    .notify-toggle-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.7; text-transform:uppercase; letter-spacing:.5px; }
+    .notify-toggle-label { font-family:'Inter',sans-serif; font-size:10.5px; opacity:.7; text-transform:uppercase; letter-spacing:.5px; }
     .modal-btns { display:flex; gap:7px; margin-top:12px; }
-    .modal-btn  { flex:1; padding:9px 10px; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:1px; cursor:pointer; transition:all .12s; position:relative; }
+    .modal-btn  { flex:1; padding:9px 10px; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:12px; border-radius:var(--r-sm); cursor:pointer; transition:all .12s; position:relative; }
     .modal-btn::before { content:'▶'; position:absolute; left:7px; font-size:6px; opacity:0; color:var(--accent); transition:opacity .1s; }
     .modal-btn:hover::before { opacity:1; }
     .modal-btn:hover { background:var(--darker); }
@@ -133,7 +132,7 @@
     .wheel-col::-webkit-scrollbar { display:none; }
     .wheel-item {
       height:44px; display:flex; align-items:center; justify-content:center;
-      font-family:'VT323',monospace; font-size:26px; color:rgba(223,238,255,.35);
+      font-family:'Inter',sans-serif; font-weight:600; font-size:26px; color:rgba(223,238,255,.35);
       scroll-snap-align:center; transition:color .1s,opacity .1s; user-select:none;
     }
     .wheel-item.sel { color:var(--accent); font-size:30px; }
@@ -147,18 +146,18 @@
     .dev-item  { display:flex; align-items:center; gap:6px; padding:6px 0; border-bottom:1px solid rgba(223,238,255,.07); font-size:14px; }
     .dev-item:last-child { border-bottom:none; }
     .dev-dot   { width:6px; height:6px; flex-shrink:0; }
-    .dev-time  { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); min-width:46px; }
+    .dev-time  { font-family:'Inter',sans-serif; font-size:10.5px; color:var(--fg-dim); min-width:46px; }
     .dev-del   { opacity:0; background:none; border:none; color:rgba(223,238,255,.5); font-size:11px; cursor:pointer; margin-left:auto; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
     .dev-item:hover .dev-del { opacity:1; }
     .dev-del:hover { color:var(--red); }
     .dev-empty { font-size:13px; color:rgba(223,238,255,.3); font-style:italic; padding:6px 0; }
     .key-form  { display:flex; flex-direction:column; gap:8px; }
     .key-info  { font-size:14px; color:var(--fg-dim); line-height:1.5; }
-    .key-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.2); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:7px 10px; outline:none; border-radius:var(--r-md); }
+    .key-inp   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.2); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:16px; padding:7px 10px; outline:none; border-radius:var(--r-md); }
     .key-inp:focus { box-shadow:inset 0 0 0 1px rgba(223,238,255,.5); }
 
     .cq-badge { position:absolute; top:-5px; right:-5px; background:var(--accent); color:#0a1929; border-radius:50%; min-width:14px; height:14px; padding:0 3px; font-size:8px; line-height:14px; text-align:center; font-family:monospace; font-weight:bold; }
-    .toast { position:fixed; bottom:36px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface); box-shadow:inset 0 0 0 2px rgba(223,238,255,.4),inset 0 0 0 4px var(--surface),inset 0 0 0 6px rgba(223,238,255,.1); color:var(--fg); font-family:'Press Start 2P',monospace; font-size:7px; letter-spacing:1px; padding:9px 18px; transition:transform .22s; z-index:998; pointer-events:none; }
+    .toast { position:fixed; bottom:36px; left:50%; transform:translateX(-50%) translateY(60px); background:var(--surface); box-shadow:inset 0 0 0 2px rgba(223,238,255,.4),inset 0 0 0 4px var(--surface),inset 0 0 0 6px rgba(223,238,255,.1); color:var(--fg); font-family:'Inter',sans-serif; font-size:11px; letter-spacing:1px; padding:9px 18px; transition:transform .22s; z-index:998; pointer-events:none; }
     .toast.show { transform:translateX(-50%) translateY(0); }
     .empty { font-size:12px; color:rgba(223,238,255,.3); font-style:italic; text-align:center; padding:8px 0; }
     input[type="date"],input[type="time"] { color-scheme:dark; }
@@ -209,7 +208,7 @@
 
       /* Tab section header */
       .mob-tab-hd {
-        font-family:'Press Start 2P',monospace; font-size:7px; opacity:.8; color:var(--accent2);
+        font-family:'Inter',sans-serif; font-size:11px; opacity:.8; color:var(--accent2);
         padding-bottom:10px; margin-bottom:12px;
         border-bottom:1px solid rgba(223,238,255,.12);
         display:flex; justify-content:space-between; align-items:center; flex-shrink:0;
@@ -217,42 +216,42 @@
 
       /* ── HOME tab ── */
       .mob-home-clock {
-        font-family:'VT323',monospace; font-size:80px; line-height:1;
+        font-family:'Inter',sans-serif; font-weight:600; font-size:80px; line-height:1;
         text-align:center; letter-spacing:3px; color:var(--fg);
         margin-bottom:2px; flex-shrink:0;
       }
       .mob-home-date {
-        font-family:'Press Start 2P',monospace; font-size:7px;
+        font-family:'Inter',sans-serif; font-size:11px;
         opacity:.55; text-align:center; margin-bottom:18px; flex-shrink:0;
       }
       .mob-home-card, .mc-card {
-        background:var(--surface);
-        box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14);
+        background:rgba(223,238,255,.045);
+        box-shadow:none;
         padding:14px 16px; margin-bottom:12px; flex-shrink:0;
         border-radius:var(--r-lg);
-        transition:box-shadow .15s, transform .1s;
+        transition:background .12s, transform .1s;
       }
-      .mob-home-card:active, .mc-card:active { transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14); }
+      .mob-home-card:active, .mc-card:active { transform:scale(.98); background:rgba(223,238,255,.07); }
       .mob-bento { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
       .mob-bento > * { min-width:0; }
       .mob-bento .mob-home-card, .mob-bento .mc-card { margin-bottom:0; }
       .mob-bento .span-2 { grid-column:span 2; }
       .mob-home-card-label {
-        font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent2);
+        font-family:'Inter',sans-serif; font-size:10.5px; color:var(--accent2);
         opacity:.85; margin-bottom:8px; letter-spacing:1px;
       }
       .mob-home-streak-num {
-        font-family:'VT323',monospace; font-size:42px; line-height:1; color:var(--fg);
+        font-family:'Inter',sans-serif; font-weight:600; font-size:42px; line-height:1; color:var(--fg);
       }
-      .mob-home-next-time  { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--accent); margin-bottom:5px; }
-      .mob-home-next-title { font-family:'VT323',monospace; font-size:26px; line-height:1.2; }
+      .mob-home-next-time  { font-family:'Inter',sans-serif; font-size:12px; color:var(--accent); margin-bottom:5px; }
+      .mob-home-next-title { font-family:'Inter',sans-serif; font-weight:600; font-size:26px; line-height:1.2; }
       .mob-home-link {
         display:inline-flex; align-items:center; gap:3px; background:none; border:none;
-        font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent2);
+        font-family:'Inter',sans-serif; font-size:10.5px; color:var(--accent2);
         opacity:.9; cursor:pointer; padding:10px 0 0; margin:0; text-align:left;
       }
       .mob-home-count-pill {
-        font-family:'Press Start 2P',monospace; font-size:6px; padding:3px 7px;
+        font-family:'Inter',sans-serif; font-size:10.5px; padding:3px 7px;
         background:rgba(102,200,255,.14); color:var(--accent2); border-radius:var(--r-pill);
       }
       .mob-home-poke-preview {
@@ -272,7 +271,7 @@
       }
       .mob-dow-row {
         display:grid; grid-template-columns:repeat(7,1fr);
-        font-family:'Press Start 2P',monospace; font-size:6px; opacity:.5;
+        font-family:'Inter',sans-serif; font-size:10.5px; opacity:.5;
         margin-bottom:4px; flex-shrink:0;
       }
       .mob-dow-row span { text-align:center; }
@@ -280,7 +279,7 @@
         background:var(--darker); padding:5px 2px; text-align:center;
         font-size:15px; cursor:pointer; min-height:36px;
         display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-        border:none; color:var(--fg); font-family:'VT323',monospace; transition:background .1s;
+        border:none; color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; transition:background .1s;
         border-radius:var(--r-sm);
       }
       .mob-day-cell:active { background:var(--surface); }
@@ -305,43 +304,43 @@
       .mob-task-row.done .mob-pix-check { background:var(--accent); }
       .mob-pix-x  { width:19px; height:19px; background:#fff; display:none; clip-path:polygon(0 0,30% 0,50% 30%,70% 0,100% 0,100% 30%,70% 50%,100% 70%,100% 100%,70% 100%,50% 70%,30% 100%,0 100%,0 70%,30% 50%,0 30%); }
       .mob-task-row.done .mob-pix-x { display:block; }
-      .mob-rank-badge { font-family:'Press Start 2P',monospace; font-size:8px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; border-radius:var(--r-pill); }
+      .mob-rank-badge { font-family:'Inter',sans-serif; font-size:12px; width:20px; text-align:center; padding:3px 2px; color:#fff; flex-shrink:0; line-height:1; border-radius:var(--r-pill); }
       .mob-rank-badge.compact { opacity:.55; }
-      .mob-xp-chip { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); flex-shrink:0; }
-      .mob-quest-time { font-family:'Press Start 2P',monospace; font-size:7px; color:rgba(223,238,255,.55); flex-shrink:0; white-space:nowrap; }
-      .mob-task-label { flex:1; font-family:'VT323',monospace; font-size:22px; line-height:1.2; }
+      .mob-xp-chip { font-family:'Inter',sans-serif; font-size:11px; color:var(--accent); flex-shrink:0; }
+      .mob-quest-time { font-family:'Inter',sans-serif; font-size:11px; color:rgba(223,238,255,.55); flex-shrink:0; white-space:nowrap; }
+      .mob-task-label { flex:1; font-family:'Inter',sans-serif; font-weight:600; font-size:22px; line-height:1.2; }
       .mob-task-row.done .mob-task-label { text-decoration:line-through; }
       .mob-task-del  { background:none; border:none; color:rgba(223,238,255,.45); font-size:18px; cursor:pointer; padding:6px; flex-shrink:0; }
       .mob-task-del:active { color:var(--red); }
 
       /* Shared add-row */
       .mob-add-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
-      .mob-inp     { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; min-height:44px; outline:none; border-radius:var(--r-md); }
+      .mob-inp     { flex:1; min-width:0; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:15px; padding:9px 10px; min-height:44px; outline:none; border-radius:var(--r-md); }
       .mob-inp::placeholder { color:rgba(223,238,255,.25); }
-      .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); font-family:'Press Start 2P',monospace; font-size:8px; padding:0 6px; cursor:pointer; width:44px; min-height:44px; appearance:none; text-align:center; border-radius:var(--r-md); }
+      .mob-rank-sel { background:var(--darker); color:var(--fg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); font-family:'Inter',sans-serif; font-size:12px; padding:0 6px; cursor:pointer; width:44px; min-height:44px; appearance:none; text-align:center; border-radius:var(--r-md); }
       .mob-time-trigger {
         background:var(--darker); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:rgba(223,238,255,.6);
-        font-family:'Press Start 2P',monospace; font-size:9px; padding:0 10px; min-width:44px; min-height:44px; flex-shrink:0;
+        font-family:'Inter',sans-serif; font-size:12px; padding:0 10px; min-width:44px; min-height:44px; flex-shrink:0;
         cursor:pointer; border-radius:var(--r-md); white-space:nowrap;
       }
       .mob-time-trigger.set { color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
       .mob-time-trigger.required { box-shadow:inset 0 0 0 1px rgba(232,93,58,.6); }
       .mob-add-btn  {
-        background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
-        font-family:'Press Start 2P',monospace; font-size:11px; padding:0 18px; min-height:44px; min-width:44px;
-        cursor:pointer; flex-shrink:0; transition:box-shadow .15s, transform .1s; border-radius:var(--r-md);
+        background:var(--accent); border:none; box-shadow:none; color:var(--bg);
+        font-family:'Inter',sans-serif; font-weight:700; font-size:15px; padding:0 18px; min-height:44px; min-width:44px;
+        cursor:pointer; flex-shrink:0; transition:transform .1s, opacity .1s; border-radius:var(--r-md);
       }
-      .mob-add-btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 rgba(0,0,0,.4); }
+      .mob-add-btn:active { transform:scale(.95); opacity:.85; }
 
       /* ── Claude tab ── */
       .mob-chat-msgs { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px 0; -webkit-overflow-scrolling:touch; min-height:0; }
       .mob-chat-inp-row { display:flex; gap:6px; padding-top:10px; flex-shrink:0; }
-      .mob-chat-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:20px; padding:9px 10px; outline:none; resize:none; min-height:50px; border-radius:var(--r-md); }
+      .mob-chat-inp  { flex:1; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-weight:600; font-size:20px; padding:9px 10px; outline:none; resize:none; min-height:50px; border-radius:var(--r-md); }
       .mob-chat-inp::placeholder { color:rgba(223,238,255,.25); }
       .mob-send-btn  {
-        background:var(--accent); border:none; box-shadow:2px 2px 0 rgba(0,0,0,.4); color:var(--bg);
-        font-family:'Press Start 2P',monospace; font-size:9px; padding:0 18px; min-width:44px;
-        cursor:pointer; flex-shrink:0; transition:box-shadow .15s, transform .1s; border-radius:var(--r-md);
+        background:var(--accent); border:none; box-shadow:none; color:var(--bg);
+        font-family:'Inter',sans-serif; font-weight:700; font-size:14px; padding:0 18px; min-width:44px;
+        cursor:pointer; flex-shrink:0; transition:transform .1s, opacity .1s; border-radius:var(--r-md);
       }
       .mob-chat-msgs .chat-bubble {
         border-radius:var(--r-lg);
@@ -349,23 +348,23 @@
       .mob-chat-msgs .chat-bubble.claude { border-bottom-left-radius:4px; }
       .mob-chat-msgs .chat-bubble.you    { border-bottom-right-radius:4px; background:var(--accent); color:var(--bg); box-shadow:none; }
       .mob-chat-msgs .chat-bubble.sys    { border-radius:var(--r-md); }
-      .mob-send-btn:active { transform:translate(1px,1px); box-shadow:1px 1px 0 rgba(0,0,0,.4); }
+      .mob-send-btn:active { transform:scale(.95); opacity:.85; }
       .mob-send-btn:disabled { opacity:.4; }
 
       /* ── Bottom nav (5 tabs) — floating rounded pill ── */
       .mob-nav {
         display:flex; flex-shrink:0;
-        background:var(--surface);
+        background:rgba(223,238,255,.045);
         border:none;
         border-radius:16px;
         margin:8px 10px 6px;
-        box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14);
+        box-shadow:none;
       }
       .mob-nav-btn {
         flex:1; padding:9px 2px 7px; border:none; background:none; cursor:pointer;
         display:flex; flex-direction:column; align-items:center; gap:3px;
         color:rgba(223,238,255,.35); transition:color .12s, background .12s;
-        font-family:'Press Start 2P',monospace; font-size:4px; letter-spacing:.3px;
+        font-family:'Inter',sans-serif; font-size:9px; letter-spacing:.3px;
         margin:4px 3px; border-radius:var(--r-sm);
       }
       .mob-nav-btn .nav-icon { font-size:17px; line-height:1; transition:transform .15s; }
@@ -425,7 +424,6 @@
       #designLabModal .modal-title { font-size:11px; }
       #designLabModal .key-info { font-size:16px; line-height:1.4; }
       #designLabModal .m-inp { font-size:18px; padding:12px; }
-      #designLabModal #dlRunBtn { font-size:13px; padding:12px 14px; }
       #designLabModal #dlList { max-height:none; flex:1; }
       #designLabModal .wiki-row { padding:14px 12px; }
       #designLabModal .wiki-row > div:first-child { font-size:21px; }
@@ -448,11 +446,11 @@
     .dl-revision-banner {
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       background:rgba(255,138,99,.14); border-bottom:1px solid rgba(255,138,99,.3);
-      color:var(--accent); font-family:'VT323',monospace; font-size:16px;
+      color:var(--accent); font-family:'Inter',sans-serif; font-weight:600; font-size:16px;
       padding:9px 16px; flex-shrink:0; cursor:pointer;
     }
     .dl-revision-banner button {
-      font-family:'Press Start 2P',monospace; font-size:6px; background:var(--accent); color:#0a1929;
+      font-family:'Inter',sans-serif; font-size:10.5px; background:var(--accent); color:#0a1929;
       border:none; border-radius:var(--r-sm); padding:7px 10px; cursor:pointer; flex-shrink:0;
     }
           .dl-revision-banner { font-size:15px; padding:12px 14px; }
@@ -462,33 +460,33 @@
     /* ══════════════════════════════════════
        CHANGE QUEUE
     ══════════════════════════════════════ */
-    .cq-section-label { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); margin:10px 0 6px; letter-spacing:1px; }
+    .cq-section-label { font-family:'Inter',sans-serif; font-size:10.5px; color:var(--fg-dim); margin:10px 0 6px; letter-spacing:1px; }
     .cq-row      { border-radius:var(--r-sm); background:rgba(223,238,255,.035); margin-bottom:6px; overflow:hidden; }
     .cq-row-head { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 10px; cursor:pointer; transition:background .1s; }
     .cq-row-head:hover, .cq-row-head:active { background:rgba(223,238,255,.06); }
     .cq-row-title { display:flex; align-items:center; gap:7px; min-width:0; flex:1; }
     .cq-src-icon  { flex-shrink:0; font-size:15px; }
-    .cq-title-text{ font-family:'VT323',monospace; font-size:19px; line-height:1.25; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .cq-row-preview{ font-family:'VT323',monospace; font-size:15px; line-height:1.3; color:var(--fg-dim); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .cq-title-text{ font-family:'Inter',sans-serif; font-weight:600; font-size:19px; line-height:1.25; color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cq-row-preview{ font-family:'Inter',sans-serif; font-weight:600; font-size:15px; line-height:1.3; color:var(--fg-dim); margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
     .cq-row-meta  { display:flex; align-items:center; gap:8px; flex-shrink:0; align-self:flex-start; }
-    .cq-date      { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); }
-    .cq-status    { font-family:'Press Start 2P',monospace; font-size:5px; padding:3px 6px; border-radius:var(--r-pill); white-space:nowrap; }
+    .cq-date      { font-family:'Inter',sans-serif; font-size:10.5px; color:var(--fg-dim); }
+    .cq-status    { font-family:'Inter',sans-serif; font-size:9.5px; padding:3px 6px; border-radius:var(--r-pill); white-space:nowrap; }
     .cq-status.pending { color:var(--accent); background:rgba(255,138,99,.14); }
     .cq-status.done    { color:var(--green); background:rgba(127,255,176,.12); }
     .cq-chevron   { color:var(--fg-dim); font-size:11px; transition:transform .15s; flex-shrink:0; }
     .cq-row.open .cq-chevron { transform:rotate(180deg); }
     .cq-row-detail { max-height:0; overflow:hidden; transition:max-height .2s ease; padding:0 10px; }
     .cq-row.open .cq-row-detail { max-height:700px; padding:0 10px 12px; }
-    .cq-detail-desc  { font-family:'VT323',monospace; font-size:16px; line-height:1.4; color:var(--fg); opacity:.9; margin-bottom:8px; white-space:pre-wrap; }
-    .cq-detail-label { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); margin-bottom:4px; letter-spacing:1px; }
-    .cq-detail-notes { font-family:'VT323',monospace; font-size:15px; line-height:1.4; opacity:.88; margin-bottom:10px; white-space:pre-wrap; }
+    .cq-detail-desc  { font-family:'Inter',sans-serif; font-weight:600; font-size:16px; line-height:1.4; color:var(--fg); opacity:.9; margin-bottom:8px; white-space:pre-wrap; }
+    .cq-detail-label { font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); margin-bottom:4px; letter-spacing:1px; }
+    .cq-detail-notes { font-family:'Inter',sans-serif; font-weight:600; font-size:15px; line-height:1.4; opacity:.88; margin-bottom:10px; white-space:pre-wrap; }
     .cq-detail-footer{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
     .cq-detail-path  { font-family:monospace; font-size:11px; opacity:.4; }
-    .cq-cancel-btn   { font-family:'Press Start 2P',monospace; font-size:6px; background:none; border:1px solid rgba(255,64,64,.35); color:#ff8a8a; padding:6px 10px; border-radius:var(--r-sm); cursor:pointer; transition:background .1s,border-color .1s; }
+    .cq-cancel-btn   { font-family:'Inter',sans-serif; font-size:10.5px; background:none; border:1px solid rgba(255,64,64,.35); color:#ff8a8a; padding:6px 10px; border-radius:var(--r-sm); cursor:pointer; transition:background .1s,border-color .1s; }
     .cq-cancel-btn:hover { background:rgba(255,64,64,.15); border-color:var(--red); }
-    .cq-toggle-done  { display:block; width:100%; text-align:left; background:none; border:none; border-top:1px dashed rgba(223,238,255,.15); color:var(--fg-dim); font-family:'Press Start 2P',monospace; font-size:6px; padding:10px 2px; cursor:pointer; letter-spacing:1px; margin-top:6px; }
+    .cq-toggle-done  { display:block; width:100%; text-align:left; background:none; border:none; border-top:1px dashed rgba(223,238,255,.15); color:var(--fg-dim); font-family:'Inter',sans-serif; font-size:10.5px; padding:10px 2px; cursor:pointer; letter-spacing:1px; margin-top:6px; }
     .cq-toggle-done:hover { color:var(--fg); }
-    .cq-empty { opacity:.5; font-family:'VT323',monospace; font-size:15px; padding:6px 2px; }
+    .cq-empty { opacity:.5; font-family:'Inter',sans-serif; font-weight:600; font-size:15px; padding:6px 2px; }
           #changeQueueModal .modal {
         width:100vw; max-width:100vw; height:100vh; max-height:100vh;
         border-radius:0; box-shadow:none;
@@ -511,7 +509,7 @@
     /* ══════════════════════════════════════
        CALENDAR POPUP TEXT FIX
     ══════════════════════════════════════ */
-    .dev-time  { font-family:'Press Start 2P',monospace; font-size:8px !important; color:var(--accent) !important; min-width:54px; }
+    .dev-time  { font-family:'Inter',sans-serif; font-size:12px !important; color:var(--accent) !important; min-width:54px; }
     .dev-item  { font-size:16px; color:var(--fg); gap:8px; padding:8px 0; }
     .dev-empty { font-size:16px; }
     .pdx-right { font-size:15px; }
@@ -549,8 +547,8 @@
        MERGED CALENDAR (grid + timeline) / WIKI DRAWER
        — CALENDAR N26-INSPIRED REDESIGN: week-strip is the primary, always-visible
        view (per the approved mockup); the toggle-behind month grid stays for full-
-       month navigation, restyled flat to match. Quest add-row below keeps its
-       existing JRPG look — shared with the Home tab, out of this redesign's scope. ── */
+       month navigation, restyled flat to match. Quest add-row below reuses shared
+       classes with the Home tab (site-wide Inter/flat styling now, layout unchanged). ── */
     .mob-week-strip { display:flex; gap:6px; padding:0 2px 12px; font-family:'Inter',sans-serif; flex-shrink:0; }
     .mob-wday { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:9px 0 8px; border-radius:var(--r-md); cursor:pointer; background:rgba(223,238,255,.045); border:none; }
     .mob-wday .mwd-name { font-size:9.5px; font-weight:600; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.03em; }
@@ -581,7 +579,7 @@
       padding:12px; border-radius:var(--r-lg);
     }
     .mob-tl-section-hd {
-      font-family:'Press Start 2P',monospace; font-size:7px; opacity:.8; color:var(--accent2);
+      font-family:'Inter',sans-serif; font-size:11px; opacity:.8; color:var(--accent2);
       padding:16px 0 10px; margin-top:8px; flex-shrink:0;
       border-top:1px dashed rgba(223,238,255,.2);
       display:flex; justify-content:space-between; align-items:center;
@@ -596,7 +594,7 @@
     }
     .mob-wiki-drawer.open { transform:translateX(0); }
     .mob-wiki-btn {
-      font-family:'Press Start 2P',monospace; font-size:8px; background:none;
+      font-family:'Inter',sans-serif; font-size:12px; background:none;
       border:1px solid rgba(223,238,255,.25); color:rgba(223,238,255,.8);
       cursor:pointer; padding:6px 9px; min-height:32px; border-radius:var(--r-md);
     }
@@ -649,12 +647,12 @@
       animation:pokeShadow 2.6s ease-in-out infinite;
     }
     .mob-home-poke-name {
-      font-family:'Press Start 2P',monospace; font-size:8px;
-      color:var(--accent); letter-spacing:2px; margin-top:7px;
+      font-family:'Inter',sans-serif; font-size:12px;
+      color:var(--accent); margin-top:7px;
       text-shadow:0 0 12px var(--accent);
     }
     .mob-home-poke-num {
-      font-family:'Press Start 2P',monospace; font-size:5px;
+      font-family:'Inter',sans-serif; font-size:9.5px;
       opacity:.45; margin-top:3px;
     }
 
@@ -687,16 +685,16 @@
     }
     .mob-stats-row:last-child { margin-bottom:0; }
     .mob-stats-count {
-      font-family:'VT323',monospace; font-size:34px;
+      font-family:'Inter',sans-serif; font-weight:600; font-size:34px;
       color:var(--accent); min-width:46px; text-align:center; line-height:1;
     }
     .mob-stats-name {
-      font-family:'VT323',monospace; font-size:21px;
+      font-family:'Inter',sans-serif; font-weight:600; font-size:21px;
       flex:1; line-height:1.2;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     }
     .mob-stats-badge {
-      font-family:'Press Start 2P',monospace; font-size:7px;
+      font-family:'Inter',sans-serif; font-size:11px;
       padding:3px 5px; color:#fff; flex-shrink:0; border-radius:var(--r-pill);
     }
     .mob-stats-bar {
@@ -706,7 +704,7 @@
     /* Pokemon type chip on calendar events */
     .kind-type-chip {
       display:inline-flex; align-items:center; gap:2px;
-      font-family:'Press Start 2P',monospace; font-size:7px;
+      font-family:'Inter',sans-serif; font-size:11px;
       padding:2px 6px; color:#fff; letter-spacing:.5px; border-radius:var(--r-pill);
     }
 
@@ -714,9 +712,9 @@
        BUDGET / GIL TRACKER
     ══════════════════════════════════════ */
     .budget-header  { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; flex-shrink:0; }
-    .budget-month   { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--fg-dim); }
-    .budget-spent   { font-family:'VT323',monospace; font-size:46px; color:var(--accent); line-height:1; }
-    .budget-limit   { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
+    .budget-month   { font-family:'Inter',sans-serif; font-size:10.5px; color:var(--fg-dim); }
+    .budget-spent   { font-family:'Inter',sans-serif; font-weight:600; font-size:46px; color:var(--accent); line-height:1; }
+    .budget-limit   { font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); }
     .budget-bar-wrap{ height:5px; background:var(--fg-faint); margin:5px 0 3px; }
     .budget-bar     { height:100%; background:var(--accent); transition:width .4s; max-width:100%; }
     .budget-bar.over{ background:var(--red); }
@@ -729,8 +727,8 @@
     #mobBudgetView .budget-txn { border-radius:var(--r-md); padding:8px 6px; margin-bottom:3px; background:rgba(223,238,255,.035); border-bottom:none; }
     .budget-summary-row { display:flex; gap:14px; margin-bottom:10px; flex-shrink:0; }
     .budget-summary-box { display:flex; flex-direction:column; gap:2px; }
-    .budget-sum-label   { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
-    .budget-sum-val     { font-family:'VT323',monospace; font-size:22px; line-height:1; }
+    .budget-sum-label   { font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); }
+    .budget-sum-val     { font-family:'Inter',sans-serif; font-weight:600; font-size:22px; line-height:1; }
     .budget-sum-val.income { color:var(--green); }
     .budget-sum-val.expense{ color:var(--red); }
 
@@ -742,9 +740,9 @@
     .bento-hero   { grid-column:1 / -1; }
     .bento-cat    { display:flex; align-items:center; gap:7px; padding:7px 9px; }
     .bento-cat-icon { font-size:16px; flex-shrink:0; }
-    .bento-label  { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); letter-spacing:.5px; margin-bottom:3px; }
+    .bento-label  { font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); letter-spacing:.5px; margin-bottom:3px; }
     .bento-cat .bento-label { margin-bottom:1px; }
-    .bento-val    { font-family:'VT323',monospace; font-size:22px; line-height:1; }
+    .bento-val    { font-family:'Inter',sans-serif; font-weight:600; font-size:22px; line-height:1; }
     .bento-hero .bento-val { font-size:26px; }
     .bento-cat .bento-val  { font-size:16px; }
     .bento-val.income  { color:var(--green); }
@@ -753,7 +751,7 @@
     .bento-bar-wrap { height:4px; background:var(--fg-faint); border-radius:var(--r-pill); overflow:hidden; margin:6px 0 3px; }
     .bento-bar      { height:100%; background:var(--accent); transition:width .4s; }
     .bento-bar.over { background:var(--red); }
-    .bento-sub      { font-family:'Press Start 2P',monospace; font-size:4px; color:var(--fg-dim); text-align:right; }
+    .bento-sub      { font-family:'Inter',sans-serif; font-size:9px; color:var(--fg-dim); text-align:right; }
     #mobBudgetView .bento-tile    { border-radius:var(--r-md); }
     #mobBudgetView .bento-label   { font-size:6px; }
     #mobBudgetView .bento-val     { font-size:26px; }
@@ -765,26 +763,27 @@
     .budget-txn     { display:flex; align-items:center; gap:6px; padding:5px 0; border-bottom:1px solid rgba(223,238,255,.06); }
     .budget-txn:last-child{ border-bottom:none; }
     .budget-txn-icon{ font-size:15px; flex-shrink:0; }
-    .budget-txn-note{ font-family:'VT323',monospace; font-size:18px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .budget-txn-date{ font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); flex-shrink:0; }
-    .budget-txn-amt { font-family:'VT323',monospace; font-size:19px; flex-shrink:0; min-width:54px; text-align:right; }
+    .budget-txn-note{ font-family:'Inter',sans-serif; font-weight:600; font-size:18px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .budget-txn-date{ font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); flex-shrink:0; }
+    .budget-txn-amt { font-family:'Inter',sans-serif; font-weight:600; font-size:19px; flex-shrink:0; min-width:54px; text-align:right; }
     .budget-txn-del { opacity:0; background:none; border:none; color:rgba(223,238,255,.5); font-size:11px; cursor:pointer; margin-left:2px; flex-shrink:0; transition:opacity .1s,color .1s; font-family:inherit; }
     .budget-txn:hover .budget-txn-del{ opacity:1; }
     .budget-txn-del:hover{ color:var(--red); }
     .budget-add-row { display:flex; gap:4px; flex-shrink:0; flex-wrap:wrap; }
-    .budget-cat-sel { font-family:'Press Start 2P',monospace; font-size:6px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); padding:5px 4px; cursor:pointer; flex-shrink:0; }
+    .budget-cat-sel { font-family:'Inter',sans-serif; font-size:10.5px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); padding:5px 4px; cursor:pointer; flex-shrink:0; }
     .budget-type-toggle { display:flex; gap:3px; flex-shrink:0; }
-    .budget-type-btn { font-family:'Press Start 2P',monospace; font-size:6px; padding:5px 7px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; }
+    .budget-type-btn { font-family:'Inter',sans-serif; font-size:10.5px; padding:5px 7px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; }
     .budget-type-btn.active.expense { color:#fff; background:var(--red); border-color:var(--red); }
     .budget-type-btn.active.income  { color:#000; background:var(--green); border-color:var(--green); }
     .budget-limit-row { display:flex; align-items:center; gap:6px; margin-bottom:8px; flex-shrink:0; }
-    .budget-limit-inp { font-family:'Press Start 2P',monospace; font-size:7px; width:80px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--accent); padding:4px 6px; }
-    .budget-empty { font-family:'VT323',monospace; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
+    .budget-limit-inp { font-family:'Inter',sans-serif; font-size:11px; width:80px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--accent); padding:4px 6px; }
+    .budget-empty { font-family:'Inter',sans-serif; font-weight:600; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
 
-    /* ── GIL WALLET N26-INSPIRED REDESIGN — scoped to #mobBudgetView only.
-       Rest of the app (Home, ED, Design Lab) keeps the JRPG Press Start 2P/VT323
-       treatment untouched; these overrides swap in Inter, flat surfaces, tabular
-       numbers, and restrained color, per the approved mockup. ── */
+    /* ── GIL WALLET N26-INSPIRED REDESIGN — scoped to #mobBudgetView.
+       Originally scoped to just this tab; the Inter/flat/restrained-color
+       treatment was later extended to the rest of the app too, so these
+       overrides now mostly just add Gil-specific layout (hero, quick actions,
+       icon-chip transactions) on top of the site-wide base styles. ── */
     #mobBudgetView { font-family:'Inter',system-ui,sans-serif; }
     #mobBudgetView .budget-tabs { gap:4px; margin-bottom:14px; background:rgba(223,238,255,.05); padding:3px; border-radius:var(--r-pill); }
     #mobBudgetView .budget-tab  { font-family:'Inter'; font-size:10px; font-weight:600; letter-spacing:.02em; padding:7px 0; background:none; border:none; color:var(--fg-dim); }
@@ -834,20 +833,20 @@
     .quickgil-pill { display:flex; align-items:center; gap:8px; background:rgba(223,238,255,.035); border:1px solid rgba(223,238,255,.08); border-radius:var(--r-md); padding:6px 8px; }
     .quickgil-info { flex:1; display:flex; align-items:center; gap:6px; min-width:0; }
     .quickgil-icon { font-size:16px; flex-shrink:0; }
-    .quickgil-name { font-family:'VT323',monospace; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .quickgil-bal  { font-family:'VT323',monospace; font-size:17px; margin-left:auto; flex-shrink:0; }
-    .quickgil-btn  { flex-shrink:0; width:30px; height:30px; border-radius:50%; border:none; font-family:'Press Start 2P',monospace; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .quickgil-name { font-family:'Inter',sans-serif; font-weight:600; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .quickgil-bal  { font-family:'Inter',sans-serif; font-weight:600; font-size:17px; margin-left:auto; flex-shrink:0; }
+    .quickgil-btn  { flex-shrink:0; width:30px; height:30px; border-radius:50%; border:none; font-family:'Inter',sans-serif; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .quickgil-btn.minus { background:rgba(255,128,128,.15); color:var(--red); }
     .quickgil-btn.plus  { background:rgba(127,255,176,.15); color:var(--green); }
 
     /* Quick money-pad popup: fast numpad entry, opened from a quickgil-pill */
     .moneypad-modal  { width:320px; }
-    .moneypad-display{ font-family:'VT323',monospace; font-size:48px; text-align:center; margin:6px 0 12px; }
+    .moneypad-display{ font-family:'Inter',sans-serif; font-weight:600; font-size:48px; text-align:center; margin:6px 0 12px; }
     .moneypad-chips  { display:flex; gap:5px; overflow-x:auto; margin-bottom:10px; padding-bottom:2px; }
     .moneypad-chip   { flex-shrink:0; width:34px; height:34px; border-radius:50%; background:var(--surface); border:1px solid rgba(223,238,255,.15); font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .moneypad-chip.active { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent); }
     .moneypad-grid   { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:4px; }
-    .moneypad-key    { padding:14px 0; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Press Start 2P',monospace; font-size:14px; cursor:pointer; }
+    .moneypad-key    { padding:14px 0; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-size:15px; cursor:pointer; }
     .moneypad-key:active { background:rgba(223,238,255,.08); }
 
     /* ── POKÉDEX BOTTOM SHEET ── */
@@ -857,15 +856,15 @@
     .pdx-sh-header { display:flex;align-items:flex-start;gap:14px;margin-bottom:14px; }
     .pdx-sh-sprite { width:88px;height:88px;image-rendering:pixelated;filter:drop-shadow(0 0 8px var(--accent)); }
     .pdx-sh-meta   { flex:1; }
-    .pdx-sh-name   { font-family:'Press Start 2P',monospace;font-size:10px;color:var(--fg);letter-spacing:1px;margin-bottom:4px; }
-    .pdx-sh-num    { font-family:'Press Start 2P',monospace;font-size:7px;color:var(--accent);margin-bottom:8px; }
+    .pdx-sh-name   { font-family:'Inter',sans-serif;font-size:13px;color:var(--fg);letter-spacing:1px;margin-bottom:4px; }
+    .pdx-sh-num    { font-family:'Inter',sans-serif;font-size:11px;color:var(--accent);margin-bottom:8px; }
     .pdx-sh-types  { display:flex;gap:4px;flex-wrap:wrap; }
-    .pdx-type-pip  { font-family:'Press Start 2P',monospace;font-size:6px;padding:3px 6px;color:#fff;letter-spacing:.5px; }
+    .pdx-type-pip  { font-family:'Inter',sans-serif;font-size:10.5px;padding:3px 6px;color:#fff;letter-spacing:.5px; }
     .pdx-sh-grid   { display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px; }
     .pdx-sh-stat   { background:var(--darker);padding:7px 5px;text-align:center; }
-    .pdx-sh-sl     { font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-bottom:3px; }
-    .pdx-sh-sv     { font-family:'VT323',monospace;font-size:22px;color:var(--fg); }
-    .pdx-sh-close  { margin-top:14px;width:100%;background:var(--darker);border:none;box-shadow:inset 0 0 0 1px rgba(223,238,255,.2);color:var(--accent);font-family:'Press Start 2P',monospace;font-size:7px;padding:10px;cursor:pointer; }
+    .pdx-sh-sl     { font-family:'Inter',sans-serif;font-size:9.5px;opacity:.5;margin-bottom:3px; }
+    .pdx-sh-sv     { font-family:'Inter',sans-serif; font-weight:600;font-size:22px;color:var(--fg); }
+    .pdx-sh-close  { margin-top:14px;width:100%;background:var(--darker);border:none;box-shadow:inset 0 0 0 1px rgba(223,238,255,.2);color:var(--accent);font-family:'Inter',sans-serif;font-size:11px;padding:10px;cursor:pointer; }
 
     /* ── MISSINGNO GLITCH ── */
     @keyframes glitch { 0%,100%{transform:none;} 20%{transform:skewX(-4deg) translateX(3px);} 40%{transform:skewX(3deg) translateX(-3px);} 60%{transform:none;} 80%{transform:skewY(2deg);} }
@@ -897,8 +896,8 @@
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0;">
         <div class="mob-home-date" id="mobDate" style="opacity:.8;margin-bottom:0;text-align:left;">—</div>
         <div style="display:flex;gap:8px;">
-          <button onclick="openPokedexModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">📖 DEX</button>
-          <button onclick="openSettingsModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Press Start 2P',monospace;font-size:9px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">⚙</button>
+          <button onclick="openPokedexModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">📖 DEX</button>
+          <button onclick="openSettingsModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">⚙</button>
         </div>
       </div>
 
@@ -920,7 +919,7 @@
         <div class="mc-card span-2">
           <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
             <span>GIL WALLET</span>
-            <span id="mobHomeGilAmt" style="font-family:'VT323',monospace;font-size:24px;">$0</span>
+            <span id="mobHomeGilAmt" style="font-family:'Inter',sans-serif;font-size:24px;;font-weight:600">$0</span>
           </div>
           <div class="quickgil-row" id="mobQuickGilRow"></div>
           <button class="mob-home-link" onclick="goToMobTab('gil')" style="margin-top:2px;">Open full wallet →</button>
@@ -967,7 +966,7 @@
         <div class="mob-cal-card">
           <div class="mob-cal-nav">
             <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
-            <span id="mobCalLabel" style="font-family:'Press Start 2P',monospace;font-size:7px;">—</span>
+            <span id="mobCalLabel" style="font-family:'Inter',sans-serif;font-size:11px;">—</span>
             <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
           </div>
           <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
@@ -1010,7 +1009,7 @@
           <button class="mob-wiki-btn" onclick="openDesignLab()">🎨 LAB</button>
           <button class="mob-wiki-btn" onclick="openWikiDrawer()">📚 WIKI</button>
           <div class="server-dot" id="mobServerDot"></div>
-          <button onclick="openModal('keyModal')" style="font-family:'Press Start 2P',monospace;font-size:6px;background:none;border:none;color:rgba(223,238,255,.4);cursor:pointer;">⚙</button>
+          <button onclick="openModal('keyModal')" style="font-family:'Inter',sans-serif;font-size:10.5px;background:none;border:none;color:rgba(223,238,255,.4);cursor:pointer;">⚙</button>
         </div>
       </div>
       <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
@@ -1026,8 +1025,8 @@
         <div class="mob-tab-hd">
           <span>📚 WIKI</span>
           <div style="display:flex;align-items:center;gap:10px;">
-            <span id="wikiBackBtn" style="display:none;font-family:'Press Start 2P',monospace;font-size:7px;cursor:pointer;opacity:.7;" onclick="showWikiList()">◀ BACK</span>
-            <button onclick="closeWikiDrawer()" style="font-family:'Press Start 2P',monospace;font-size:11px;background:none;border:none;color:rgba(223,238,255,.6);cursor:pointer;padding:4px;">✕</button>
+            <span id="wikiBackBtn" style="display:none;font-family:'Inter',sans-serif;font-size:11px;cursor:pointer;opacity:.7;" onclick="showWikiList()">◀ BACK</span>
+            <button onclick="closeWikiDrawer()" style="font-family:'Inter',sans-serif;font-size:13px;background:none;border:none;color:rgba(223,238,255,.6);cursor:pointer;padding:4px;">✕</button>
           </div>
         </div>
         <div id="wikiListView">
@@ -1035,8 +1034,8 @@
           <div id="wikiList" style="overflow-y:auto;flex:1;min-height:0;"></div>
         </div>
         <div id="wikiPageView" style="display:none;overflow-y:auto;flex:1;min-height:0;">
-          <div id="wikiPageTitle" style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
-          <div id="wikiPageBody" style="font-family:'VT323',monospace;font-size:17px;line-height:1.5;color:var(--fg);"></div>
+          <div id="wikiPageTitle" style="font-family:'Inter',sans-serif;font-size:13px;color:var(--accent);margin-bottom:10px;line-height:1.6;"></div>
+          <div id="wikiPageBody" style="font-family:'Inter',sans-serif;font-size:17px;line-height:1.5;color:var(--fg);;font-weight:600"></div>
         </div>
       </div>
     </div>
@@ -1072,48 +1071,48 @@
   .pdx-header { background:var(--accent); padding:10px 16px; display:flex; align-items:center; gap:10px; }
   .pdx-led { width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.8); flex-shrink:0; }
   .pdx-led-sm { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .pdx-title-bar { font-family:'Press Start 2P',monospace; font-size:9px; color:#fff; letter-spacing:2px; flex:1; }
+  .pdx-title-bar { font-family:'Inter',sans-serif; font-size:12px; color:#fff; flex:1; }
   .pdx-body { display:flex; gap:0; min-height:220px; }
   .pdx-left { width:140px; flex-shrink:0; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px 10px; border-right:2px solid rgba(223,238,255,.15); position:relative; overflow:hidden; }
   .pdx-scan { position:absolute; inset:0; background:linear-gradient(to bottom,transparent 0%,rgba(223,238,255,.12) 50%,transparent 100%); animation:pdxScan .8s ease-out forwards; pointer-events:none; z-index:5; }
   @keyframes pdxScan { from{transform:translateY(-100%);} to{transform:translateY(100%);} }
   .pdx-poke-img { width:96px; height:96px; image-rendering:pixelated; }
-  .pdx-poke-num { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--accent); margin-top:6px; opacity:.8; }
-  .pdx-poke-name { font-family:'Press Start 2P',monospace; font-size:8px; color:var(--fg); margin-top:3px; text-transform:uppercase; }
+  .pdx-poke-num { font-family:'Inter',sans-serif; font-size:10.5px; color:var(--accent); margin-top:6px; opacity:.8; }
+  .pdx-poke-name { font-family:'Inter',sans-serif; font-size:12px; color:var(--fg); margin-top:3px; text-transform:uppercase; }
   .pdx-right { flex:1; padding:12px 14px; display:flex; flex-direction:column; gap:8px; overflow-y:auto; max-height:320px; }
-  .pdx-date-label { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); margin-bottom:2px; }
-  .pdx-section-hd { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.5; margin-bottom:4px; letter-spacing:1px; }
+  .pdx-date-label { font-family:'Inter',sans-serif; font-size:11px; color:var(--accent); margin-bottom:2px; }
+  .pdx-section-hd { font-family:'Inter',sans-serif; font-size:10.5px; opacity:.5; margin-bottom:4px; letter-spacing:1px; }
   .pdx-add-form { border-top:1px solid rgba(223,238,255,.1); padding-top:10px; display:flex; flex-direction:column; gap:5px; }
   .pdx-footer { background:var(--surface); padding:8px 14px; display:flex; gap:6px; border-top:2px solid rgba(223,238,255,.1); }
   /* ── Budget panel mini-tabs ── */
   .budget-tabs { display:flex; gap:3px; margin-bottom:8px; flex-shrink:0; }
-  .budget-tab  { font-family:'Press Start 2P',monospace; font-size:6px; padding:5px 0; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; flex:1; text-align:center; }
+  .budget-tab  { font-family:'Inter',sans-serif; font-size:10.5px; padding:5px 0; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; flex:1; text-align:center; }
   .budget-tab.active { color:var(--accent); border-color:var(--accent); }
   /* ── Budget mode toggle ── */
-  .budget-mode-btn { font-family:'Press Start 2P',monospace; font-size:5px; padding:4px 8px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; }
+  .budget-mode-btn { font-family:'Inter',sans-serif; font-size:9.5px; padding:4px 8px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg-dim); cursor:pointer; }
   .budget-mode-btn.active { color:var(--accent); border-color:var(--accent); }
   /* ── Budget big balance ── */
-  .budget-big-num { font-family:'VT323',monospace; font-size:54px; line-height:1; }
+  .budget-big-num { font-family:'Inter',sans-serif; font-weight:600; font-size:54px; line-height:1; }
   /* ── Savings goal view ── */
   .save-field  { display:flex; flex-direction:column; gap:3px; margin-bottom:8px; }
-  .save-label  { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--fg-dim); }
-  .save-inp    { font-family:'VT323',monospace; font-size:20px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); padding:4px 6px; width:100%; box-sizing:border-box; }
+  .save-label  { font-family:'Inter',sans-serif; font-size:9.5px; color:var(--fg-dim); }
+  .save-inp    { font-family:'Inter',sans-serif; font-weight:600; font-size:20px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); padding:4px 6px; width:100%; box-sizing:border-box; }
   .save-adj-row{ display:flex; gap:6px; align-items:center; }
-  .save-adj-btn{ font-family:'VT323',monospace; font-size:24px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); cursor:pointer; padding:0 10px; line-height:1.4; }
+  .save-adj-btn{ font-family:'Inter',sans-serif; font-weight:600; font-size:24px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--fg); cursor:pointer; padding:0 10px; line-height:1.4; }
   .save-adj-btn:hover{ border-color:var(--accent); color:var(--accent); }
   /* ── Pokédex modal ── */
   .dex-modal-bg  { position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.85);backdrop-filter:blur(6px); }
   .dex-modal     { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:401;background:var(--surface);border:2px solid var(--accent);padding:16px 16px 20px;width:min(94vw,440px);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 0 0 4px var(--bg),0 0 40px rgba(126,200,122,.2); }
   .dex-modal-hd  { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-shrink:0; }
-  .dex-modal-title{ font-family:'Press Start 2P',monospace;font-size:9px;color:var(--accent);margin-bottom:3px; }
-  .dex-modal-count{ font-family:'VT323',monospace;font-size:22px;color:var(--fg-dim); }
-  .dex-modal-close{ background:none;border:1px solid rgba(223,238,255,.2);color:var(--fg);font-family:'Press Start 2P',monospace;font-size:6px;cursor:pointer;padding:5px 10px; }
+  .dex-modal-title{ font-family:'Inter',sans-serif;font-size:12px;color:var(--accent);margin-bottom:3px; }
+  .dex-modal-count{ font-family:'Inter',sans-serif; font-weight:600;font-size:22px;color:var(--fg-dim); }
+  .dex-modal-close{ background:none;border:1px solid rgba(223,238,255,.2);color:var(--fg);font-family:'Inter',sans-serif;font-size:10.5px;cursor:pointer;padding:5px 10px; }
   .dex-modal-close:hover{ border-color:var(--accent);color:var(--accent); }
   .dex-grid      { display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px;overflow-y:auto;flex:1;min-height:0;padding-right:2px; }
   .dex-grid-item { display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:5px 3px;border:1px solid rgba(223,238,255,.08);background:var(--bg);transition:border-color .15s,background .15s; }
   .dex-grid-item:hover { border-color:var(--accent);background:var(--surface); }
   .dex-grid-item img { width:48px;height:48px;image-rendering:pixelated; }
-  .dex-gi-num  { font-family:'Press Start 2P',monospace;font-size:4px;color:var(--fg-dim);margin-top:3px; }
+  .dex-gi-num  { font-family:'Inter',sans-serif;font-size:9px;color:var(--fg-dim);margin-top:3px; }
 </style>
 <div class="overlay" id="dayModal">
   <div class="modal pdx-modal">
@@ -1280,14 +1279,8 @@
 <div class="overlay" id="designLabModal">
   <div class="modal" style="width:560px;max-width:95vw;">
     <div class="modal-title">🎨 DESIGN LAB</div>
-    <p class="key-info" style="margin-bottom:10px;">Send Red — ED's research counterpart — off to research UI/UX ideas for Mission Control. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs daily too. Rate findings on the scale to send Red back to refine them.</p>
-    <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <input id="dlTopicInp" class="m-inp" type="text" placeholder="Optional focus (e.g. 'mobile nav', 'gamification')..." style="flex:1;" onkeydown="if(event.key==='Enter')runDesignResearch();">
-      <button class="modal-btn ok" id="dlRunBtn" onclick="runDesignResearch()">▶ RESEARCH</button>
-    </div>
-    <div id="dlStatus" style="font-family:'VT323',monospace;font-size:15px;opacity:.7;min-height:18px;margin-bottom:10px;"></div>
-    <div class="m-label" style="margin-bottom:6px;">BRIEF RED (chat first, research anything with a design lens)</div>
-    <div id="redChatScroll" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+    <p class="key-info" style="margin-bottom:10px;">Chat with Red — ED's research counterpart — about anything you want researched, design lens included. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs daily too. Rate findings on the scale to send Red back to refine them.</p>
+    <div id="redChatScroll" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
     <div style="display:flex;gap:6px;margin-bottom:14px;">
       <input id="redChatInp" class="m-inp" type="text" placeholder="Tell Red what to look into..." style="flex:1;" onkeydown="if(event.key==='Enter')sendRedChat();">
       <button class="modal-btn ok" id="redChatSendBtn" onclick="sendRedChat()">▶</button>
@@ -1302,7 +1295,7 @@
 <div class="overlay" id="redLearningsModal">
   <div class="modal" style="width:520px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;">
     <div class="modal-title">🧠 WHAT RED'S LEARNED</div>
-    <div id="redLearningsBody" style="overflow-y:auto;flex:1;font-family:'VT323',monospace;font-size:16px;line-height:1.4;"></div>
+    <div id="redLearningsBody" style="overflow-y:auto;flex:1;font-family:'Inter',sans-serif;font-size:16px;line-height:1.4;;font-weight:600"></div>
     <div class="modal-btns"><button class="modal-btn" onclick="closeModal('redLearningsModal')">CLOSE</button></div>
   </div>
 </div>
@@ -1335,14 +1328,14 @@
 <!-- SETTINGS MODAL -->
 <style>
   .theme-presets { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
-  .theme-preset-btn { border:none; cursor:pointer; padding:10px 4px 7px; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Press Start 2P',monospace; font-size:5px; color:#fff; letter-spacing:.5px; box-shadow:inset 0 0 0 2px rgba(255,255,255,.15); transition:transform .1s,box-shadow .1s; }
+  .theme-preset-btn { border:none; cursor:pointer; padding:10px 4px 7px; display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Inter',sans-serif; font-size:9.5px; color:#fff; letter-spacing:.5px; box-shadow:inset 0 0 0 2px rgba(255,255,255,.15); transition:transform .1s,box-shadow .1s; }
   .theme-preset-btn:hover { transform:scale(1.06); }
   .theme-preset-btn.active { box-shadow:inset 0 0 0 2px #fff; }
   .theme-swatch { width:22px; height:22px; border-radius:50%; border:2px solid rgba(255,255,255,.3); }
   .color-pickers { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .color-pick-row { display:flex; align-items:center; gap:8px; }
   .color-pick-row input[type=color] { width:36px; height:28px; border:none; background:none; cursor:pointer; padding:0; }
-  .color-pick-label { font-family:'Press Start 2P',monospace; font-size:6px; opacity:.65; flex:1; }
+  .color-pick-label { font-family:'Inter',sans-serif; font-size:10.5px; opacity:.65; flex:1; }
 </style>
 <div class="overlay" id="settingsModal">
   <div class="modal" style="width:500px;">
@@ -1367,8 +1360,8 @@
         </div>
       </div>
       <div id="settingsKeyCloud" style="display:none;">
-        <div style="font-family:'Press Start 2P',monospace;font-size:5px;line-height:1.8;color:var(--accent);">CLOUD MODE — key must be set as env var:</div>
-        <div style="font-family:'VT323',monospace;font-size:16px;line-height:1.5;margin-top:4px;">
+        <div style="font-family:'Inter',sans-serif;font-size:9.5px;line-height:1.8;color:var(--accent);">CLOUD MODE — key must be set as env var:</div>
+        <div style="font-family:'Inter',sans-serif;font-size:16px;line-height:1.5;margin-top:4px;;font-weight:600">
           1. Go to render.com → your BrainVault service<br>
           2. Click <b>Environment</b> tab<br>
           3. Add variable: <b>ANTHROPIC_API_KEY</b><br>
@@ -1376,12 +1369,12 @@
           5. Click Save → Render redeploys automatically
         </div>
       </div>
-      <div id="settingsKeyStatus" style="font-family:'Press Start 2P',monospace;font-size:5px;opacity:.5;margin-top:4px;"></div>
+      <div id="settingsKeyStatus" style="font-family:'Inter',sans-serif;font-size:9.5px;opacity:.5;margin-top:4px;"></div>
     </div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(223,238,255,.1);">
       <div class="m-label" style="margin-bottom:6px;">EVENT NOTIFICATIONS</div>
       <button class="modal-btn sm ok" id="pushToggleBtn" onclick="togglePushSubscription()" style="width:100%;">🔔 ENABLE NOTIFICATIONS</button>
-      <div id="pushStatus" style="font-family:'VT323',monospace;font-size:15px;opacity:.6;margin-top:6px;line-height:1.4;"></div>
+      <div id="pushStatus" style="font-family:'Inter',sans-serif;font-size:15px;opacity:.6;margin-top:6px;line-height:1.4;;font-weight:600"></div>
     </div>
     <div class="modal-btns" style="margin-top:14px;">
       <button class="modal-btn ok" onclick="saveTheme()">APPLY THEME</button>
@@ -1662,7 +1655,7 @@ function openPokedexModal(){
       <div class="dex-gi-num">#${String(id).padStart(3,'0')}</div>
       ${d.count>1?`<div class="dex-gi-num" style="color:var(--accent);">${d.count}×</div>`:''}
     </div>`;
-  }).join(''):`<div style="grid-column:1/-1;text-align:center;font-family:'VT323',monospace;font-size:20px;color:var(--fg-dim);padding:28px 12px;">No Pokémon caught yet.<br>Click wandering Pokémon to catch them!</div>`;
+  }).join(''):`<div style="grid-column:1/-1;text-align:center;font-family:'Inter',sans-serif;font-size:20px;color:var(--fg-dim);padding:28px 12px;;font-weight:600">No Pokémon caught yet.<br>Click wandering Pokémon to catch them!</div>`;
   modal.innerHTML=`
     <div class="dex-modal-hd">
       <div>
@@ -2004,7 +1997,7 @@ function renderDaySummaryInto(key,el,isMob){
   const evs=(APP.events||{})[key]||[];
   const pt = k => KIND_POKE_TYPE[k]||KIND_POKE_TYPE.routine;
   const chip = (e)=>`<span class="kind-type-chip" style="background:${KIND_COLORS[e.kind||'focus']||'#666'};">${pt(e.kind||'focus').icon} ${(e.kind||'').toUpperCase()}</span>`;
-  el.innerHTML=`<span style="font-family:'Press Start 2P',monospace;font-size:${isMob?'7':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
+  el.innerHTML=`<span style="font-family:'Inter',sans-serif;font-size:${isMob?'7':'5'}px;opacity:.65;">${d.getDate()} ${MONTHS_S[d.getMonth()]}:</span>`
     + (evs.length ? evs.map(chip).join('') : `<span style="font-size:${isMob?'15':'12'}px;opacity:.45;">nothing scheduled</span>`);
 
   // On mobile also populate the event detail list below the grid
@@ -2035,8 +2028,8 @@ function renderDevList(key){
     return`<div class="dev-item">
       <div class="dev-dot" style="background:${kc};width:8px;height:8px;flex-shrink:0;"></div>
       <span class="dev-time">${e.time?fmtTime(e.time):'—'}</span>
-      <span style="flex:1;font-size:16px;color:var(--fg);font-family:'VT323',monospace;">${esc(e.title)}</span>
-      <span style="font-family:'Press Start 2P',monospace;font-size:6px;background:${kc};color:#fff;padding:2px 4px;flex-shrink:0;">${pt.icon} ${(e.kind||'').toUpperCase()}</span>
+      <span style="flex:1;font-size:16px;color:var(--fg);font-family:'Inter',sans-serif;;font-weight:600">${esc(e.title)}</span>
+      <span style="font-family:'Inter',sans-serif;font-size:10.5px;background:${kc};color:#fff;padding:2px 4px;flex-shrink:0;">${pt.icon} ${(e.kind||'').toUpperCase()}</span>
       <button class="dev-del" onclick="openEditEvent('${key}',${i})" title="Edit" style="font-size:13px;">✎</button>
       <button class="dev-del" onclick="deleteDayEv('${key}',${i})" style="font-size:13px;">✕</button>
     </div>`;
@@ -2184,7 +2177,7 @@ function renderTimelineItems(items, containerEl, isMob){
         <div class="sched-body${next?' next':''}">
           <span class="sched-t">${s.time}</span>
           <span class="sched-ttl">${esc(s.title)}</span>
-          ${next?'<span class="blink" style="font-family:\'Press Start 2P\',monospace;font-size:5px;color:var(--accent);">▶</span>':''}
+          ${next?'<span class="blink" style="font-family:\'Inter\',sans-serif;font-size:10px;color:var(--accent);">▶</span>':''}
           <button class="sched-chk${done?' done':''}" onclick="toggleTimelineCheck(${i},'${date}')">
             <div class="sched-chk-x"></div>
           </button>
@@ -2521,9 +2514,9 @@ function buildStatsHTML(sorted, max, compact){
     const rank=task?.rank||'B';
     if(compact){
       return`<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(223,238,255,.06);">
-        <span style="font-family:'VT323',monospace;font-size:22px;color:var(--accent);min-width:34px;text-align:center;">${count}×</span>
-        <span style="font-family:'VT323',monospace;font-size:16px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(name)}</span>
-        <span style="font-family:'Press Start 2P',monospace;font-size:5px;padding:2px 4px;color:#fff;background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</span>
+        <span style="font-family:'Inter',sans-serif;font-size:22px;color:var(--accent);min-width:34px;text-align:center;;font-weight:600">${count}×</span>
+        <span style="font-family:'Inter',sans-serif;font-size:16px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;;font-weight:600">${esc(name)}</span>
+        <span style="font-family:'Inter',sans-serif;font-size:9.5px;padding:2px 4px;color:#fff;background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</span>
       </div>`;
     }
     return`<div class="mob-stats-row">
@@ -3048,7 +3041,7 @@ function dueBillsBannerHtml(){
   const due=dueBills();
   if(!due.length)return '';
   return `<div style="background:rgba(255,138,99,.12);border:1px solid rgba(255,138,99,.3);border-radius:var(--r-md);padding:6px 8px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
-    <span style="font-family:'VT323',monospace;font-size:15px;color:var(--accent);">⚠ ${due.length} bill${due.length>1?'s':''} due</span>
+    <span style="font-family:'Inter',sans-serif;font-size:15px;color:var(--accent);;font-weight:600">⚠ ${due.length} bill${due.length>1?'s':''} due</span>
     <button class="mini-btn" style="font-size:7px;" onclick="switchBudgetTab('bills')">VIEW</button>
   </div>`;
 }
@@ -3327,10 +3320,10 @@ async function renderWikiList(){
   const list=document.getElementById('wikiList');
   if(!filtered.length){ list.innerHTML='<div class="empty">No pages found</div>'; return; }
   list.innerHTML=Object.entries(byCat).map(([cat,pgs])=>`
-    <div style="font-family:'Press Start 2P',monospace;font-size:7px;opacity:.5;margin:10px 0 6px;">${esc(cat.toUpperCase())}</div>
+    <div style="font-family:'Inter',sans-serif;font-size:11px;opacity:.5;margin:10px 0 6px;">${esc(cat.toUpperCase())}</div>
     ${pgs.map(p=>`<div class="wiki-row" onclick="openWikiPage('${p.dir}','${p.slug}')" style="cursor:pointer;margin-bottom:3px;">
-      <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${esc(p.slug)}</div>
-      <div style="font-family:'VT323',monospace;font-size:14px;opacity:.55;">${esc(p.summary)}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:18px;color:var(--fg);;font-weight:600">${esc(p.slug)}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:14px;opacity:.55;;font-weight:600">${esc(p.summary)}</div>
     </div>`).join('')}
   `).join('');
 }
@@ -3349,9 +3342,9 @@ async function openWikiPage(dir,slug){
 function formatWikiMd(md){
   const body = md.replace(/^---\n[\s\S]*?\n---\n?/,'');
   return esc(body)
-    .replace(/^### (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:9px;color:var(--accent);margin:12px 0 6px;">$1</div>')
-    .replace(/^## (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--accent);margin:14px 0 8px;">$1</div>')
-    .replace(/^# (.*)$/gm,'<div style="font-family:\'Press Start 2P\',monospace;font-size:11px;color:var(--fg);margin:14px 0 8px;">$1</div>')
+    .replace(/^### (.*)$/gm,'<div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:13px;color:var(--accent);margin:12px 0 6px;">$1</div>')
+    .replace(/^## (.*)$/gm,'<div style="font-family:\'Inter\',sans-serif;font-weight:700;font-size:14px;color:var(--accent);margin:14px 0 8px;">$1</div>')
+    .replace(/^# (.*)$/gm,'<div style="font-family:\'Inter\',sans-serif;font-weight:800;font-size:16px;color:var(--fg);margin:14px 0 8px;">$1</div>')
     .replace(/\[\[([^\]|]+)(\|[^\]]+)?\]\]/g,(m,slug,label)=>{
       const disp=label?label.slice(1):slug;
       const pg=(wikiPagesCache||[]).find(p=>p.slug===slug);
@@ -3419,19 +3412,19 @@ async function openDesignLab(){
 function dlRowHtml(r,isNew){
   return`
     <div class="wiki-row${isNew?' dl-row-new':''}" id="dlRow-${r.id}" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
-      <div style="font-family:'VT323',monospace;font-size:18px;color:var(--fg);">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
-      <div style="font-family:'VT323',monospace;font-size:13px;opacity:.55;">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
+      <div style="font-family:'Inter',sans-serif;font-size:18px;color:var(--fg);;font-weight:600">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:13px;opacity:.55;;font-weight:600">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
     </div>`;
 }
 async function loadDesignResearchList(){
   const list=document.getElementById('dlList');
-  list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">Loading…</div>';
+  list.innerHTML='<div style="opacity:.5;font-family:\'Inter\',sans-serif;font-size:13px;">Loading…</div>';
   try{
     const r=await fetch(`${SERVER}/api/design-research`,{signal:AbortSignal.timeout(8000)});
     const d=await r.json();
     const runs=d.runs||[];
     _dlKnownIds=new Set(runs.map(x=>x.id));
-    if(!runs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'VT323\',monospace;font-size:15px;">No research yet — run one above.</div>'; return; }
+    if(!runs.length){ list.innerHTML='<div style="opacity:.5;font-family:\'Inter\',sans-serif;font-size:13px;">No research yet — run one above.</div>'; return; }
     list.innerHTML=runs.map(r=>dlRowHtml(r,false)).join('');
   }catch(e){ list.innerHTML='<div style="opacity:.5;">Failed to load.</div>'; }
 }
@@ -3447,22 +3440,6 @@ async function checkDlListForNewRuns(){
     const list=document.getElementById('dlList');
     if(list) list.innerHTML=runs.map(r=>dlRowHtml(r,freshIds.has(r.id))).join('');
   }catch(e){}
-}
-async function runDesignResearch(){
-  const inp=document.getElementById('dlTopicInp');
-  const topic=inp?.value.trim()||'';
-  const btn=document.getElementById('dlRunBtn');
-  const status=document.getElementById('dlStatus');
-  if(!serverOnline){ status.textContent='⚠ Server offline — start the server first.'; return; }
-  btn.setAttribute('disabled','1');
-  status.textContent='Red is researching… this can take up to a minute.';
-  try{
-    const r=await fetch(`${SERVER}/api/design-research`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic}),signal:AbortSignal.timeout(120000)});
-    const d=await r.json();
-    if(d.error){ status.textContent='⚠ '+(d.message||d.error); }
-    else{ status.textContent=`✓ Done — "${d.title}" (${d.findingsCount} findings)`; inp.value=''; await loadDesignResearchList(); }
-  }catch(e){ status.textContent='⚠ Request failed: '+(e.message||'timeout'); }
-  btn.removeAttribute('disabled');
 }
 async function openRedLearnings(){
   const body=document.getElementById('redLearningsBody');
