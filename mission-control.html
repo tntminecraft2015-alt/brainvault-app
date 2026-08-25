@@ -104,6 +104,9 @@
     .m-inp:focus { box-shadow:inset 0 0 0 1px rgba(223,238,255,.45); }
     .m-sel   { width:100%; background:var(--bg); border:none; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'VT323',monospace; font-size:16px; padding:6px 9px; cursor:pointer; color-scheme:dark; }
     .m-2col  { display:grid; grid-template-columns:1fr 1fr; gap:4px; }
+    .ev-more-toggle { background:none; border:none; color:var(--accent2); font-family:'Inter',sans-serif; font-size:11px; font-weight:600; padding:4px 2px; cursor:pointer; text-align:left; }
+    .ev-more-wrap { display:none; flex-direction:column; gap:8px; }
+    .ev-more-wrap.open { display:flex; }
     .notify-row    { display:flex; flex-direction:column; gap:6px; margin-bottom:6px; }
     .notify-toggle { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; width:fit-content; }
     .notify-toggle input { position:absolute; opacity:0; width:0; height:0; }
@@ -914,15 +917,13 @@
           </div>
         </div>
 
-        <div class="mc-card" onclick="goToMobTab('gil')" style="cursor:pointer;">
-          <div class="mob-home-card-label">GIL WALLET</div>
-          <div class="mob-home-streak-num" id="mobHomeGilAmt" style="font-size:30px;">$0</div>
-          <button class="mob-home-link">Open GIL →</button>
-        </div>
-
         <div class="mc-card span-2">
-          <div class="mob-home-card-label">QUICK GIL</div>
+          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>GIL WALLET</span>
+            <span id="mobHomeGilAmt" style="font-family:'VT323',monospace;font-size:24px;">$0</span>
+          </div>
           <div class="quickgil-row" id="mobQuickGilRow"></div>
+          <button class="mob-home-link" onclick="goToMobTab('gil')" style="margin-top:2px;">Open full wallet →</button>
         </div>
 
         <div class="mc-card" onclick="openPokedexModal()" style="cursor:pointer;">
@@ -933,13 +934,13 @@
           <div class="mob-home-poke-preview" id="mobHomeDexPreview"></div>
         </div>
 
-        <div class="mc-card span-2" onclick="goToMobTab('claude')" style="cursor:pointer;">
+        <div class="mc-card" onclick="goToMobTab('claude')" style="cursor:pointer;">
           <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
             <span>▲ ED</span>
             <div class="server-dot" id="mobHomeServerDot"></div>
           </div>
-          <div class="mob-home-next-title" style="font-size:18px;font-style:italic;line-height:1.3;">Ask ED anything about your day, tasks, or wiki.</div>
-          <button class="mob-home-link">Open ED + Wiki →</button>
+          <div class="mob-home-next-title" style="font-size:15px;font-style:italic;line-height:1.3;">Chat, tasks & wiki</div>
+          <button class="mob-home-link">Open ED →</button>
         </div>
 
         <div class="mc-card span-2" onclick="goToMobTab('cal')" style="cursor:pointer;">
@@ -1137,27 +1138,30 @@
         </div>
         <div class="pdx-add-form">
           <div class="pdx-section-hd">NEW ENCOUNTER</div>
-          <input id="devQuick" class="m-inp" type="text" placeholder="Quick add: 'lunch tomorrow 1pm'..." onkeydown="if(event.key==='Enter'){event.preventDefault();parseQuickAdd();}" style="border-color:var(--accent);">
-          <input id="devTitle" class="m-inp" type="text" placeholder="Event name...">
-          <div class="m-2col">
-            <input id="devTime" class="m-inp" type="time">
-            <input id="devLoc" class="m-inp" type="text" placeholder="Location">
-          </div>
-          <select id="devKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
-          <div class="notify-row">
-            <label class="notify-toggle">
-              <input type="checkbox" id="devNotify" onchange="onNotifyToggle('dev')">
-              <span class="notify-track"><span class="notify-thumb"></span></span>
-              <span class="notify-toggle-label">🔔 Notify me before</span>
-            </label>
-            <select id="devNotifyLead" class="m-sel" style="display:none;">
-              <option value="5">5 minutes before</option>
-              <option value="15">15 minutes before</option>
-              <option value="30" selected>30 minutes before</option>
-              <option value="60">1 hour before</option>
-              <option value="120">2 hours before</option>
-              <option value="1440">1 day before</option>
-            </select>
+          <input id="devQuick" class="m-inp" type="text" placeholder="Add anything: 'lunch tomorrow 1pm'..." onkeydown="if(event.key==='Enter'){event.preventDefault();quickAddDayEvent();}" style="border-color:var(--accent);">
+          <button type="button" class="ev-more-toggle" id="evMoreToggle" onclick="toggleEventMoreOptions()">+ More options (time, location, notify)</button>
+          <div class="ev-more-wrap" id="evMoreWrap">
+            <input id="devTitle" class="m-inp" type="text" placeholder="Event name...">
+            <div class="m-2col">
+              <input id="devTime" class="m-inp" type="time">
+              <input id="devLoc" class="m-inp" type="text" placeholder="Location">
+            </div>
+            <select id="devKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
+            <div class="notify-row">
+              <label class="notify-toggle">
+                <input type="checkbox" id="devNotify" onchange="onNotifyToggle('dev')">
+                <span class="notify-track"><span class="notify-thumb"></span></span>
+                <span class="notify-toggle-label">🔔 Notify me before</span>
+              </label>
+              <select id="devNotifyLead" class="m-sel" style="display:none;">
+                <option value="5">5 minutes before</option>
+                <option value="15">15 minutes before</option>
+                <option value="30" selected>30 minutes before</option>
+                <option value="60">1 hour before</option>
+                <option value="120">2 hours before</option>
+                <option value="1440">1 day before</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -2047,34 +2051,51 @@ function guessEventKind(text){
   if(/\b(errand|pickup|pick up|grocery|shopping|appointment|dentist|doctor|bank)\b/.test(t)) return 'errand';
   return 'focus';
 }
-function parseQuickAdd(){
+// Fills the (now-hidden-by-default) title/time/kind fields from the single quick-add
+// field's natural language, e.g. "lunch tomorrow 1pm" — falls back to using the raw
+// text as the title if chrono can't find a date/time, so the quick-add field alone is
+// always enough to add an event, no need to open "More options".
+function resolveQuickAddTitle(){
   const inp=document.getElementById('devQuick');
   const text=inp.value.trim();
   if(!text) return;
-  if(typeof chrono==='undefined'){ showToast('Quick-add still loading — try again in a sec'); return; }
-  const results=chrono.parse(text, new Date());
-  if(!results.length){ showToast('No date/time found — fill fields manually'); return; }
-  const r=results[0];
-  const dt=r.start.date();
-  const hasTime=r.start.isCertain('hour');
-  let title=(text.slice(0,r.index)+text.slice(r.index+r.text.length)).replace(/\s+/g,' ').trim();
-  title=title.replace(/^(on|at|for|the)\s+/i,'').replace(/\s+(on|at|for|the)$/i,'').trim();
-  document.getElementById('devTitle').value=title||text;
-  if(hasTime) document.getElementById('devTime').value=`${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
-  document.getElementById('devKind').value=guessEventKind(text);
-  const parsedKey=dateKey(dt);
-  if(parsedKey!==dayModalDate){
-    dayModalDate=parsedKey;
-    document.getElementById('dayModalTitle').textContent=`${MONTHS_S[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
-    renderDevList(dayModalDate);
-    showToast(`Targeting ${MONTHS_S[dt.getMonth()]} ${dt.getDate()} ◆`);
+  if(typeof chrono!=='undefined'){
+    const results=chrono.parse(text, new Date());
+    if(results.length){
+      const r=results[0];
+      const dt=r.start.date();
+      const hasTime=r.start.isCertain('hour');
+      let title=(text.slice(0,r.index)+text.slice(r.index+r.text.length)).replace(/\s+/g,' ').trim();
+      title=title.replace(/^(on|at|for|the)\s+/i,'').replace(/\s+(on|at|for|the)$/i,'').trim();
+      document.getElementById('devTitle').value=title||text;
+      if(hasTime) document.getElementById('devTime').value=`${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+      document.getElementById('devKind').value=guessEventKind(text);
+      const parsedKey=dateKey(dt);
+      if(parsedKey!==dayModalDate){
+        dayModalDate=parsedKey;
+        document.getElementById('dayModalTitle').textContent=`${MONTHS_S[dt.getMonth()]} ${dt.getDate()}, ${dt.getFullYear()}`;
+        renderDevList(dayModalDate);
+        showToast(`Targeting ${MONTHS_S[dt.getMonth()]} ${dt.getDate()} ◆`);
+      }
+      return;
+    }
   }
-  inp.value='';
-  document.getElementById('devTitle').focus();
+  document.getElementById('devTitle').value=text;
+  document.getElementById('devKind').value=guessEventKind(text);
+}
+function quickAddDayEvent(){
+  resolveQuickAddTitle();
+  addDayEvent();
+}
+function toggleEventMoreOptions(){
+  const wrap=document.getElementById('evMoreWrap');
+  const open=wrap.classList.toggle('open');
+  document.getElementById('evMoreToggle').textContent=open?'− Hide options':'+ More options (time, location, notify)';
 }
 function onNotifyToggle(prefix){ const on=document.getElementById(prefix+'Notify').checked; document.getElementById(prefix+'NotifyLead').style.display=on?'':'none'; }
 function addDayEvent(){
-  const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter event title');return;}
+  if(!document.getElementById('devTitle').value.trim()) resolveQuickAddTitle();
+  const title=document.getElementById('devTitle').value.trim(); if(!title){showToast('Enter an event to add');return;}
   if(!APP.events[dayModalDate])APP.events[dayModalDate]=[];
   const notify=document.getElementById('devNotify').checked;
   const time=document.getElementById('devTime').value;
@@ -2086,7 +2107,7 @@ function addDayEvent(){
   ev.linkedTaskId=task.id;
   patchData({events:APP.events, tasks:APP.tasks});
   renderDevList(dayModalDate); renderMobMonthGrid(); renderMobTasks();
-  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; showToast('Event added ◆');
+  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; document.getElementById('evMoreWrap').classList.remove('open'); document.getElementById('evMoreToggle').textContent='+ More options (time, location, notify)'; showToast('Event added ◆'); document.getElementById('devQuick').focus();
 }
 function deleteDayEv(key,idx){
   if(!APP.events[key])return;
@@ -2531,7 +2552,6 @@ function renderStats(){
 // ══════════════════════════════════════════════════════════════
 // BUDGET / GIL TRACKER
 // ══════════════════════════════════════════════════════════════
-let _budgetType = 'expense';
 let _budgetTab  = 'gil';
 
 function budgetMonthKey(){ const n=new Date(); return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
@@ -2593,25 +2613,7 @@ function commitTransaction({amount, category, note, type, accountId}){
   return txn;
 }
 
-function addTransaction(){
-  const amtEl  = document.getElementById('mobBudgetAmtInp');
-  const noteEl = document.getElementById('mobBudgetNoteInp');
-  const catEl  = document.getElementById('mobBudgetCatSel');
-  const acctEl = document.getElementById('mobBudgetAcctSel');
-  const amt = parseFloat((amtEl?.value||'').trim());
-  if(isNaN(amt)||amt<=0){showToast('Enter a valid amount');return;}
-  const note = (noteEl?.value||'').trim();
-  const cat  = catEl?.value||'other';
-  const acctId = acctEl?.value||'general';
-  const type = _budgetType;
-  commitTransaction({amount:amt, category:cat, note, type, accountId:acctId});
-  if(amtEl)  amtEl.value  = '';
-  if(noteEl) noteEl.value = '';
-}
-
 // ── QUICK MONEY PAD (fast card add/subtract) ──
-// Deliberately kept independent of _budgetType (the inline GIL-row's toggle state):
-// this popup can be opened/cancelled without ever touching that row's UI or default.
 let _moneyPadAcctId=null, _moneyPadAmt='', _moneyPadCat=null, _moneyPadType='expense';
 
 function setMoneyPadType(type){
@@ -2698,23 +2700,6 @@ function editWeeklyLimit(){
   APP.budget.weeklyLimit=n;
   patchData({budget:APP.budget});
   renderBudget();
-}
-
-function setTxnType(type,clickedBtn){
-  _budgetType=type;
-  document.querySelectorAll('.budget-type-btn').forEach(b=>{
-    b.classList.remove('active');
-    b.classList.toggle('active',b.dataset.type===type);
-  });
-}
-
-function toggleTxnType(btn){
-  _budgetType=_budgetType==='expense'?'income':'expense';
-  const isIncome=_budgetType==='income';
-  btn.textContent=isIncome?'+ INCOME':'− EXPENSE';
-  btn.classList.toggle('income',isIncome);
-  btn.classList.toggle('expense',!isIncome);
-  btn.dataset.type=_budgetType;
 }
 
 function categoryBreakdown(txns){
@@ -3150,7 +3135,6 @@ function buildMobBudgetGilHTML(){
   const remaining=limit-expense;
   const pct=Math.min(100,Math.round(expense/limit*100));
   const over=expense>limit;
-  const catOptions=Object.entries(BUDGET_CATS).map(([k,v])=>`<option value="${k}">${v.icon} ${v.label}</option>`).join('');
   const txnRows=txns.length?txns.map(t=>{
     const cat=BUDGET_CATS[t.category]||BUDGET_CATS.other;
     const color=t.type==='income'?'var(--green)':'var(--red)';
@@ -3188,15 +3172,7 @@ function buildMobBudgetGilHTML(){
       ${bentoCatTilesHtml(categoryBreakdown(txns))}
     </div>
     <div class="m-label" style="margin:4px 0 6px;">Recent</div>
-    <div class="budget-txn-list" style="flex:1;overflow-y:auto;">${txnRows}</div>
-    <div class="budget-add-row" style="margin-top:8px;flex-wrap:wrap;gap:5px;">
-      <button class="budget-type-btn ${_budgetType==='income'?'income':'expense'} active" data-type="${_budgetType}" id="mobTxnTypeBtn" onclick="toggleTxnType(this)" style="font-size:8px;padding:8px 10px;">${_budgetType==='income'?'+ INCOME':'− EXPENSE'}</button>
-      <input type="number" class="mob-inp budget-limit-inp" id="mobBudgetAmtInp" placeholder="$0.00" min="0" step="0.01" style="width:90px;font-size:13px;">
-      <select class="mob-inp budget-cat-sel" id="mobBudgetCatSel" style="font-size:12px;">${catOptions}</select>
-      <select class="mob-inp budget-cat-sel" id="mobBudgetAcctSel" style="font-size:12px;">${accountOptionsHtml()}</select>
-      <input type="text" class="mob-inp" id="mobBudgetNoteInp" placeholder="Note (optional)" style="flex:1;min-width:80px;">
-      <button class="mob-add-btn" onclick="addTransaction()" style="flex-shrink:0;">+</button>
-    </div>`;
+    <div class="budget-txn-list" style="flex:1;overflow-y:auto;">${txnRows}</div>`;
 }
 
 function buildMobBudgetHTML(){
@@ -3216,9 +3192,6 @@ function switchBudgetMode(mode){
 function renderBudget(){
   const mob=document.getElementById('mobBudgetView');
   if(mob) mob.innerHTML=buildMobBudgetHTML();
-  document.querySelectorAll('.budget-type-btn').forEach(b=>{
-    b.classList.toggle('active',b.dataset.type===_budgetType);
-  });
   renderMobHomeGil();
 }
 
@@ -3829,6 +3802,8 @@ function openDayModal(key,date){
   document.getElementById('devNotify').checked=false;
   document.getElementById('devNotifyLead').style.display='none';
   document.getElementById('devNotifyLead').value='30';
+  document.getElementById('evMoreWrap').classList.remove('open');
+  document.getElementById('evMoreToggle').textContent='+ More options (time, location, notify)';
   renderDevList(key);
 
   // Pokédex pokemon for this date
@@ -3844,7 +3819,7 @@ function openDayModal(key,date){
   if(scan){ scan.style.animation='none'; scan.offsetHeight; scan.style.animation='pdxScan .8s ease-out forwards'; }
 
   openModal('dayModal');
-  setTimeout(()=>document.getElementById('devTitle').focus(),60);
+  setTimeout(()=>document.getElementById('devQuick').focus(),60);
 }
 
 // ── TOAST ──
