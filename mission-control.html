@@ -1985,7 +1985,7 @@ function renderMobWeekStrip(){
     const btn=document.createElement('button');
     btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
     btn.innerHTML=`<span class="mwd-name">${DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
-    btn.onclick=()=>{ selectedKey=key; renderMobWeekStrip(); renderMobDaySummary(); renderMobCalQuests(); };
+    btn.onclick=()=>{ selectedKey=key; renderMobMonthGrid(); renderMobCalQuests(); };
     el.appendChild(btn);
   }
 }
