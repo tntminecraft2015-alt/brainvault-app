@@ -371,6 +371,42 @@
   "lastDesignResearchAutoRun": "2026-08-25",
   "changeRequests": [
     {
+      "id": "2026-08-25-modernize-calendar-ui-for-quick-scanning",
+      "date": "2026-08-25",
+      "title": "Modernize calendar UI for quick scanning and minimal clicks",
+      "status": "done",
+      "source": "ED chat",
+      "description": "User wants the calendar to match the modernized Gil wallet approach — less clicks needed to navigate and find events, everything scannable at a glance without hunting around.",
+      "details": "Designed a mockup first (published as an Artifact) showing an always-visible horizontal week-strip as the primary way to browse days — no more opening a toggle just to see today. Implemented for real in mission-control.html: added #mobWeekStrip above the existing month-grid-behind-toggle (kept, restyled flat, for full month navigation), wired to the existing selectedKey/renderMobDaySummary/renderMobCalQuests functions so day selection stays consistent with the existing data flow. Restyled the toggle button, grid card, and day-event-list rows to Inter/flat per the N26 direction (day-event-dot changed from a small circle to a vertical accent bar). Deliberately did NOT change the quest add-row (rank select, time picker, task input) — that's shared with the Home tab and out of this redesign's scope, so it keeps its existing JRPG look. Deliberately did NOT change month-grid day-cell styling (VT323 grid) to limit risk to the dense date-picker component. Week-strip day taps do not auto-open the day modal (unlike month-grid taps, which keep that existing behavior) — intentional, to match the 'scan quickly' goal."
+    },
+    {
+      "id": "2026-08-25-modernize-gil-wallet-ui-with-n26-inspire",
+      "date": "2026-08-25",
+      "title": "Modernize Gil wallet UI with N26-inspired design",
+      "status": "done",
+      "source": "ED chat",
+      "description": "User wants the Gil budget tracker tab to feel like a modern banking app with minimal friction and clicks.",
+      "details": "Designed a mockup first (published as an Artifact) showing balance-first hero + two-tap quick actions + flat transaction list. User approved ('it looks beautiful') then asked to also cover the 4 sub-tabs the mockup didn't show (Trends/Accounts/Bills/Goals) plus the weekly/monthly mode toggle — confirmed via follow-up question to restyle all 5 sub-tabs consistently rather than just the main view. Implemented in mission-control.html, scoped entirely to #mobBudgetView (verified via grep that .bento-tile/.budget-txn*/.budget-tab* classes are exclusive to this tab, so no leak into Home's stats or other tabs): added a balance hero with a real 7-day cumulative-net sparkline and an up/down/flat delta vs last week (both derived from actual transaction data, new weekRangeOffset/weekNetForOffset/gilSparkPoints/buildGilSparkSvg helpers), added two prominent Expense/Income quick-action buttons wired to the existing openMoneyPad() flow (same fast per-card add already shipped, no new transaction-commit code path), gave transaction rows a category-colored icon chip (reusing each category's real BUDGET_CATS color via the existing hexAlpha() helper), and restyled the shared bento-tile/budget-tab/budget-txn/mini-btn/save-field classes to Inter + flat surfaces + tabular-nums, scoped via the #mobBudgetView prefix pattern already established in the codebase — so Trends/Accounts/Bills/Goals inherit the new look automatically without their own render logic changing. No functional behavior was touched (accounts, recurring bills, savings goals, weekly/monthly mode all work exactly as before)."
+    },
+    {
+      "id": "2026-08-25-make-pending-change-queue-expandable-and",
+      "date": "2026-08-25",
+      "title": "Make pending change queue expandable and readable",
+      "status": "done",
+      "source": "ED chat",
+      "description": "User can't actually see what's queued without opening each tab — they want the pending change queue in Mission Control to show summaries or titles they can read at a glance, and ideally be able to expand/click each one to see the full spec without leaving the app.",
+      "details": "Investigation found the Change Queue modal already had badge counts, click-to-expand rows, and full spec/implementation-notes display — the real issue was a bug: toggleCqDetail() looked up the row via getElementById(`cqRow-${CSS.escape(id)}`), but CSS.escape() is for CSS selectors, not element ids, and getElementById does a literal string match. Since every request id starts with a digit (the year), CSS.escape numeric-escaped it, so the lookup never matched the real DOM id and the row never visibly expanded. Fixed by using the raw id: getElementById('cqRow-'+id) (mission-control.html)."
+    },
+    {
+      "id": "2026-08-25-expand-red-s-research-scope-and-add-comm",
+      "date": "2026-08-25",
+      "title": "Expand Red's research scope and add communication loop",
+      "status": "done",
+      "source": "ED chat",
+      "description": "Red currently only does design research for the app itself, but the user wants Red to be able to research anything while maintaining a design focus.",
+      "details": "Scoped via Q&A with the user before implementing: Mission Control's design stays a secondary lens on any briefed topic (not a full replacement of MC framing); Red got real persistent memory (redMemory, mirroring edMemory's storage pattern with its own rmem- id prefix) and its own tool set (save_red_memory, forget_red_memory, start_red_research); Red's tools are structurally separate from ED's (RED_TOOL_HANDLERS vs ED_TOOL_HANDLERS, never merged) so Red cannot reach queue/task/expense/ED-memory actions — enforced in code, not just prompt text, per the user's explicit boundary: 'ED should be like my personal assistant... Red should be purely for research purposes and will not do it if it falls under ED's scope.' Added a new /api/red-chat endpoint + briefing chat box in the Design Lab modal so the user can brief Red on a topic before it researches. Threaded an openTopic flag through runDesignResearch/buildFindingSchema/runSingleFindingRevision/saveDesignResearchWiki so open-topic runs get a real primary-subject framing (with an optional mc_relevance field noting any genuine tie-back) while the existing MC-focused entry points (manual focus box, daily auto-run) are untouched. Also generalized runChatTurn (previously hardcoded to ED's 6 tools) to accept a toolHandlers map per call, since Red needed to reuse it. Verified end-to-end: ED's existing chat/tools still work identically after the refactor, and a real open-topic research run (desk lamps for eye strain) produced correctly-scoped findings, tags, and wiki content (server.js, mission-control.html)."
+    },
+    {
       "id": "2026-08-12-improve-change-queue-ui-dropdown-text-re",
       "date": "2026-08-12",
       "title": "Improve Change Queue UI: Dropdown & Text Readability",

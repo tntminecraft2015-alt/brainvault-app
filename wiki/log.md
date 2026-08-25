@@ -682,3 +682,21 @@ Tasks synced for 2026-08-14: 0/0 complete
 **Pages created:** [[2026-08-25-design-research-daily]]
 
 Design research: General Improvements: Visual Clarity, Habit Durability, & Context-Aware Micro-Feedback (3 findings)
+
+## [2026-08-25] note | Ran Mission Control change queue
+
+**Operation:** note
+
+Ran the 2026-08-25 change queue (4 items, none of which had synced from Render to GitHub — discovered live writes were failing silently, see below). Walked each item with the user before implementing rather than trusting ED's specs as-is:
+- Fixed the change-queue dropdown bug (CSS.escape misused for an element-id lookup in toggleCqDetail — every row failed to expand). Marked done.
+- Added GitHub-sync diagnostics to server.js (ghGet failure logging, syncStatus tracking, exposed via /api/status) so future silent write failures are visible instead of invisible — root cause of today's non-synced items still needs the user to check Render's GITHUB_TOKEN/logs.
+- Expanded Red's research scope: real persistent memory (redMemory) + its own tool set (save_red_memory/forget_red_memory/start_red_research), a new /api/red-chat briefing endpoint, Mission Control kept as a secondary lens on open-topic research, and a hard code-level boundary so Red's tools can never overlap ED's action-taking scope. Verified end-to-end with a real open-topic research run. Marked done.
+- Calendar modernization and Gil Wallet N26 redesign left pending — built a mockup instead of implementing directly, since both were vague UI asks; published as an Artifact for the user to react to before any real code changes.
+
+Not yet pushed to either remote — holding for the user's OK given the open sync issue.
+
+## [2026-08-25] note | Implemented Gil Wallet + Calendar redesign
+
+**Operation:** note
+
+User approved the Gil Wallet/Calendar mockup ("it looks beautiful") and asked to implement + push. Before implementing, found the mockup only covered a fraction of the real Gil Wallet (5 sub-tabs: GIL/TRENDS/ACCOUNTS/BILLS/GOALS, plus weekly/monthly mode — none shown in the mockup); confirmed with the user to restyle all 5 consistently rather than just the main view. Implemented both redesigns in mission-control.html — balance+sparkline hero and two-tap quick actions for Gil Wallet, always-visible week-strip for Calendar — scoped so the new look only touches Gil Wallet and Calendar (verified the relevant CSS classes are exclusive to those tabs before restyling, so Home/ED/Design Lab are untouched). No data logic changed, only rendering/presentation. Verified via syntax checks (node --check on the extracted inline script, CSS brace-balance check) and a local server smoke test; could not do live visual browser testing (Chrome extension not connected in this environment) — flagged to the user. Marked both items done in the queue.

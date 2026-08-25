@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="BrainVault">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chrono-node@2/dist/chrono.min.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -527,39 +527,54 @@
       border-top:1px dashed rgba(223,238,255,.2);
     }
     .mob-day-event-row {
-      display:flex; align-items:center; gap:10px; padding:8px 8px;
-      background:rgba(223,238,255,.035); border-radius:var(--r-md); margin-bottom:3px;
+      display:flex; align-items:center; gap:10px; padding:10px 10px;
+      background:rgba(223,238,255,.045); border-radius:var(--r-md); margin-bottom:5px;
     }
-    .mob-day-event-dot { width:8px; height:8px; flex-shrink:0; }
+    .mob-day-event-dot { width:3px; align-self:stretch; border-radius:2px; flex-shrink:0; }
     .mob-day-event-time {
-      font-family:'Press Start 2P',monospace; font-size:7px;
-      color:var(--accent); min-width:60px; flex-shrink:0;
+      font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:700;
+      color:var(--accent2); min-width:52px; flex-shrink:0;
     }
     .mob-day-event-name {
-      font-family:'VT323',monospace; font-size:21px; line-height:1.1; flex:1;
+      font-family:'Inter'; font-size:13.5px; font-weight:600; line-height:1.3; flex:1;
     }
     .mob-no-events {
-      font-size:16px; opacity:.4; font-style:italic; padding:4px 0;
+      font-family:'Inter',sans-serif; font-size:13px; font-weight:500; opacity:.5; padding:4px 0;
     }
 
     /* ══════════════════════════════════════
        MERGED CALENDAR (grid + timeline) / WIKI DRAWER
-    ══════════════════════════════════════ */
+       — CALENDAR N26-INSPIRED REDESIGN: week-strip is the primary, always-visible
+       view (per the approved mockup); the toggle-behind month grid stays for full-
+       month navigation, restyled flat to match. Quest add-row below keeps its
+       existing JRPG look — shared with the Home tab, out of this redesign's scope. ── */
+    .mob-week-strip { display:flex; gap:6px; padding:0 2px 12px; font-family:'Inter',sans-serif; flex-shrink:0; }
+    .mob-wday { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:9px 0 8px; border-radius:var(--r-md); cursor:pointer; background:rgba(223,238,255,.045); border:none; }
+    .mob-wday .mwd-name { font-size:9.5px; font-weight:600; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.03em; }
+    .mob-wday .mwd-num  { font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); }
+    .mob-wday .mwd-dot  { width:4px; height:4px; border-radius:50%; background:var(--accent2); margin-top:1px; opacity:0; }
+    .mob-wday.has-events .mwd-dot { opacity:1; }
+    .mob-wday.today { background:rgba(255,138,99,.14); }
+    .mob-wday.today .mwd-num { color:var(--accent); }
+    .mob-wday.sel { background:var(--fg); }
+    .mob-wday.sel .mwd-num, .mob-wday.sel .mwd-name { color:var(--bg); }
+    .mob-wday.sel .mwd-dot { background:var(--bg); }
+
     .mob-cal-toggle {
       display:flex; align-items:center; justify-content:space-between; width:100%;
-      background:var(--surface); box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14);
+      background:rgba(223,238,255,.045); box-shadow:none;
       border:none; border-radius:var(--r-lg);
-      color:var(--fg); font-family:'Press Start 2P',monospace; font-size:8px;
+      color:var(--fg); font-family:'Inter'; font-size:11px; font-weight:600;
       padding:13px 14px; margin-bottom:10px; cursor:pointer; min-height:44px; flex-shrink:0;
-      transition:box-shadow .15s, transform .1s;
+      transition:background .15s;
     }
-    .mob-cal-toggle:active { transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14); }
+    .mob-cal-toggle:active { background:rgba(223,238,255,.08); }
     .mob-cal-toggle-arrow { opacity:.6; transition:transform .2s; color:var(--accent2); }
     .mob-cal-toggle.open .mob-cal-toggle-arrow { transform:rotate(180deg); }
     .mob-cal-grid-wrap { overflow:hidden; max-height:0; transition:max-height .25s ease; flex-shrink:0; }
     .mob-cal-grid-wrap.open { max-height:420px; margin-bottom:12px; }
     .mob-cal-card {
-      background:var(--surface); box-shadow:3px 3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(223,238,255,.14);
+      background:rgba(223,238,255,.045); box-shadow:none;
       padding:12px; border-radius:var(--r-lg);
     }
     .mob-tl-section-hd {
@@ -763,6 +778,54 @@
     .budget-limit-inp { font-family:'Press Start 2P',monospace; font-size:7px; width:80px; background:var(--surface); border:1px solid rgba(223,238,255,.15); color:var(--accent); padding:4px 6px; }
     .budget-empty { font-family:'VT323',monospace; font-size:20px; color:var(--fg-dim); text-align:center; padding:18px 0; }
 
+    /* ── GIL WALLET N26-INSPIRED REDESIGN — scoped to #mobBudgetView only.
+       Rest of the app (Home, ED, Design Lab) keeps the JRPG Press Start 2P/VT323
+       treatment untouched; these overrides swap in Inter, flat surfaces, tabular
+       numbers, and restrained color, per the approved mockup. ── */
+    #mobBudgetView { font-family:'Inter',system-ui,sans-serif; }
+    #mobBudgetView .budget-tabs { gap:4px; margin-bottom:14px; background:rgba(223,238,255,.05); padding:3px; border-radius:var(--r-pill); }
+    #mobBudgetView .budget-tab  { font-family:'Inter'; font-size:10px; font-weight:600; letter-spacing:.02em; padding:7px 0; background:none; border:none; color:var(--fg-dim); }
+    #mobBudgetView .budget-tab.active { color:var(--bg); background:var(--fg); border-color:transparent; }
+
+    .gil-hero { padding:4px 2px 18px; }
+    .gil-hero-lbl { font-family:'Inter'; font-size:11px; font-weight:500; color:var(--fg-dim); margin-bottom:4px; }
+    .gil-hero-num { font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1; display:flex; align-items:baseline; gap:2px; }
+    .gil-hero-delta { display:inline-flex; align-items:center; gap:4px; margin-top:9px; font-family:'Inter'; font-size:11px; font-weight:600; padding:3px 9px; border-radius:var(--r-pill); }
+    .gil-hero-delta.up   { color:var(--green); background:rgba(127,255,176,.12); }
+    .gil-hero-delta.down { color:var(--red); background:rgba(255,148,148,.12); }
+    .gil-hero-delta.flat { color:var(--fg-dim); background:rgba(223,238,255,.06); }
+    .gil-spark { display:block; margin-top:14px; width:100%; height:36px; }
+
+    .gil-quick-row { display:flex; gap:8px; padding:0 2px 16px; }
+    .gil-qbtn { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:11px 0 9px; border-radius:var(--r-md); border:none; cursor:pointer; background:rgba(223,238,255,.045); transition:transform .1s; font-family:'Inter'; }
+    .gil-qbtn:active { transform:scale(.96); }
+    .gil-qbtn .gqi { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; }
+    .gil-qbtn.expense .gqi { background:rgba(255,148,148,.14); color:var(--red); }
+    .gil-qbtn.income  .gqi { background:rgba(127,255,176,.14); color:var(--green); }
+    .gil-qbtn span.gql { font-size:10.5px; font-weight:600; color:var(--fg-dim); }
+
+    #mobBudgetView .m-label, #mobBudgetView .bento-label { font-family:'Inter'; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+    #mobBudgetView .bento-tile { background:rgba(223,238,255,.045); border:none; }
+    #mobBudgetView .bento-val { font-family:'Inter'; font-variant-numeric:tabular-nums; font-weight:700; }
+    #mobBudgetView .bento-hero .bento-val { font-size:24px; }
+    #mobBudgetView .bento-sub { font-family:'Inter'; font-size:10px; font-weight:500; }
+
+    #mobBudgetView .budget-txn { display:flex; align-items:center; gap:10px; padding:9px 6px; background:none; }
+    #mobBudgetView .budget-txn-icon { width:34px; height:34px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; background:rgba(223,238,255,.07); }
+    #mobBudgetView .budget-txn-note { font-family:'Inter'; font-size:13.5px; font-weight:600; }
+    #mobBudgetView .budget-txn-amt { font-family:'Inter'; font-variant-numeric:tabular-nums; font-weight:700; font-size:14px; }
+
+    #mobBudgetView .mob-inp, #mobBudgetView .budget-cat-sel, #mobBudgetView .budget-limit-inp { font-family:'Inter'; font-size:12.5px; background:rgba(223,238,255,.05); border:none; }
+    #mobBudgetView .mob-add-btn { border-radius:var(--r-sm); }
+    #mobBudgetView .budget-type-btn { font-family:'Inter'; font-size:11px; font-weight:600; border:none; background:rgba(223,238,255,.05); }
+    #mobBudgetView .budget-type-btn.active.expense { background:var(--red); color:#2a0d0d; border-color:transparent; }
+    #mobBudgetView .budget-type-btn.active.income  { background:var(--green); color:#0d2a1a; border-color:transparent; }
+    #mobBudgetView .mini-btn { font-family:'Inter'; font-size:10.5px; font-weight:600; background:rgba(223,238,255,.06); box-shadow:none; }
+    #mobBudgetView .save-label { font-family:'Inter'; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    #mobBudgetView .save-inp { font-family:'Inter'; font-size:14px; background:rgba(223,238,255,.05); border:none; }
+    #mobBudgetView .budget-empty { font-family:'Inter'; font-size:13px; font-weight:500; }
+    #mobBudgetView .budget-month { font-family:'Inter'; font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--fg-dim); }
+
     /* Quick GIL: fast per-card add/subtract pills on the Home tab */
     .quickgil-row  { display:flex; flex-direction:column; gap:6px; }
     .quickgil-pill { display:flex; align-items:center; gap:8px; background:rgba(223,238,255,.035); border:1px solid rgba(223,238,255,.08); border-radius:var(--r-md); padding:6px 8px; }
@@ -892,6 +955,8 @@
       <div class="mob-tab-hd">
         <span>📅 CALENDAR</span>
       </div>
+
+      <div class="mob-week-strip" id="mobWeekStrip"></div>
 
       <button class="mob-cal-toggle" id="mobCalToggleBtn" onclick="toggleMobCalGrid()">
         <span>📅 Browse dates</span>
@@ -1217,6 +1282,12 @@
       <button class="modal-btn ok" id="dlRunBtn" onclick="runDesignResearch()">▶ RESEARCH</button>
     </div>
     <div id="dlStatus" style="font-family:'VT323',monospace;font-size:15px;opacity:.7;min-height:18px;margin-bottom:10px;"></div>
+    <div class="m-label" style="margin-bottom:6px;">BRIEF RED (chat first, research anything with a design lens)</div>
+    <div id="redChatScroll" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:6px;margin-bottom:14px;">
+      <input id="redChatInp" class="m-inp" type="text" placeholder="Tell Red what to look into..." style="flex:1;" onkeydown="if(event.key==='Enter')sendRedChat();">
+      <button class="modal-btn ok" id="redChatSendBtn" onclick="sendRedChat()">▶</button>
+    </div>
     <div class="m-label" style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">PAST RESEARCH <span class="dl-live-dot" title="Checking for new research while this is open"></span></div>
     <div id="dlList" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
     <div class="modal-btns"><button class="modal-btn" onclick="openRedLearnings()">🧠 WHAT RED'S LEARNED</button><button class="modal-btn" onclick="closeModal('designLabModal')">CLOSE</button></div>
@@ -1895,7 +1966,30 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
   renderDaySummaryInto(selKey, summaryEl, isMob);
 }
 
-function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); }
+// Always-visible week strip (mockup's primary nav) — sits above the toggle-behind
+// month grid, which stays for jumping to a different week/month. Selecting a day
+// here just refreshes the summary/quest panels, no modal — the month grid's own
+// day-cell tap keeps its existing "open day modal" behavior unchanged.
+function renderMobWeekStrip(){
+  const el=document.getElementById('mobWeekStrip'); if(!el)return;
+  const DOW=['S','M','T','W','T','F','S'];
+  const ref=new Date(selectedKey+'T00:00:00');
+  const sun=new Date(ref); sun.setDate(ref.getDate()-ref.getDay());
+  const todayK=TODAY();
+  el.innerHTML='';
+  for(let i=0;i<7;i++){
+    const d=new Date(sun); d.setDate(sun.getDate()+i);
+    const key=dateKey(d);
+    const evs=(APP.events||{})[key]||[];
+    const isToday=key===todayK, isSel=key===selectedKey;
+    const btn=document.createElement('button');
+    btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
+    btn.innerHTML=`<span class="mwd-name">${DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
+    btn.onclick=()=>{ selectedKey=key; renderMobWeekStrip(); renderMobDaySummary(); renderMobCalQuests(); };
+    el.appendChild(btn);
+  }
+}
+function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); renderMobWeekStrip(); }
 function renderMobDaySummary(){
   renderDaySummaryInto(selectedKey,document.getElementById('mobDaySummary'),true);
 }
@@ -2994,6 +3088,61 @@ function buildBudgetTabBody(tab){
   return '';
 }
 
+// ── GIL HERO: weekly net trend + delta, derived from real transaction data ──
+function weekRangeOffset(offsetWeeks){
+  const now=new Date(),day=now.getDay(),daysFromMon=(day===0)?6:day-1;
+  const mon=new Date(now); mon.setDate(now.getDate()-daysFromMon+offsetWeeks*7);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  return{start:dateKey(mon),end:dateKey(sun)};
+}
+function weekNetForOffset(offsetWeeks){
+  const{start,end}=weekRangeOffset(offsetWeeks);
+  const txns=(APP.budget?.transactions||[]).filter(t=>t.date>=start&&t.date<=end);
+  let income=0,expense=0;
+  txns.forEach(t=>{if(t.type==='income')income+=t.amount;else expense+=t.amount;});
+  return{income,expense,net:income-expense};
+}
+function gilWeekDeltaHtml(){
+  const cur=weekNetForOffset(0).net, prev=weekNetForOffset(-1).net;
+  let pct,dir;
+  if(prev===0&&cur===0){dir='flat';pct=0;}
+  else if(prev===0){dir=cur>0?'up':'down';pct=100;}
+  else{pct=Math.round(((cur-prev)/Math.abs(prev))*100);dir=pct>0?'up':pct<0?'down':'flat';}
+  const arrow=dir==='up'?'↑':dir==='down'?'↓':'→';
+  const label=dir==='flat'?'No change vs last week':`${arrow} ${Math.abs(pct)}% vs last week`;
+  return`<div class="gil-hero-delta ${dir}">${label}</div>`;
+}
+function gilSparkPoints(){
+  const{start}=weekRangeOffset(0);
+  const startDate=new Date(start+'T00:00:00');
+  const pts=[]; let cum=0;
+  for(let i=0;i<7;i++){
+    const d=new Date(startDate); d.setDate(startDate.getDate()+i);
+    const key=dateKey(d);
+    let net=0;
+    (APP.budget?.transactions||[]).filter(t=>t.date===key).forEach(t=>{net+=t.type==='income'?t.amount:-t.amount;});
+    cum+=net; pts.push(cum);
+  }
+  return pts;
+}
+function buildGilSparkSvg(){
+  const pts=gilSparkPoints();
+  const w=280,h=36;
+  const min=Math.min(0,...pts),max=Math.max(0,...pts);
+  const range=(max-min)||1;
+  const stepX=w/(pts.length-1);
+  const coords=pts.map((v,i)=>`${(i*stepX).toFixed(1)},${(h-((v-min)/range)*h).toFixed(1)}`);
+  const color=pts[pts.length-1]>=0?'var(--green)':'var(--red)';
+  const [lx,ly]=coords[coords.length-1].split(',');
+  return`<svg class="gil-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <polyline points="${coords.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${lx}" cy="${ly}" r="3.5" fill="${color}"/>
+  </svg>`;
+}
+function quickAddGil(type){
+  openMoneyPad(APP.budget?.lastAccountId||(APP.budget?.accounts||[])[0]?.id||'general', type);
+}
+
 function buildMobBudgetGilHTML(){
   const{expense,txns}=budgetWeekTotals();
   const balance=budgetAllBalance();
@@ -3007,18 +3156,25 @@ function buildMobBudgetGilHTML(){
     const color=t.type==='income'?'var(--green)':'var(--red)';
     const sign=t.type==='income'?'+':'-';
     return`<div class="budget-txn">
-      <span class="budget-txn-icon">${cat.icon}</span>
+      <span class="budget-txn-icon" style="background:${hexAlpha(cat.color,.15)};">${cat.icon}</span>
       <span class="budget-txn-note">${esc(t.note)}</span>
-      <span class="budget-txn-amt" style="color:${color};font-size:22px;">${sign}$${t.amount.toFixed(2)}</span>
+      <span class="budget-txn-amt" style="color:${color};">${sign}$${t.amount.toFixed(2)}</span>
       <button class="budget-txn-del" onclick="deleteTxn(${t.id})" title="Delete" style="font-size:16px;opacity:1;">✕</button>
     </div>`;
   }).join(''):`<div class="budget-empty">No transactions this week.</div>`;
   return`
-    <div class="budget-month" style="font-size:7px;margin-bottom:2px;">${weekLabel()}</div>
     ${dueBillsBannerHtml()}
-    <div class="save-label" style="font-size:6px;margin-bottom:1px;">BALANCE</div>
-    <div class="budget-big-num" style="font-size:62px;color:${balance>=0?'var(--green)':'var(--red)'};">${balance>=0?'+':'-'}$${Math.abs(balance).toFixed(0)}</div>
-    <div class="bento-grid" style="margin:8px 0 10px;">
+    <div class="gil-hero">
+      <div class="gil-hero-lbl">Balance</div>
+      <div class="gil-hero-num" style="color:${balance>=0?'var(--green)':'var(--red)'};">$<span>${Math.abs(balance).toFixed(0)}</span></div>
+      ${gilWeekDeltaHtml()}
+      ${buildGilSparkSvg()}
+    </div>
+    <div class="gil-quick-row">
+      <button class="gil-qbtn expense" onclick="quickAddGil('expense')"><div class="gqi">−</div><span class="gql">Expense</span></button>
+      <button class="gil-qbtn income" onclick="quickAddGil('income')"><div class="gqi">+</div><span class="gql">Income</span></button>
+    </div>
+    <div class="bento-grid" style="margin:0 0 10px;">
       <div class="bento-tile bento-hero" onclick="editWeeklyLimit()" style="cursor:pointer;">
         <div class="bento-label">SPENT THIS WEEK</div>
         <div class="bento-val expense">-$${expense.toFixed(2)}</div>
@@ -3031,6 +3187,7 @@ function buildMobBudgetGilHTML(){
       </div>
       ${bentoCatTilesHtml(categoryBreakdown(txns))}
     </div>
+    <div class="m-label" style="margin:4px 0 6px;">Recent</div>
     <div class="budget-txn-list" style="flex:1;overflow-y:auto;">${txnRows}</div>
     <div class="budget-add-row" style="margin-top:8px;flex-wrap:wrap;gap:5px;">
       <button class="budget-type-btn ${_budgetType==='income'?'income':'expense'} active" data-type="${_budgetType}" id="mobTxnTypeBtn" onclick="toggleTxnType(this)" style="font-size:8px;padding:8px 10px;">${_budgetType==='income'?'+ INCOME':'− EXPENSE'}</button>
@@ -3121,11 +3278,11 @@ function closeWikiDrawer(){
 // ══════════════════════════════════════════════════════════════
 let chatHistory=[];
 
-function appendChatMsg(role,text,elId){
+function appendChatMsg(role,text,elId,label){
   const scrollId = elId||'chatScroll';
   const scroll=document.getElementById(scrollId); if(!scroll)return;
   const who=role==='user'?'you':role==='claude'?'claude':'sys';
-  const lbl=role==='user'?'YOU':role==='claude'?'ED':'SYSTEM';
+  const lbl=label||(role==='user'?'YOU':role==='claude'?'ED':'SYSTEM');
   const div=document.createElement('div'); div.className='chat-msg';
   div.innerHTML=`<span class="chat-msg-who ${who}">${lbl}</span><div class="chat-bubble ${who}">${formatChatText(text)}</div>`;
   scroll.appendChild(div); scroll.scrollTop=scroll.scrollHeight;
@@ -3134,7 +3291,7 @@ function formatChatText(text){
   return esc(text).replace(/```([\s\S]*?)```/g,'<pre>$1</pre>').replace(/`([^`]+)`/g,'<code style="background:var(--bg);padding:1px 4px;font-size:11px;">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
 }
 let typingEls={};
-function showTyping(elId){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML='<span class="chat-msg-who claude">ED</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
+function showTyping(elId,label){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML=`<span class="chat-msg-who claude">${label||'ED'}</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
 function hideTyping(elId){ const t=typingEls[elId||'chatScroll'];if(t){t.remove();delete typingEls[elId||'chatScroll'];} }
 
 async function sendChatCommon(msg, scrollId, btnId){
@@ -3234,6 +3391,36 @@ function formatWikiMd(md){
 }
 
 function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
+
+// ── RED CHAT (briefing conversation before a research run) ──
+let redChatHistory=[];
+async function sendRedChatCommon(msg){
+  if(!msg.trim())return;
+  if(!serverOnline){ appendChatMsg('sys','Server offline — start the server to chat with Red.','redChatScroll'); return; }
+  appendChatMsg('user',msg,'redChatScroll');
+  document.getElementById('redChatSendBtn')?.setAttribute('disabled','1');
+  showTyping('redChatScroll','RED');
+  try{
+    const r=await fetch(`${SERVER}/api/red-chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:redChatHistory}),signal:AbortSignal.timeout(60000)});
+    const d=await r.json(); hideTyping('redChatScroll');
+    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.','redChatScroll'); openModal('settingsModal'); }
+    else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,'redChatScroll'); openModal('settingsModal'); }
+    else if(d.error){ appendChatMsg('sys','⚠ '+(d.message||('Error: '+d.error)),'redChatScroll'); }
+    else{
+      appendChatMsg('claude',d.response,'redChatScroll','RED');
+      redChatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response});
+      if(redChatHistory.length>20)redChatHistory=redChatHistory.slice(-20);
+      (d.toolActions||[]).forEach(a=>{
+        if(a.type==='red_memory_saved')      showToast(`Red remembered that ◆`);
+        if(a.type==='red_memory_forgotten')  showToast(`Red forgot that ◆`);
+        if(a.type==='research_started')      showToast(`Red is researching: "${a.topic}" ◆`);
+      });
+      if((d.toolActions||[]).some(a=>a.type==='research_started')) await loadDesignResearchList();
+    }
+  }catch(e){ hideTyping('redChatScroll'); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),'redChatScroll'); }
+  document.getElementById('redChatSendBtn')?.removeAttribute('disabled');
+}
+function sendRedChat(){ const inp=document.getElementById('redChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendRedChatCommon(msg); }
 
 // ══════════════════════════════════════════════════════════════
 // DESIGN LAB
@@ -3464,7 +3651,7 @@ function cqRowHtml(r){
 
 function toggleCqDetail(id){
   if(_cqOpenIds.has(id)) _cqOpenIds.delete(id); else _cqOpenIds.add(id);
-  document.getElementById(`cqRow-${CSS.escape(id)}`)?.classList.toggle('open');
+  document.getElementById('cqRow-'+id)?.classList.toggle('open');
 }
 
 function toggleCqDone(){

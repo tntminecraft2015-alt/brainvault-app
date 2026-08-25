@@ -33,12 +33,34 @@ const GH_API   = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents`;
 const fileStore  = {};  // ghPath → string content (in-memory cache)
 const shaStore   = {};  // ghPath → blob SHA (required for GitHub PUT updates)
 const writeQueue = {};  // ghPath → debounce timer
+const syncStatus = {};  // ghPath → { lastReadAttempt, lastReadOk, lastReadError, lastReadSuccess, lastWriteAttempt, lastWriteOk, lastWriteError, lastWriteSuccess }
+
+// Records the outcome of a GitHub read/write so failures (esp. silent ones) are visible via /api/status.
+function recordSync(ghPath, kind, ok, error) {
+  const s = syncStatus[ghPath] || (syncStatus[ghPath] = {});
+  const now = new Date().toISOString();
+  s[`last${kind === 'read' ? 'Read' : 'Write'}Attempt`] = now;
+  s[`last${kind === 'read' ? 'Read' : 'Write'}Ok`]       = ok;
+  if (ok) {
+    s[`last${kind === 'read' ? 'Read' : 'Write'}Success`] = now;
+    s[`last${kind === 'read' ? 'Read' : 'Write'}Error`]   = null;
+  } else {
+    s[`last${kind === 'read' ? 'Read' : 'Write'}Error`]   = String(error || '').slice(0, 300);
+  }
+}
 
 async function ghGet(ghPath) {
   const r = await fetch(`${GH_API}/${ghPath}`, {
     headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json' },
   });
-  return r.ok ? r.json() : null;
+  if (!r.ok) {
+    const errBody = await r.text().catch(() => '');
+    console.error(`ghGet failed for ${ghPath}: ${r.status} ${errBody}`);
+    recordSync(ghPath, 'read', false, `${r.status} ${errBody}`);
+    return null;
+  }
+  recordSync(ghPath, 'read', true);
+  return r.json();
 }
 
 async function ghPut(ghPath, content, isRetry = false) {
@@ -61,10 +83,12 @@ async function ghPut(ghPath, content, isRetry = false) {
       if (fresh?.sha) { shaStore[ghPath] = fresh.sha; return ghPut(ghPath, content, true); }
     }
     console.error(`ghPut failed for ${ghPath}: ${r.status} ${errBody}`);
+    recordSync(ghPath, 'write', false, `${r.status} ${errBody}`);
     return;
   }
   const data = await r.json();
   if (data?.content?.sha) shaStore[ghPath] = data.content.sha;
+  recordSync(ghPath, 'write', true);
 }
 
 async function ghDelete(ghPath) {
@@ -109,6 +133,8 @@ async function initStore() {
   console.log('  Loading vault from GitHub…');
   await loadDir('');
   console.log(`  Loaded ${Object.keys(fileStore).length} files from ${GH_OWNER}/${GH_REPO}`);
+  const readFailures = Object.entries(syncStatus).filter(([, s]) => s.lastReadOk === false).length;
+  if (readFailures) console.log(`  ${readFailures} read failure(s) during load — see /api/status for details`);
 }
 
 // Debounced write: updates memory immediately, persists to GitHub after 600ms idle
@@ -216,7 +242,7 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [] };
+  return { schedule: DEFAULT_SCHEDULE, events: {}, tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [], redMemory: [] };
 }
 
 function saveAppData(data) {
@@ -323,7 +349,8 @@ You also have persistent memory across every conversation, not just this one —
 app.get('/', (req, res) => res.sendFile(path.join(VAULT, 'mission-control.html')));
 
 app.get('/api/status', (req, res) => {
-  res.json({ ok: true, hasKey: !!getApiKey(), mode: USE_GITHUB ? 'cloud' : 'local', date: today() });
+  const sync = USE_GITHUB ? Object.entries(syncStatus).map(([path, s]) => ({ path, ...s })) : [];
+  res.json({ ok: true, hasKey: !!getApiKey(), mode: USE_GITHUB ? 'cloud' : 'local', date: today(), sync });
 });
 
 app.post('/api/set-key', (req, res) => {
@@ -488,6 +515,73 @@ function forgetEdMemory({ id }) {
   return { ok: true, id, text: removed.text };
 }
 
+// ── RED'S MEMORY (separate namespace from ED's — own id prefix so ids can never cross) ────────
+const SAVE_RED_MEMORY_TOOL = {
+  name: 'save_red_memory',
+  description: 'Save a durable, reusable note about ongoing research context, goals, or standing preferences for how the user likes research done — carries over into every future research briefing, not just this one. This is separate from ED\'s memory: never use it for tasks, expenses, code changes, or anything outside research context. Never save something that already appears in the WHAT RED REMEMBERS list.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      text: { type: 'string', description: 'The research context/goal/preference itself, written concisely in your own words, e.g. "User is redesigning their home office, cares about minimalism" or "Prefers sources with real screenshots over pure text descriptions."' },
+    },
+    required: ['text'],
+  },
+};
+
+function saveRedMemory({ text }) {
+  const clean = String(text || '').trim().slice(0, 400);
+  if (!clean) return { ok: false, error: 'Empty memory text' };
+  const data = getAppData();
+  data.redMemory = data.redMemory || [];
+  const id = `rmem-${Date.now()}`;
+  data.redMemory.unshift({ id, date: today(), text: clean });
+  data.redMemory = data.redMemory.slice(0, 150);
+  saveAppData(data);
+  return { ok: true, id, text: clean };
+}
+
+const FORGET_RED_MEMORY_TOOL = {
+  name: 'forget_red_memory',
+  description: 'Permanently delete one saved research memory. Use ONLY when the user asks you to forget something, or a remembered note turns out to be wrong/outdated. Never call this speculatively.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      id: { type: 'string', description: 'The exact id of the memory to delete, copied from the WHAT RED REMEMBERS list, e.g. "rmem-1786517286745".' },
+    },
+    required: ['id'],
+  },
+};
+
+function forgetRedMemory({ id }) {
+  if (!id || !/^rmem-\d+$/.test(id)) return { ok: false, error: 'Invalid id' };
+  const data = getAppData();
+  data.redMemory = data.redMemory || [];
+  const idx = data.redMemory.findIndex(m => m.id === id);
+  if (idx === -1) return { ok: false, error: 'No memory with that id' };
+  const [removed] = data.redMemory.splice(idx, 1);
+  saveAppData(data);
+  return { ok: true, id, text: removed.text };
+}
+
+const START_RED_RESEARCH_TOOL = {
+  name: 'start_red_research',
+  description: 'Kick off a real research run on a briefed topic. Use once the user has given you a clear topic/goal to research — design-focused, but on any subject, not just Mission Control. The run happens in the background and results show up in Design Lab as a slideshow, plus a filed wiki page — it takes up to a minute, so don\'t wait for it or claim you have findings yet; just confirm it started.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      topic: { type: 'string', description: 'The research topic/brief, as specific as what the user gave you, e.g. "Ergonomic desk setups for small apartments" or "Modern onboarding flows for habit-tracking apps".' },
+    },
+    required: ['topic'],
+  },
+};
+
+function startRedResearch({ topic }) {
+  const clean = String(topic || '').trim().slice(0, 200);
+  if (!clean) return { ok: false, error: 'No topic given' };
+  runAndSaveDesignResearch(clean, null, { openTopic: true }).catch(console.error);
+  return { ok: true, topic: clean };
+}
+
 const ADD_TASK_TOOL = {
   name: 'add_task',
   description: 'Add a real to-do item to the user\'s task list for today. Use ONLY when the user clearly asks you to add, create, or remember a task/to-do right now — not for hypothetical or future-conditional requests.',
@@ -551,12 +645,73 @@ function logEdExpense({ amount, category, note, type }) {
   return { ok: true, txn };
 }
 
-const CLIENT_TOOL_NAMES = ['queue_code_change', 'remove_queued_change', 'save_memory', 'forget_memory', 'add_task', 'log_expense'];
+// ED's tool dispatch. Each handler performs the action, pushes onto toolActions on success
+// (matching each tool's original push-only-on-ok behavior), and returns the tool_result payload.
+const ED_TOOL_HANDLERS = {
+  queue_code_change: (input, toolActions) => {
+    const result = queueCodeChange(input);
+    toolActions.push({ type: 'queued', id: result.id, title: result.title });
+    return { ok: true, id: result.id, message: `Queued as change-requests/${result.id}.md — Claude Code will pick this up next session.` };
+  },
+  remove_queued_change: async (input, toolActions) => {
+    const result = await removeQueuedChange(input);
+    if (result.ok) toolActions.push({ type: 'removed', id: result.id, title: result.title });
+    return result.ok
+      ? { ok: true, message: `Removed change-requests/${result.id}.md and its queue entry.` }
+      : { ok: false, message: result.error };
+  },
+  save_memory: (input, toolActions) => {
+    const result = saveEdMemory(input);
+    if (result.ok) toolActions.push({ type: 'memory_saved', text: result.text });
+    return result.ok ? { ok: true, id: result.id, message: 'Saved to persistent memory.' } : { ok: false, message: result.error };
+  },
+  forget_memory: (input, toolActions) => {
+    const result = forgetEdMemory(input);
+    if (result.ok) toolActions.push({ type: 'memory_forgotten', text: result.text });
+    return result.ok ? { ok: true, message: 'Forgotten.' } : { ok: false, message: result.error };
+  },
+  add_task: (input, toolActions) => {
+    const result = addEdTask(input);
+    if (result.ok) toolActions.push({ type: 'task_added', text: result.text });
+    return result.ok ? { ok: true, message: `Added "${result.text}" to today's tasks.` } : { ok: false, message: result.error };
+  },
+  log_expense: (input, toolActions) => {
+    const result = logEdExpense(input);
+    if (result.ok) toolActions.push({ type: 'expense_logged', txn: result.txn });
+    return result.ok ? { ok: true, message: `Logged $${result.txn.amount.toFixed(2)} (${result.txn.category}).` } : { ok: false, message: result.error };
+  },
+};
 
-async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
+// Red's tool dispatch — deliberately separate from ED_TOOL_HANDLERS, never merged. This is the
+// concrete code-level boundary: Red physically cannot reach queue/task/expense/ED-memory actions
+// because runChatTurn only ever dispatches whatever handler map is passed in for that call.
+const RED_TOOL_HANDLERS = {
+  save_red_memory: (input, toolActions) => {
+    const result = saveRedMemory(input);
+    if (result.ok) toolActions.push({ type: 'red_memory_saved', text: result.text });
+    return result.ok ? { ok: true, id: result.id, message: 'Saved to research memory.' } : { ok: false, message: result.error };
+  },
+  forget_red_memory: (input, toolActions) => {
+    const result = forgetRedMemory(input);
+    if (result.ok) toolActions.push({ type: 'red_memory_forgotten', text: result.text });
+    return result.ok ? { ok: true, message: 'Forgotten.' } : { ok: false, message: result.error };
+  },
+  start_red_research: (input, toolActions) => {
+    const result = startRedResearch(input);
+    if (result.ok) toolActions.push({ type: 'research_started', topic: result.topic });
+    return result.ok
+      ? { ok: true, message: `Started researching "${result.topic}" — it'll show up in Design Lab shortly.` }
+      : { ok: false, message: result.error };
+  },
+};
+
+async function runChatTurn(anthropic, system, tools, messages, toolHandlers, maxRounds = 4) {
   let finalText = '';
   let usage = null;
   const toolActions = [];
+  // web_search is dispatched by the API itself, not by us — every *_TOOL definition has an
+  // input_schema key, so this set is exactly "the tools we're responsible for handling".
+  const clientToolNames = new Set(tools.filter(t => t.input_schema).map(t => t.name));
   for (let round = 0; round < maxRounds; round++) {
     const resp = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
@@ -569,40 +724,14 @@ async function runChatTurn(anthropic, system, tools, messages, maxRounds = 4) {
     const textBlocks = stripCiteTags(resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n\n'));
     if (textBlocks) finalText = textBlocks;
 
-    const clientToolUses = resp.content.filter(b => b.type === 'tool_use' && CLIENT_TOOL_NAMES.includes(b.name));
+    const clientToolUses = resp.content.filter(b => b.type === 'tool_use' && clientToolNames.has(b.name));
     if (resp.stop_reason !== 'tool_use' || !clientToolUses.length) break;
 
     messages.push({ role: 'assistant', content: resp.content });
     const toolResults = [];
     for (const tu of clientToolUses) {
-      let payload;
-      if (tu.name === 'queue_code_change') {
-        const result = queueCodeChange(tu.input || {});
-        toolActions.push({ type: 'queued', id: result.id, title: result.title });
-        payload = { ok: true, id: result.id, message: `Queued as change-requests/${result.id}.md — Claude Code will pick this up next session.` };
-      } else if (tu.name === 'remove_queued_change') {
-        const result = await removeQueuedChange(tu.input || {});
-        if (result.ok) toolActions.push({ type: 'removed', id: result.id, title: result.title });
-        payload = result.ok
-          ? { ok: true, message: `Removed change-requests/${result.id}.md and its queue entry.` }
-          : { ok: false, message: result.error };
-      } else if (tu.name === 'save_memory') {
-        const result = saveEdMemory(tu.input || {});
-        if (result.ok) toolActions.push({ type: 'memory_saved', text: result.text });
-        payload = result.ok ? { ok: true, id: result.id, message: 'Saved to persistent memory.' } : { ok: false, message: result.error };
-      } else if (tu.name === 'forget_memory') {
-        const result = forgetEdMemory(tu.input || {});
-        if (result.ok) toolActions.push({ type: 'memory_forgotten', text: result.text });
-        payload = result.ok ? { ok: true, message: 'Forgotten.' } : { ok: false, message: result.error };
-      } else if (tu.name === 'add_task') {
-        const result = addEdTask(tu.input || {});
-        if (result.ok) toolActions.push({ type: 'task_added', text: result.text });
-        payload = result.ok ? { ok: true, message: `Added "${result.text}" to today's tasks.` } : { ok: false, message: result.error };
-      } else if (tu.name === 'log_expense') {
-        const result = logEdExpense(tu.input || {});
-        if (result.ok) toolActions.push({ type: 'expense_logged', txn: result.txn });
-        payload = result.ok ? { ok: true, message: `Logged $${result.txn.amount.toFixed(2)} (${result.txn.category}).` } : { ok: false, message: result.error };
-      }
+      const handler = toolHandlers[tu.name];
+      const payload = handler ? await handler(tu.input || {}, toolActions) : { ok: false, message: 'Unknown tool' };
       toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: JSON.stringify(payload) });
     }
     messages.push({ role: 'user', content: toolResults });
@@ -628,7 +757,7 @@ app.post('/api/chat', async (req, res) => {
       ADD_TASK_TOOL,
       LOG_EXPENSE_TOOL,
     ];
-    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages);
+    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages, ED_TOOL_HANDLERS);
     saveConversation(message, responseText);
     res.json({ response: responseText, tokens: usage, toolActions });
   } catch (err) {
@@ -656,6 +785,83 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({
         error: 'TOO_LONG',
         message: 'Your question plus the wiki context ED pulled in was too large for one request. Try a shorter question, or ask about one specific page instead of a broad topic.',
+      });
+    }
+    if (isOverloaded) {
+      return res.status(503).json({
+        error: 'OVERLOADED',
+        message: "Claude's servers are overloaded right now — wait a minute and try again.",
+      });
+    }
+    if (isNetwork) {
+      return res.status(502).json({
+        error: 'NETWORK',
+        message: 'Could not reach the Claude API — check the server has internet access and try again.',
+      });
+    }
+    res.status(500).json({
+      error: 'UNKNOWN',
+      message: `Something went wrong (${err.status || 'no status'}): ${msg || 'unknown error'}`,
+    });
+  }
+});
+
+// ── RED CHAT (briefing conversation before a research run) ────────────────────
+function buildRedChatSystemPrompt() {
+  const appData = getAppData();
+  const memory = appData.redMemory || [];
+  const memoryText = memory.length
+    ? memory.map(m => `- id: ${m.id} | [${m.date}] ${m.text}`).join('\n')
+    : '(nothing remembered yet)';
+
+  const persona = `You are Red, the design research agent embedded in BrainVault Mission Control. Read this first, it governs every reply you write: you talk like a focused research collaborator briefing the user before you go dig into something — casual but purposeful, not a formal report. Most replies should be ONE TO THREE SENTENCES unless the user is asking you to actually lay out research findings.
+
+You are a separate persona from ED, the general-purpose chat assistant elsewhere in this app. ED can act on nearly anything in the app on the user's behalf — tasks, queued code changes, memory — except looking at the budget. Your job is strictly research and reporting: you dig into topics (design-focused, but not limited to Mission Control) and report back findings as a Design Lab slideshow. You do NOT take actions that fall under ED's scope — you have no tools for tasks, expenses, code changes, or ED's own memory, and you should say so plainly and point the user to ED if they ask you to do one of those things here. Don't pretend you can or did.
+
+Before starting a research run, make sure you actually understand what the user wants — ask a clarifying question if the topic or angle is vague, rather than guessing. Once you have a clear brief, call start_red_research with the topic. Findings always keep a design-quality lens, and where relevant, note how an idea could apply back to Mission Control's own design — but that's a secondary consideration, not the main point, unless the user is specifically briefing you on Mission Control itself.
+
+You also have persistent memory across every research conversation, not just this one — the WHAT RED REMEMBERS section below is durable notes you've saved about the user's research goals/preferences over time. Use it to shape how you approach new briefings. When you learn something durable and reusable — a standing research interest, a preference for how findings should be presented, a correction — call save_red_memory to write it down concisely. Don't save one-off ephemeral chat content, and don't save duplicates of what's already below. If a memory turns out wrong or the user asks you to forget it, call forget_red_memory with its exact id.`;
+
+  return persona + `\n\n═══════════════════════════════\n\n# WHAT RED REMEMBERS ABOUT THE USER'S RESEARCH GOALS (across all past briefings — use exact ids for forget_red_memory)\n${memoryText}`;
+}
+
+app.post('/api/red-chat', async (req, res) => {
+  const key = getApiKey();
+  if (!key) return res.status(401).json({ error: 'NO_KEY', message: 'No API key found.' });
+  const { message, history = [] } = req.body;
+  if (!message) return res.status(400).json({ error: 'Empty message' });
+  const anthropic = makeClient(key);
+  try {
+    const messages = [...history.map(m => ({ role: m.role, content: m.content })),
+                       { role: 'user', content: message }];
+    const tools = [SAVE_RED_MEMORY_TOOL, FORGET_RED_MEMORY_TOOL, START_RED_RESEARCH_TOOL];
+    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildRedChatSystemPrompt(), tools, messages, RED_TOOL_HANDLERS);
+    res.json({ response: responseText, tokens: usage, toolActions });
+  } catch (err) {
+    console.error('Red chat API error:', err.status, err.message);
+    const msg = String(err.message || '');
+    const isRateLimit  = err.status === 429 || msg.includes('rate_limit');
+    const isAuth       = err.status === 401 || msg.includes('authentication');
+    const isTooLong     = err.status === 400 && (msg.includes('too long') || msg.includes('maximum context') || msg.includes('token'));
+    const isOverloaded = err.status === 529 || err.status === 503 || msg.includes('overloaded');
+    const isNetwork    = !err.status;
+
+    if (isRateLimit) {
+      return res.status(429).json({
+        error: 'RATE_LIMIT',
+        message: 'Rate limit reached on the shared OAuth token. Go to ⚙ Settings → API Key and paste a key from console.anthropic.com for unlimited access.',
+      });
+    }
+    if (isAuth) {
+      return res.status(401).json({
+        error: 'AUTH_ERROR',
+        message: 'Authentication failed. Your API key may be expired. Set a new one in ⚙ Settings.',
+      });
+    }
+    if (isTooLong) {
+      return res.status(400).json({
+        error: 'TOO_LONG',
+        message: 'That briefing got too large for one request — try a shorter message.',
       });
     }
     if (isOverloaded) {
@@ -997,14 +1203,18 @@ Archived ideas from before a cleanup wipe (still real history — don't repeat t
 ${archiveText}`;
 }
 
-async function runDesignResearch(topic) {
+async function runDesignResearch(topic, openTopic = false) {
   const key = getApiKey();
   if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
   const anthropic = makeClient(key);
   const mcPage = readWiki('entities/mission-control.md');
   const focus  = (topic || '').trim();
 
-  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). You are a separate persona from ED, the chat assistant elsewhere in the app: ED answers questions about the vault, Red's only job is running design research and reporting back findings. Treat presentation as part of the design work, not an afterthought — a finding only counts as done when its mockup is understandable at a glance, not just conceptually sound. Its current design is documented below.
+  const researchDirective = openTopic
+    ? `The user has briefed you on a specific topic — research "${focus}" thoroughly and on its own terms, with a general design-quality lens, using web search for current real-world examples. As a secondary consideration, note anywhere a finding could meaningfully apply back to Mission Control (a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic) — don't force-fit ideas that don't genuinely transfer; it's fine for a finding to have no Mission Control tie-in. Be economical with searches — a few well-chosen queries beat many broad ones.`
+    : `Use web search to find current, real UI/UX patterns and trends relevant to${focus ? ` "${focus}" in` : ''} personal dashboards, habit trackers, gamified productivity apps, and bento-grid/neumorphic design systems. Prioritize ideas that would make Mission Control more fun, easier to use, and better-looking WITHOUT abandoning its existing JRPG identity. Be economical with searches — a few well-chosen queries beat many broad ones.`;
+
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). You are a separate persona from ED, the chat assistant elsewhere in the app: ED is a general-purpose assistant who can act on nearly anything in the app (tasks, queued changes, memory) except the budget; Red's job is strictly research and reporting — you never take actions that fall under ED's scope, and you say so plainly if asked. Treat presentation as part of the design work, not an afterthought — a finding only counts as done when its mockup is understandable at a glance, not just conceptually sound. Mission Control's current design is documented below${openTopic ? ' as background context' : ''}.
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
@@ -1019,14 +1229,14 @@ ${buildKnownWorkDigest()}
 ${buildFeedbackDigest()}
 Use this to calibrate: lean into directions similar to what scored "Got it" or "Just one more tweak", and steer away from patterns similar to what scored "Not even close" or "Kind of". If a note explains what needed tweaking, treat that as a specific critique to address in related future ideas — don't just repeat the same idea unchanged.
 
-Use web search to find current, real UI/UX patterns and trends relevant to${focus ? ` "${focus}" in` : ''} personal dashboards, habit trackers, gamified productivity apps, and bento-grid/neumorphic design systems. Prioritize ideas that would make Mission Control more fun, easier to use, and better-looking WITHOUT abandoning its existing JRPG identity. Be economical with searches — a few well-chosen queries beat many broad ones.
+${researchDirective}
 
 Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema:
 {
   "title": "short title for this research run",
   "summary": "2-3 sentence overview of what you found",
   "findings": [
-    ${buildFindingSchema()}
+    ${buildFindingSchema(openTopic)}
   ]
 }
 Produce exactly 3 findings. Keep everything concise — this is a budget-conscious run.`;
@@ -1053,14 +1263,23 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
   return parsed;
 }
 
-function buildFindingSchema() {
+function buildFindingSchema(openTopic = false) {
   const palette = extractLiveHexPalette();
+  const mockupInstruction = openTopic
+    ? `a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea on its own terms — it does not need to reuse Mission Control's palette or class names unless the idea genuinely is a Mission Control application. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box.`
+    : `a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own look. This mockup renders in an isolated sandboxed iframe with no access to the real site's stylesheet, so hardcode these CURRENT real hex values pulled live from the app right now (do not invent or approximate different ones): ${palette}. Reuse the app's real class-naming conventions and its exact terminology/wording from the LIVE APP FACTS section above (its UI copy list and CSS class-name groups) instead of inventing new labels or class names for things that already exist. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box.`;
+  const mcRelevanceField = openTopic
+    ? `,\n  "mc_relevance": "1-2 sentences on how this could apply back to Mission Control specifically, or an empty string if it genuinely doesn't transfer"`
+    : '';
+  const descriptionField = openTopic
+    ? '2-3 sentences: what it is and why it matters for the briefed topic'
+    : '2-3 sentences: what it is, why it fits Mission Control, how it could be applied';
   return `{
   "title": "short name of the pattern/idea",
-  "description": "2-3 sentences: what it is, why it fits Mission Control, how it could be applied",
+  "description": "${descriptionField}",
   "source_title": "name of the site/app it's drawn from",
   "source_url": "https://...",
-  "mockup_html": "a small self-contained HTML snippet (inline <style> ok, no external assets, no <script>) illustrating the idea applied to Mission Control's own look. This mockup renders in an isolated sandboxed iframe with no access to the real site's stylesheet, so hardcode these CURRENT real hex values pulled live from the app right now (do not invent or approximate different ones): ${palette}. Reuse the app's real class-naming conventions and its exact terminology/wording from the LIVE APP FACTS section above (its UI copy list and CSS class-name groups) instead of inventing new labels or class names for things that already exist. Keep it under ~25 lines. This must be understandable in about 5 seconds without reading the description text: use clear visual hierarchy (size, spacing, contrast) to guide the eye, purposeful (not arbitrary) color and typography, obvious grouping/whitespace, and a layout that's scannable at a glance. Visually representative and self-explanatory, not just a text description squeezed into a box."
+  "mockup_html": "${mockupInstruction}"${mcRelevanceField}
 }`;
 }
 
@@ -1091,8 +1310,9 @@ async function runSingleFindingRevision(thread) {
   // Only the search-backed tiers (1-2) are effectively mini fresh-discovery calls with
   // real duplicate risk — ratings 3-4 are anchored to one known idea, keep them lean/cheap.
   const knownWork = useSearch ? `\n\n# ALREADY QUEUED OR PROPOSED (avoid duplicating these)\n${buildKnownWorkDigest()}` : '';
+  const openTopic = !!thread.openTopic;
 
-  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback. Treat presentation as part of the design work, not an afterthought — the mockup should be understandable at a glance, not just conceptually sound.
+  const system = `You are Red, the design research agent embedded in BrainVault Mission Control — a personal ops dashboard with a dark cyan "Hub C" JRPG battle-menu aesthetic (hard-shadow bento cards, Press Start 2P + VT323 fonts, rank badges, XP pop animations, mobile 5-tab nav). This is a revision request, not a fresh research run — you're iterating on one specific idea based on direct user feedback. Treat presentation as part of the design work, not an afterthought — the mockup should be understandable at a glance, not just conceptually sound.${openTopic ? ' The original idea came from an open-topic briefed research run, not a Mission Control-framed one — keep that framing: revise the idea on its own terms, Mission Control is only a secondary consideration.' : ''}
 
 # CURRENT MISSION CONTROL DESIGN
 ${mcPage || '(no design doc on file)'}
@@ -1109,7 +1329,7 @@ ${thread.source_url ? `Source: ${thread.source_title || thread.source_url} (${th
 ${instruction}
 
 Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema — produce exactly ONE revised finding:
-${buildFindingSchema()}
+${buildFindingSchema(openTopic)}
 Keep it concise — this is a budget-conscious run.`;
 
   const resp = await anthropic.messages.create({
@@ -1342,16 +1562,18 @@ function buildSlideshowHtml(id, topic, result) {
 </body></html>`;
 }
 
-function saveDesignResearchWiki(id, date, topic, result) {
+function saveDesignResearchWiki(id, date, topic, result, openTopic = false) {
   const findingsMd = result.findings.map((f, i) =>
-    `### ${i + 1}. ${f.title}\n\n${f.description || ''}\n\n${f.source_url ? `Source: [${f.source_title || f.source_url}](${f.source_url})` : ''}\n`
+    `### ${i + 1}. ${f.title}\n\n${f.description || ''}\n\n${f.mc_relevance ? `_Mission Control tie-in: ${f.mc_relevance}_\n\n` : ''}${f.source_url ? `Source: [${f.source_title || f.source_url}](${f.source_url})` : ''}\n`
   ).join('\n');
   const title = (result.title || 'Design Research').replace(/"/g, '\\"');
+  const baseTags = openTopic ? ['design'] : ['design', 'ui-ux', 'mission-control'];
+  const tags = topic ? [...baseTags, slugifyTopic(topic)] : baseTags;
   writeWiki(`analyses/${id}.md`, `---
 type: analysis
 title: "${title}"
 date: "${date}"
-tags: [design, ui-ux, mission-control${topic ? ', ' + slugifyTopic(topic) : ''}]
+tags: [${tags.join(', ')}]
 ---
 
 ## Design Research${topic ? ` — focus: ${topic}` : ''}
@@ -1383,8 +1605,9 @@ function uniqueDesignResearchId(data, baseId) {
   return id;
 }
 
-async function runAndSaveDesignResearch(topic, idSuffix) {
-  const result = await runDesignResearch(topic);
+async function runAndSaveDesignResearch(topic, idSuffix, opts = {}) {
+  const openTopic = !!opts.openTopic;
+  const result = await runDesignResearch(topic, openTopic);
   const date   = today();
   const data   = getAppData();
   const id     = uniqueDesignResearchId(data, `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`);
@@ -1402,14 +1625,15 @@ async function runAndSaveDesignResearch(topic, idSuffix) {
       lastRating: null, lastRatingLabel: null, lastComment: '',
       createdDate: date, updatedDate: date,
       originResearchId: id,
+      openTopic,
     };
   });
 
   const html = buildSlideshowHtml(id, topic, result);
   writeVault(`design-research/${id}.html`, html);
-  saveDesignResearchWiki(id, date, topic, result);
+  saveDesignResearchWiki(id, date, topic, result, openTopic);
   data.designResearch = data.designResearch || [];
-  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix, viewed: false });
+  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix, viewed: false, openTopic });
   data.designResearch = data.designResearch.slice(0, 30);
   saveAppData(data);
   return { id, result };
