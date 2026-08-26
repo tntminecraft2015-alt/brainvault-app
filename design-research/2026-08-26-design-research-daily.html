@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Visual Clarity, Habit Durability, &amp; Context-Aware Micro-Feedback</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Visual Clarity, Habit Durability, &amp; Context-Aware Micro-Feedback</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Current habit tracker apps prioritize fast daily check-ins, clear pattern visualization, and forgiving yes/no/skip logging over point-chasing; bento grids dominate dashboards for their glanceability and hierarchy; and depth design (glassmorphism, not neumorphism) works best when it signals affordance and interactivity, not decoration. Mission Control's JRPG aesthetic is well-positioned here, but can strengthen scannability, reduce streak anxiety, and add contextual inline notes to deepen habit understanding.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Inline Context Notes for Habit Logging (Like Way of Life)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Allow brief 1-2 sentence notes logged alongside quests (especially S-rank items), so users can attach real-world context ("skipped due to travel", "harder than usual") instead of just a binary yes/no. This surfaces patterns over time without punishing streaks. Show notes in a collapsed/expandable format to keep the daily view clean but searchable for weekly reviews. Fits Mission Control's design philosophy of showing only what matters on first glance.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.jotform.com/blog/best-apps-for-habit-tracking/" target="_blank" rel="noopener" style="color:#ff8a63;">Jotform Blog: 5 Best Habit Tracking Apps 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:12px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:320px;margin:16px auto}.quest{padding:10px 12px;background:#0c1422;border-radius:6px;margin-bottom:8px;border-left:4px solid #ff8a63}.quest-title{font-size:14px;font-weight:bold;margin-bottom:4px}.note-btn{background:#1e3a5f;color:#8fd6ff;border:none;font-family:inherit;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:4px}.note-text{font-size:11px;color:#8fd6ff;margin-top:6px;padding:8px;background:#070b14;border-radius:4px;max-height:0;overflow:hidden;transition:max-height .2s}.note-text.show{max-height:80px}.rank-s{color:#e85d3a}&lt;/style&gt;&lt;div class='demo'&gt;&lt;h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'&gt;Today's Quests&lt;/h3&gt;&lt;div class='quest'&gt;&lt;div class='quest-title'&gt;&lt;span class='rank-s'&gt;S&lt;/span&gt; Morning Meditate&lt;/div&gt;&lt;button class='note-btn' onclick=&quot;this.nextElementSibling.classList.toggle('show')&quot;&gt;+ Add Note&lt;/button&gt;&lt;div class='note-text'&gt;Rushed before meeting — 5min instead of 10&lt;/div&gt;&lt;/div&gt;&lt;div class='quest'&gt;&lt;div class='quest-title'&gt;&lt;span class='rank-s'&gt;S&lt;/span&gt; Review Weekly Goals&lt;/div&gt;&lt;button class='note-btn'&gt;+ Add Note&lt;/button&gt;&lt;div class='note-text'&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Daily Quest Check-In with Skip/Yes Toggle (Forgiving Streak Model)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Distinguish between "skipped" (circumstances, not a choice) and "missed" (chose not to), so one bad day doesn't reset weeks of progress. This directly reduces quit-after-setback behavior documented in Way of Life's design. The visual should show yes/skip buttons on the same row for ultra-fast logging, with skip graying out the entry but keeping the streak chain intact. Matches Mission Control's focus on realistic, grace-based gamification.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://www.jotform.com/blog/best-apps-for-habit-tracking/" target="_blank" rel="noopener" style="color:#ff8a63;">Jotform Blog: 5 Best Habit Tracking Apps 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:340px;margin:16px auto}.quest-row{display:flex;align-items:center;gap:12px;padding:10px;background:#0c1422;border-radius:6px;border-left:4px solid #4a90d9;margin-bottom:8px}.quest-row.skipped{opacity:.6}.quest-title{flex:1;font-size:13px;font-weight:bold}.quest-row.skipped .quest-title{text-decoration:line-through}.btn{border:none;padding:6px 12px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:11px;font-weight:bold}.btn-yes{background:#7fffb0;color:#070b14}.btn-skip{background:#8fd6ff;color:#070b14;margin-left:auto}.streak{font-size:10px;color:#8fd6ff;margin-left:auto;padding:0 8px}[data-streak]:before{content:attr(data-streak)}&lt;/style&gt;&lt;div class='demo'&gt;&lt;h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'&gt;Today's Quests&lt;/h3&gt;&lt;div class='quest-row'&gt;&lt;div class='quest-title'&gt;Morning Run&lt;/div&gt;&lt;span class='streak' data-streak='12 days'&gt;&lt;/span&gt;&lt;button class='btn btn-yes'&gt;✓ YES&lt;/button&gt;&lt;button class='btn btn-skip'&gt;⊘ SKIP&lt;/button&gt;&lt;/div&gt;&lt;div class='quest-row skipped'&gt;&lt;div class='quest-title'&gt;Journal Entry&lt;/div&gt;&lt;span class='streak' data-streak='8 days'&gt;&lt;/span&gt;&lt;button class='btn btn-yes'&gt;✓ YES&lt;/button&gt;&lt;button class='btn btn-skip'&gt;⊘ SKIP&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Weekly Pattern Heatmap in Cal Tab (Color-Grid Story at a Glance)</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Show a small color-coded grid for each quest in the Cal tab's weekly view (green=yes, yellow=skip, red=missed, gray=not-attempted) so users can spot which habits are struggling without opening charts. Inspired by Way of Life's approach: the grid tells the story at a glance, and the color palette fits Mission Control's existing accent scheme. Keep it compact (a small 7-column row per quest) to avoid clutter in an already full calendar view.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://finestreak.com/blog/best-habit-tracking-apps" target="_blank" rel="noopener" style="color:#ff8a63;">Finestreak: 10 Best Habit Tracking Apps 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:360px;margin:16px auto}.week-item{margin-bottom:12px;padding:8px;background:#0c1422;border-radius:6px;border-left:4px solid #66c8ff}.week-label{font-size:11px;font-weight:bold;margin-bottom:6px;text-transform:uppercase}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold}.cell.yes{background:#7fffb0;color:#070b14}.cell.skip{background:#d3f0ff;color:#070b14;opacity:.7}.cell.missed{background:#ff8080;color:#070b14}.cell.none{background:#1e3a5f;opacity:.4}&lt;/style&gt;&lt;div class='demo'&gt;&lt;h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'&gt;Week of Aug 26&lt;/h3&gt;&lt;div class='week-item'&gt;&lt;div class='week-label'&gt;Morning Run&lt;/div&gt;&lt;div class='grid'&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell skip'&gt;◯&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell missed'&gt;✕&lt;/div&gt;&lt;div class='cell yes' style='border:2px solid #ff8a63'&gt;✓&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class='week-item'&gt;&lt;div class='week-label'&gt;Journal&lt;/div&gt;&lt;div class='grid'&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell skip'&gt;◯&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell none'&gt;&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;div class='cell yes'&gt;✓&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-08-26-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Inline Context Notes for Habit Logging (Like Way of Life)","description":"Allow brief 1-2 sentence notes logged alongside quests (especially S-rank items), so users can attach real-world context (\"skipped due to travel\", \"harder than usual\") instead of just a binary yes/no. This surfaces patterns over time without punishing streaks. Show notes in a collapsed/expandable format to keep the daily view clean but searchable for weekly reviews. Fits Mission Control's design philosophy of showing only what matters on first glance.","source_title":"Jotform Blog: 5 Best Habit Tracking Apps 2026","source_url":"https://www.jotform.com/blog/best-apps-for-habit-tracking/","mockup_html":"<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:12px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:320px;margin:16px auto}.quest{padding:10px 12px;background:#0c1422;border-radius:6px;margin-bottom:8px;border-left:4px solid #ff8a63}.quest-title{font-size:14px;font-weight:bold;margin-bottom:4px}.note-btn{background:#1e3a5f;color:#8fd6ff;border:none;font-family:inherit;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:4px}.note-text{font-size:11px;color:#8fd6ff;margin-top:6px;padding:8px;background:#070b14;border-radius:4px;max-height:0;overflow:hidden;transition:max-height .2s}.note-text.show{max-height:80px}.rank-s{color:#e85d3a}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Morning Meditate</div><button class='note-btn' onclick=\"this.nextElementSibling.classList.toggle('show')\">+ Add Note</button><div class='note-text'>Rushed before meeting — 5min instead of 10</div></div><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Review Weekly Goals</div><button class='note-btn'>+ Add Note</button><div class='note-text'></div></div></div>","threadId":"thread-1787702623236-0-inline-context-notes-for-habit-logging-l"},{"title":"Daily Quest Check-In with Skip/Yes Toggle (Forgiving Streak Model)","description":"Distinguish between \"skipped\" (circumstances, not a choice) and \"missed\" (chose not to), so one bad day doesn't reset weeks of progress. This directly reduces quit-after-setback behavior documented in Way of Life's design. The visual should show yes/skip buttons on the same row for ultra-fast logging, with skip graying out the entry but keeping the streak chain intact. Matches Mission Control's focus on realistic, grace-based gamification.","source_title":"Jotform Blog: 5 Best Habit Tracking Apps 2026","source_url":"https://www.jotform.com/blog/best-apps-for-habit-tracking/","mockup_html":"<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:340px;margin:16px auto}.quest-row{display:flex;align-items:center;gap:12px;padding:10px;background:#0c1422;border-radius:6px;border-left:4px solid #4a90d9;margin-bottom:8px}.quest-row.skipped{opacity:.6}.quest-title{flex:1;font-size:13px;font-weight:bold}.quest-row.skipped .quest-title{text-decoration:line-through}.btn{border:none;padding:6px 12px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:11px;font-weight:bold}.btn-yes{background:#7fffb0;color:#070b14}.btn-skip{background:#8fd6ff;color:#070b14;margin-left:auto}.streak{font-size:10px;color:#8fd6ff;margin-left:auto;padding:0 8px}[data-streak]:before{content:attr(data-streak)}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest-row'><div class='quest-title'>Morning Run</div><span class='streak' data-streak='12 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div><div class='quest-row skipped'><div class='quest-title'>Journal Entry</div><span class='streak' data-streak='8 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div></div>","threadId":"thread-1787702623236-1-daily-quest-check-in-with-skip-yes-toggl"},{"title":"Weekly Pattern Heatmap in Cal Tab (Color-Grid Story at a Glance)","description":"Show a small color-coded grid for each quest in the Cal tab's weekly view (green=yes, yellow=skip, red=missed, gray=not-attempted) so users can spot which habits are struggling without opening charts. Inspired by Way of Life's approach: the grid tells the story at a glance, and the color palette fits Mission Control's existing accent scheme. Keep it compact (a small 7-column row per quest) to avoid clutter in an already full calendar view.","source_title":"Finestreak: 10 Best Habit Tracking Apps 2026","source_url":"https://finestreak.com/blog/best-habit-tracking-apps","mockup_html":"<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:360px;margin:16px auto}.week-item{margin-bottom:12px;padding:8px;background:#0c1422;border-radius:6px;border-left:4px solid #66c8ff}.week-label{font-size:11px;font-weight:bold;margin-bottom:6px;text-transform:uppercase}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold}.cell.yes{background:#7fffb0;color:#070b14}.cell.skip{background:#d3f0ff;color:#070b14;opacity:.7}.cell.missed{background:#ff8080;color:#070b14}.cell.none{background:#1e3a5f;opacity:.4}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Week of Aug 26</h3><div class='week-item'><div class='week-label'>Morning Run</div><div class='grid'><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell missed'>✕</div><div class='cell yes' style='border:2px solid #ff8a63'>✓</div></div></div><div class='week-item'><div class='week-label'>Journal</div><div class='grid'><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell none'></div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div></div></div></div>","threadId":"thread-1787702623236-2-weekly-pattern-heatmap-in-cal-tab-color-"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
