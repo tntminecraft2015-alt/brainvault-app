@@ -272,6 +272,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-26-design-research-daily",
+      "date": "2026-08-26",
+      "topic": "",
+      "title": "General Improvements: Visual Clarity, Habit Durability, & Context-Aware Micro-Feedback",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": true,
+      "openTopic": false
+    },
+    {
       "id": "2026-08-25-design-research-daily",
       "date": "2026-08-25",
       "topic": "",
@@ -368,7 +378,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-08-25",
+  "lastDesignResearchAutoRun": "2026-08-26",
   "changeRequests": [
     {
       "id": "2026-08-25-modernize-calendar-ui-for-quick-scanning",
@@ -1118,6 +1128,57 @@
       "createdDate": "2026-08-25",
       "updatedDate": "2026-08-25",
       "originResearchId": "2026-08-25-design-research-daily"
+    },
+    "thread-1787702623236-0-inline-context-notes-for-habit-logging-l": {
+      "id": "thread-1787702623236-0-inline-context-notes-for-habit-logging-l",
+      "title": "Inline Context Notes for Habit Logging (Like Way of Life)",
+      "description": "Allow brief 1-2 sentence notes logged alongside quests (especially S-rank items), so users can attach real-world context (\"skipped due to travel\", \"harder than usual\") instead of just a binary yes/no. This surfaces patterns over time without punishing streaks. Show notes in a collapsed/expandable format to keep the daily view clean but searchable for weekly reviews. Fits Mission Control's design philosophy of showing only what matters on first glance.",
+      "source_title": "Jotform Blog: 5 Best Habit Tracking Apps 2026",
+      "source_url": "https://www.jotform.com/blog/best-apps-for-habit-tracking/",
+      "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:12px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:320px;margin:16px auto}.quest{padding:10px 12px;background:#0c1422;border-radius:6px;margin-bottom:8px;border-left:4px solid #ff8a63}.quest-title{font-size:14px;font-weight:bold;margin-bottom:4px}.note-btn{background:#1e3a5f;color:#8fd6ff;border:none;font-family:inherit;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:4px}.note-text{font-size:11px;color:#8fd6ff;margin-top:6px;padding:8px;background:#070b14;border-radius:4px;max-height:0;overflow:hidden;transition:max-height .2s}.note-text.show{max-height:80px}.rank-s{color:#e85d3a}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Morning Meditate</div><button class='note-btn' onclick=\"this.nextElementSibling.classList.toggle('show')\">+ Add Note</button><div class='note-text'>Rushed before meeting — 5min instead of 10</div></div><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Review Weekly Goals</div><button class='note-btn'>+ Add Note</button><div class='note-text'></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-26",
+      "updatedDate": "2026-08-26",
+      "originResearchId": "2026-08-26-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1787702623236-1-daily-quest-check-in-with-skip-yes-toggl": {
+      "id": "thread-1787702623236-1-daily-quest-check-in-with-skip-yes-toggl",
+      "title": "Daily Quest Check-In with Skip/Yes Toggle (Forgiving Streak Model)",
+      "description": "Distinguish between \"skipped\" (circumstances, not a choice) and \"missed\" (chose not to), so one bad day doesn't reset weeks of progress. This directly reduces quit-after-setback behavior documented in Way of Life's design. The visual should show yes/skip buttons on the same row for ultra-fast logging, with skip graying out the entry but keeping the streak chain intact. Matches Mission Control's focus on realistic, grace-based gamification.",
+      "source_title": "Jotform Blog: 5 Best Habit Tracking Apps 2026",
+      "source_url": "https://www.jotform.com/blog/best-apps-for-habit-tracking/",
+      "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:340px;margin:16px auto}.quest-row{display:flex;align-items:center;gap:12px;padding:10px;background:#0c1422;border-radius:6px;border-left:4px solid #4a90d9;margin-bottom:8px}.quest-row.skipped{opacity:.6}.quest-title{flex:1;font-size:13px;font-weight:bold}.quest-row.skipped .quest-title{text-decoration:line-through}.btn{border:none;padding:6px 12px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:11px;font-weight:bold}.btn-yes{background:#7fffb0;color:#070b14}.btn-skip{background:#8fd6ff;color:#070b14;margin-left:auto}.streak{font-size:10px;color:#8fd6ff;margin-left:auto;padding:0 8px}[data-streak]:before{content:attr(data-streak)}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest-row'><div class='quest-title'>Morning Run</div><span class='streak' data-streak='12 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div><div class='quest-row skipped'><div class='quest-title'>Journal Entry</div><span class='streak' data-streak='8 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-26",
+      "updatedDate": "2026-08-26",
+      "originResearchId": "2026-08-26-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1787702623236-2-weekly-pattern-heatmap-in-cal-tab-color-": {
+      "id": "thread-1787702623236-2-weekly-pattern-heatmap-in-cal-tab-color-",
+      "title": "Weekly Pattern Heatmap in Cal Tab (Color-Grid Story at a Glance)",
+      "description": "Show a small color-coded grid for each quest in the Cal tab's weekly view (green=yes, yellow=skip, red=missed, gray=not-attempted) so users can spot which habits are struggling without opening charts. Inspired by Way of Life's approach: the grid tells the story at a glance, and the color palette fits Mission Control's existing accent scheme. Keep it compact (a small 7-column row per quest) to avoid clutter in an already full calendar view.",
+      "source_title": "Finestreak: 10 Best Habit Tracking Apps 2026",
+      "source_url": "https://finestreak.com/blog/best-habit-tracking-apps",
+      "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:360px;margin:16px auto}.week-item{margin-bottom:12px;padding:8px;background:#0c1422;border-radius:6px;border-left:4px solid #66c8ff}.week-label{font-size:11px;font-weight:bold;margin-bottom:6px;text-transform:uppercase}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold}.cell.yes{background:#7fffb0;color:#070b14}.cell.skip{background:#d3f0ff;color:#070b14;opacity:.7}.cell.missed{background:#ff8080;color:#070b14}.cell.none{background:#1e3a5f;opacity:.4}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Week of Aug 26</h3><div class='week-item'><div class='week-label'>Morning Run</div><div class='grid'><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell missed'>✕</div><div class='cell yes' style='border:2px solid #ff8a63'>✓</div></div></div><div class='week-item'><div class='week-label'>Journal</div><div class='grid'><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell none'></div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-26",
+      "updatedDate": "2026-08-26",
+      "originResearchId": "2026-08-26-design-research-daily",
+      "openTopic": false
     }
   },
   "designArchive": [
