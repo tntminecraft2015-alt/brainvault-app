@@ -510,6 +510,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-26-design-research-daily",
+      "findingIndex": 0,
+      "threadId": "thread-1787702623236-0-inline-context-notes-for-habit-logging-l",
+      "findingTitle": "Inline Context Notes for Habit Logging (Like Way of Life)",
+      "findingDescription": "Allow brief 1-2 sentence notes logged alongside quests (especially S-rank items), so users can attach real-world context (\"skipped due to travel\", \"harder than usual\") instead of just a binary yes/no. This surfaces patterns over time without punishing streaks. Show notes in a collapsed/expandable format to keep the daily view clean but searchable for weekly reviews. Fits Mission Control's design philosophy of showing only what matters on first glance.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-26"
+    },
+    {
       "id": "2026-08-12-design-research-revisions-1786515122903",
       "findingIndex": 1,
       "threadId": "thread-1786514464358-2-entry-level-micro-rewards-coins-for-log-",
@@ -1136,10 +1147,10 @@
       "source_title": "Jotform Blog: 5 Best Habit Tracking Apps 2026",
       "source_url": "https://www.jotform.com/blog/best-apps-for-habit-tracking/",
       "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:12px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:320px;margin:16px auto}.quest{padding:10px 12px;background:#0c1422;border-radius:6px;margin-bottom:8px;border-left:4px solid #ff8a63}.quest-title{font-size:14px;font-weight:bold;margin-bottom:4px}.note-btn{background:#1e3a5f;color:#8fd6ff;border:none;font-family:inherit;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px;margin-top:4px}.note-text{font-size:11px;color:#8fd6ff;margin-top:6px;padding:8px;background:#070b14;border-radius:4px;max-height:0;overflow:hidden;transition:max-height .2s}.note-text.show{max-height:80px}.rank-s{color:#e85d3a}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Morning Meditate</div><button class='note-btn' onclick=\"this.nextElementSibling.classList.toggle('show')\">+ Add Note</button><div class='note-text'>Rushed before meeting — 5min instead of 10</div></div><div class='quest'><div class='quest-title'><span class='rank-s'>S</span> Review Weekly Goals</div><button class='note-btn'>+ Add Note</button><div class='note-text'></div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-26",
       "updatedDate": "2026-08-26",
