@@ -275,10 +275,51 @@ function recalcStreak(data, clientDate) {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function today()   { return new Date().toISOString().split('T')[0]; }
+// Every user-facing date/time is anchored to ONE explicit timezone rather than the
+// server process's OS clock. Render containers run UTC, so deriving "today" from
+// new Date().toISOString() silently rolled the date over at 8pm Eastern — a recurring
+// event later that same evening fell outside checkReminders()'s today/tomorrow
+// buckets and never fired. The browser side is already correct (it reads the user's
+// real local clock via dateKey), so this only needs to hold on the server.
+const APP_TZ = process.env.APP_TZ || 'America/New_York';
+
+// Calendar date (YYYY-MM-DD) in APP_TZ for a given instant.
+function dateInTz(d = new Date()) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: APP_TZ, year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(d);
+}
+
+// APP_TZ's UTC offset in ms at a given instant (DST-aware).
+function tzOffsetMs(d) {
+  const p = new Intl.DateTimeFormat('en-US', {
+    timeZone: APP_TZ, hourCycle: 'h23',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }).formatToParts(d).reduce((a, x) => (a[x.type] = x.value, a), {});
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - d.getTime();
+}
+
+// The real instant at which wall-clock <dateStr> <timeStr> occurs in APP_TZ.
+// Two passes so DST transitions resolve against the offset actually in effect.
+function instantInTz(dateStr, timeStr) {
+  const naive = Date.parse(`${dateStr}T${timeStr}:00Z`);
+  const inst  = naive - tzOffsetMs(new Date(naive));
+  return new Date(naive - tzOffsetMs(new Date(inst)));
+}
+
+// Calendar-day arithmetic on a YYYY-MM-DD string — timezone-independent by design.
+function addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().split('T')[0];
+}
+
+function today()   { return dateInTz(); }
 function nowStamp() {
-  const n = new Date();
-  return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: APP_TZ, hourCycle: 'h23', hour: '2-digit', minute: '2-digit',
+  }).format(new Date());
 }
 
 // ── CLAUDE CONTEXT BUILDER ────────────────────────────────────────────────────
@@ -2184,9 +2225,9 @@ async function checkReminders() {
   // Recurring events are never in data.events — expand today's (and, for late-night events
   // with a long lead time, tomorrow's) occurrences so they get reminders like one-off events do.
   const eventsByDate = { ...(data.events || {}) };
+  const todayStr = dateInTz(now);
   for (const offset of [0, 1]) {
-    const d = new Date(now); d.setDate(d.getDate() + offset);
-    const dateStr = d.toISOString().split('T')[0];
+    const dateStr = addDays(todayStr, offset);
     const occs = (data.recurringEvents || []).filter(rec => occursOn(rec, dateStr)).map(rec => occurrenceForDate(rec, dateStr));
     if (occs.length) eventsByDate[dateStr] = [...(eventsByDate[dateStr] || []), ...occs];
   }
@@ -2194,7 +2235,7 @@ async function checkReminders() {
   for (const [date, evs] of Object.entries(eventsByDate)) {
     for (const ev of evs) {
       if (!ev.time || !ev.notify || !ev.notifyLeadMin) continue;
-      const evDt = new Date(`${date}T${ev.time}:00`);
+      const evDt = instantInTz(date, ev.time);
       const diffMin = (evDt - now) / 60000;
       const key = `${date}|${ev.time}|${ev.title}`;
       if (diffMin <= 0 || diffMin > ev.notifyLeadMin || data.notifiedEvents[key]) continue;
@@ -2256,7 +2297,8 @@ async function main() {
     console.log(`  URL    : http://localhost:${PORT}`);
     if (lan) console.log(`  Phone  : http://${lan.address}:${PORT}  (same WiFi)`);
     console.log(`  API key: ${key ? '✅ loaded' : '❌ missing'}`);
-    console.log(`  Push   : ${PUSH_ENABLED ? '✅ enabled' : '❌ disabled (set VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY)'}\n`);
+    console.log(`  Push   : ${PUSH_ENABLED ? '✅ enabled' : '❌ disabled (set VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY)'}`);
+    console.log(`  Zone   : ${APP_TZ}  (today = ${today()}, now = ${nowStamp()}) — set APP_TZ to change\n`);
   });
 
   if (PUSH_ENABLED) {

@@ -772,3 +772,23 @@ Fixed by clamping to the month's last day (`Math.min(dayOfMonth, daysInMonth(...
 Wrote a 66-case test that runs each scenario through **both** copies and asserts they agree, covering: clamped months across a full year, leap vs. non-leap February for the 29th/30th/31st, an exhaustive per-month sweep asserting exactly one occurrence per month (guarding against double-fire), and the untouched paths (mid-month dates, `interval > 1`, `startDate`/`endDate` bounds, and a `skip` exception landing on a clamped day). Also verified the test genuinely fails against the pre-fix logic (5/5 clamped dates) rather than passing vacuously. Confirmed live in the browser with a real ED-created "rent due on the 31st" series: Aug 31 → Sep 30 → Oct 31 → Nov 30 → Feb 28 2027, one marker per month, event details correct, no console errors.
 
 One process note worth recording: while cleaning up afterward I ran a scratch "restore design fields" script written *earlier in the session*, before the vault merge — it silently reverted Render's real merged design-research data (11 entries back to 10, `lastDesignResearchAutoRun` back to 2026-08-25). Caught it by diffing the working copy against HEAD, restored with `git checkout -- app-data.json`, and deleted the stale script. Lesson: a revert-to-snapshot helper becomes actively dangerous the moment new upstream data is merged in, and should be regenerated or discarded rather than re-run.
+
+## [2026-08-26] note | Anchored all server-side dates to an explicit timezone
+
+**Operation:** note
+**Pages updated:** [[mission-control]]
+
+Fixed the timezone gap flagged during the verification pass earlier today. The user's initial read was that it only mattered if they moved timezones; clarified that the actual exposure is a mismatch between Render's server clock and their own — a fixed nightly window, not something triggered by travel — and they asked for the fix.
+
+Root cause: the server had no timezone concept at all, and mixed two different implicit ones. `today()` and `checkReminders()`'s today/tomorrow buckets derived the calendar date from `new Date().toISOString()` (**UTC**), while event times were parsed via `new Date(\`${date}T${time}:00\`)` (**the server process's OS timezone**). Render containers run UTC, so from ~8pm Eastern onward the UTC date had already rolled over: an evening recurring event fell outside both computed buckets and its reminder silently never fired. Nothing logged an error — the event simply didn't exist as far as the reminder loop was concerned.
+
+Fixed by introducing a single explicit `APP_TZ` (default `America/New_York`, overridable by env var) and routing every server-side date/time decision through it:
+- `dateInTz()` — calendar date in APP_TZ, replacing the UTC-derived `today()`.
+- `tzOffsetMs()` / `instantInTz()` — resolve a wall-clock date+time in APP_TZ to a real instant, two-pass so DST transitions use the offset actually in effect.
+- `addDays()` — pure YYYY-MM-DD string arithmetic for the reminder buckets, timezone-independent by construction.
+- `nowStamp()` now formats in APP_TZ instead of reading server-local hours.
+- Startup banner prints `Zone : <APP_TZ> (today = …, now = …)` so a mismatch is visible immediately rather than silent.
+
+Deliberately left alone: `occursOn`'s internal date math (it builds local midnight and reads local fields, so the timezone cancels out and it's already correct), the streak loop (already pure UTC string arithmetic), `pruneOldEvents` (a one-year cutoff where hours are irrelevant), and the entire client side — the browser genuinely runs in the user's real local timezone via `dateKey`, so it was never wrong. The two sides agree as long as `APP_TZ` matches the user's actual zone, which is now visible in the banner.
+
+Verified with a 19-case test run twice, under `TZ=UTC` (simulating Render) **and** `TZ=America/New_York` (this PC) — identical results both times, which is the real proof that the server's OS timezone no longer affects behavior. Cases cover the UTC/Eastern day boundary (9pm, 11:59pm, 12:01am), EST vs EDT wall-clock→instant conversion, both DST transitions, calendar arithmetic across month/year/leap boundaries, and an end-to-end reproduction of the original failure: a Tue/Thu 10pm event at 9pm Eastern is now found in the buckets with the correct 60-minute lead time. The test also asserts the *old* UTC-bucket logic missed that day, so it can't pass vacuously. Re-ran the 66-case monthly-recurrence test (still green), confirmed `today()`/`nowStamp()` match real Eastern time, checked ED reports the correct date, and verified the calendar UI live in the browser with no console errors.
