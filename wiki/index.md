@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-26-design-research-daily]] — Current habit tracker apps prioritize fast daily check-ins, clear pattern visualization, and forgiving yes/no/skip logging over point-chasin
 - [[2026-08-12-design-research-a-smart-tile-hierarchy-with-variable-siz]] — Hierarchy comes from size variation. Three findings that apply bento-grid principles to Mission Control's GIL tracker, letting the most impo
 - [[2026-08-12-design-research-auto-reloading-or-auto-refreshing-design]] — Research surfaces three patterns for keeping design research slideshows live without manual reopen: event-driven polling (similar to how das
 - [[2026-08-12-design-research-revisions-1786515023845]] — 2 ideas Red reworked based on your feedback.
