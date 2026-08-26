@@ -511,6 +511,17 @@
   "designFeedback": [
     {
       "id": "2026-08-26-design-research-daily",
+      "findingIndex": 1,
+      "threadId": "thread-1787702623236-1-daily-quest-check-in-with-skip-yes-toggl",
+      "findingTitle": "Daily Quest Check-In with Skip/Yes Toggle (Forgiving Streak Model)",
+      "findingDescription": "Distinguish between \"skipped\" (circumstances, not a choice) and \"missed\" (chose not to), so one bad day doesn't reset weeks of progress. This directly reduces quit-after-setback behavior documented in Way of Life's design. The visual should show yes/skip buttons on the same row for ultra-fast logging, with skip graying out the entry but keeping the streak chain intact. Matches Mission Control's focus on realistic, grace-based gamification.",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "2026-08-26-design-research-daily",
       "findingIndex": 0,
       "threadId": "thread-1787702623236-0-inline-context-notes-for-habit-logging-l",
       "findingTitle": "Inline Context Notes for Habit Logging (Like Way of Life)",
@@ -1164,10 +1175,10 @@
       "source_title": "Jotform Blog: 5 Best Habit Tracking Apps 2026",
       "source_url": "https://www.jotform.com/blog/best-apps-for-habit-tracking/",
       "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:340px;margin:16px auto}.quest-row{display:flex;align-items:center;gap:12px;padding:10px;background:#0c1422;border-radius:6px;border-left:4px solid #4a90d9;margin-bottom:8px}.quest-row.skipped{opacity:.6}.quest-title{flex:1;font-size:13px;font-weight:bold}.quest-row.skipped .quest-title{text-decoration:line-through}.btn{border:none;padding:6px 12px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:11px;font-weight:bold}.btn-yes{background:#7fffb0;color:#070b14}.btn-skip{background:#8fd6ff;color:#070b14;margin-left:auto}.streak{font-size:10px;color:#8fd6ff;margin-left:auto;padding:0 8px}[data-streak]:before{content:attr(data-streak)}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Today's Quests</h3><div class='quest-row'><div class='quest-title'>Morning Run</div><span class='streak' data-streak='12 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div><div class='quest-row skipped'><div class='quest-title'>Journal Entry</div><span class='streak' data-streak='8 days'></span><button class='btn btn-yes'>✓ YES</button><button class='btn btn-skip'>⊘ SKIP</button></div></div>",
-      "status": "awaiting_rating",
+      "status": "revision_failed",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-08-26",
       "updatedDate": "2026-08-26",
