@@ -621,6 +621,9 @@ const EVENT_KIND_KEYS = ['training', 'meeting', 'focus', 'social', 'errand', 'ro
 function daysBetweenDates(aStr, bStr) {
   return Math.round((new Date(bStr + 'T00:00:00') - new Date(aStr + 'T00:00:00')) / 86400000);
 }
+function daysInMonth(year, monthIdx) {
+  return new Date(year, monthIdx + 1, 0).getDate();
+}
 function occursOn(rec, dateStr) {
   if (dateStr < rec.startDate) return false;
   if (rec.endDate && dateStr > rec.endDate) return false;
@@ -637,7 +640,10 @@ function occursOn(rec, dateStr) {
   }
   if (rec.freq === 'monthly') {
     const d = new Date(dateStr + 'T00:00:00'), s = new Date(rec.startDate + 'T00:00:00');
-    if (d.getDate() !== rec.dayOfMonth) return false;
+    // Months too short for dayOfMonth fall back to that month's last day, so a "31st"
+    // series still fires in Feb/Apr/Jun/Sep/Nov instead of silently skipping them.
+    const targetDay = Math.min(rec.dayOfMonth, daysInMonth(d.getFullYear(), d.getMonth()));
+    if (d.getDate() !== targetDay) return false;
     const monthsDiff = (d.getFullYear() - s.getFullYear()) * 12 + (d.getMonth() - s.getMonth());
     return monthsDiff >= 0 && monthsDiff % interval === 0;
   }
