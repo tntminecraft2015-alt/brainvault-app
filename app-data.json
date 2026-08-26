@@ -511,6 +511,17 @@
   "designFeedback": [
     {
       "id": "2026-08-26-design-research-daily",
+      "findingIndex": 2,
+      "threadId": "thread-1787702623236-2-weekly-pattern-heatmap-in-cal-tab-color-",
+      "findingTitle": "Weekly Pattern Heatmap in Cal Tab (Color-Grid Story at a Glance)",
+      "findingDescription": "Show a small color-coded grid for each quest in the Cal tab's weekly view (green=yes, yellow=skip, red=missed, gray=not-attempted) so users can spot which habits are struggling without opening charts. Inspired by Way of Life's approach: the grid tells the story at a glance, and the color palette fits Mission Control's existing accent scheme. Keep it compact (a small 7-column row per quest) to avoid clutter in an already full calendar view.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-26"
+    },
+    {
+      "id": "2026-08-26-design-research-daily",
       "findingIndex": 1,
       "threadId": "thread-1787702623236-1-daily-quest-check-in-with-skip-yes-toggl",
       "findingTitle": "Daily Quest Check-In with Skip/Yes Toggle (Forgiving Streak Model)",
@@ -1192,10 +1203,10 @@
       "source_title": "Finestreak: 10 Best Habit Tracking Apps 2026",
       "source_url": "https://finestreak.com/blog/best-habit-tracking-apps",
       "mockup_html": "<style>html{background:#0a1929;font-family:VT323,monospace;color:#dfeeff}.demo{padding:16px;background:#12253c;border-radius:10px;border:1px solid #1e3a5f;max-width:360px;margin:16px auto}.week-item{margin-bottom:12px;padding:8px;background:#0c1422;border-radius:6px;border-left:4px solid #66c8ff}.week-label{font-size:11px;font-weight:bold;margin-bottom:6px;text-transform:uppercase}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold}.cell.yes{background:#7fffb0;color:#070b14}.cell.skip{background:#d3f0ff;color:#070b14;opacity:.7}.cell.missed{background:#ff8080;color:#070b14}.cell.none{background:#1e3a5f;opacity:.4}</style><div class='demo'><h3 style='margin:0 0 12px;font-size:12px;text-transform:uppercase'>Week of Aug 26</h3><div class='week-item'><div class='week-label'>Morning Run</div><div class='grid'><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell missed'>✕</div><div class='cell yes' style='border:2px solid #ff8a63'>✓</div></div></div><div class='week-item'><div class='week-label'>Journal</div><div class='grid'><div class='cell yes'>✓</div><div class='cell skip'>◯</div><div class='cell yes'>✓</div><div class='cell none'></div><div class='cell yes'>✓</div><div class='cell yes'>✓</div><div class='cell yes'>✓</div></div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-26",
       "updatedDate": "2026-08-26",
