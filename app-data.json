@@ -547,6 +547,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-08-27-design-research-daily",
+      "findingIndex": 0,
+      "threadId": "thread-1787873979570-0-predictive-trend-forecast-in-quest-calen",
+      "findingTitle": "Predictive Trend Forecast in Quest & Calendar Patterns",
+      "findingDescription": "Gamified apps that show users where they're trending (not just where they are) help with course-correction — a user on track to miss a monthly goal sees that forecast before it becomes a failure. Mission Control's quest and calendar data can surface weekly/monthly pattern analysis directly in the Home card or Cal tab, showing when habits are trending up/down without gamified language. This aligns with modern dashboard design that embeds AI-driven insights into the decision workflow itself.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-27"
+    },
+    {
       "id": "2026-08-26-design-research-daily",
       "findingIndex": 2,
       "threadId": "thread-1787702623236-2-weekly-pattern-heatmap-in-cal-tab-color-",
@@ -1257,10 +1268,10 @@
       "source_title": "Guul Games: Gamification in Habit Tracking Apps (2026)",
       "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
       "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; font-size: 14px; max-width: 280px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 2px;\">PATTERN FORECAST</div><div style=\"background: #12253c; border: 1px solid #1e3a5f; border-radius: 6px; padding: 12px; margin-bottom: 8px;\"><div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;\"><span style=\"color: #ff8a63; font-weight: bold;\">Morning Routine</span><span style=\"color: #7fffb0; font-size: 12px;\">↑ +2 this week</span></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6); margin-bottom: 6px;\">5-day trend → likely +1 next week</div><div style=\"width: 100%; height: 24px; background: #0a1929; border-radius: 4px; overflow: hidden;\"><div style=\"height: 100%; background: linear-gradient(to right, #7fffb0, #ff8a63); width: 68%; animation: none;\"></div></div></div><div style=\"background: #12253c; border: 1px solid #1e3a5f; border-radius: 6px; padding: 12px;\"><div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;\"><span style=\"color: #4a90d9; font-weight: bold;\">Focus Session</span><span style=\"color: #ff8080; font-size: 12px;\">↓ −1 this week</span></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6);\">3-day dip → reset before Friday?</div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-27",
       "updatedDate": "2026-08-27",
