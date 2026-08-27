@@ -792,3 +792,10 @@ Fixed by introducing a single explicit `APP_TZ` (default `America/New_York`, ove
 Deliberately left alone: `occursOn`'s internal date math (it builds local midnight and reads local fields, so the timezone cancels out and it's already correct), the streak loop (already pure UTC string arithmetic), `pruneOldEvents` (a one-year cutoff where hours are irrelevant), and the entire client side — the browser genuinely runs in the user's real local timezone via `dateKey`, so it was never wrong. The two sides agree as long as `APP_TZ` matches the user's actual zone, which is now visible in the banner.
 
 Verified with a 19-case test run twice, under `TZ=UTC` (simulating Render) **and** `TZ=America/New_York` (this PC) — identical results both times, which is the real proof that the server's OS timezone no longer affects behavior. Cases cover the UTC/Eastern day boundary (9pm, 11:59pm, 12:01am), EST vs EDT wall-clock→instant conversion, both DST transitions, calendar arithmetic across month/year/leap boundaries, and an end-to-end reproduction of the original failure: a Tue/Thu 10pm event at 9pm Eastern is now found in the buckets with the correct 60-minute lead time. The test also asserts the *old* UTC-bucket logic missed that day, so it can't pass vacuously. Re-ran the 66-case monthly-recurrence test (still green), confirmed `today()`/`nowStamp()` match real Eastern time, checked ED reports the correct date, and verified the calendar UI live in the browser with no console errors.
+
+## [2026-08-26] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-26]]
+
+Chat session on 2026-08-26
