@@ -548,6 +548,17 @@
   "designFeedback": [
     {
       "id": "2026-08-27-design-research-daily",
+      "findingIndex": 1,
+      "threadId": "thread-1787873979570-1-behavioral-reward-not-point-inflation-fo",
+      "findingTitle": "Behavioral Reward (Not Point Inflation) for Multi-Habit Chains",
+      "findingDescription": "Research shows gamifying outcomes instead of behaviors reduces score-gaming; gamifying the specific behaviors that produce engagement drives actual culture change. Mission Control can show visual feedback when the user completes a chain of quests on the same day (e.g., morning routine + focus session + evening reflection), rewarding the interdependent *behavior* rather than inflating individual XP values. This leverages the existing bento grid to highlight combo streaks without adding new curren",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-27"
+    },
+    {
+      "id": "2026-08-27-design-research-daily",
       "findingIndex": 0,
       "threadId": "thread-1787873979570-0-predictive-trend-forecast-in-quest-calen",
       "findingTitle": "Predictive Trend Forecast in Quest & Calendar Patterns",
@@ -1285,10 +1296,10 @@
       "source_title": "Happily.ai: Gamified Habit Formation in the Workplace (2026)",
       "source_url": "https://happily.ai/blog/gamified-habit-formation-workplace/",
       "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; max-width: 260px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase;\">TODAY'S QUESTS</div><div style=\"background: #12253c; border: 2px solid #66c8ff; border-radius: 8px; padding: 12px; margin-bottom: 8px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 7px; color: #66c8ff; margin-bottom: 8px; letter-spacing: 1px;\">COMBO ACTIVE ×3</div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" checked style=\"width: 18px; height: 18px; accent-color: #7fffb0;\"/><label style=\"font-size: 14px;\">Morning Routine</label></div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" checked style=\"width: 18px; height: 18px; accent-color: #7fffb0;\"/><label style=\"font-size: 14px;\">Focus Block</label></div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" style=\"width: 18px; height: 18px; accent-color: #4a90d9;\"/><label style=\"font-size: 14px;\">Evening Journal</label></div><div style=\"border-top: 1px solid #1e3a5f; padding-top: 8px; margin-top: 8px; font-size: 12px; color: #7fffb0; font-weight: bold;\">Complete chain → behavior badge (no XP inflation)</div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-27",
       "updatedDate": "2026-08-27",
