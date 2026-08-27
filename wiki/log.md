@@ -818,3 +818,10 @@ Ran the two pending change requests (both queued via ED chat 2026-08-26).
 2. **Remove "NEXT UP" mission button from Home.** It was a clickable card on the mobile Home grid (not a button + modal as the spec guessed). Removed the card from `mission-control.html`, deleted the dead `renderMobHomeNext()` and its 5 call sites, and dropped the unused `.mob-home-next-time` CSS.
 
 Both marked `done` in `app-data.json` and their `change-requests/*.md` removed. Note: the live Render instance still held both as pending in memory at push time — its `app-data.json` GitHub writes for these entries had not landed in the vault repo — so live state reconciles on the next Render cold-start (or via ED's remove-queued-change). Code pending push to the `app` remote.
+
+## [2026-08-27] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-27]]
+
+Chat session on 2026-08-27
