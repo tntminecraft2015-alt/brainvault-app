@@ -381,6 +381,24 @@
   "lastDesignResearchAutoRun": "2026-08-26",
   "changeRequests": [
     {
+      "id": "2026-08-26-remove-next-up-mission-button-from-home-",
+      "date": "2026-08-26",
+      "title": "Remove \"NEXT UP\" mission button from Home screen",
+      "status": "done",
+      "source": "ED chat",
+      "description": "User wants the \"NEXT UP\" mission button removed from the Home screen — they say it serves no purpose. Just delete it from the UI.",
+      "details": "Removed the \"NEXT UP\" card from the mobile Home grid in mission-control.html (it was a clickable .mc-card span-2 linking to the Cal tab, not a button+modal as the spec guessed — no modal existed). Also deleted the now-dead renderMobHomeNext() function, its 5 call sites (updateClock, renderMobHomeTeasers, addSchedItem, deleteSchedItem, saveEditMission), and the unused .mob-home-next-time CSS rules. Kept .mob-home-next-title (still used by the ED card)."
+    },
+    {
+      "id": "2026-08-26-auto-sync-calendar-events-to-vault-on-ch",
+      "date": "2026-08-26",
+      "title": "Auto-sync calendar events to vault on change",
+      "status": "done",
+      "source": "ED chat",
+      "description": "User wants Mission Control to automatically sync calendar events to the vault whenever they change, so ED can see the current state instead of working from stale data. Right now the calendar sync is manual and the wiki copy is outdated (last synced 8/11). This should push updates live so ED can read and react to calendar changes in real time.",
+      "details": "One-off events already auto-synced to wiki/analyses/calendar-events.md via syncEvents() (GitHub-API persisted, timestamped). Filled the real gaps: (1) recurring events now sync too — syncEvents() takes the full app-data object and emits a '## Recurring Events' table with each rule in plain English (new describeRecurrence() helper: 'every Mon & Wed at 06:00, from 2026-08-01 until …'); added the missing syncEvents() calls to every recurring branch of add/edit/deleteEdCalendarEvent and to /api/data for patch.recurringEvents. (2) buildSystemPrompt() now loads calendar-events.md into ED's context (# CALENDAR EVENTS block) so ED actually reads current calendar state. Added synced_at to the file's frontmatter. Kept the existing wiki/analyses/calendar-events.md path (already in the index with inbound links) rather than the spec's literal wiki/calendar-events.md."
+    },
+    {
       "id": "2026-08-25-modernize-calendar-ui-for-quick-scanning",
       "date": "2026-08-25",
       "title": "Modernize calendar UI for quick scanning and minimal clicks",

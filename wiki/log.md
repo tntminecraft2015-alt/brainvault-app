@@ -805,3 +805,16 @@ Chat session on 2026-08-26
 **Operation:** note
 
 Mission Control change requested via ED chat: Auto-sync calendar events to vault on change
+
+## [2026-08-26] note | Mission Control — ran the change queue (calendar auto-sync + removed Home "NEXT UP" card)
+
+**Operation:** note
+**Pages updated:** [[mission-control]], [[calendar-events]]
+
+Ran the two pending change requests (both queued via ED chat 2026-08-26).
+
+1. **Auto-sync calendar events to vault on change.** One-off events already auto-synced to `wiki/analyses/calendar-events.md` (GitHub-API persisted, timestamped) — the real gaps were recurring events and ED's own context. Fixed in `server.js`: `syncEvents()` now takes the full app-data object and writes a `## Recurring Events` table with each rule rendered in plain English by a new `describeRecurrence()` helper (e.g. "every Mon & Wed at 06:00, from 2026-08-01 until 2026-12-31"); added the missing `syncEvents()` calls to every recurring branch of `add`/`edit`/`deleteEdCalendarEvent` and to `/api/data` for `patch.recurringEvents`; `buildSystemPrompt()` now loads `calendar-events.md` into ED's prompt as a `# CALENDAR EVENTS` block so ED reads live calendar state instead of guessing it's stale. Added `synced_at` to the file's frontmatter. Kept the existing `analyses/calendar-events.md` path rather than the spec's literal `wiki/calendar-events.md`.
+
+2. **Remove "NEXT UP" mission button from Home.** It was a clickable card on the mobile Home grid (not a button + modal as the spec guessed). Removed the card from `mission-control.html`, deleted the dead `renderMobHomeNext()` and its 5 call sites, and dropped the unused `.mob-home-next-time` CSS.
+
+Both marked `done` in `app-data.json` and their `change-requests/*.md` removed. Note: the live Render instance still held both as pending in memory at push time — its `app-data.json` GitHub writes for these entries had not landed in the vault repo — so live state reconciles on the next Render cold-start (or via ED's remove-queued-change). Code pending push to the `app` remote.
