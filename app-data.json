@@ -1546,30 +1546,6 @@
       "exceptions": {}
     },
     {
-      "id": "rec-1787801896920",
-      "title": "Math",
-      "time": "10:30",
-      "location": "",
-      "kind": "training",
-      "notify": false,
-      "notifyLeadMin": null,
-      "freq": "weekly",
-      "daysOfWeek": [
-        1,
-        3,
-        5
-      ],
-      "dayOfMonth": null,
-      "interval": 1,
-      "startDate": "2026-08-31",
-      "endDate": null,
-      "exceptions": {
-        "2026-09-07": {
-          "skip": true
-        }
-      }
-    },
-    {
       "id": "rec-1787801896922",
       "title": "Film",
       "time": "12:30",
