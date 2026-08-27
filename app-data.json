@@ -272,6 +272,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-08-27-design-research-daily",
+      "date": "2026-08-27",
+      "topic": "",
+      "title": "General Improvements: Data-Driven Insights, Predictive Feedback & Quiet Gamification",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-08-26-design-research-daily",
       "date": "2026-08-26",
       "topic": "",
@@ -378,8 +388,17 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-08-26",
+  "lastDesignResearchAutoRun": "2026-08-27",
   "changeRequests": [
+    {
+      "id": "2026-08-27-live-calendar-sync-for-ed-chat-sessions",
+      "date": "2026-08-27",
+      "title": "Live calendar sync for ED chat sessions",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "ED currently reads calendar events from a static markdown file that can lag hours or days behind what's actually in Mission Control. The user's asking why ED can't see their updated class schedule. ED should fetch live calendar data from the Render API at session start, the same way the app's own UI does, so ED always sees current events instead of stale context.",
+      "details": "Add an endpoint or extend an existing one in `server.js` that returns the current calendar events from `appData.calendarEvents` as JSON. At the start of each ED chat session, fetch this endpoint and use the live data to populate the calendar context instead of reading from the static markdown file in the wiki. This ensures ED always sees what's actually in the app, matching the user's expectation that ED has access to \"the calendar.\""
+    },
     {
       "id": "2026-08-26-remove-next-up-mission-button-from-home-",
       "date": "2026-08-26",
@@ -1229,6 +1248,57 @@
       "createdDate": "2026-08-26",
       "updatedDate": "2026-08-26",
       "originResearchId": "2026-08-26-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1787873979570-0-predictive-trend-forecast-in-quest-calen": {
+      "id": "thread-1787873979570-0-predictive-trend-forecast-in-quest-calen",
+      "title": "Predictive Trend Forecast in Quest & Calendar Patterns",
+      "description": "Gamified apps that show users where they're trending (not just where they are) help with course-correction — a user on track to miss a monthly goal sees that forecast before it becomes a failure. Mission Control's quest and calendar data can surface weekly/monthly pattern analysis directly in the Home card or Cal tab, showing when habits are trending up/down without gamified language. This aligns with modern dashboard design that embeds AI-driven insights into the decision workflow itself.",
+      "source_title": "Guul Games: Gamification in Habit Tracking Apps (2026)",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; font-size: 14px; max-width: 280px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 2px;\">PATTERN FORECAST</div><div style=\"background: #12253c; border: 1px solid #1e3a5f; border-radius: 6px; padding: 12px; margin-bottom: 8px;\"><div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;\"><span style=\"color: #ff8a63; font-weight: bold;\">Morning Routine</span><span style=\"color: #7fffb0; font-size: 12px;\">↑ +2 this week</span></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6); margin-bottom: 6px;\">5-day trend → likely +1 next week</div><div style=\"width: 100%; height: 24px; background: #0a1929; border-radius: 4px; overflow: hidden;\"><div style=\"height: 100%; background: linear-gradient(to right, #7fffb0, #ff8a63); width: 68%; animation: none;\"></div></div></div><div style=\"background: #12253c; border: 1px solid #1e3a5f; border-radius: 6px; padding: 12px;\"><div style=\"display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;\"><span style=\"color: #4a90d9; font-weight: bold;\">Focus Session</span><span style=\"color: #ff8080; font-size: 12px;\">↓ −1 this week</span></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6);\">3-day dip → reset before Friday?</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-27",
+      "updatedDate": "2026-08-27",
+      "originResearchId": "2026-08-27-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1787873979570-1-behavioral-reward-not-point-inflation-fo": {
+      "id": "thread-1787873979570-1-behavioral-reward-not-point-inflation-fo",
+      "title": "Behavioral Reward (Not Point Inflation) for Multi-Habit Chains",
+      "description": "Research shows gamifying outcomes instead of behaviors reduces score-gaming; gamifying the specific behaviors that produce engagement drives actual culture change. Mission Control can show visual feedback when the user completes a chain of quests on the same day (e.g., morning routine + focus session + evening reflection), rewarding the interdependent *behavior* rather than inflating individual XP values. This leverages the existing bento grid to highlight combo streaks without adding new currency.",
+      "source_title": "Happily.ai: Gamified Habit Formation in the Workplace (2026)",
+      "source_url": "https://happily.ai/blog/gamified-habit-formation-workplace/",
+      "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; max-width: 260px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 2px; text-transform: uppercase;\">TODAY'S QUESTS</div><div style=\"background: #12253c; border: 2px solid #66c8ff; border-radius: 8px; padding: 12px; margin-bottom: 8px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 7px; color: #66c8ff; margin-bottom: 8px; letter-spacing: 1px;\">COMBO ACTIVE ×3</div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" checked style=\"width: 18px; height: 18px; accent-color: #7fffb0;\"/><label style=\"font-size: 14px;\">Morning Routine</label></div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" checked style=\"width: 18px; height: 18px; accent-color: #7fffb0;\"/><label style=\"font-size: 14px;\">Focus Block</label></div><div style=\"display: flex; gap: 8px; margin-bottom: 8px;\"><input type=\"checkbox\" style=\"width: 18px; height: 18px; accent-color: #4a90d9;\"/><label style=\"font-size: 14px;\">Evening Journal</label></div><div style=\"border-top: 1px solid #1e3a5f; padding-top: 8px; margin-top: 8px; font-size: 12px; color: #7fffb0; font-weight: bold;\">Complete chain → behavior badge (no XP inflation)</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-27",
+      "updatedDate": "2026-08-27",
+      "originResearchId": "2026-08-27-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1787873979570-2-quiet-streak-display-informational-not-c": {
+      "id": "thread-1787873979570-2-quiet-streak-display-informational-not-c",
+      "title": "Quiet Streak Display: Informational, Not Crisis-Driven",
+      "description": "Good trackers show streaks as information without turning missed days into crises. There's a difference between \"you've logged 12 days in a row\" as a quiet fact and \"YOUR STREAK IS IN DANGER\" as a flashing warning. Mission Control's removed Home streak card is an opportunity: move streak info into the calendar itself (per-quest calendar heatmap) and Cal tab as a calm, factual summary — no notifications, no alarmist language, just pattern visibility.",
+      "source_title": "Logly Blog: Tired of Gamified Habit Apps? (2026)",
+      "source_url": "https://getlogly.app/blog/tired-of-gamified-habit-apps/",
+      "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; max-width: 280px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 2px;\">MORNING ROUTINE</div><div style=\"display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;\"><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #1e3a5f; border-radius: 4px; border: 1px solid #66c8ff;\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6); text-align: center;\">3 in a row. Last done Aug 24.</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-08-27",
+      "updatedDate": "2026-08-27",
+      "originResearchId": "2026-08-27-design-research-daily",
       "openTopic": false
     }
   },
