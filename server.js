@@ -329,6 +329,7 @@ function buildSystemPrompt(userMessage) {
   const overviewMd = readWiki('overview.md');
   const taskPage   = readWiki(`analyses/daily-tasks-${today()}.md`);
   const schedPage  = readWiki('analyses/mission-schedule.md');
+  const calPage    = readWiki('analyses/calendar-events.md');
 
   const words = (userMessage || '').toLowerCase().split(/\W+/).filter(w => w.length > 3);
   const extra = [];
@@ -384,6 +385,7 @@ You also have persistent memory across every conversation, not just this one —
   ];
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
+  if (calPage)      parts.push('# CALENDAR EVENTS (auto-synced from Mission Control on every change)\n' + calPage);
   if (extra.length) parts.push('# RELEVANT WIKI PAGES\n' + extra.slice(0,4).join('\n\n---\n\n'));
   return parts.join('\n\n═══════════════════════════════\n\n');
 }
@@ -432,7 +434,7 @@ app.post('/api/data', (req, res) => {
     recalcStreak(data, date);
     saveAppData(data);
     if (patch.tasks && Array.isArray(patch.tasks)) syncTasks(patch.tasks, date);
-    if (patch.events   !== undefined) syncEvents(data.events);
+    if (patch.events !== undefined || patch.recurringEvents !== undefined) syncEvents(data);
     if (patch.schedule !== undefined) syncSchedule(data.schedule);
     res.json({ ok: true, currentStreak: data.currentStreak, streakDays: data.streakDays });
   } catch (err) {
@@ -786,6 +788,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
     if (!Array.isArray(data.recurringEvents)) data.recurringEvents = [];
     data.recurringEvents.push(rec);
     saveAppData(data);
+    syncEvents(data);
     return { ok: true, recurring: true, rec };
   }
 
@@ -796,7 +799,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
   const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: false, notifyLeadMin: null };
   data.events[d].push(ev);
   saveAppData(data);
-  syncEvents(data.events);
+  syncEvents(data);
   return { ok: true, recurring: false, date: d, ev };
 }
 
@@ -841,7 +844,7 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
       data.events[new_date].push(m.ev);
     }
     saveAppData(data);
-    syncEvents(data.events);
+    syncEvents(data);
     return { ok: true, message: `Updated "${m.ev.title}".` };
   }
 
@@ -851,10 +854,12 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
     m.rec.exceptions = m.rec.exceptions || {};
     m.rec.exceptions[m.date] = { ...m.rec.exceptions[m.date], ...fields };
     saveAppData(data);
+    syncEvents(data);
     return { ok: true, message: `Updated the ${m.date} occurrence of "${m.rec.title}".` };
   }
   Object.assign(m.rec, fields);
   saveAppData(data);
+  syncEvents(data);
   return { ok: true, message: `Updated the whole "${m.rec.title}" series.` };
 }
 
@@ -883,7 +888,7 @@ function deleteEdCalendarEvent({ title_search, date, scope }) {
     data.events[m.date] = data.events[m.date].filter(e => e !== m.ev);
     if (!data.events[m.date].length) delete data.events[m.date];
     saveAppData(data);
-    syncEvents(data.events);
+    syncEvents(data);
     return { ok: true, message: `Deleted "${m.ev.title}" on ${m.date}.` };
   }
 
@@ -892,10 +897,12 @@ function deleteEdCalendarEvent({ title_search, date, scope }) {
     m.rec.exceptions = m.rec.exceptions || {};
     m.rec.exceptions[m.date] = { skip: true };
     saveAppData(data);
+    syncEvents(data);
     return { ok: true, message: `Deleted the ${m.date} occurrence of "${m.rec.title}".` };
   }
   data.recurringEvents = (data.recurringEvents || []).filter(r => r.id !== m.rec.id);
   saveAppData(data);
+  syncEvents(data);
   return { ok: true, message: `Deleted the whole "${m.rec.title}" series.` };
 }
 
@@ -1198,7 +1205,7 @@ app.post('/api/sync', (req, res) => {
   try {
     const { type, data, date } = req.body;
     if      (type === 'tasks')    syncTasks(data, date || today());
-    else if (type === 'events')   syncEvents(data);
+    else if (type === 'events')   syncEvents({ events: data, recurringEvents: getAppData().recurringEvents });
     else if (type === 'schedule') syncSchedule(data);
     res.json({ ok: true });
   } catch (err) {
@@ -1299,26 +1306,74 @@ _Last synced: ${new Date().toLocaleString()}_
   updateIndex();
 }
 
-function syncEvents(events) {
-  if (typeof events !== 'object') return;
-  const entries = Object.entries(events).sort(([a],[b]) => a.localeCompare(b))
-    .flatMap(([date, evs]) =>
-      evs.map(e => `| ${date} | ${e.time||'—'} | ${e.title} | ${e.kind||'focus'} | ${e.location||''} |`)
-    ).join('\n');
+// Renders one recurrence template as a plain-English rule, e.g.
+// "every Mon & Wed at 06:00, from 2026-08-01 until 2026-12-31".
+const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+function describeRecurrence(rec) {
+  const iv = rec.interval && rec.interval > 1 ? rec.interval : 1;
+  let base;
+  if (rec.freq === 'daily') {
+    base = iv === 1 ? 'every day' : `every ${iv} days`;
+  } else if (rec.freq === 'weekly') {
+    const days = (rec.daysOfWeek || []).slice().sort((a, b) => a - b)
+      .map(d => DOW_SHORT[d]).filter(Boolean).join(' & ') || '—';
+    base = iv === 1 ? `every ${days}` : `every ${iv} weeks on ${days}`;
+  } else if (rec.freq === 'monthly') {
+    const dom = rec.dayOfMonth || 1;
+    base = iv === 1 ? `day ${dom} of every month` : `day ${dom} every ${iv} months`;
+  } else {
+    base = rec.freq || 'unknown schedule';
+  }
+  const at   = rec.time ? ` at ${rec.time}` : '';
+  const from = rec.startDate ? `, from ${rec.startDate}` : '';
+  const till = rec.endDate ? ` until ${rec.endDate}` : '';
+  return `${base}${at}${from}${till}`;
+}
+
+// Mirrors calendar state into wiki/analyses/calendar-events.md on every calendar
+// mutation — one-off AND recurring. Takes the full app-data object so recurring
+// templates in data.recurringEvents are captured, not just the data.events map.
+function syncEvents(data) {
+  data = data && typeof data === 'object' ? data : {};
+  const events    = data.events && typeof data.events === 'object' ? data.events : {};
+  const recurring = Array.isArray(data.recurringEvents) ? data.recurringEvents : [];
+
+  const oneoffRows = Object.entries(events).sort(([a], [b]) => a.localeCompare(b))
+    .flatMap(([date, evs]) => (Array.isArray(evs) ? evs : [])
+      .map(e => `| ${date} | ${e.time || '—'} | ${e.title} | ${e.kind || 'focus'} | ${e.location || ''} |`))
+    .join('\n');
+
+  const recurRows = recurring.slice()
+    .sort((a, b) => (a.title || '').localeCompare(b.title || ''))
+    .map(rec => {
+      const excCount = Object.keys(rec.exceptions || {}).length;
+      const excNote  = excCount ? ` _(${excCount} exception${excCount > 1 ? 's' : ''})_` : '';
+      return `| ${rec.title || 'Untitled'} | ${describeRecurrence(rec)}${excNote} | ${rec.kind || 'focus'} | ${rec.location || ''} |`;
+    })
+    .join('\n');
+
+  const stamp = new Date().toLocaleString();
   writeWiki('analyses/calendar-events.md', `---
 type: analysis
 title: "Calendar Events"
 last_updated: "${today()}"
+synced_at: "${stamp}"
 tags: [calendar, events]
 ---
 
-## All Scheduled Events
+## One-Off Events
 
 | Date | Time | Title | Kind | Location |
 |------|------|-------|------|----------|
-${entries || '| — | — | No events | — | — |'}
+${oneoffRows || '| — | — | No one-off events | — | — |'}
 
-_Last synced: ${new Date().toLocaleString()}_
+## Recurring Events
+
+| Title | Recurrence | Kind | Location |
+|-------|------------|------|----------|
+${recurRows || '| — | No recurring events | — | — |'}
+
+_Last synced: ${stamp}_
 `);
   appendLog('sync', 'Calendar events synced', ['[[calendar-events]]'], []);
   updateIndex();
