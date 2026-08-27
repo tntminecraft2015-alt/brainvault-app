@@ -1563,7 +1563,11 @@
       "interval": 1,
       "startDate": "2026-08-31",
       "endDate": null,
-      "exceptions": {}
+      "exceptions": {
+        "2026-09-07": {
+          "skip": true
+        }
+      }
     },
     {
       "id": "rec-1787801896922",
