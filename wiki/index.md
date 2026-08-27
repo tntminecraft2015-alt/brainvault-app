@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-27-design-research-daily]] — Modern dashboards prioritize embedding actionable insights directly into the UI instead of static displays, while gamified habit apps see hi
 - [[chat-2026-08-27]] — Claude conversation log for 2026-08-27
 - [[chat-2026-08-26]] — Claude conversation log for 2026-08-26
 - [[2026-08-26-design-research-daily]] — Current habit tracker apps prioritize fast daily check-ins, clear pattern visualization, and forgiving yes/no/skip logging over point-chasin
