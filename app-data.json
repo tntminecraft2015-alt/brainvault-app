@@ -548,6 +548,17 @@
   "designFeedback": [
     {
       "id": "2026-08-27-design-research-daily",
+      "findingIndex": 2,
+      "threadId": "thread-1787873979570-2-quiet-streak-display-informational-not-c",
+      "findingTitle": "Quiet Streak Display: Informational, Not Crisis-Driven",
+      "findingDescription": "Good trackers show streaks as information without turning missed days into crises. There's a difference between \"you've logged 12 days in a row\" as a quiet fact and \"YOUR STREAK IS IN DANGER\" as a flashing warning. Mission Control's removed Home streak card is an opportunity: move streak info into the calendar itself (per-quest calendar heatmap) and Cal tab as a calm, factual summary — no notifications, no alarmist language, just pattern visibility.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-08-27"
+    },
+    {
+      "id": "2026-08-27-design-research-daily",
       "findingIndex": 1,
       "threadId": "thread-1787873979570-1-behavioral-reward-not-point-inflation-fo",
       "findingTitle": "Behavioral Reward (Not Point Inflation) for Multi-Habit Chains",
@@ -1313,10 +1324,10 @@
       "source_title": "Logly Blog: Tired of Gamified Habit Apps? (2026)",
       "source_url": "https://getlogly.app/blog/tired-of-gamified-habit-apps/",
       "mockup_html": "<div style=\"background: #0a1929; color: #dfeeff; padding: 16px; border-radius: 10px; font-family: VT323, monospace; max-width: 280px;\"><div style=\"font-family: 'Press Start 2P', cursive; font-size: 8px; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 2px;\">MORNING ROUTINE</div><div style=\"display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px;\"><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #7fffb0; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #0a1929;\">✓</div><div style=\"width: 28px; height: 28px; background: #1e3a5f; border-radius: 4px; border: 1px solid #66c8ff;\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div><div style=\"width: 28px; height: 28px; background: #12253c; border-radius: 4px; border: 1px solid rgba(26,37,51,.8);\"></div></div><div style=\"font-size: 12px; color: rgba(223,238,255,.6); text-align: center;\">3 in a row. Last done Aug 24.</div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-08-27",
       "updatedDate": "2026-08-27",
