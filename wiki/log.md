@@ -799,3 +799,9 @@ Verified with a 19-case test run twice, under `TZ=UTC` (simulating Render) **and
 **Pages created:** [[chat-2026-08-26]]
 
 Chat session on 2026-08-26
+
+## [2026-08-26] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Auto-sync calendar events to vault on change
