@@ -825,3 +825,10 @@ Both marked `done` in `app-data.json` and their `change-requests/*.md` removed. 
 **Pages created:** [[chat-2026-08-27]]
 
 Chat session on 2026-08-27
+
+## [2026-08-31] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-08-31-design-research-daily]]
+
+Design research: General Improvements: Simplification, Social Streaks & Glanceable Visual Summary (3 findings)
