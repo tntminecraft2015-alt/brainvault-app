@@ -832,3 +832,10 @@ Chat session on 2026-08-27
 **Pages created:** [[2026-08-31-design-research-daily]]
 
 Design research: General Improvements: Simplification, Social Streaks & Glanceable Visual Summary (3 findings)
+
+## [2026-08-31] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-08-31]]
+
+Chat session on 2026-08-31
