@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-08-31-design-research-daily]] — Research found that modern habit trackers succeed by reducing cognitive load (avoiding points/levels), emphasizing community accountability,
 - [[2026-08-27-design-research-daily]] — Modern dashboards prioritize embedding actionable insights directly into the UI instead of static displays, while gamified habit apps see hi
 - [[chat-2026-08-27]] — Claude conversation log for 2026-08-27
 - [[chat-2026-08-26]] — Claude conversation log for 2026-08-26
