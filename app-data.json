@@ -272,6 +272,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-09-30-design-research-daily",
+      "date": "2026-09-30",
+      "topic": "",
+      "title": "General Improvements: Data Storytelling, Predictive Feedback & Task Forecasting",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-08-27-design-research-daily",
       "date": "2026-08-27",
       "topic": "",
@@ -388,7 +398,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-08-27",
+  "lastDesignResearchAutoRun": "2026-09-30",
   "changeRequests": [
     {
       "id": "2026-08-27-live-calendar-sync-for-ed-chat-sessions",
@@ -1333,6 +1343,57 @@
       "updatedDate": "2026-08-27",
       "originResearchId": "2026-08-27-design-research-daily",
       "openTopic": false
+    },
+    "thread-1790781370582-0-trend-forecast-micro-card-quest-momentum": {
+      "id": "thread-1790781370582-0-trend-forecast-micro-card-quest-momentum",
+      "title": "Trend Forecast Micro-Card: Quest Momentum at a Glance",
+      "description": "A small card on the Home screen below TODAY'S QUESTS that shows your quest completion trajectory for the current week — a simple trend line or percentage (e.g., \"68% on pace\" or \"likely to hit 3/4 quests this week\"). Unlike a raw streak counter, this is a *leading indicator* that surfaces course-correction opportunities before the week ends, matching research showing that leading indicators boost agency and retention 17% higher than trailing metrics. Mockup applies a subtle accent bar and compact typography to fit Mission Control's card layout without clutter.",
+      "source_title": "Guul Games: Predictive Gamification in Habit Tracking",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<div style=\"background:#0a1929;padding:12px;border-radius:10px;border:1px solid #1e3a5f;font-family:VT323,monospace;color:#dfeeff;margin:4px 0;\">\n  <div style=\"font-family:'Press Start 2P',cursive;font-size:7px;color:#8fd6ff;letter-spacing:1px;margin-bottom:8px;\">WEEK TREND</div>\n  <div style=\"display:flex;align-items:center;gap:10px;\">\n    <div style=\"flex:1;\">\n      <div style=\"height:4px;background:#1e3a5f;border-radius:2px;overflow:hidden;\">\n        <div style=\"width:68%;height:100%;background:linear-gradient(90deg,#ff8a63,#66c8ff);transition:width 0.3s;\"></div>\n      </div>\n      <div style=\"font-size:12px;margin-top:4px;color:#8fd6ff;\">68% on pace</div>\n    </div>\n    <div style=\"font-size:14px;color:#7fffb0;\">↗</div>\n  </div>\n  <div style=\"font-size:9px;color:rgba(223,238,255,.45);margin-top:6px;\">3 of 4 likely by Sunday</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790781370582-1-quest-difficulty-signaling-via-card-weig": {
+      "id": "thread-1790781370582-1-quest-difficulty-signaling-via-card-weig",
+      "title": "Quest Difficulty Signaling via Card Weight & Spacing",
+      "description": "Visually distinguish S-rank quests from B-rank by increasing card padding and bottom-shadow depth on S-rank items — a lightweight visual affordance that groups by importance without adding noise. This matches research on cognitive hierarchy: purposeful micro-interactions and data-driven personalization raise task success rates, while decorative-only styles bloat payloads and muddle hierarchy. Mission Control's existing rank colors already signal difference; adding subtle whitespace and shadow layering reinforces the mental model that S-rank quests demand more care.",
+      "source_title": "BAIResDev: UX Design Trends 2025",
+      "source_url": "https://www.bairesdev.com/blog/ux-ui-design-trends/",
+      "mockup_html": "<div style=\"font-family:VT323,monospace;color:#dfeeff;\">\n  <div style=\"background:#12253c;padding:16px;border-radius:10px;margin-bottom:8px;box-shadow:inset 0 0 0 3px #ff8a63,inset 0 0 0 5px #12253c,inset 0 0 0 7px #ff8a63,0 4px 12px rgba(0,0,0,0.4);border-left:3px solid #e85d3a;\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center;\">\n      <span style=\"font-size:14px;\">→ Morning Routine (S)</span>\n      <span style=\"font-family:'Press Start 2P',cursive;font-size:7px;color:#ff8a63;letter-spacing:0.5px;\">S-RANK</span>\n    </div>\n    <div style=\"font-size:11px;color:rgba(223,238,255,.45);margin-top:4px;\">6:00 AM</div>\n  </div>\n  <div style=\"background:#12253c;padding:12px;border-radius:10px;margin-bottom:8px;box-shadow:inset 0 0 0 3px #4a90d9,inset 0 0 0 5px #12253c,inset 0 0 0 7px #4a90d9,0 2px 6px rgba(0,0,0,0.2);border-left:3px solid #4a90d9;\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center;\">\n      <span style=\"font-size:14px;\">⊡ Code review notes</span>\n      <span style=\"font-family:'Press Start 2P',cursive;font-size:7px;color:#4a90d9;letter-spacing:0.5px;\">B-RANK</span>\n    </div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790781370582-2-weekly-snapshot-habit-completion-heat-ma": {
+      "id": "thread-1790781370582-2-weekly-snapshot-habit-completion-heat-ma",
+      "title": "Weekly Snapshot: Habit Completion Heat-Map Mini-Card",
+      "description": "Bento grids work when content has natural card-level units and the cognitive load stays low. Add a 7-day mini heat-map (one small square per day, colored by quest completion percentage) to the GIL WALLET row as a glanceable habit health check — no clicks, no scrolling, just a pattern recognition visual similar to GitHub contribution graphs. This plays to research showing users are more motivated by visual representations of progress, and apps like Habitica that gamify tracking show higher engagement. Fits Mission Control's retro aesthetic and takes <5 seconds to interpret.",
+      "source_title": "Sanjaydey: UI/UX Trends 2026 — Bento Grids & Micro-Interactions",
+      "source_url": "https://www.sanjaydey.com/ui-ux-design-trends-2026/",
+      "mockup_html": "<div style=\"background:#12253c;padding:10px;border-radius:10px;border:1px solid #1e3a5f;font-family:VT323,monospace;\">\n  <div style=\"font-family:'Press Start 2P',cursive;font-size:7px;color:#8fd6ff;letter-spacing:1px;margin-bottom:8px;\">THIS WEEK</div>\n  <div style=\"display:grid;grid-template-columns:repeat(7,1fr);gap:4px;\">\n    <div style=\"width:100%;aspect-ratio:1;background:#7fffb0;border-radius:4px;opacity:1;\" title=\"100%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#7fffb0;border-radius:4px;opacity:0.8;\" title=\"80%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#66c8ff;border-radius:4px;opacity:0.5;\" title=\"50%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#ff8080;border-radius:4px;opacity:0.4;\" title=\"25%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#1e3a5f;border-radius:4px;\" title=\"0%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#7fffb0;border-radius:4px;opacity:1;\" title=\"100%\"></div>\n    <div style=\"width:100%;aspect-ratio:1;background:#7fffb0;border-radius:4px;opacity:0.9;\" title=\"90%\"></div>\n  </div>\n  <div style=\"font-size:9px;color:rgba(223,238,255,.45);margin-top:6px;text-align:center;\">Mon–Sun</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-daily",
+      "openTopic": false
     }
   },
   "designArchive": [
@@ -1635,7 +1696,13 @@
       "origin": "run-missing-file"
     }
   ],
-  "edMemory": [],
+  "edMemory": [
+    {
+      "id": "mem-1790781472258",
+      "date": "2026-09-30",
+      "text": "Prefers very short, casual replies — one to three sentences max. No multi-paragraph explanations unless explicitly asked for long-form content."
+    }
+  ],
   "savingsGoals": [
     {
       "id": "goal-migrated",
