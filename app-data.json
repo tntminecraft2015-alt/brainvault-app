@@ -673,6 +673,17 @@
   "designFeedback": [
     {
       "id": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "findingIndex": 2,
+      "threadId": "thread-1790808860908-2-punishment-vs-reward-timing-when-consequ",
+      "findingTitle": "Punishment vs. Reward Timing: When Consequences Work, and When They Backfire",
+      "findingDescription": "Habitica's RPG mechanics with punishment (lost hit points) suit users who have already committed, not those still forming a habit. Collaborative ally and quest mechanics outperform competition for emotionally significant behavior. Minimalist systems like Streaks build early habits; richer systems like Habitica retain the long tail. The pattern: streaks use loss aversion to build daily habits, variable rewards use dopamine anticipation to drive repeat actions, and progress bars use the Zeigarnik ",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
+      "id": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
       "findingIndex": 1,
       "threadId": "thread-1790808860908-1-the-burnout-boundary-when-gamification-b",
       "findingTitle": "The Burnout Boundary: When Gamification Becomes Obligation",
@@ -1680,10 +1691,10 @@
       "source_title": "Gamification Productivity Apps: 8 Examples Analyzed (2026) + Streaks Alternatives",
       "source_url": "https://habi.app/insights/streaks-alternatives/",
       "mockup_html": "<style>body { font-family: system-ui; background: #0a1322; color: #dfeeff; padding: 20px; margin: 0; } .quest-row { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 3px solid #0ea5e9; } .icon { font-size: 24px; } .content { flex: 1; } .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; } .desc { font-size: 12px; color: rgba(223,238,255,0.6); } .reward { background: #1e3a5f; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; } .early { border-left-color: #22c55e; } .committed { border-left-color: #f59e0b; } .reset { border-left-color: #ef4444; opacity: 0.7; } </style> <div class='quest-row early'> <div class='icon'>🌱</div> <div class='content'> <div class='title'>Early-stage: Streaks (no penalty)</div> <div class='desc'>Just don't break the chain. Visual feedback only.</div> </div> <div class='reward'>Intrinsic</div> </div> <div class='quest-row committed'> <div class='icon'>⚔️</div> <div class='content'> <div class='title'>Committed: Habitica (lose HP)</div> <div class='desc'>Punishment works once you've invested identity.</div> </div> <div class='reward'>+Extrinsic</div> </div> <div class='quest-row reset'> <div class='icon'>↺</div> <div class='content'> <div class='title'>After break: Willpower gap</div> <div class='desc'>Reset streak alone isn't enough to restart.</div> </div> <div class='reward'>Friction</div> </div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
