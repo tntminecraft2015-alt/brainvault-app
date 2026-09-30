@@ -886,3 +886,9 @@ Tasks synced for 2026-09-30: 0/1 complete
 **Pages created:** [[2026-09-30-design-research-end-to-end-daily-income-logging-reminder]]
 
 Design research: End-to-End Daily Income Logging: Quick Entry, Smart Reminders & Friction-Free Flows (3 findings)
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+
+Implemented two queued change requests: a clean bottom-sheet add form for events/quests (floating + button, one-tap date/time chips, inline date picker, vertical type list) and keeping today's date highlighted even when selected. Both marked done.

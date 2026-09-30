@@ -446,19 +446,19 @@
       "id": "2026-09-30-redesign-add-quest-event-modal-for-clean",
       "date": "2026-09-30",
       "title": "Redesign add quest/event modal for cleaner UX",
-      "status": "pending",
+      "status": "done",
       "source": "ED chat",
       "description": "User wants the add quest/event modal to be cleaner and easier to use. Research on structured calendar apps (Apple Calendar, Todoist, Things 3, Fantastical) shows patterns: make \"add event\" one-tap and always visible; use vertical list layout instead of complex grids; show clean calendar picker instead of text input; consider floating action button for fast entry; use subtle visual cues (gradients, highlighting) to mark current date without clutter.",
-      "details": "Redesign the add event/quest modal to:\n1. Simplify the modal form to essentials only: title, date (via visual calendar picker), time, and type/kind selector\n2. Replace text-based date input with an inline calendar grid picker\n3. Use vertical list layout for event type options instead of radio buttons/grid\n4. Consider adding a floating \"+\" button for quick access to add events (currently only accessible via menu)\n5. Add subtle visual highlight (gradient or background color) to mark today's date in the calendar picker\n6. Keep the modal accessible but make common actions (add event, set time, pick type) require fewer taps\n\nReference patterns from: Apple Calendar (one-tap visible add button), Todoist (clean form hierarchy), Things 3 (vertical list layout, gradient on current date), Fantastical (split calendar/timeline views for clarity)."
+      "details": "New bottom-sheet add form (floating + on the Calendar tab): Event/Quest switch that remembers the last choice; big title field with natural-language date/time and auto-guessed type; one-tap date chips (Today, Tomorrow, next 4 days) plus an inline month picker with today highlighted; one-tap time chips plus custom; vertical list of event types with icons/descriptions; S/B rank list for quests (S still needs a time); location/reminder tucked away; save button reads back what it will add. Removed the Cal tab's inline quest row, the day-header + and the Pokédex add form (Pokédex keeps its day list with an 'Add to this day' button; Home keeps its quest row). Commit 708ecde in brainvault-app."
     },
     {
       "id": "2026-09-30-highlight-today-s-date-on-calendar",
       "date": "2026-09-30",
       "title": "Highlight today's date on calendar",
-      "status": "pending",
+      "status": "done",
       "source": "ED chat",
       "description": "User wants the calendar to visually highlight the current day so it's immediately obvious which day is today when looking at the month/week view.",
-      "details": "In the calendar UI (buildCalGrid function and related calendar rendering), add a visual highlight to the cell/element representing today's date. Use the existing --accent color (#ff8a63) or --green (#7fffb0) for the highlight — apply it as a background color, border, or other prominent visual indicator. Make sure the highlight is distinctive enough to stand out from other dates but doesn't interfere with readability of the date number or any event labels."
+      "details": "Today keeps an orange ring + gradient even when it's the selected day (previously the selected style hid it) in the week strip (labeled 'Today'), month grid and week view; event tints no longer paint over today's cell. Commit 708ecde in brainvault-app."
     },
     {
       "id": "2026-09-30-redesign-calendar-to-structured-style-ti",
