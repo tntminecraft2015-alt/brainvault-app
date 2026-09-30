@@ -404,19 +404,19 @@
       "id": "2026-09-30-redesign-calendar-to-structured-style-ti",
       "date": "2026-09-30",
       "title": "Redesign calendar to Structured-style timeline view",
-      "status": "pending",
+      "status": "done",
       "source": "ED chat",
       "description": "User wants the calendar redesigned to match Structured's clean timeline-based layout with daily/weekly/monthly view switching. Keep the existing calendar grid view as an option somewhere in the app, but make the timeline view the primary experience.",
-      "details": "Redesign the calendar modal/section to feature a timeline-style day view (like Structured) with smooth switching between daily, weekly, and monthly perspectives. The timeline should display events vertically with clean typography and minimal visual clutter. Keep the traditional grid calendar view available as a secondary option (maybe in a settings toggle or alternate tab). Focus on readability and ease of use."
+      "details": "Cal tab now opens on a Structured-style vertical day timeline: start times on the left, a rail of colored icon pills joined by a line (event kind color/icon, or quest rank), title + details, and a checkbox on quests. Linked quest/event pairs show once. Untimed items go in an 'Anytime' section; gaps of 30m+ are labeled free time (events have no end time, so 60m/event and 30m/quest are assumed); today has a live 'now' marker and past items dim. Day/Week/Month switch in the header (remembered per device). Week = per-day agenda cards; Month = the existing grid kept as the classic view, now always open instead of behind 'Browse dates'. Commit 7cbe587 in brainvault-app."
     },
     {
       "id": "2026-08-27-live-calendar-sync-for-ed-chat-sessions",
       "date": "2026-08-27",
       "title": "Live calendar sync for ED chat sessions",
-      "status": "pending",
+      "status": "done",
       "source": "ED chat",
       "description": "ED currently reads calendar events from a static markdown file that can lag hours or days behind what's actually in Mission Control. The user's asking why ED can't see their updated class schedule. ED should fetch live calendar data from the Render API at session start, the same way the app's own UI does, so ED always sees current events instead of stale context.",
-      "details": "Add an endpoint or extend an existing one in `server.js` that returns the current calendar events from `appData.calendarEvents` as JSON. At the start of each ED chat session, fetch this endpoint and use the live data to populate the calendar context instead of reading from the static markdown file in the wiki. This ensures ED always sees what's actually in the app, matching the user's expectation that ED has access to \"the calendar.\""
+      "details": "ED no longer reads wiki/analyses/calendar-events.md. buildSystemPrompt() now builds a '# CALENDAR (LIVE)' section from the in-memory app data on every message: day-by-day agenda from 3 days back to 3 weeks ahead with repeating events expanded, the repeating rules with ids, and further-out one-offs. No HTTP self-fetch needed since ED runs in the same process. Also added GET /api/calendar?from=YYYY-MM-DD&days=N returning the same data as JSON. Commit f0529d5 in brainvault-app."
     },
     {
       "id": "2026-08-26-remove-next-up-mission-button-from-home-",
