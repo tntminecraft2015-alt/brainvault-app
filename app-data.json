@@ -47,9 +47,9 @@
         "title": "Therapy",
         "time": "14:00",
         "location": "",
-        "kind": "focus",
-        "notify": false,
-        "notifyLeadMin": null,
+        "kind": "meeting",
+        "notify": true,
+        "notifyLeadMin": 30,
         "linkedTaskId": 1790806801853
       }
     ]
