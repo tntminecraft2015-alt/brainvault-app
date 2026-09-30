@@ -673,6 +673,17 @@
   "designFeedback": [
     {
       "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
+      "findingIndex": 1,
+      "threadId": "thread-1790808957925-1-octalysis-framework-eight-core-drives-ac",
+      "findingTitle": "Octalysis Framework: Eight Core Drives Across Categories (Motivation Beyond Points)",
+      "findingDescription": "Mechanics like points, badges, challenges, and progress tracking tap into human psychological needs for achievement, competition, and social interaction. Self-determination theory shows gamification fosters intrinsic motivation by satisfying autonomy, competence, and relatedness. Fitness apps like Strava (Core Drives 2: Development & Accomplishment, and 5: Social Influence) and Peloton (adding Core Drive 8: Loss & Avoidance with streaks) leverage multiple drives simultaneously, with Strava turni",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
+      "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
       "findingIndex": 0,
       "threadId": "thread-1790808957925-0-loss-aversion-over-reward-accumulation-t",
       "findingTitle": "Loss Aversion Over Reward Accumulation: The Streak as Protective Mechanism",
@@ -1736,10 +1747,10 @@
       "source_title": "Yukai Chou's Octalysis Framework applied to Fitness Apps (2026)",
       "source_url": "https://yukaichou.com/gamification-analysis/top-10-gamification-in-fitness/",
       "mockup_html": "<div style='font-family:VT323,monospace;background:#0a1929;color:#dfeeff;padding:16px;border-radius:10px;max-width:300px'><div style='font-size:10px;font-family:\"Press Start 2P\",sans-serif;color:#8fd6ff;margin-bottom:12px;letter-spacing:1px'>QUEST DRIVES</div><div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px'><div style='background:#1e3a5f;padding:8px;border-radius:6px;border-left:3px solid #7fffb0'><div style='font-size:9px;color:#8fd6ff'>AUTONOMY</div><div style='font-size:11px;color:#dfeeff;margin-top:4px'>Set your time</div></div><div style='background:#1e3a5f;padding:8px;border-radius:6px;border-left:3px solid #66c8ff'><div style='font-size:9px;color:#8fd6ff'>COMPETENCE</div><div style='font-size:11px;color:#dfeeff;margin-top:4px'>Rank S / B</div></div><div style='background:#1e3a5f;padding:8px;border-radius:6px;border-left:3px solid #ff8a63'><div style='font-size:9px;color:#8fd6ff'>SOCIAL</div><div style='font-size:11px;color:#dfeeff;margin-top:4px'>Guild share</div></div><div style='background:#1e3a5f;padding:8px;border-radius:6px;border-left:3px solid #e85d3a'><div style='font-size:9px;color:#8fd6ff'>LOSS</div><div style='font-size:11px;color:#dfeeff;margin-top:4px'>Streak risk</div></div></div><div style='font-size:9px;color:#fg-dim;text-align:center'>Quests aligned to all four drives exceed retention</div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
