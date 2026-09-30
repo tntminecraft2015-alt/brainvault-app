@@ -309,6 +309,18 @@
   ],
   "designResearch": [
     {
+      "id": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "date": "2026-09-30",
+      "topic": "Gamification Patterns in Personal Productivity Apps",
+      "title": "Gamification Patterns in Personal Productivity Apps: Loss Aversion Over Rewards, Minimalism Over Complexity, and the Burnout Boundary",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": false,
+      "openTopic": true,
+      "assignedBy": "ED",
+      "brief": "Do a really deep dive on how modern personal dashboards and productivity apps use gamification to drive engagement and habit formation. Look at what actually works (points, streaks, levels, progress bars, achievements, social accountability, etc.) vs. what feels hollow or overstimulating. We want to understand the mechanics that create intrinsic motivation without burnout before we decide how to apply any of this to Mission Control."
+    },
+    {
       "id": "2026-09-30-design-research-revisions-1790808117446",
       "date": "2026-09-30",
       "topic": "",
@@ -1594,6 +1606,57 @@
       "updatedDate": "2026-09-30",
       "originResearchId": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
       "openTopic": true
+    },
+    "thread-1790808860908-0-loss-aversion-over-points-streaks-minima": {
+      "id": "thread-1790808860908-0-loss-aversion-over-points-streaks-minima",
+      "title": "Loss Aversion Over Points: Streaks' Minimalist Psychology",
+      "description": "Duolingo and Streaks tap into loss aversion, where people are more motivated to avoid losing progress than to gain rewards, making a long streak feel like something valuable that users must protect. Critically, Streaks deliberately avoids points and levels, contributing to its focus on intrinsic motivation; the primary goal is to build habits, not accumulate external rewards, which helps prevent users from becoming overly focused on extrinsic incentives. Streaks work through habit formation and loss aversion: short, low-friction actions repeated daily create sticky behavior, while loss aversion—being more motivated to avoid losing something than gaining something equivalent—turns a streak from a counter into a commitment device.",
+      "source_title": "How Streaks Leverages Gamification to Boost Retention (2025) + Gamification Productivity Apps",
+      "source_url": "https://trophy.so/blog/streaks-gamification-case-study",
+      "mockup_html": "<style>body { font-family: -apple-system; background: #f5f5f5; padding: 20px; margin: 0; } .streak-card { background: white; border-radius: 12px; padding: 24px; max-width: 280px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); } .habit { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; } .circle { width: 56px; height: 56px; border-radius: 50%; background: #e8f4fd; border: 2px solid #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #0ea5e9; font-size: 18px; } .label { font-size: 13px; color: #666; } .habit:nth-child(1) .circle { background: #dcfce7; border-color: #22c55e; color: #22c55e; } </style> <div class='streak-card'> <div class='habit'> <div><div class='label'>Morning Run</div></div> <div class='circle'>17</div> </div> <div class='habit'> <div><div class='label'>Meditation</div></div> <div class='circle'>9</div> </div> <div class='habit'> <div><div class='label'>Read</div></div> <div class='circle'>23</div> </div> <p style='margin-top: 20px; font-size: 12px; color: #999; text-align: center;'>No points. No levels. Just days in a row you don't want to break.</p> </div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "openTopic": true
+    },
+    "thread-1790808860908-1-the-burnout-boundary-when-gamification-b": {
+      "id": "thread-1790808860908-1-the-burnout-boundary-when-gamification-b",
+      "title": "The Burnout Boundary: When Gamification Becomes Obligation",
+      "description": "Habit apps overwhelmingly rely on extrinsic motivators and often produce dependency on the reward system itself, not the habit. A 2024 meta-analysis found gamified programs added only trivial fitness gains over non-gamified ones, and a 2025 analysis found the engagement boost fades as trials run past six months. Poor implementation reduces work to point-hunting, burnout happens, and the streak mentality creates anxiety—while deep focus suffers as quick wins take priority over sustained effort. Best practices include letting users opt out of challenges, providing multiple gameplay paths, avoiding harsh penalties for missed tasks, and keeping failure low-pressure and forgiving.",
+      "source_title": "Gamified Productivity Apps: 8 Examples Analyzed (2026) + GearBrain Analysis",
+      "source_url": "https://trophy.so/blog/productivity-gamification-examples",
+      "mockup_html": "<style>body { font-family: system-ui; background: #fafafa; padding: 20px; margin: 0; } .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; } .box { padding: 16px; border-radius: 8px; font-size: 13px; } .burnout { background: #fee2e2; border: 1px solid #fecaca; } .healthy { background: #dcfce7; border: 1px solid #86efac; } .label { font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; } ul { margin: 8px 0 0 0; padding-left: 16px; } li { margin: 4px 0; line-height: 1.4; } </style> <div class='comparison'> <div class='box burnout'> <div class='label'>❌ Burnout Zone</div> <ul> <li>Streak breaks = punishment</li> <li>Points always visible</li> <li>Missed day = anxiety</li> <li>No way to pause</li> <li>Comparison pressure</li> </ul> </div> <div class='box healthy'> <div class='label'>✓ Sustainable</div> <ul> <li>Streak breaks = restart</li> <li>Progress over points</li> <li>Miss = try again tomorrow</li> <li>Grace periods OK</li> <li>Personal journey</li> </ul> </div> </div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "openTopic": true
+    },
+    "thread-1790808860908-2-punishment-vs-reward-timing-when-consequ": {
+      "id": "thread-1790808860908-2-punishment-vs-reward-timing-when-consequ",
+      "title": "Punishment vs. Reward Timing: When Consequences Work, and When They Backfire",
+      "description": "Habitica's RPG mechanics with punishment (lost hit points) suit users who have already committed, not those still forming a habit. Collaborative ally and quest mechanics outperform competition for emotionally significant behavior. Minimalist systems like Streaks build early habits; richer systems like Habitica retain the long tail. The pattern: streaks use loss aversion to build daily habits, variable rewards use dopamine anticipation to drive repeat actions, and progress bars use the Zeigarnik effect to pull users toward completion—each mechanic maps to a psychological principle. But if a streak breaks, there's no consequence beyond a reset counter—no reason to start again except willpower.",
+      "source_title": "Gamification Productivity Apps: 8 Examples Analyzed (2026) + Streaks Alternatives",
+      "source_url": "https://habi.app/insights/streaks-alternatives/",
+      "mockup_html": "<style>body { font-family: system-ui; background: #0a1322; color: #dfeeff; padding: 20px; margin: 0; } .quest-row { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 3px solid #0ea5e9; } .icon { font-size: 24px; } .content { flex: 1; } .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; } .desc { font-size: 12px; color: rgba(223,238,255,0.6); } .reward { background: #1e3a5f; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; } .early { border-left-color: #22c55e; } .committed { border-left-color: #f59e0b; } .reset { border-left-color: #ef4444; opacity: 0.7; } </style> <div class='quest-row early'> <div class='icon'>🌱</div> <div class='content'> <div class='title'>Early-stage: Streaks (no penalty)</div> <div class='desc'>Just don't break the chain. Visual feedback only.</div> </div> <div class='reward'>Intrinsic</div> </div> <div class='quest-row committed'> <div class='icon'>⚔️</div> <div class='content'> <div class='title'>Committed: Habitica (lose HP)</div> <div class='desc'>Punishment works once you've invested identity.</div> </div> <div class='reward'>+Extrinsic</div> </div> <div class='quest-row reset'> <div class='icon'>↺</div> <div class='content'> <div class='title'>After break: Willpower gap</div> <div class='desc'>Reset streak alone isn't enough to restart.</div> </div> <div class='reward'>Friction</div> </div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "openTopic": true
     }
   },
   "designArchive": [
@@ -2031,8 +2094,17 @@
       "topic": "Gamification Patterns in Personal Productivity Apps",
       "brief": "Do a really deep dive on how modern personal dashboards and productivity apps use gamification to drive engagement and habit formation. Look at what actually works (points, streaks, levels, progress bars, achievements, social accountability, etc.) vs. what feels hollow or overstimulating. We want to understand the mechanics that create intrinsic motivation without burnout before we decide how to apply any of this to Mission Control.",
       "scope": "open",
-      "status": "running",
-      "startedAt": "2026-09-30T22:53:50.858Z"
+      "status": "done",
+      "startedAt": "2026-09-30T22:53:50.858Z",
+      "finishedAt": "2026-09-30T22:54:20.909Z",
+      "researchId": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "title": "Gamification Patterns in Personal Productivity Apps: Loss Aversion Over Rewards, Minimalism Over Complexity, and the Burnout Boundary",
+      "summary": "The key to effective gamification is finding the \"bliss point\" where an experience is just rewarding enough to keep users coming back, with small but consistent dopamine hits turning mundane tasks into addictive routines. But burnout happens when users fixate on metrics instead of meaningful results, and the streak mentality creates anxiety when life interrupts routines. The most successful apps (Streaks, Productive) lean into loss aversion and structure over extrinsic points, while the most engaging ones (Habitica) add punishment mechanics—but only for users who've already committed.",
+      "findings": [
+        "Loss Aversion Over Points: Streaks' Minimalist Psychology",
+        "The Burnout Boundary: When Gamification Becomes Obligation",
+        "Punishment vs. Reward Timing: When Consequences Work, and When They Backfire"
+      ]
     }
   ]
 }
