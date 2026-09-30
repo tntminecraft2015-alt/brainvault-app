@@ -1925,6 +1925,22 @@
       "startDate": "2026-09-30",
       "endDate": "2026-12-20",
       "exceptions": {}
+    },
+    {
+      "id": "rec-1790807951527",
+      "title": "Pay rent",
+      "time": null,
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "monthly",
+      "daysOfWeek": null,
+      "dayOfMonth": 1,
+      "interval": 1,
+      "startDate": "2026-10-01",
+      "endDate": null,
+      "exceptions": {}
     }
   ]
 }
