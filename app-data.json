@@ -651,6 +651,17 @@
   "designFeedback": [
     {
       "id": "2026-09-30-design-research-revisions-1790808117446",
+      "findingIndex": 1,
+      "threadId": "thread-1790807197955-0-one-tap-notification-to-log-pre-filled-f",
+      "findingTitle": "Lock Screen Pre-Filled Income Snap: Native OS Fast-Path Logging",
+      "findingDescription": "Apps like Moneko intercept notifications from enabled payment or income apps and auto-capture transactions via native shortcuts or notification processing. Rather than a generic \"confirm or adjust\" dialog, this pattern surfaces a pre-filled micro-form directly on the lock screen or notification center (iOS Live Activity or Android rich notification), letting users log routine income in a single tap—or unlock to adjust if the pre-fill is wrong. The key difference from the previous idea: uses nati",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
+      "id": "2026-09-30-design-research-revisions-1790808117446",
       "findingIndex": 0,
       "threadId": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
       "findingTitle": "Crossfade Card Swap with Mockup Persistence",
@@ -1539,10 +1550,10 @@
       "source_title": "Moneko: AI Budgeting App for iOS & Android",
       "source_url": "https://moneko.io/",
       "mockup_html": "<div style='font-family: system-ui; background: #0a1929; color: #dfeeff; padding: 20px; border-radius: 12px; max-width: 280px; margin: 0 auto; border: 1px solid #1e3a5f;'>\n  <div style='font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #8fd6ff; margin-bottom: 12px; font-weight: 600;'>LOCK SCREEN · INCOME</div>\n  <div style='background: #12253c; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #7fffb0;'>\n    <div style='font-size: 13px; color: #8fd6ff; margin-bottom: 4px;'>Weekly Deposit</div>\n    <div style='font-size: 24px; font-weight: bold; color: #7fffb0; font-family: monospace;'>R$ 1,250.00</div>\n  </div>\n  <div style='display: grid; grid-template-columns: 1fr 1fr; gap: 8px;'>\n    <button style='background: #7fffb0; color: #0a1929; border: none; padding: 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;'>CONFIRM</button>\n    <button style='background: #1e3a5f; color: #dfeeff; border: 1px solid #8fd6ff; padding: 10px; border-radius: 6px; font-size: 12px; cursor: pointer;'>ADJUST</button>\n  </div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 1,
-      "lastRating": 2,
-      "lastRatingLabel": "Kind of",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
