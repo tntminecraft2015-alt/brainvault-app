@@ -906,3 +906,9 @@ Chat session on 2026-09-30
 **Pages created:** [[2026-09-30-design-research-revisions-1790808117446]]
 
 Design research: Revisions: "Crossfade Card Swap with Mockup Persistence", "Lock Screen Pre-Filled Income S… (2 findings)
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via Design Lab: Crossfade Card Swap with Mockup Persistence
