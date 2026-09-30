@@ -839,3 +839,10 @@ Design research: General Improvements: Simplification, Social Streaks & Glanceab
 **Pages created:** [[chat-2026-08-31]]
 
 Chat session on 2026-08-31
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-09-30-design-research-daily]]
+
+Design research: General Improvements: Data Storytelling, Predictive Feedback & Task Forecasting (3 findings)
