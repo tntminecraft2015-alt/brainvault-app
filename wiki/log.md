@@ -919,3 +919,10 @@ Mission Control change requested via Design Lab: Crossfade Card Swap with Mockup
 **Pages created:** [[2026-09-30-design-research-gamification-patterns-in-personal-produc]]
 
 Design research: Gamification Patterns in Personal Productivity Apps: Loss Aversion Over Rewards, Minimalism Over Complexity, and the Burnout Boundary (3 findings)
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-09-30-design-research-comprehensive-gamification-in-apps-mecha]]
+
+Design research: Comprehensive Gamification Mechanics: Loss Aversion, Behavioral Economics & Real-World Scale (3 findings)
