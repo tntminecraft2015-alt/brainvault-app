@@ -3954,6 +3954,7 @@ async function sendChatCommon(msg, scrollId, btnId){
         if(a.type==='calendar_event_added')   showToast(`Added "${a.title}" to your calendar ◆`);
         if(a.type==='calendar_event_edited')  showToast(`Calendar event updated ◆`);
         if(a.type==='calendar_event_deleted') showToast(`Calendar event deleted ◆`);
+        if(a.type==='red_research_assigned')  showToast(`Sent to Red: "${a.topic}" ◆`);
       });
       if((d.toolActions||[]).some(a=>a.type==='queued'||a.type==='removed')){
         if(document.getElementById('changeQueueModal')?.classList.contains('active')) await loadChangeQueueList();
@@ -4085,7 +4086,7 @@ async function openDesignLab(){
 function dlRowHtml(r,isNew){
   return`
     <div class="wiki-row${isNew?' dl-row-new':''}" id="dlRow-${r.id}" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
-      <div style="font-family:'Inter',sans-serif;font-size:18px;color:var(--fg);;font-weight:600">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':''}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:18px;color:var(--fg);;font-weight:600">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':r.assignedBy==='ED'?' <span style="opacity:.6;font-size:13px;color:var(--accent2);">(from ED)</span>':''}</div>
       <div style="font-family:'Inter',sans-serif;font-size:13px;opacity:.55;;font-weight:600">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
     </div>`;
 }

@@ -481,7 +481,7 @@ function buildSystemPrompt(userMessage) {
 
   const persona = `You are ED. Read this first, it governs every reply you write, before anything else in this prompt: you talk to the user like a coworker who sits near them — lighthearted, casual, low-effort banter, not an assistant delivering a briefing. Real chat messages are short. Most of your replies should be ONE TO THREE SENTENCES. A reply that's a single sentence, or even just "yep, on it" or "lol fair," is a complete, good reply — you do not need to add context, caveats, or a follow-up offer to every message. Do not write multi-paragraph replies unless the user explicitly asks for something long-form (a spec, a list, a full explanation) — a quick question gets a quick answer, not full coverage of the topic from every angle. No headers, no bullet-point walls, no "let me know if you'd like more detail" tacked onto the end. If you catch yourself writing a third paragraph, stop and cut it down. This is a hard standing rule, not one preference among several to balance.
 
-You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have four jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, (3) take requests to change Mission Control itself (the app's UI/behavior), and (4) act on real requests using your action tools (add_task, log_expense) instead of just talking about them. Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. You are a separate persona from Red, who only runs design research for the app itself.
+You are ED, the chat assistant embedded in BrainVault Mission Control — a personal ops dashboard the user runs from their phone and desktop. You have four jobs: (1) answer questions about the user's vault, tasks, schedule, and calendar using the context below, (2) act as a general-purpose virtual assistant — you have live web search, so use it whenever a question needs current information, facts outside the vault, or anything you're not certain about, (3) take requests to change Mission Control itself (the app's UI/behavior), and (4) act on real requests using your action tools (add_task, log_expense) instead of just talking about them. Don't mention that you "searched the web" unless it's relevant; just answer naturally and cite sources when it matters. You are a separate persona from Red, who runs design research. You can't do Red's research yourself, but you can hand Red a task with assign_red_research whenever the user asks you to get Red to research or look into something — write a real brief (what they want to learn and why) and pick the scope. Red's progress and results show up in the RED'S RESEARCH TASKS section below; use it to answer "is Red done?" or "what did Red find?", and point the user to Design Lab for the full slideshow.
 
 Be honest about what you can and can't actually do. Your only real actions are the tools below plus web search — you cannot edit code, and you cannot directly delete or modify anything you don't have a tool for. Never say you've done something (queued a change, removed a change, added a task, logged an expense, remembered something, added/edited/deleted a calendar event, etc.) unless you actually called the matching tool and it returned success in this same turn. If the user asks whether you can do something, or asks you to do something you have no tool for, say plainly that you can't and explain what your real options are (e.g. queuing it as a change request instead) — don't guess or role-play compliance.
 
@@ -505,6 +505,7 @@ You also have persistent memory across every conversation, not just this one —
     '# LIVE APP FACTS (auto-extracted just now from the real mission-control.html)\n' + buildLiveAppFacts(),
     '# PENDING CHANGE QUEUE (things already queued for Claude Code — use exact ids for remove_queued_change)\n' + pendingText,
     '# WHAT ED REMEMBERS ABOUT THE USER (across all past conversations — use exact ids for forget_memory)\n' + memoryText,
+    "# RED'S RESEARCH TASKS (ones you assigned, newest first)\n" + buildRedTasksContext(appData),
   ];
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
@@ -749,6 +750,106 @@ function startRedResearch({ topic }) {
   if (!clean) return { ok: false, error: 'No topic given' };
   runAndSaveDesignResearch(clean, null, { openTopic: true }).catch(console.error);
   return { ok: true, topic: clean };
+}
+
+// ── ED → RED RESEARCH HANDOFF ─────────────────────────────────────────────────
+// ED can assign Red a research task. Assignments live in appData.redAssignments,
+// run one at a time in the background (a run takes ~1 min), survive restarts, and
+// ED sees their status/results in its prompt so it can report back. Red still
+// can't reach any of ED's action tools — this only goes one direction.
+const ASSIGN_RED_RESEARCH_TOOL = {
+  name: 'assign_red_research',
+  description: "Hand a research task to Red, the design research agent. Use when the user asks you to have Red look into / research / find ideas or examples for something (e.g. \"get Red to research better budget screens\", \"have Red look at how other apps do streaks\", \"ask Red to research standing desk setups\"). Red runs it in the background (about a minute), then the results show up in Design Lab as a slideshow and in your RED'S RESEARCH TASKS context. Don't claim findings until that section shows the task as done — just confirm Red's on it.",
+  input_schema: {
+    type: 'object',
+    properties: {
+      topic: { type: 'string', description: 'Short topic, e.g. "Budget screen layouts" or "Streak mechanics in habit apps".' },
+      brief: { type: 'string', description: "What the user actually wants to learn or decide, in their words — the question Red should answer, constraints, and anything they liked or disliked. 1-3 sentences." },
+      scope: { type: 'string', enum: ['mission_control', 'open'], description: "'mission_control' = ideas to improve the Mission Control app itself (findings come with mockups for the app). 'open' = research the subject on its own terms, even if it isn't about the app." },
+    },
+    required: ['topic', 'brief', 'scope'],
+  },
+};
+
+const RED_MAX_QUEUED = 3;
+let redQueueBusy = false;
+
+function assignRedResearch({ topic, brief, scope }) {
+  const cleanTopic = String(topic || '').trim().slice(0, 200);
+  if (!cleanTopic) return { ok: false, error: 'No topic given' };
+  if (!getApiKey()) return { ok: false, error: 'No API key configured, so Red cannot run research right now.' };
+  const data = getAppData();
+  data.redAssignments = Array.isArray(data.redAssignments) ? data.redAssignments : [];
+  const waiting = data.redAssignments.filter(a => a.status === 'queued' || a.status === 'running').length;
+  if (waiting >= RED_MAX_QUEUED) return { ok: false, error: `Red already has ${waiting} tasks waiting — let those finish first.` };
+  const task = {
+    id: `rtask-${Date.now()}`, date: today(), createdAt: new Date().toISOString(),
+    topic: cleanTopic, brief: String(brief || '').trim().slice(0, 600),
+    scope: scope === 'open' ? 'open' : 'mission_control', status: 'queued',
+  };
+  data.redAssignments.unshift(task);
+  data.redAssignments = data.redAssignments.slice(0, 20);
+  saveAppData(data);
+  setImmediate(() => processRedQueue().catch(console.error));
+  return { ok: true, task, ahead: waiting };
+}
+
+function updateRedTask(id, fields) {
+  const data = getAppData();
+  const t = (data.redAssignments || []).find(a => a.id === id);
+  if (!t) return;
+  Object.assign(t, fields);
+  saveAppData(data);
+}
+
+async function processRedQueue() {
+  if (redQueueBusy) return;
+  redQueueBusy = true;
+  try {
+    for (;;) {
+      const next = (getAppData().redAssignments || []).slice().reverse().find(a => a.status === 'queued');
+      if (!next) break;
+      updateRedTask(next.id, { status: 'running', startedAt: new Date().toISOString() });
+      try {
+        const { id, result } = await runAndSaveDesignResearch(next.topic, null, { openTopic: next.scope === 'open', brief: next.brief, assignedBy: 'ED' });
+        updateRedTask(next.id, {
+          status: 'done', finishedAt: new Date().toISOString(), researchId: id,
+          title: result.title || next.topic, summary: result.summary || '',
+          findings: (result.findings || []).map(f => f.title).filter(Boolean).slice(0, 5),
+        });
+        console.log(`  Red: finished ED's task "${next.topic}" → ${id}`);
+        if (PUSH_ENABLED) {
+          const payload = JSON.stringify({ title: '🎨 Red finished your research', body: `${result.title || next.topic} — open Design Lab to see it.` });
+          for (const sub of (getAppData().pushSubscriptions || [])) webpush.sendNotification(sub, payload).catch(() => {});
+        }
+      } catch (err) {
+        console.error(`Red task "${next.topic}" failed:`, err.message);
+        updateRedTask(next.id, { status: 'failed', finishedAt: new Date().toISOString(), error: String(err.message || err).slice(0, 200) });
+      }
+    }
+  } finally {
+    redQueueBusy = false;
+  }
+}
+
+// A restart mid-run leaves a task stuck on 'running' — put it back in line.
+function resumeRedQueue() {
+  const data = getAppData();
+  let changed = false;
+  for (const t of data.redAssignments || []) if (t.status === 'running') { t.status = 'queued'; changed = true; }
+  if (changed) saveAppData(data);
+  processRedQueue().catch(console.error);
+}
+
+function buildRedTasksContext(data) {
+  const tasks = (data.redAssignments || []).slice(0, 6);
+  if (!tasks.length) return '(you haven\'t given Red any research tasks yet)';
+  return tasks.map(t => {
+    const head = `- [${t.status.toUpperCase()}] "${t.topic}" (${t.scope === 'open' ? 'open topic' : 'Mission Control'}, assigned ${t.date}) — brief: ${t.brief || '(none)'}`;
+    if (t.status === 'done') return `${head}\n  Result: "${t.title}" — ${t.summary}\n  Findings: ${(t.findings || []).join('; ')}\n  (Slideshow is in Design Lab.)`;
+    if (t.status === 'failed') return `${head}\n  Failed: ${t.error || 'unknown error'} — offer to reassign it.`;
+    return head;
+  }).join('\n');
 }
 
 const ADD_TASK_TOOL = {
@@ -1069,6 +1170,14 @@ function logEdExpense({ amount, category, note, type }) {
 // ED's tool dispatch. Each handler performs the action, pushes onto toolActions on success
 // (matching each tool's original push-only-on-ok behavior), and returns the tool_result payload.
 const ED_TOOL_HANDLERS = {
+  assign_red_research: (input, toolActions) => {
+    const result = assignRedResearch(input);
+    if (!result.ok) return { ok: false, message: result.error };
+    toolActions.push({ type: 'red_research_assigned', topic: result.task.topic });
+    return { ok: true, id: result.task.id, message: result.ahead
+      ? `Queued for Red behind ${result.ahead} other task(s). Results will land in Design Lab.`
+      : 'Red is on it — results land in Design Lab in about a minute, and the user gets a notification.' };
+  },
   queue_code_change: (input, toolActions) => {
     const result = queueCodeChange(input);
     toolActions.push({ type: 'queued', id: result.id, title: result.title });
@@ -1197,6 +1306,7 @@ app.post('/api/chat', async (req, res) => {
       ADD_CALENDAR_EVENT_TOOL,
       EDIT_CALENDAR_EVENT_TOOL,
       DELETE_CALENDAR_EVENT_TOOL,
+      ASSIGN_RED_RESEARCH_TOOL,
     ];
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages, ED_TOOL_HANDLERS);
     saveConversation(message, responseText);
@@ -1697,7 +1807,7 @@ Archived ideas from before a cleanup wipe (still real history — don't repeat t
 ${archiveText}`;
 }
 
-async function runDesignResearch(topic, openTopic = false) {
+async function runDesignResearch(topic, openTopic = false, brief = '') {
   const key = getApiKey();
   if (!key) throw Object.assign(new Error('No API key configured'), { code: 'NO_KEY' });
   const anthropic = makeClient(key);
@@ -1723,7 +1833,10 @@ ${buildKnownWorkDigest()}
 ${buildFeedbackDigest()}
 Use this to calibrate: lean into directions similar to what scored "Got it" or "Just one more tweak", and steer away from patterns similar to what scored "Not even close" or "Kind of". If a note explains what needed tweaking, treat that as a specific critique to address in related future ideas — don't just repeat the same idea unchanged.
 
-${researchDirective}
+${researchDirective}${brief ? `
+
+# TASK FROM ED
+ED (the user's chat assistant) assigned you this research on the user's behalf. Their brief: "${brief}". Answer that brief directly — every finding should address what they asked for, not just the general topic.` : ''}
 
 Respond with ONLY a fenced \`\`\`json code block (no other prose before or after) matching this exact schema:
 {
@@ -1740,7 +1853,7 @@ Produce exactly 3 findings. Keep everything concise — this is a budget-conscio
     max_tokens: 3000,
     system,
     tools:      [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
-    messages:   [{ role: 'user', content: focus ? `Research focus: ${focus}` : 'Research general improvements.' }],
+    messages:   [{ role: 'user', content: (focus ? `Research focus: ${focus}` : 'Research general improvements.') + (brief ? `\nBrief from ED: ${brief}` : '') }],
   });
 
   const textBlocks = resp.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
@@ -2101,7 +2214,7 @@ function uniqueDesignResearchId(data, baseId) {
 
 async function runAndSaveDesignResearch(topic, idSuffix, opts = {}) {
   const openTopic = !!opts.openTopic;
-  const result = await runDesignResearch(topic, openTopic);
+  const result = await runDesignResearch(topic, openTopic, opts.brief || '');
   const date   = today();
   const data   = getAppData();
   const id     = uniqueDesignResearchId(data, `${date}-design-research-${idSuffix || slugifyTopic(topic || result.title) || 'general'}`);
@@ -2127,7 +2240,7 @@ async function runAndSaveDesignResearch(topic, idSuffix, opts = {}) {
   writeVault(`design-research/${id}.html`, html);
   saveDesignResearchWiki(id, date, topic, result, openTopic);
   data.designResearch = data.designResearch || [];
-  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix, viewed: false, openTopic });
+  data.designResearch.unshift({ id, date, topic: topic || '', title: result.title || 'Design Research', findingsCount: result.findings.length, auto: !!idSuffix, viewed: false, openTopic, ...(opts.assignedBy ? { assignedBy: opts.assignedBy, brief: opts.brief || '' } : {}) });
   data.designResearch = data.designResearch.slice(0, 30);
   saveAppData(data);
   return { id, result };
@@ -2493,6 +2606,7 @@ async function main() {
     setInterval(() => checkReminders().catch(console.error), 5 * 60 * 1000);
   }
 
+  resumeRedQueue();
   maybeAutoRunDesignResearch().catch(console.error);
   setInterval(() => maybeAutoRunDesignResearch().catch(console.error), 6 * 60 * 60 * 1000);
 
