@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-09-30"
-synced_at: "9/30/2026, 10:20:30 PM"
+synced_at: "9/30/2026, 10:39:11 PM"
 tags: [calendar, events]
 ---
 
@@ -25,6 +25,7 @@ tags: [calendar, events]
 | Film | every Mon at 12:00, from 2026-09-30 until 2026-12-20 | focus |  |
 | History | every Mon at 15:00, from 2026-09-30 until 2026-12-20 | focus |  |
 | Math | every Mon & Wed & Fri at 10:00, from 2026-09-30 until 2026-12-20 | focus |  |
+| Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 | focus |  |
 
-_Last synced: 9/30/2026, 10:20:30 PM_
+_Last synced: 9/30/2026, 10:39:11 PM_
