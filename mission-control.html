@@ -588,6 +588,86 @@
       border-top:1px dashed rgba(223,238,255,.2);
       display:flex; justify-content:space-between; align-items:center;
     }
+    /* ══════════════════════════════════════
+       CALENDAR — STRUCTURED-STYLE TIMELINE (Day / Week / Month)
+       Day = vertical timeline: time column, a rail of colored icon pills joined by a
+       line, free-time gaps and a "now" marker. Week = compact agenda. Month = the
+       classic grid kept unchanged. ── */
+    .cal-seg { display:flex; gap:2px; background:rgba(223,238,255,.06); border-radius:var(--r-pill); padding:2px; }
+    .cal-seg button { border:none; background:none; color:var(--fg-dim); font-family:'Inter',sans-serif; font-size:11px; font-weight:600; padding:5px 11px; border-radius:var(--r-pill); cursor:pointer; min-height:28px; }
+    .cal-seg button.active { background:var(--fg); color:var(--bg); }
+    .cal-view { display:none; flex-direction:column; flex-shrink:0; }
+    .cal-view.active { display:flex; }
+    #mobTabCal.view-month .mob-week-strip { display:none; }
+
+    .tl-dayhead { display:flex; align-items:center; gap:6px; margin:2px 0 14px; }
+    .tl-dayhead-txt { flex:1; min-width:0; }
+    .tl-dayname { font-size:19px; font-weight:700; letter-spacing:-.01em; color:var(--fg); }
+    .tl-daymeta { font-size:12px; font-weight:500; color:var(--fg-dim); margin-top:2px; }
+    .tl-nav, .tl-today, .tl-add { border:none; cursor:pointer; font-family:'Inter',sans-serif; color:var(--fg); background:rgba(223,238,255,.06); border-radius:var(--r-pill); min-height:34px; }
+    .tl-nav { width:34px; font-size:18px; line-height:1; }
+    .tl-today { padding:0 12px; font-size:11.5px; font-weight:600; }
+    .tl-today[hidden] { display:none; }
+    .tl-add { width:34px; font-size:20px; font-weight:600; background:var(--accent); color:#1a0e08; }
+
+    .tl-list { display:flex; flex-direction:column; }
+    .tl-section { font-size:10.5px; font-weight:700; letter-spacing:.06em; color:var(--fg-dim); text-transform:uppercase; margin:4px 0 8px; }
+    .tl-section + .tl-row { margin-top:0; }
+    .tl-anytime { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+    .tl-anytime .tl-row { background:rgba(223,238,255,.045); border-radius:var(--r-md); padding:8px 10px; }
+    .tl-anytime .tl-rail::before { display:none; }
+
+    .tl-row { display:grid; grid-template-columns:52px 44px 1fr auto; align-items:center; column-gap:8px; min-height:58px; }
+    .tl-anytime .tl-row { grid-template-columns:36px 1fr auto; min-height:48px; }
+    .tl-time { font-variant-numeric:tabular-nums; font-size:13px; font-weight:700; color:var(--fg); text-align:right; line-height:1.1; }
+    .tl-time small { display:block; font-size:9.5px; font-weight:600; color:var(--fg-dim); }
+    .tl-rail { position:relative; align-self:stretch; display:flex; align-items:center; justify-content:center; }
+    .tl-rail::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; transform:translateX(-50%); background:var(--fg-faint); }
+    .tl-row:first-of-type .tl-rail::before { top:50%; }
+    .tl-list > .tl-row:last-child .tl-rail::before { bottom:50%; }
+    .tl-pill { position:relative; z-index:1; width:36px; height:44px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 0 0 3px var(--bg); }
+    .tl-pill.quest { height:36px; font-size:13px; font-weight:800; color:#10141c; }
+    .tl-anytime .tl-pill { width:30px; height:30px; border-radius:15px; font-size:14px; box-shadow:none; }
+    .tl-body { min-width:0; cursor:pointer; padding:6px 0; }
+    .tl-title { font-size:15px; font-weight:600; line-height:1.25; color:var(--fg); overflow-wrap:anywhere; }
+    .tl-sub { font-size:12px; font-weight:500; color:var(--fg-dim); margin-top:2px; }
+    .tl-check { width:28px; height:28px; border-radius:50%; border:2px solid rgba(223,238,255,.35); background:none; color:transparent; font-size:14px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+    .tl-check-spacer { width:28px; }
+    .tl-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
+    .tl-row.done .tl-title { text-decoration:line-through; opacity:.55; }
+    .tl-row.past .tl-pill, .tl-row.done .tl-pill { filter:saturate(.35) brightness(.6); }
+    .tl-row.past .tl-title { opacity:.7; }
+
+    .tl-gap { display:grid; grid-template-columns:52px 44px 1fr; column-gap:8px; min-height:34px; align-items:center; }
+    .tl-gap .tl-rail::before { background:none; border-left:2px dotted rgba(223,238,255,.22); width:0; }
+    .tl-gap-txt { font-size:12px; font-weight:500; color:var(--fg-dim); font-style:italic; }
+    .tl-now { display:grid; grid-template-columns:52px 44px 1fr; column-gap:8px; min-height:22px; align-items:center; }
+    .tl-now .tl-time { color:var(--accent); font-size:11px; }
+    .tl-now .tl-rail::before { background:var(--fg-faint); }
+    .tl-now-dot { position:relative; z-index:1; width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px var(--bg); }
+    .tl-now-line { height:2px; background:var(--accent); border-radius:1px; opacity:.8; }
+
+    .tl-empty { text-align:center; padding:28px 12px; background:rgba(223,238,255,.035); border-radius:var(--r-lg); }
+    .tl-empty-t { font-size:15px; font-weight:600; }
+    .tl-empty-s { font-size:12.5px; color:var(--fg-dim); margin-top:4px; }
+
+    .wk-list { display:flex; flex-direction:column; gap:10px; }
+    .wk-day { background:rgba(223,238,255,.045); border-radius:var(--r-lg); padding:10px 12px; }
+    .wk-day.today { box-shadow:inset 0 0 0 1px rgba(255,138,99,.45); }
+    .wk-day-hd { display:flex; align-items:baseline; gap:8px; cursor:pointer; background:none; border:none; color:inherit; width:100%; padding:0; font-family:'Inter',sans-serif; text-align:left; }
+    .wk-day-name { font-size:14px; font-weight:700; }
+    .wk-day.today .wk-day-name { color:var(--accent); }
+    .wk-day-count { font-size:11.5px; color:var(--fg-dim); font-weight:500; margin-left:auto; }
+    .wk-rows { display:flex; flex-direction:column; gap:2px; margin-top:6px; }
+    .wk-row { display:grid; grid-template-columns:62px 10px 1fr auto; align-items:center; column-gap:8px; min-height:30px; }
+    .wk-row .wk-t { font-variant-numeric:tabular-nums; font-size:12px; font-weight:600; color:var(--fg-dim); }
+    .wk-row .wk-dot { width:8px; height:8px; border-radius:50%; }
+    .wk-row .wk-title { font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .wk-row.done .wk-title { text-decoration:line-through; opacity:.5; }
+    .wk-row .tl-check { width:22px; height:22px; font-size:11px; }
+    .wk-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
+    .wk-free { font-size:12.5px; color:var(--fg-dim); margin-top:4px; font-style:italic; }
+
     .mob-wiki-drawer {
       position:absolute; inset:0; z-index:20;
       display:flex; flex-direction:column;
@@ -948,37 +1028,68 @@
       </div>
     </div>
 
-    <!-- CAL tab (merged: Calendar + Timeline) -->
+    <!-- CAL tab: Structured-style timeline (Day) is primary; Week agenda; Month = classic grid -->
     <div class="mob-tab-pane" id="mobTabCal">
       <div class="mob-tab-hd">
         <span>📅 CALENDAR</span>
+        <div class="cal-seg" id="calSeg" role="tablist">
+          <button type="button" data-v="day" onclick="setCalView('day')">Day</button>
+          <button type="button" data-v="week" onclick="setCalView('week')">Week</button>
+          <button type="button" data-v="month" onclick="setCalView('month')">Month</button>
+        </div>
       </div>
 
       <div class="mob-week-strip" id="mobWeekStrip"></div>
 
-      <button class="mob-cal-toggle" id="mobCalToggleBtn" onclick="toggleMobCalGrid()">
-        <span>📅 Browse dates</span>
-        <span class="mob-cal-toggle-arrow">▾</span>
-      </button>
-      <div class="mob-cal-grid-wrap" id="mobCalGridWrap">
-        <div class="mob-cal-card">
-          <div class="mob-cal-nav">
-            <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
-            <span id="mobCalLabel" style="font-family:'Inter',sans-serif;font-size:11px;">—</span>
-            <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
+      <!-- DAY: vertical timeline -->
+      <div class="cal-view" id="calViewDay">
+        <div class="tl-dayhead">
+          <button type="button" class="tl-nav" onclick="shiftCalDay(-1)" aria-label="Previous day">‹</button>
+          <div class="tl-dayhead-txt">
+            <div class="tl-dayname" id="tlDayName">—</div>
+            <div class="tl-daymeta" id="tlDayMeta"></div>
           </div>
-          <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-          <div class="mob-month-grid" id="mobMonthGrid"></div>
+          <button type="button" class="tl-nav" onclick="shiftCalDay(1)" aria-label="Next day">›</button>
+          <button type="button" class="tl-today" id="tlTodayBtn" onclick="jumpCalToday()">Today</button>
+          <button type="button" class="tl-add" onclick="openDayModalFor(selectedKey)" aria-label="Add event">+</button>
         </div>
+        <div class="tl-list" id="tlList"></div>
       </div>
 
-      <div class="mob-day-summary" id="mobDaySummary"></div>
-      <div class="mob-day-event-list" id="mobDayEventList"></div>
-
-      <div class="mob-tl-section-hd">
-        <span id="mobCalQuestHd">🎯 QUESTS</span>
+      <!-- WEEK: agenda of the selected week -->
+      <div class="cal-view" id="calViewWeek">
+        <div class="tl-dayhead">
+          <button type="button" class="tl-nav" onclick="shiftCalDay(-7)" aria-label="Previous week">‹</button>
+          <div class="tl-dayhead-txt"><div class="tl-dayname" id="wkRange">—</div><div class="tl-daymeta" id="wkMeta"></div></div>
+          <button type="button" class="tl-nav" onclick="shiftCalDay(7)" aria-label="Next week">›</button>
+          <button type="button" class="tl-today" id="wkTodayBtn" onclick="jumpCalToday()">Today</button>
+        </div>
+        <div class="wk-list" id="wkList"></div>
       </div>
-      <div class="mob-quest-list" id="mobCalQuestList"></div>
+
+      <!-- MONTH: the classic grid, kept as-is -->
+      <div class="cal-view" id="calViewMonth">
+        <div class="mob-cal-grid-wrap open" id="mobCalGridWrap">
+          <div class="mob-cal-card">
+            <div class="mob-cal-nav">
+              <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
+              <span id="mobCalLabel" style="font-family:'Inter',sans-serif;font-size:11px;">—</span>
+              <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
+            </div>
+            <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+            <div class="mob-month-grid" id="mobMonthGrid"></div>
+          </div>
+        </div>
+
+        <div class="mob-day-summary" id="mobDaySummary"></div>
+        <div class="mob-day-event-list" id="mobDayEventList"></div>
+
+        <div class="mob-tl-section-hd">
+          <span id="mobCalQuestHd">🎯 QUESTS</span>
+        </div>
+        <div class="mob-quest-list" id="mobCalQuestList"></div>
+      </div>
+
       <div class="mob-add-row">
         <select id="mobCalRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobCal')"><option value="S">S</option><option value="B" selected>B</option></select>
         <button type="button" class="mob-time-trigger" id="mobCalTimeSel" onclick="openTimeWheel('mobCal')">🕐</button>
@@ -1979,11 +2090,178 @@ function renderMobWeekStrip(){
     const btn=document.createElement('button');
     btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
     btn.innerHTML=`<span class="mwd-name">${DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
-    btn.onclick=()=>{ selectedKey=key; renderMobMonthGrid(); renderMobCalQuests(); };
+    btn.onclick=()=>{ selectedKey=key; mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth(); renderMobMonthGrid(); renderMobCalQuests(); };
     el.appendChild(btn);
   }
 }
-function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); renderMobWeekStrip(); }
+function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); renderMobWeekStrip(); renderCalViews(); }
+
+// ── STRUCTURED-STYLE TIMELINE ─────────────────────────────────────────────────
+// Day view is the primary calendar: one vertical timeline merging events and quests
+// (a quest linked to an event shows once, with a checkbox). Events only store a start
+// time, so free-time gaps assume 60 min per event / 30 min per quest.
+const TL_EVENT_MIN=60, TL_QUEST_MIN=30, TL_GAP_MIN=30;
+let calView='day';
+try{ const v=localStorage.getItem('mc.calView'); if(['day','week','month'].includes(v)) calView=v; }catch{}
+
+function setCalView(v){
+  calView=v;
+  try{ localStorage.setItem('mc.calView',v); }catch{}
+  renderCalViews();
+}
+function shiftCalDay(n){
+  const d=new Date(selectedKey+'T00:00:00'); d.setDate(d.getDate()+n);
+  selectedKey=dateKey(d); mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth();
+  renderMobMonthGrid(); renderMobCalQuests();
+}
+function jumpCalToday(){
+  selectedKey=TODAY(); const d=new Date(selectedKey+'T00:00:00');
+  mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth();
+  renderMobMonthGrid(); renderMobCalQuests();
+}
+function openDayModalFor(key){ openDayModal(key,new Date(key+'T00:00:00')); }
+function tlMins(t){ if(!t)return null; const [h,m]=t.split(':').map(Number); return h*60+(m||0); }
+function tlDur(m){ const h=Math.floor(m/60), r=m%60; return h?(r?`${h}h ${r}m`:`${h}h`):`${r}m`; }
+
+function calItemsForDate(key){
+  const evs=eventsForDate(key);
+  const tasks=getTasksForDate(key);
+  const oneoff=(APP.events||{})[key]||[];
+  const used=new Set();
+  const items=evs.map(e=>{
+    let t=tasks.find(x=>x.linkedEventId!=null && x.linkedEventId===e.id)
+       || (e.linkedTaskId!=null ? tasks.find(x=>x.id===e.linkedTaskId) : null) || null;
+    if(t) used.add(t);
+    return { e, task:t, time:e.time||(t&&t.time)||'', title:e.title, kind:e.kind||'focus',
+             oneoffIdx:e.recurring?null:oneoff.indexOf(e) };
+  });
+  tasks.forEach(t=>{ if(!used.has(t)) items.push({ e:null, task:t, time:t.time||'', title:t.text, kind:null, oneoffIdx:null }); });
+  items.sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));
+  return items;
+}
+function tlItemClick(key,it){
+  if(it.e && !it.e.recurring && it.oneoffIdx>-1) return `openEditEvent('${key}',${it.oneoffIdx})`;
+  if(it.e && it.e.recurring) return `editRecurringOccurrence('${key}','${esc(String(it.e.recurringId))}')`;
+  return `openDayModalFor('${key}')`;
+}
+function tlPill(it){
+  if(it.e){
+    const col=KIND_COLORS[it.kind]||'#666', pt=KIND_POKE_TYPE[it.kind]||KIND_POKE_TYPE.routine;
+    return `<div class="tl-pill" style="background:${hexAlpha(col,.9)};">${pt.icon}</div>`;
+  }
+  const rank=it.task.rank||'B';
+  return `<div class="tl-pill quest" style="background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</div>`;
+}
+function tlCheck(it){
+  if(!it.task) return '<span class="tl-check-spacer"></span>';
+  const i=APP.tasks.indexOf(it.task);
+  return `<button type="button" class="tl-check" onclick="event.stopPropagation();toggleTask(${i})" aria-label="${it.task.done?'Mark not done':'Mark done'}">✓</button>`;
+}
+function tlSub(it){
+  const parts=[];
+  if(it.time) parts.push(fmtTime(it.time));
+  if(it.e && it.e.location) parts.push(esc(it.e.location));
+  if(it.e && it.e.recurring) parts.push('🔁 repeats');
+  if(!it.e) parts.push('Quest');
+  else if(it.task) parts.push('Quest · '+(it.task.rank||'B'));
+  return parts.join(' · ');
+}
+
+function renderCalDay(){
+  const list=document.getElementById('tlList'); if(!list)return;
+  const key=selectedKey, d=new Date(key+'T00:00:00'), isToday=key===TODAY();
+  const nm=document.getElementById('tlDayName');
+  if(nm) nm.textContent = isToday ? 'Today' : d.toLocaleDateString('en-US',{weekday:'long'});
+  const items=calItemsForDate(key);
+  const q=items.filter(x=>x.task), qd=q.filter(x=>x.task.done).length;
+  const meta=document.getElementById('tlDayMeta');
+  if(meta) meta.textContent = `${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}${isToday?' · '+d.toLocaleDateString('en-US',{weekday:'long'}):''}`
+    + (items.some(x=>x.e&&!x.task) ? ` · ${items.filter(x=>x.e&&!x.task).length} event${items.filter(x=>x.e&&!x.task).length===1?'':'s'}` : '')
+    + (q.length ? ` · ${qd}/${q.length} quests` : '');
+  const tb=document.getElementById('tlTodayBtn'); if(tb) tb.hidden=isToday;
+
+  if(!items.length){
+    list.innerHTML=`<div class="tl-empty"><div class="tl-empty-t">Nothing planned</div><div class="tl-empty-s">Tap + to add an event, or add a quest below.</div></div>`;
+    return;
+  }
+  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
+  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
+  let html='';
+  if(untimed.length){
+    html+=`<div class="tl-section">Anytime</div><div class="tl-anytime">`+untimed.map(it=>`
+      <div class="tl-row${it.task&&it.task.done?' done':''}">
+        <div class="tl-rail">${tlPill(it)}</div>
+        <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+        ${tlCheck(it)}
+      </div>`).join('')+`</div>`;
+    if(timed.length) html+=`<div class="tl-section">Schedule</div>`;
+  }
+  let rows='', nowPlaced=!isToday;
+  const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
+  timed.forEach((it,idx)=>{
+    const start=tlMins(it.time), dur=it.e?TL_EVENT_MIN:TL_QUEST_MIN;
+    if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
+    const past=isToday && start+dur<=nowMin;
+    const [hm,ap]=fmtTime(it.time).split(' ');
+    rows+=`<div class="tl-row${it.task&&it.task.done?' done':''}${past?' past':''}">
+      <div class="tl-time">${hm}<small>${ap}</small></div>
+      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+      ${tlCheck(it)}
+    </div>`;
+    const next=timed[idx+1];
+    if(next){
+      const free=tlMins(next.time)-(start+dur);
+      if(free>=TL_GAP_MIN) rows+=`<div class="tl-gap"><div></div><div class="tl-rail"></div><div class="tl-gap-txt">${tlDur(free)} free</div></div>`;
+    }
+  });
+  if(!nowPlaced && timed.length) rows+=nowRow();
+  list.innerHTML=html+rows;
+}
+
+function renderCalWeek(){
+  const el=document.getElementById('wkList'); if(!el)return;
+  const ref=new Date(selectedKey+'T00:00:00');
+  const sun=new Date(ref); sun.setDate(ref.getDate()-ref.getDay());
+  const sat=new Date(sun); sat.setDate(sun.getDate()+6);
+  const f=o=>o.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const rg=document.getElementById('wkRange'); if(rg) rg.textContent=`${f(sun)} – ${f(sat)}`;
+  const todayK=TODAY(); let total=0, inWeek=false, html='';
+  for(let i=0;i<7;i++){
+    const d=new Date(sun); d.setDate(sun.getDate()+i);
+    const key=dateKey(d), items=calItemsForDate(key), isToday=key===todayK;
+    if(isToday) inWeek=true;
+    total+=items.length;
+    const rows=items.map(it=>`<div class="wk-row${it.task&&it.task.done?' done':''}">
+        <span class="wk-t">${it.time?fmtTime(it.time):'Anytime'}</span>
+        <span class="wk-dot" style="background:${it.e?(KIND_COLORS[it.kind]||'#666'):(RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B)};"></span>
+        <span class="wk-title" onclick="${tlItemClick(key,it)}" style="cursor:pointer;">${esc(it.title)}</span>
+        ${it.task?tlCheck(it):'<span></span>'}
+      </div>`).join('');
+    html+=`<div class="wk-day${isToday?' today':''}">
+      <button type="button" class="wk-day-hd" onclick="selectedKey='${key}';setCalView('day');renderMobMonthGrid();renderMobCalQuests();">
+        <span class="wk-day-name">${d.toLocaleDateString('en-US',{weekday:'short'})} ${d.getDate()}${isToday?' · Today':''}</span>
+        <span class="wk-day-count">${items.length?items.length+' item'+(items.length===1?'':'s'):''} ›</span>
+      </button>
+      ${items.length?`<div class="wk-rows">${rows}</div>`:'<div class="wk-free">Free day</div>'}
+    </div>`;
+  }
+  el.innerHTML=html;
+  const mt=document.getElementById('wkMeta'); if(mt) mt.textContent=total?`${total} item${total===1?'':'s'} this week`:'Nothing planned this week';
+  const tb=document.getElementById('wkTodayBtn'); if(tb) tb.hidden=inWeek;
+}
+
+function renderCalViews(){
+  const pane=document.getElementById('mobTabCal'); if(!pane)return;
+  ['day','week','month'].forEach(v=>{
+    document.getElementById('calView'+v[0].toUpperCase()+v.slice(1))?.classList.toggle('active',calView===v);
+    pane.classList.toggle('view-'+v,calView===v);
+  });
+  document.querySelectorAll('#calSeg button').forEach(b=>b.classList.toggle('active',b.dataset.v===calView));
+  if(calView==='day') renderCalDay();
+  else if(calView==='week') renderCalWeek();
+}
+
 function renderMobDaySummary(){
   renderDaySummaryInto(selectedKey,document.getElementById('mobDaySummary'),true);
 }
@@ -2431,7 +2709,7 @@ function renderTasksInto(el, tasks, isMob){
   }).join('');
 }
 
-function renderMobTasks(){ renderMobHomeQuests(); renderMobCalQuests(); }
+function renderMobTasks(){ renderMobHomeQuests(); renderMobCalQuests(); if(typeof renderCalViews==='function') renderCalViews(); }
 
 // Quests and calendar events auto-link on creation (a new task gets a matching
 // calendar event and vice versa) so the daily quest list and the month grid
