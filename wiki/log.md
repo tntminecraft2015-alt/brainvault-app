@@ -865,3 +865,10 @@ Mission Control change requested via ED chat: Redesign calendar to Structured-st
 **Operation:** note
 
 Fixed GitHub sync saves failing with 409 conflicts (writes now go one at a time with retries). Implemented two queued change requests: Structured-style timeline calendar (Day/Week/Month, grid kept as Month) and ED reading the live calendar instead of the wiki copy. Both marked done.
+
+## [2026-09-30] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[calendar-events]]
+
+Calendar events synced
