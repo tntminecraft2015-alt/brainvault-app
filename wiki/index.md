@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-09-30-design-research-comprehensive-gamification-in-apps-mecha]] — Gamification drives engagement across education, fitness, and productivity through three core psychological mechanisms: loss aversion (strea
 - [[2026-09-30-design-research-gamification-patterns-in-personal-produc]] — The key to effective gamification is finding the "bliss point" where an experience is just rewarding enough to keep users coming back, with 
 - [[2026-09-30-design-research-revisions-1790808117446]] — 2 ideas Red reworked based on your feedback.
 - [[2026-09-30-design-research-end-to-end-daily-income-logging-reminder]] — Modern income-tracking apps succeed by removing friction at three critical moments: the reminder that prompts the user, the entry flow (opti
