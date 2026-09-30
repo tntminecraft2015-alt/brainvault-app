@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-09-30"
-synced_at: "9/30/2026, 9:42:48 PM"
+synced_at: "9/30/2026, 10:02:44 PM"
 tags: [calendar, events]
 ---
 
@@ -26,4 +26,4 @@ tags: [calendar, events]
 | Math | every Mon & Wed & Fri at 10:30, from 2026-08-31 | training |  |
 | Psych | every Tue & Thu at 10:50, from 2026-08-27 | training |  |
 
-_Last synced: 9/30/2026, 9:42:48 PM_
+_Last synced: 9/30/2026, 10:02:44 PM_
