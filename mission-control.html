@@ -288,8 +288,10 @@
         border-radius:var(--r-sm);
       }
       .mob-day-cell:active { background:var(--surface); }
-      .mob-day-cell.today  { box-shadow:inset 0 0 0 2px var(--accent); }
+      .mob-day-cell.today  { box-shadow:inset 0 0 0 2px var(--accent); color:var(--accent); font-weight:800; }
       .mob-day-cell.sel    { background:var(--fg); color:var(--bg); }
+      /* today stays marked even when it's the selected day */
+      .mob-day-cell.today.sel { background:linear-gradient(160deg,#ffd6c7,var(--fg) 70%); color:#b3401c; box-shadow:inset 0 0 0 2px var(--accent); }
       .mob-day-dots { display:flex; gap:2px; justify-content:center; margin-top:2px; flex-wrap:wrap; }
       .mob-dot-sq   { width:4px; height:4px; }
       .mob-day-summary {
@@ -559,11 +561,13 @@
     .mob-wday .mwd-num  { font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); }
     .mob-wday .mwd-dot  { width:4px; height:4px; border-radius:50%; background:var(--accent2); margin-top:1px; opacity:0; }
     .mob-wday.has-events .mwd-dot { opacity:1; }
-    .mob-wday.today { background:rgba(255,138,99,.14); }
-    .mob-wday.today .mwd-num { color:var(--accent); }
+    .mob-wday.today { background:linear-gradient(170deg,rgba(255,138,99,.32),rgba(255,138,99,.1)); box-shadow:inset 0 0 0 2px var(--accent); }
+    .mob-wday.today .mwd-num, .mob-wday.today .mwd-name { color:var(--accent); }
     .mob-wday.sel { background:var(--fg); }
     .mob-wday.sel .mwd-num, .mob-wday.sel .mwd-name { color:var(--bg); }
     .mob-wday.sel .mwd-dot { background:var(--bg); }
+    .mob-wday.today.sel { background:linear-gradient(170deg,#ffd6c7,var(--fg) 75%); box-shadow:inset 0 0 0 2px var(--accent); }
+    .mob-wday.today.sel .mwd-num, .mob-wday.today.sel .mwd-name { color:#b3401c; }
 
     .mob-cal-toggle {
       display:flex; align-items:center; justify-content:space-between; width:100%;
@@ -653,7 +657,7 @@
 
     .wk-list { display:flex; flex-direction:column; gap:10px; }
     .wk-day { background:rgba(223,238,255,.045); border-radius:var(--r-lg); padding:10px 12px; }
-    .wk-day.today { box-shadow:inset 0 0 0 1px rgba(255,138,99,.45); }
+    .wk-day.today { background:linear-gradient(170deg,rgba(255,138,99,.18),rgba(223,238,255,.045) 60%); box-shadow:inset 0 0 0 2px rgba(255,138,99,.7); }
     .wk-day-hd { display:flex; align-items:baseline; gap:8px; cursor:pointer; background:none; border:none; color:inherit; width:100%; padding:0; font-family:'Inter',sans-serif; text-align:left; }
     .wk-day-name { font-size:14px; font-weight:700; }
     .wk-day.today .wk-day-name { color:var(--accent); }
@@ -667,6 +671,63 @@
     .wk-row .tl-check { width:22px; height:22px; font-size:11px; }
     .wk-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
     .wk-free { font-size:12.5px; color:var(--fg-dim); margin-top:4px; font-style:italic; }
+
+    /* ══════════════════════════════════════
+       ADD SHEET — one bottom sheet for events + quests
+    ══════════════════════════════════════ */
+    .add-sheet-ov { align-items:flex-end; background:rgba(0,0,0,.6); }
+    .add-sheet { width:100%; max-width:520px; max-height:92vh; overflow-y:auto; background:var(--surface); border-radius:22px 22px 0 0; padding:8px 18px calc(18px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; animation:asUp .22s ease-out; font-family:'Inter',sans-serif; }
+    @keyframes asUp { from{transform:translateY(40px);opacity:.3;} to{transform:none;opacity:1;} }
+    .as-grab { width:40px; height:5px; border-radius:3px; background:rgba(223,238,255,.25); margin:0 auto 10px; flex-shrink:0; }
+    .as-top { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .as-seg button { font-size:13px; padding:7px 16px; min-height:34px; }
+    .as-hd-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+    .as-x { margin-left:auto; width:34px; height:34px; border-radius:50%; border:none; background:rgba(223,238,255,.08); color:var(--fg); font-size:15px; cursor:pointer; }
+    .as-title { width:100%; background:none; border:none; border-bottom:2px solid rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-size:22px; font-weight:700; padding:6px 0 10px; outline:none; }
+    .as-title:focus { border-bottom-color:var(--accent); }
+    .as-title::placeholder { color:rgba(223,238,255,.3); }
+    .as-hint { font-size:12px; color:var(--fg-dim); margin:6px 0 4px; min-height:16px; }
+    .as-hint.parsed { color:var(--green); }
+    .as-label { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-dim); margin:16px 0 8px; display:flex; align-items:center; gap:8px; }
+    .as-req { text-transform:none; letter-spacing:0; font-weight:600; color:var(--accent); display:none; }
+    .as-req.on { display:inline; }
+    .as-chips { display:flex; gap:8px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+    .as-chips::-webkit-scrollbar { display:none; }
+    .as-chip { flex-shrink:0; border:none; border-radius:var(--r-pill); background:rgba(223,238,255,.07); color:var(--fg); font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; padding:9px 14px; min-height:40px; cursor:pointer; white-space:nowrap; }
+    .as-chip.on { background:var(--fg); color:var(--bg); }
+    .as-chip.time-inp { padding:0 10px; display:flex; align-items:center; }
+    .as-chip.time-inp input { background:none; border:none; color:inherit; font:inherit; outline:none; width:104px; color-scheme:dark; }
+    .as-chip.time-inp.on input { color-scheme:light; }
+    .as-cal { display:none; margin-top:10px; background:rgba(223,238,255,.04); border-radius:var(--r-lg); padding:10px; }
+    .as-cal.open { display:block; }
+    .as-cal-nav { display:flex; align-items:center; justify-content:space-between; font-size:14px; font-weight:700; margin-bottom:6px; }
+    .as-cal-nav button { border:none; background:rgba(223,238,255,.07); color:var(--fg); width:32px; height:32px; border-radius:50%; font-size:17px; cursor:pointer; }
+    .as-cal-dow, .as-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+    .as-cal-dow span { font-size:10.5px; font-weight:700; color:var(--fg-dim); padding:2px 0; }
+    .as-cal-grid button { border:none; background:none; color:var(--fg); font-family:'Inter',sans-serif; font-size:14px; font-weight:600; height:38px; border-radius:10px; cursor:pointer; font-variant-numeric:tabular-nums; }
+    .as-cal-grid button.past { color:rgba(223,238,255,.35); }
+    .as-cal-grid button.today { background:linear-gradient(160deg,rgba(255,138,99,.45),rgba(255,138,99,.12)); color:var(--accent); font-weight:800; box-shadow:inset 0 0 0 2px var(--accent); }
+    .as-cal-grid button.sel { background:var(--fg); color:var(--bg); box-shadow:none; }
+    .as-cal-grid button.today.sel { background:linear-gradient(160deg,#ffd6c7,var(--fg) 70%); color:#b3401c; box-shadow:inset 0 0 0 2px var(--accent); }
+    .as-kinds { display:flex; flex-direction:column; gap:6px; }
+    .as-kind { display:flex; align-items:center; gap:12px; width:100%; border:none; background:rgba(223,238,255,.045); border-radius:var(--r-md); padding:10px 12px; color:var(--fg); font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600; cursor:pointer; text-align:left; min-height:48px; }
+    .as-kind .as-ic { width:30px; height:30px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:800; color:#10141c; }
+    .as-kind .as-sub { font-size:12px; font-weight:500; color:var(--fg-dim); display:block; margin-top:1px; }
+    .as-kind .as-tick { margin-left:auto; width:22px; height:22px; border-radius:50%; border:2px solid rgba(223,238,255,.3); flex-shrink:0; }
+    .as-kind.on { background:rgba(223,238,255,.1); box-shadow:inset 0 0 0 1.5px rgba(223,238,255,.35); }
+    .as-kind.on .as-tick { border-color:var(--green); background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%230a1929' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat; }
+    .as-more-btn { margin-top:12px; border:none; background:none; color:var(--accent2); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; padding:6px 0; cursor:pointer; text-align:left; }
+    .as-more-btn span { display:inline-block; transition:transform .2s; }
+    .as-more-btn.open span { transform:rotate(180deg); }
+    .as-more { display:none; flex-direction:column; gap:10px; margin-top:6px; }
+    .as-more.open { display:flex; }
+    .as-inp { width:100%; background:var(--bg); border:none; border-radius:var(--r-md); box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); color:var(--fg); font-family:'Inter',sans-serif; font-size:15px; font-weight:500; padding:11px 12px; outline:none; }
+    .as-remind { display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; flex-wrap:wrap; }
+    .as-remind input[type=checkbox] { width:20px; height:20px; accent-color:var(--accent); }
+    .as-save { margin-top:20px; border:none; border-radius:var(--r-lg); background:var(--accent); color:#1a0e08; font-family:'Inter',sans-serif; font-size:16px; font-weight:800; min-height:52px; cursor:pointer; flex-shrink:0; }
+    .as-save:active { transform:scale(.98); }
+    .cal-fab { position:sticky; bottom:14px; align-self:flex-end; margin-top:auto; width:56px; height:56px; border-radius:50%; border:none; background:var(--accent); color:#1a0e08; font-size:30px; font-weight:600; line-height:1; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.45); flex-shrink:0; z-index:5; }
+    .cal-fab:active { transform:scale(.94); }
 
     .mob-wiki-drawer {
       position:absolute; inset:0; z-index:20;
@@ -1051,7 +1112,6 @@
           </div>
           <button type="button" class="tl-nav" onclick="shiftCalDay(1)" aria-label="Next day">›</button>
           <button type="button" class="tl-today" id="tlTodayBtn" onclick="jumpCalToday()">Today</button>
-          <button type="button" class="tl-add" onclick="openDayModalFor(selectedKey)" aria-label="Add event">+</button>
         </div>
         <div class="tl-list" id="tlList"></div>
       </div>
@@ -1090,13 +1150,7 @@
         <div class="mob-quest-list" id="mobCalQuestList"></div>
       </div>
 
-      <div class="mob-add-row">
-        <select id="mobCalRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobCal')"><option value="S">S</option><option value="B" selected>B</option></select>
-        <button type="button" class="mob-time-trigger" id="mobCalTimeSel" onclick="openTimeWheel('mobCal')">🕐</button>
-        <input type="text" class="mob-inp" id="mobCalTaskInp" placeholder="New quest...">
-        <button class="mob-add-btn" onclick="addQuestFromRow('mobCal', selectedKey)">+</button>
-      </div>
-
+      <button type="button" class="cal-fab" onclick="openAddSheet(selectedKey)" aria-label="Add event or quest">+</button>
     </div>
 
     <!-- BUDGET tab -->
@@ -1244,7 +1298,7 @@
           <div class="pdx-section-hd">ENCOUNTERS</div>
           <div class="dev-list" id="devList"></div>
         </div>
-        <div class="pdx-add-form">
+        <div class="pdx-add-form" style="display:none;" aria-hidden="true">
           <div class="pdx-section-hd">NEW ENCOUNTER</div>
           <input id="devQuick" class="m-inp" type="text" placeholder="Add anything: 'lunch tomorrow 1pm'..." onkeydown="if(event.key==='Enter'){event.preventDefault();quickAddDayEvent();}" style="border-color:var(--accent);">
           <button type="button" class="ev-more-toggle" id="evMoreToggle" onclick="toggleEventMoreOptions()">+ More options (time, location, notify)</button>
@@ -1275,9 +1329,59 @@
       </div>
     </div>
     <div class="pdx-footer">
-      <button class="modal-btn ok" style="flex:1;" onclick="addDayEvent()">▶ ADD</button>
+      <button class="modal-btn ok" style="flex:1;" onclick="closeModal('dayModal');openAddSheet(dayModalDate)">＋ ADD TO THIS DAY</button>
       <button class="modal-btn" style="flex:1;" onclick="closeModal('dayModal')">CLOSE</button>
     </div>
+  </div>
+</div>
+
+<!-- ADD SHEET: one clean form for new events and quests -->
+<div class="overlay add-sheet-ov" id="addSheet" onclick="if(event.target===this)closeAddSheet()">
+  <div class="add-sheet" role="dialog" aria-labelledby="asTitleHd">
+    <div class="as-grab"></div>
+    <div class="as-top">
+      <div class="cal-seg as-seg" id="asSeg">
+        <button type="button" data-t="event" onclick="setAddType('event')">Event</button>
+        <button type="button" data-t="quest" onclick="setAddType('quest')">Quest</button>
+      </div>
+      <span id="asTitleHd" class="as-hd-sr">New item</span>
+      <button type="button" class="as-x" onclick="closeAddSheet()" aria-label="Close">✕</button>
+    </div>
+
+    <input id="asTitle" class="as-title" type="text" autocomplete="off" placeholder="What's the plan?" oninput="asTitleChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();saveAddSheet();}">
+    <div class="as-hint" id="asHint">Tip: type "gym tomorrow 6pm" and the date and time fill in.</div>
+
+    <div class="as-label">Date</div>
+    <div class="as-chips" id="asDateChips"></div>
+    <div class="as-cal" id="asCal">
+      <div class="as-cal-nav"><button type="button" onclick="asCalMove(-1)" aria-label="Previous month">‹</button><span id="asCalLbl">—</span><button type="button" onclick="asCalMove(1)" aria-label="Next month">›</button></div>
+      <div class="as-cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="as-cal-grid" id="asCalGrid"></div>
+    </div>
+
+    <div class="as-label">Time <span class="as-req" id="asTimeReq">required for S-rank</span></div>
+    <div class="as-chips" id="asTimeChips"></div>
+
+    <div id="asEventOpts">
+      <div class="as-label">Type</div>
+      <div class="as-kinds" id="asKinds"></div>
+      <button type="button" class="as-more-btn" id="asMoreBtn" onclick="document.getElementById('asMore').classList.toggle('open');this.classList.toggle('open')">Location &amp; reminder <span>▾</span></button>
+      <div class="as-more" id="asMore">
+        <input id="asLoc" class="as-inp" type="text" placeholder="Location (optional)">
+        <label class="as-remind"><input type="checkbox" id="asNotify" onchange="document.getElementById('asLead').style.display=this.checked?'':'none'"> Remind me
+          <select id="asLead" class="as-inp" style="display:none;width:auto;">
+            <option value="5">5 min before</option><option value="15">15 min before</option><option value="30" selected>30 min before</option><option value="60">1 hour before</option><option value="1440">1 day before</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div id="asQuestOpts">
+      <div class="as-label">Rank</div>
+      <div class="as-kinds" id="asRanks"></div>
+    </div>
+
+    <button type="button" class="as-save" id="asSave" onclick="saveAddSheet()">Add event</button>
   </div>
 </div>
 
@@ -1903,7 +2007,9 @@ function renderMobCalQuests(){
   const d=new Date(key+'T00:00:00');
   const hd=document.getElementById('mobCalQuestHd'); if(hd)hd.textContent=`🎯 QUESTS — ${MONTHS_S[d.getMonth()]} ${d.getDate()}`;
   const tasks=getTasksForDate(key);
-  renderTasksInto(document.getElementById('mobCalQuestList'), tasks, true);
+  const ql=document.getElementById('mobCalQuestList');
+  renderTasksInto(ql, tasks, true);
+  if(ql && !tasks.length) ql.innerHTML='<div class="empty">No quests for this day — tap + to add one</div>';
 }
 
 function renderMobHomeGil(){
@@ -2061,7 +2167,7 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
     btn.className=(isMob?'mob-day-cell':'day-cell')+(isToday?' today':'')+(isSel?' sel':'');
     const dots=evs.slice(0,4).map(e=>`<div class="${isMob?'mob-dot-sq':'dot-sq'}" style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'};"></div>`).join('');
     btn.innerHTML=`<span class="dn">${d}</span><div class="${isMob?'mob-day-dots':'day-dots'}">${dots}</div>`;
-    if(evs.length && !isSel){
+    if(evs.length && !isSel && !isToday){
       const tint=KIND_COLORS[evs[0].kind||'focus']||'var(--fg)';
       btn.style.background=hexAlpha(tint, Math.min(.12+evs.length*.06, .4));
     }
@@ -2089,12 +2195,142 @@ function renderMobWeekStrip(){
     const isToday=key===todayK, isSel=key===selectedKey;
     const btn=document.createElement('button');
     btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
-    btn.innerHTML=`<span class="mwd-name">${DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
+    btn.innerHTML=`<span class="mwd-name">${isToday?'Today':DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
+    if(isToday) btn.setAttribute('aria-current','date');
     btn.onclick=()=>{ selectedKey=key; mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth(); renderMobMonthGrid(); renderMobCalQuests(); };
     el.appendChild(btn);
   }
 }
 function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); renderMobWeekStrip(); renderCalViews(); }
+
+// ── ADD SHEET ─────────────────────────────────────────────────────────────────
+// One form for both events and quests. Everything common is one tap: date chips
+// (Today / Tomorrow / weekday / Pick date → inline calendar), time chips, and a
+// vertical list of types. Natural language in the title still fills date/time.
+const AS_TIMES=[['','Anytime'],['09:00','9 AM'],['12:00','Noon'],['15:00','3 PM'],['18:00','6 PM'],['20:00','8 PM']];
+const AS_KIND_SUB={ focus:'Study, work, deep focus', meeting:'Calls, classes, 1:1s', training:'Gym, practice, games', social:'Friends, food, hangouts', errand:'Appointments, pickups', routine:'Everything else' };
+let asLastType='event'; try{ const v=localStorage.getItem('mc.addType'); if(v==='event'||v==='quest') asLastType=v; }catch{}
+let asState={type:'event',date:null,time:'',kind:'focus',rank:'B',kindTouched:false,calY:0,calM:0,calOpen:false};
+
+function openAddSheet(key){
+  const d=key||TODAY(), dt=new Date(d+'T00:00:00');
+  asState={type:asLastType,date:d,time:'',kind:'focus',rank:'B',kindTouched:false,calY:dt.getFullYear(),calM:dt.getMonth(),calOpen:false};
+  document.getElementById('asTitle').value='';
+  document.getElementById('asLoc').value='';
+  document.getElementById('asNotify').checked=false;
+  document.getElementById('asLead').style.display='none';
+  document.getElementById('asMore').classList.remove('open');
+  document.getElementById('asMoreBtn').classList.remove('open');
+  const h=document.getElementById('asHint'); h.classList.remove('parsed'); h.textContent='Tip: type "gym tomorrow 6pm" and the date and time fill in.';
+  renderAddSheet();
+  openModal('addSheet');
+  setTimeout(()=>document.getElementById('asTitle').focus(),80);
+}
+function closeAddSheet(){ closeModal('addSheet'); }
+function setAddType(t){ asState.type=t; asLastType=t; try{ localStorage.setItem('mc.addType',t); }catch{} renderAddSheet(); }
+function asSetDate(k){ asState.date=k; const d=new Date(k+'T00:00:00'); asState.calY=d.getFullYear(); asState.calM=d.getMonth(); renderAddSheet(); }
+function asToggleCal(){ asState.calOpen=!asState.calOpen; renderAddSheet(); }
+function asCalMove(n){ asState.calM+=n; if(asState.calM>11){asState.calM=0;asState.calY++;} if(asState.calM<0){asState.calM=11;asState.calY--;} renderAddSheet(); }
+function asSetTime(t){ asState.time=t; renderAddSheet(); }
+function asSetKind(k){ asState.kind=k; asState.kindTouched=true; renderAddSheet(); }
+function asSetRank(r){ asState.rank=r; renderAddSheet(); }
+
+function asDateLabel(k){
+  const t=TODAY(); if(k===t) return 'Today';
+  const d=new Date(k+'T00:00:00'), tm=new Date(t+'T00:00:00'); tm.setDate(tm.getDate()+1);
+  if(k===dateKey(tm)) return 'Tomorrow';
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+function renderAddSheet(){
+  const st=asState, t=TODAY();
+  document.querySelectorAll('#asSeg button').forEach(b=>b.classList.toggle('active',b.dataset.t===st.type));
+  document.getElementById('asEventOpts').style.display=st.type==='event'?'':'none';
+  document.getElementById('asQuestOpts').style.display=st.type==='quest'?'':'none';
+  document.getElementById('asTitle').placeholder=st.type==='event'?"What's happening?":'What do you need to do?';
+  document.getElementById('asTimeReq').classList.toggle('on',st.type==='quest'&&st.rank==='S');
+
+  // date chips: Today, Tomorrow, next 4 weekdays, Pick date
+  const chips=[]; const base=new Date(t+'T00:00:00');
+  for(let i=0;i<6;i++){ const d=new Date(base); d.setDate(base.getDate()+i); const k=dateKey(d);
+    chips.push(`<button type="button" class="as-chip${st.date===k&&!st.calOpen?' on':''}" onclick="asState.calOpen=false;asSetDate('${k}')">${i===0?'Today':i===1?'Tomorrow':d.toLocaleDateString('en-US',{weekday:'short',day:'numeric'})}</button>`); }
+  const inChips=[...Array(6).keys()].some(i=>{const d=new Date(base);d.setDate(base.getDate()+i);return dateKey(d)===st.date;});
+  chips.push(`<button type="button" class="as-chip${st.calOpen||!inChips?' on':''}" onclick="asToggleCal()">📅 ${!inChips?asDateLabel(st.date):'Pick date'}</button>`);
+  document.getElementById('asDateChips').innerHTML=chips.join('');
+
+  // inline calendar picker
+  const cal=document.getElementById('asCal'); cal.classList.toggle('open',st.calOpen);
+  if(st.calOpen){
+    document.getElementById('asCalLbl').textContent=new Date(st.calY,st.calM,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+    const first=new Date(st.calY,st.calM,1).getDay(), last=new Date(st.calY,st.calM+1,0).getDate();
+    let g=''; for(let i=0;i<first;i++) g+='<span></span>';
+    for(let d=1;d<=last;d++){ const k=dateKey(new Date(st.calY,st.calM,d));
+      g+=`<button type="button" class="${k===t?'today ':''}${k===st.date?'sel ':''}${k<t?'past':''}" onclick="asSetDate('${k}')"${k===t?' aria-current="date"':''}>${d}</button>`; }
+    document.getElementById('asCalGrid').innerHTML=g;
+  }
+
+  // time chips + custom
+  const custom=st.time && !AS_TIMES.some(([v])=>v===st.time);
+  document.getElementById('asTimeChips').innerHTML=AS_TIMES.map(([v,l])=>`<button type="button" class="as-chip${st.time===v?' on':''}" onclick="asSetTime('${v}')">${l}</button>`).join('')
+    +`<label class="as-chip time-inp${custom?' on':''}"><input type="time" id="asTimeCustom" value="${custom?st.time:''}" onchange="asSetTime(this.value)" aria-label="Custom time"></label>`;
+
+  // kinds (vertical list) / ranks
+  document.getElementById('asKinds').innerHTML=Object.keys(KIND_COLORS).map(k=>`<button type="button" class="as-kind${st.kind===k?' on':''}" onclick="asSetKind('${k}')">
+      <span class="as-ic" style="background:${KIND_COLORS[k]};">${KIND_POKE_TYPE[k].icon}</span>
+      <span>${k[0].toUpperCase()+k.slice(1)}<span class="as-sub">${AS_KIND_SUB[k]}</span></span><span class="as-tick"></span></button>`).join('');
+  document.getElementById('asRanks').innerHTML=[['S','S-rank','Big, time-boxed — worth +'+(RANK_XP.S||'')+' XP'],['B','B-rank','Everyday to-do — +'+(RANK_XP.B||'')+' XP']].map(([r,l,sub])=>`<button type="button" class="as-kind${st.rank===r?' on':''}" onclick="asSetRank('${r}')">
+      <span class="as-ic" style="background:${RANK_COLORS[r]};">${r}</span><span>${l}<span class="as-sub">${sub}</span></span><span class="as-tick"></span></button>`).join('');
+
+  document.getElementById('asSave').textContent=`Add ${st.type} · ${asDateLabel(st.date)}${st.time?' '+fmtTime(st.time):''}`;
+}
+
+// Natural language: "lunch tomorrow 1pm" → title "lunch", date, time, kind
+function asParse(){
+  const raw=document.getElementById('asTitle').value.trim();
+  if(!raw || typeof chrono==='undefined') return { title:raw };
+  const r=chrono.parse(raw,new Date())[0];
+  if(!r) return { title:raw };
+  let title=(raw.slice(0,r.index)+raw.slice(r.index+r.text.length)).replace(/\s+/g,' ').trim();
+  title=title.replace(/^(on|at|for|the)\s+/i,'').replace(/\s+(on|at|for|the)$/i,'').trim();
+  const dt=r.start.date();
+  return { title:title||raw, date:dateKey(dt), time:r.start.isCertain('hour')?`${pad(dt.getHours())}:${pad(dt.getMinutes())}`:null, matched:r.text };
+}
+function asTitleChanged(){
+  const raw=document.getElementById('asTitle').value;
+  if(asState.type==='event' && !asState.kindTouched && raw.trim()) asState.kind=guessEventKind(raw);
+  const p=asParse(), h=document.getElementById('asHint');
+  if(p.matched){
+    if(p.date) asState.date=p.date;
+    if(p.time) asState.time=p.time;
+    const d=new Date(asState.date+'T00:00:00'); asState.calY=d.getFullYear(); asState.calM=d.getMonth();
+    h.classList.add('parsed'); h.textContent=`✓ Got it: "${p.title}" · ${asDateLabel(asState.date)}${p.time?' at '+fmtTime(p.time):''}`;
+  } else { h.classList.remove('parsed'); h.textContent='Tip: type "gym tomorrow 6pm" and the date and time fill in.'; }
+  renderAddSheet();
+  const el=document.getElementById('asTitle'); if(document.activeElement!==el) el.focus();
+}
+
+function saveAddSheet(){
+  const st=asState, p=asParse(), title=(p.matched?p.title:p.title||'').trim();
+  if(!title){ showToast(st.type==='event'?'Give the event a name':'Give the quest a name'); document.getElementById('asTitle').focus(); return; }
+  if(st.type==='quest'){
+    if(st.rank==='S' && !st.time){ showToast('S-rank quests need a time'); return; }
+    addTaskCommon(title, st.rank, st.date, st.time||null);
+  } else {
+    if(!APP.events) APP.events={};
+    if(!APP.events[st.date]) APP.events[st.date]=[];
+    const notify=document.getElementById('asNotify').checked;
+    const ev={id:genLinkId(),title,time:st.time||'',location:document.getElementById('asLoc').value.trim(),kind:st.kind,notify,notifyLeadMin:notify?parseInt(document.getElementById('asLead').value,10):null};
+    APP.events[st.date].push(ev);
+    if(!Array.isArray(APP.tasks)) APP.tasks=[];
+    const task={id:genLinkId(),text:title,done:false,rank:'B',date:st.date,time:st.time||null,linkedEventId:ev.id};
+    APP.tasks.push(task); ev.linkedTaskId=task.id;
+    patchData({events:APP.events, tasks:APP.tasks});
+  }
+  closeAddSheet();
+  selectedKey=st.date; const d=new Date(st.date+'T00:00:00'); mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth();
+  renderMobMonthGrid(); renderMobTasks();
+  showToast(`${st.type==='event'?'Event':'Quest'} added · ${asDateLabel(st.date)} ◆`);
+}
 
 // ── STRUCTURED-STYLE TIMELINE ─────────────────────────────────────────────────
 // Day view is the primary calendar: one vertical timeline merging events and quests
@@ -2181,7 +2417,7 @@ function renderCalDay(){
   const tb=document.getElementById('tlTodayBtn'); if(tb) tb.hidden=isToday;
 
   if(!items.length){
-    list.innerHTML=`<div class="tl-empty"><div class="tl-empty-t">Nothing planned</div><div class="tl-empty-s">Tap + to add an event, or add a quest below.</div></div>`;
+    list.innerHTML=`<div class="tl-empty"><div class="tl-empty-t">Nothing planned</div><div class="tl-empty-s">Tap + to add an event or quest.</div></div>`;
     return;
   }
   const now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
