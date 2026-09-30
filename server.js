@@ -404,6 +404,48 @@ function nowStamp() {
   }).format(new Date());
 }
 
+// ── LIVE CALENDAR (read straight from app data, never from the wiki copy) ─────
+// ED used to read wiki/analyses/calendar-events.md, a markdown mirror that lags
+// whenever a sync write is missed and lists recurring events only as rules, so ED
+// had to work out "what's on Tuesday" itself. Both ED and GET /api/calendar now
+// read the in-memory app data — the same state the app UI shows — and expand
+// recurring events into real per-day occurrences.
+function eventsOnDate(data, dateStr) {
+  const oneoff = ((data.events || {})[dateStr] || []).map(e => ({ ...e, date: dateStr, recurring: false }));
+  const recurring = (data.recurringEvents || [])
+    .filter(rec => occursOn(rec, dateStr))
+    .map(rec => ({ ...occurrenceForDate(rec, dateStr), date: dateStr }));
+  return oneoff.concat(recurring).sort((a, b) => (a.time || '99').localeCompare(b.time || '99'));
+}
+
+function liveCalendar(data, from, days) {
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const date = addDays(from, i);
+    out.push({ date, weekday: new Date(date + 'T00:00:00Z').toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' }), events: eventsOnDate(data, date) });
+  }
+  return out;
+}
+
+function buildLiveCalendarContext(data) {
+  const t = today();
+  const fmt12 = hm => { if (!hm) return 'anytime'; const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
+  const line = e => `${fmt12(e.time)} — ${e.title}${e.location ? ` @ ${e.location}` : ''} (${e.kind || 'focus'}${e.recurring ? ', repeating' : ''})`;
+  const agenda = liveCalendar(data, addDays(t, -3), 3 + 21).map(d => {
+    const tag = d.date === t ? ' ← TODAY' : '';
+    return `${d.weekday} ${d.date}${tag}: ${d.events.length ? d.events.map(line).join('; ') : 'nothing scheduled'}`;
+  }).join('\n');
+  const rules = (data.recurringEvents || []).map(rec => `- id: ${rec.id} | "${rec.title}" — ${describeRecurrence(rec)}${rec.location ? ` @ ${rec.location}` : ''}`).join('\n') || '(none)';
+  const later = Object.keys(data.events || {}).filter(d => d > addDays(t, 20)).sort()
+    .flatMap(d => (data.events[d] || []).map(e => `- ${d} ${line({ ...e, recurring: false })}`)).slice(0, 15).join('\n');
+  return [
+    `Read live from the app just now (${t} ${nowStamp()} ${APP_TZ}). This is exactly what the user sees in the Calendar tab — trust it over any wiki page about the calendar.`,
+    `## Day-by-day (3 days ago → 3 weeks ahead; repeating events already expanded)\n${agenda}`,
+    `## Repeating event rules\n${rules}`,
+    later ? `## Further-out one-off events\n${later}` : '',
+  ].filter(Boolean).join('\n\n');
+}
+
 // ── CLAUDE CONTEXT BUILDER ────────────────────────────────────────────────────
 function buildSystemPrompt(userMessage) {
   const claudeMd   = readVault('CLAUDE.md');
@@ -411,7 +453,6 @@ function buildSystemPrompt(userMessage) {
   const overviewMd = readWiki('overview.md');
   const taskPage   = readWiki(`analyses/daily-tasks-${today()}.md`);
   const schedPage  = readWiki('analyses/mission-schedule.md');
-  const calPage    = readWiki('analyses/calendar-events.md');
 
   const words = (userMessage || '').toLowerCase().split(/\W+/).filter(w => w.length > 3);
   const extra = [];
@@ -467,7 +508,7 @@ You also have persistent memory across every conversation, not just this one —
   ];
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
-  if (calPage)      parts.push('# CALENDAR EVENTS (auto-synced from Mission Control on every change)\n' + calPage);
+  parts.push('# CALENDAR (LIVE)\n' + buildLiveCalendarContext(appData));
   if (extra.length) parts.push('# RELEVANT WIKI PAGES\n' + extra.slice(0,4).join('\n\n---\n\n'));
   return parts.join('\n\n═══════════════════════════════\n\n');
 }
@@ -2246,6 +2287,15 @@ app.get('/api/design-research/learnings', (req, res) => {
     calibrationDigest: buildFeedbackDigest(),
     knownWorkDigest: buildKnownWorkDigest(),
   });
+});
+
+// Live calendar as JSON: one-off events plus expanded repeating occurrences.
+// ?from=YYYY-MM-DD (default today) &days=N (default 14, max 92)
+app.get('/api/calendar', (req, res) => {
+  const from = /^\d{4}-\d{2}-\d{2}$/.test(req.query.from || '') ? req.query.from : today();
+  const days = Math.min(Math.max(parseInt(req.query.days, 10) || 14, 1), 92);
+  const data = getAppData();
+  res.json({ today: today(), timezone: APP_TZ, from, days: liveCalendar(data, from, days), recurring: data.recurringEvents || [] });
 });
 
 app.get('/api/change-requests', (req, res) => {
