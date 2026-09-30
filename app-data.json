@@ -673,6 +673,17 @@
   "designFeedback": [
     {
       "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
+      "findingIndex": 2,
+      "threadId": "thread-1790808957925-2-the-compulsion-inflection-when-gamificat",
+      "findingTitle": "The Compulsion Inflection: When Gamification Becomes Obligation—Design Guardrails for Healthy Use",
+      "findingDescription": "Prospect Theory (Kahneman & Tversky) shows losing something feels twice as psychologically painful as gaining it feels good, which apps like Duolingo weaponize with daily \"Don't break your streak\" rituals. Competition-heavy mechanics can lead to privacy invasion, social overload, and exhaustion; research documents a U-shaped relationship between gamification competition intensity and technological burnout. Forest flips this by making non-engagement the goal: rewards focus *avoidance* of distract",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
+      "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
       "findingIndex": 1,
       "threadId": "thread-1790808957925-1-octalysis-framework-eight-core-drives-ac",
       "findingTitle": "Octalysis Framework: Eight Core Drives Across Categories (Motivation Beyond Points)",
@@ -1764,10 +1775,10 @@
       "source_title": "The Brink: Dark Psychology of Gamified Apps + HEAD Foundation Digests",
       "source_url": "https://www.thebrink.me/gamified-life-dark-psychology-app-addiction/",
       "mockup_html": "<div style='font-family:VT323,monospace;background:#0a1929;color:#dfeeff;padding:16px;border-radius:10px;max-width:280px'><div style='font-size:10px;font-family:\"Press Start 2P\",sans-serif;color:#ff8080;margin-bottom:12px;letter-spacing:1px'>⚠ HABIT HEALTH</div><div style='margin-bottom:12px'><div style='display:flex;justify-content:space-between;font-size:9px;color:#8fd6ff;margin-bottom:4px'><span>Motivation</span><span>Obligation</span></div><div style='background:#1e3a5f;height:6px;border-radius:3px;overflow:hidden'><div style='width:65%;height:100%;background:#7fffb0;position:relative'><div style='position:absolute;right:-2px;top:-3px;width:12px;height:12px;background:#ff8a63;border-radius:50%'></div></div></div></div><div style='background:#1a2533;padding:8px;border-radius:6px;margin-bottom:8px;border-left:2px solid #7fffb0'><div style='font-size:9px;color:#8fd6ff'>GREEN: You want to do this</div></div><div style='background:#1a2533;padding:8px;border-radius:6px;border-left:2px solid #ff8080'><div style='font-size:9px;color:#8fd6ff'>RED: Fear of loss drives you</div><div style='font-size:8px;color:#fg-dim;margin-top:4px'>Consider: skip without penalty option</div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
