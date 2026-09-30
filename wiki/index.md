@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[chat-2026-09-30]] — Claude conversation log for 2026-09-30
 - [[2026-09-30-design-research-daily]] — Modern personal dashboards increasingly pair beautiful data visualization with predictive intelligence — not just showing what happened, but
 - [[chat-2026-08-31]] — Claude conversation log for 2026-08-31
 - [[2026-08-31-design-research-daily]] — Research found that modern habit trackers succeed by reducing cognitive load (avoiding points/levels), emphasizing community accountability,
