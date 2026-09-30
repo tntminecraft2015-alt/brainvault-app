@@ -401,6 +401,15 @@
   "lastDesignResearchAutoRun": "2026-09-30",
   "changeRequests": [
     {
+      "id": "2026-09-30-redesign-calendar-to-structured-style-ti",
+      "date": "2026-09-30",
+      "title": "Redesign calendar to Structured-style timeline view",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants the calendar redesigned to match Structured's clean timeline-based layout with daily/weekly/monthly view switching. Keep the existing calendar grid view as an option somewhere in the app, but make the timeline view the primary experience.",
+      "details": "Redesign the calendar modal/section to feature a timeline-style day view (like Structured) with smooth switching between daily, weekly, and monthly perspectives. The timeline should display events vertically with clean typography and minimal visual clutter. Keep the traditional grid calendar view available as a secondary option (maybe in a settings toggle or alternate tab). Focus on readability and ease of use."
+    },
+    {
       "id": "2026-08-27-live-calendar-sync-for-ed-chat-sessions",
       "date": "2026-08-27",
       "title": "Live calendar sync for ED chat sessions",
