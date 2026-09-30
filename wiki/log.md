@@ -853,3 +853,9 @@ Design research: General Improvements: Data Storytelling, Predictive Feedback & 
 **Pages created:** [[chat-2026-09-30]]
 
 Chat session on 2026-09-30
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Redesign calendar to Structured-style timeline view
