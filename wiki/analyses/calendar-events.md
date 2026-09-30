@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-09-30"
-synced_at: "9/30/2026, 10:02:44 PM"
+synced_at: "9/30/2026, 10:14:31 PM"
 tags: [calendar, events]
 ---
 
@@ -20,10 +20,6 @@ tags: [calendar, events]
 
 | Title | Recurrence | Kind | Location |
 |-------|------------|------|----------|
-| English | every Tue & Thu at 12:30, from 2026-08-27 | training |  |
-| Film | every Mon at 12:30, from 2026-08-31 | training |  |
-| History | every Mon at 15:15, from 2026-08-31 | training |  |
-| Math | every Mon & Wed & Fri at 10:30, from 2026-08-31 | training |  |
-| Psych | every Tue & Thu at 10:50, from 2026-08-27 | training |  |
+| — | No recurring events | — | — |
 
-_Last synced: 9/30/2026, 10:02:44 PM_
+_Last synced: 9/30/2026, 10:14:31 PM_
