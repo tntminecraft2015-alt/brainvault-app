@@ -672,6 +672,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
+      "findingIndex": 0,
+      "threadId": "thread-1790808957925-0-loss-aversion-over-reward-accumulation-t",
+      "findingTitle": "Loss Aversion Over Reward Accumulation: The Streak as Protective Mechanism",
+      "findingDescription": "Loss aversion—where people are more motivated to avoid losing progress than to gain rewards—becomes dramatically more powerful when users build a long streak, making breaking it feel like losing something valuable. Duolingo found that when streaks were decoupled from full goal completion (allowing any lesson to count), 7+-day streak users increased by 40%, proving that an easy-to-maintain streak actually gets maintained because loss aversion only works if the object is intact. Forest's variant—a",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
       "id": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
       "findingIndex": 2,
       "threadId": "thread-1790808860908-2-punishment-vs-reward-timing-when-consequ",
@@ -1708,10 +1719,10 @@
       "source_title": "Duolingo's Habit-Forming Reminders: A UX Breakdown + Trophy.so Gamification Examples",
       "source_url": "https://www.digia.tech/post/duolingo-habit-forming-reminders-retention-architecture/",
       "mockup_html": "<div style='font-family:VT323,monospace;background:#0a1929;color:#dfeeff;padding:20px;border-radius:10px;max-width:280px;text-align:center'><div style='font-size:28px;font-weight:bold;margin-bottom:8px;color:#7fffb0'>142 day streak</div><div style='font-size:11px;color:#8fd6ff;margin-bottom:16px;font-family:\"Press Start 2P\",sans-serif;letter-spacing:1px'>ACTIVE CHAIN</div><div style='display:flex;gap:4px;justify-content:center;margin-bottom:16px;flex-wrap:wrap'><span style='width:12px;height:12px;background:#7fffb0;border-radius:2px'></span><span style='width:12px;height:12px;background:#7fffb0;border-radius:2px'></span><span style='width:12px;height:12px;background:#7fffb0;border-radius:2px'></span><span style='width:12px;height:12px;background:#ff8080;border-radius:2px;opacity:0.3'></span><span style='width:12px;height:12px;background:#1e3a5f;border-radius:2px;opacity:0.2'></span></div><div style='font-size:12px;color:#ff8080;border:1px solid #ff8080;padding:8px;border-radius:6px;margin-bottom:12px'>Break it today and lose 142 days</div><button style='background:#7fffb0;color:#0a1929;border:none;padding:8px 16px;border-radius:6px;font-family:VT323,monospace;font-weight:bold;cursor:pointer;width:100%'>COMPLETE TODAY</button></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
