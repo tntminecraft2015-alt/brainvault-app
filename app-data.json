@@ -2022,5 +2022,17 @@
       "endDate": null,
       "exceptions": {}
     }
+  ],
+  "redAssignments": [
+    {
+      "id": "rtask-1790808830855",
+      "date": "2026-09-30",
+      "createdAt": "2026-09-30T22:53:50.855Z",
+      "topic": "Gamification Patterns in Personal Productivity Apps",
+      "brief": "Do a really deep dive on how modern personal dashboards and productivity apps use gamification to drive engagement and habit formation. Look at what actually works (points, streaks, levels, progress bars, achievements, social accountability, etc.) vs. what feels hollow or overstimulating. We want to understand the mechanics that create intrinsic motivation without burnout before we decide how to apply any of this to Mission Control.",
+      "scope": "open",
+      "status": "running",
+      "startedAt": "2026-09-30T22:53:50.858Z"
+    }
   ]
 }
