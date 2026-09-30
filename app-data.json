@@ -304,6 +304,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "date": "2026-09-30",
+      "topic": "End-to-end daily income logging: reminder systems, quick-entry UI for amount + source, and complete flow design from notification to logged data",
+      "title": "End-to-End Daily Income Logging: Quick Entry, Smart Reminders & Friction-Free Flows",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": false,
+      "openTopic": true
+    },
+    {
       "id": "2026-09-30-design-research-daily",
       "date": "2026-09-30",
       "topic": "",
@@ -1453,6 +1463,57 @@
       "updatedDate": "2026-09-30",
       "originResearchId": "2026-09-30-design-research-daily",
       "openTopic": false
+    },
+    "thread-1790807197955-0-one-tap-notification-to-log-pre-filled-f": {
+      "id": "thread-1790807197955-0-one-tap-notification-to-log-pre-filled-f",
+      "title": "One-Tap Notification-to-Log: Pre-Filled Fast-Confirm from Push",
+      "description": "Pre-filled confirmation buttons (e.g., 'Confirm R$ X' with default income amount) paired with an 'Adjust' link directly accessible from a push notification enable users to log routine income without opening a full form. Apps like Tip Tracker prompt 'How much did you make in tips today?' and let users log in under 10 seconds—this pattern combines notification-triggered micro-forms with an optional \"go deeper\" path. Ideal for recurring paychecks or predictable daily/weekly income patterns.",
+      "source_title": "Moneto: Phase 4 Income Reminder Design & Tip Tracker (iOS App Store)",
+      "source_url": "https://github.com/GuiCezaF/Moneto/issues/12",
+      "mockup_html": "<style>\n  body { font-family: VT323, monospace; background: #0a1929; color: #dfeeff; padding: 20px; margin: 0; }\n  .notify-card { background: #12253c; border: 2px solid #ff8a63; border-radius: 8px; padding: 16px; max-width: 320px; }\n  .notify-title { font-size: 12px; text-transform: uppercase; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 1px; }\n  .amount { font-size: 28px; font-weight: bold; margin: 12px 0; color: #ff8a63; }\n  .btn-confirm { width: 100%; background: #7fffb0; color: #070b14; padding: 12px; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 8px; }\n  .btn-adjust { width: 100%; background: transparent; color: #8fd6ff; padding: 8px; border: 1px dashed #8fd6ff; border-radius: 4px; font-size: 12px; cursor: pointer; }\n</style>\n<div class=\"notify-card\">\n  <div class=\"notify-title\">📬 Income Logged</div>\n  <div class=\"amount\">+$425.50</div>\n  <button class=\"btn-confirm\">✓ CONFIRM</button>\n  <button class=\"btn-adjust\">⚙ Adjust Amount</button>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "openTopic": true
+    },
+    "thread-1790807197955-1-prefilled-favorites-library-tap-to-prefi": {
+      "id": "thread-1790807197955-1-prefilled-favorites-library-tap-to-prefi",
+      "title": "Prefilled Favorites Library: Tap to Prefill, Save to Persist",
+      "description": "Favorites can be two kinds: fixed amounts (\"Coffee · $3.20\") or amount-each-time (\"Lunch\")—tapping a favorite prefills the log form, with nothing saved until the user confirms. A star on the Saved banner saves the entry as a favorite. This pattern dramatically accelerates repeat logging by remembering context (amount, source, category) without forcing the user to type it every time. Particularly effective for self-employed users with recurring income sources.",
+      "source_title": "MoneyUp iOS App: Quick Log Widget & Favorites Redesign (GitHub PR #86)",
+      "source_url": "https://github.com/LaiWenKang/MoneyUp/pull/86",
+      "mockup_html": "<style>\n  body { font-family: VT323, monospace; background: #0a1929; color: #dfeeff; padding: 20px; margin: 0; }\n  .fav-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }\n  .fav-chip { background: #12253c; border: 1px solid #8fd6ff; color: #dfeeff; padding: 8px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.2s; }\n  .fav-chip:hover { background: #1e3a5f; border-color: #ff8a63; }\n  .fav-chip.starred::before { content: \"★ \"; color: #ff8a63; }\n  .amt { font-size: 11px; color: #8fd6ff; display: block; margin-top: 2px; }\n  .label { font-size: 11px; text-transform: uppercase; color: #8fd6ff; letter-spacing: 1px; margin-bottom: 8px; }\n</style>\n<div>\n  <div class=\"label\">Recent Income Sources</div>\n  <div class=\"fav-row\">\n    <button class=\"fav-chip starred\">Freelance Design<span class=\"amt\">$85</span></button>\n    <button class=\"fav-chip starred\">Tip Out<span class=\"amt\">Variable</span></button>\n    <button class=\"fav-chip\">Bonus</button>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "openTopic": true
+    },
+    "thread-1790807197955-2-motivational-micro-feedback-loop-celebra": {
+      "id": "thread-1790807197955-2-motivational-micro-feedback-loop-celebra",
+      "title": "Motivational Micro-Feedback Loop: Celebration + Running Total Visibility",
+      "description": "Every save comes with instant feedback—a quick animation, a positive message like 'Nice! Logged $85 for today', and even a haptic buzz, making logging feel as satisfying as earning. After each entry, get a simple summary: today's total, this week's running total, and a clean chart of weekly earnings. This combines immediate affirmation (satisfying the moment of logging) with concrete progress visibility (showing accumulated impact over a week)—critical for maintaining daily habit compliance in income-tracking apps.",
+      "source_title": "Tip Tracker: Fast Earnings Logger (iOS App Store)",
+      "source_url": "https://apps.apple.com/app/id6744293760",
+      "mockup_html": "<style>\n  body { font-family: VT323, monospace; background: #0a1929; color: #dfeeff; padding: 20px; margin: 0; }\n  .feedback { background: #1e3a5f; border: 2px solid #7fffb0; border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center; }\n  .emoji { font-size: 32px; margin-bottom: 8px; }\n  .msg { font-size: 14px; color: #7fffb0; margin-bottom: 4px; font-weight: bold; }\n  .sparkle { color: #66c8ff; font-size: 12px; }\n  .summary { background: #12253c; padding: 12px; border-radius: 6px; }\n  .row { display: flex; justify-content: space-between; font-size: 12px; margin: 6px 0; }\n  .label { color: #8fd6ff; }\n  .value { color: #ff8a63; font-weight: bold; }\n</style>\n<div class=\"feedback\">\n  <div class=\"emoji\">✨</div>\n  <div class=\"msg\">Logged $425 for today</div>\n  <div class=\"sparkle\">nice work!</div>\n</div>\n<div class=\"summary\">\n  <div class=\"row\"><span class=\"label\">TODAY</span> <span class=\"value\">$425</span></div>\n  <div class=\"row\"><span class=\"label\">THIS WEEK</span> <span class=\"value\">$2,180</span></div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-09-30",
+      "updatedDate": "2026-09-30",
+      "originResearchId": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "openTopic": true
     }
   },
   "designArchive": [
