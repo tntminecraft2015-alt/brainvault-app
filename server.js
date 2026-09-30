@@ -554,6 +554,7 @@ app.post('/api/data', (req, res) => {
     if (patch.caughtPoke     !== undefined) data.caughtPoke     = patch.caughtPoke;
     if (patch.savings        !== undefined) data.savings        = patch.savings;
     if (patch.savingsGoals   !== undefined) data.savingsGoals   = patch.savingsGoals;
+    if (patch.buddy          !== undefined) data.buddy          = (patch.buddy && typeof patch.buddy === 'object') ? patch.buddy : null;
     const date = req.body._date || today();
     recalcStreak(data, date);
     saveAppData(data);

@@ -539,11 +539,11 @@
     }
     .mob-day-event-dot { width:3px; align-self:stretch; border-radius:2px; flex-shrink:0; }
     .mob-day-event-time {
-      font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:700;
+      font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-size:11.5px; font-weight:700;
       color:var(--accent2); min-width:52px; flex-shrink:0;
     }
     .mob-day-event-name {
-      font-family:'Inter'; font-size:13.5px; font-weight:600; line-height:1.3; flex:1;
+      font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; line-height:1.3; flex:1;
     }
     .mob-no-events {
       font-family:'Inter',sans-serif; font-size:13px; font-weight:500; opacity:.5; padding:4px 0;
@@ -558,7 +558,7 @@
     .mob-week-strip { display:flex; gap:6px; padding:0 2px 12px; font-family:'Inter',sans-serif; flex-shrink:0; }
     .mob-wday { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:9px 0 8px; border-radius:var(--r-md); cursor:pointer; background:rgba(223,238,255,.045); border:none; }
     .mob-wday .mwd-name { font-size:9.5px; font-weight:600; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.03em; }
-    .mob-wday .mwd-num  { font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); }
+    .mob-wday .mwd-num  { font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); }
     .mob-wday .mwd-dot  { width:4px; height:4px; border-radius:50%; background:var(--accent2); margin-top:1px; opacity:0; }
     .mob-wday.has-events .mwd-dot { opacity:1; }
     .mob-wday.today { background:linear-gradient(170deg,rgba(255,138,99,.32),rgba(255,138,99,.1)); box-shadow:inset 0 0 0 2px var(--accent); }
@@ -573,7 +573,7 @@
       display:flex; align-items:center; justify-content:space-between; width:100%;
       background:rgba(223,238,255,.045); box-shadow:none;
       border:none; border-radius:var(--r-lg);
-      color:var(--fg); font-family:'Inter'; font-size:11px; font-weight:600;
+      color:var(--fg); font-family:'Inter',sans-serif; font-size:11px; font-weight:600;
       padding:13px 14px; margin-bottom:10px; cursor:pointer; min-height:44px; flex-shrink:0;
       transition:background .15s;
     }
@@ -863,6 +863,280 @@
     #changeQueueModal .cq-row-head { min-height:0; }
     .cq-row.open .cq2-preview { display:none; }
 
+    /* ══════════════════════════════════════
+       WHOLE-APP STREAMLINE — nav, Home, buddy, encounters, Pokédex
+    ══════════════════════════════════════ */
+    body, button, input, textarea, select { font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; }
+
+    /* bottom nav: floating bar, line icons, readable labels */
+    .mob-nav { margin:6px 12px calc(8px + env(safe-area-inset-bottom)) !important; background:rgba(18,37,60,.92) !important; -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-radius:24px !important; box-shadow:0 8px 28px rgba(0,0,0,.45), inset 0 0 0 1px rgba(223,238,255,.07) !important; padding:6px; gap:4px; }
+    .mob-nav-btn { font-size:11px !important; font-weight:600; letter-spacing:0 !important; padding:7px 2px 6px !important; margin:0 !important; gap:4px !important; border-radius:18px !important; color:rgba(223,238,255,.5) !important; min-height:52px; }
+    .mob-nav-btn .nav-svg { width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; transition:transform .15s; }
+    .mob-nav-btn.active { background:rgba(255,138,99,.14) !important; color:var(--fg) !important; }
+    .mob-nav-btn.active .nav-svg { stroke:var(--accent); transform:translateY(-1px); }
+    .mob-nav-btn:active .nav-svg { transform:scale(.9); }
+    .mob-tab-pane { padding-top:calc(14px + env(safe-area-inset-top)) !important; }
+
+    /* Home */
+    .home-pane { gap:12px; }
+    .home-pane > * { flex-shrink:0; }
+    .home-hd { display:flex; align-items:center; gap:10px; margin:2px 0 2px; }
+    .home-hd-txt { flex:1; min-width:0; }
+    .home-day { font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.1; }
+    .home-date { font-size:13.5px; font-weight:500; color:var(--fg-dim); margin-top:2px; }
+    .ed-round svg { width:20px; height:20px; display:block; margin:auto; }
+    .home-card { background:rgba(223,238,255,.045); border-radius:22px; padding:14px 16px; }
+    .home-card-hd { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .home-card-t { font-size:15px; font-weight:700; }
+    .home-count { font-size:12px; font-weight:700; color:var(--fg-dim); background:rgba(223,238,255,.07); border-radius:999px; padding:3px 9px; }
+    .home-add { margin-left:auto; border:none; background:rgba(255,138,99,.16); color:var(--accent); font-size:13px; font-weight:700; border-radius:999px; padding:7px 13px; cursor:pointer; }
+    .home-gil { margin-left:auto; font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+    .home-empty { font-size:13.5px; color:var(--fg-dim); padding:6px 0 4px; }
+    .home-empty button { border:none; background:none; color:var(--accent); font-weight:700; font-size:13.5px; cursor:pointer; padding:0 2px; }
+    .home-tl .tl-row { min-height:52px; }
+    .home-tl .tl-anytime { margin-bottom:10px; }
+    .home-tl .tl-sched { display:flex; flex-direction:column; }
+    .home-tl .tl-sched > .tl-row:first-child .tl-rail::before { top:50%; }
+    .home-tl .tl-sched > .tl-row:last-child .tl-rail::before, .home-tl .tl-sched > .tl-now:last-child .tl-rail::before { bottom:50%; }
+    .home-tl .tl-pill { box-shadow:0 0 0 3px #111f33; }
+    .home-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .home-mini { display:flex; flex-direction:column; gap:10px; align-items:stretch; text-align:left; border:none; cursor:pointer; background:rgba(223,238,255,.045); border-radius:22px; padding:12px 14px; color:var(--fg); font-family:inherit; min-height:96px; }
+    .home-mini:active { transform:scale(.98); }
+    .home-mini-hd { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; }
+    .home-mini-hd .ed-pill-ic svg { width:16px; height:16px; }
+    .home-mini-hd .cm-av { width:28px; height:28px; }
+    .home-mini-count { margin-left:auto; font-size:12px; color:var(--fg-dim); }
+    .home-mini-hd .server-dot { margin-left:auto; }
+    .home-mini-s { font-size:12.5px; font-weight:500; color:var(--fg-dim); line-height:1.35; }
+    .home-dex-thumbs { display:flex; gap:4px; }
+    .home-dex-thumbs img { width:34px; height:34px; object-fit:contain; background:rgba(223,238,255,.06); border-radius:12px; padding:2px; }
+    .quickgil-pill { border:none !important; background:rgba(223,238,255,.045) !important; border-radius:16px !important; padding:8px 8px !important; }
+    .quickgil-name, .quickgil-bal { font-size:15px !important; }
+    .quickgil-btn { width:34px !important; height:34px !important; font-size:18px !important; font-weight:700; }
+
+    /* Buddy */
+    .buddy-card { position:relative; display:flex; align-items:center; gap:14px; background:linear-gradient(150deg,rgba(74,144,217,.2),rgba(223,238,255,.04) 60%); border-radius:24px; padding:12px 16px 12px 10px; min-height:150px; }
+    .buddy-stage { position:relative; width:130px; height:130px; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; }
+    .buddy-glow { position:absolute; inset:14px; border-radius:50%; background:radial-gradient(circle,rgba(143,196,255,.35),transparent 70%); }
+    .buddy-img { position:relative; width:118px; height:118px; object-fit:contain; animation:buddyBreathe 3.2s ease-in-out infinite; transform-origin:50% 90%; filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)); user-select:none; -webkit-user-drag:none; }
+    .buddy-img.hop { animation:buddyHop .6s cubic-bezier(.3,1.6,.5,1), buddyBreathe 3.2s ease-in-out .6s infinite; }
+    .buddy-shadow { position:absolute; bottom:8px; left:50%; width:70px; height:10px; margin-left:-35px; border-radius:50%; background:rgba(0,0,0,.35); filter:blur(3px); animation:buddyShadow 3.2s ease-in-out infinite; }
+    @keyframes buddyBreathe { 0%,100%{ transform:translateY(0) scale(1,1); } 50%{ transform:translateY(-3px) scale(1.02,.985); } }
+    @keyframes buddyShadow { 0%,100%{ transform:scaleX(1); opacity:.9; } 50%{ transform:scaleX(.9); opacity:.7; } }
+    @keyframes buddyHop { 0%{ transform:translateY(0) scale(1); } 30%{ transform:translateY(-22px) scale(1.05,.95); } 60%{ transform:translateY(0) scale(1.08,.9); } 100%{ transform:translateY(0) scale(1); } }
+    .buddy-heart { position:absolute; top:34px; font-size:20px; color:#ff6b8b; pointer-events:none; animation:heartUp 1.2s ease-out forwards; text-shadow:0 2px 6px rgba(0,0,0,.3); }
+    @keyframes heartUp { 0%{ transform:translateY(0) scale(.6); opacity:0; } 20%{ opacity:1; transform:translateY(-10px) scale(1.1); } 100%{ transform:translateY(-70px) scale(.9); opacity:0; } }
+    .buddy-info { flex:1; min-width:0; }
+    .buddy-name { font-size:20px; font-weight:800; letter-spacing:-.01em; }
+    .buddy-level { font-size:12px; font-weight:700; color:#8fc4ff; margin-top:1px; text-transform:uppercase; letter-spacing:.05em; }
+    .buddy-bar { height:6px; border-radius:3px; background:rgba(223,238,255,.1); margin:8px 0 5px; overflow:hidden; }
+    .buddy-bar i { display:block; height:100%; border-radius:3px; background:linear-gradient(90deg,#ff6b8b,#ff8a63); transition:width .4s; }
+    .buddy-hearts { font-size:12.5px; font-weight:700; color:#ff8fa5; }
+    .buddy-hearts span { color:var(--fg-dim); font-weight:500; }
+    .buddy-bubble { margin-top:9px; font-size:13px; font-weight:500; line-height:1.35; background:rgba(10,25,41,.55); border-radius:14px 14px 14px 4px; padding:8px 10px; }
+    .buddy-swap { position:absolute; top:10px; right:10px; width:32px; height:32px; border-radius:50%; border:none; background:rgba(223,238,255,.08); color:var(--fg-dim); font-size:15px; cursor:pointer; }
+    .buddy-shiny { font-size:15px; }
+    .buddy-pick { width:100%; padding:6px 4px; }
+    .buddy-pick-t { font-size:18px; font-weight:800; }
+    .buddy-pick-s { font-size:13px; color:var(--fg-dim); margin:4px 0 12px; line-height:1.4; }
+    .buddy-pick-row { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+    .buddy-pick-row button { flex:0 0 76px; border:none; background:rgba(10,25,41,.45); border-radius:18px; padding:8px 4px 8px; color:var(--fg); font-size:11.5px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .buddy-pick-row img { width:58px; height:58px; object-fit:contain; }
+    .buddy-pick-row button:active { transform:scale(.95); }
+
+    /* Wild encounter */
+    .enc-ov { position:fixed; inset:0; z-index:300; background:rgba(3,8,16,.72); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:20px; animation:encFade .2s ease-out; }
+    @keyframes encFade { from{ opacity:0; } to{ opacity:1; } }
+    .enc-card { width:100%; max-width:360px; background:linear-gradient(170deg,#1b3656,#12253c 55%); border-radius:28px; padding:20px 20px 18px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,.5); animation:encPop .35s cubic-bezier(.3,1.4,.5,1); }
+    .enc-card.shiny { background:linear-gradient(170deg,#4a3b12,#1b2b40 60%); }
+    @keyframes encPop { from{ transform:scale(.85); opacity:0; } to{ transform:none; opacity:1; } }
+    .enc-kicker { display:inline-block; font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); background:rgba(255,138,99,.14); border-radius:999px; padding:5px 11px; }
+    .enc-stage { position:relative; height:200px; display:flex; align-items:center; justify-content:center; margin:6px 0 2px; }
+    .enc-glow { position:absolute; width:170px; height:170px; border-radius:50%; background:radial-gradient(circle,rgba(143,196,255,.35),transparent 70%); }
+    .enc-card.shiny .enc-glow { background:radial-gradient(circle,rgba(255,215,90,.45),transparent 70%); }
+    .enc-img { position:relative; width:170px; height:170px; object-fit:contain; animation:encIdle 1.6s ease-in-out infinite; filter:drop-shadow(0 10px 12px rgba(0,0,0,.4)); transition:transform .35s ease-in, opacity .35s ease-in, filter .2s; }
+    @keyframes encIdle { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-8px); } }
+    .enc-img.absorbed { animation:none; transform:scale(.05) translateY(120px); opacity:0; filter:brightness(4); }
+    .enc-ball { position:absolute; width:44px; height:44px; bottom:-60px; left:50%; margin-left:-22px; opacity:0; }
+    .enc-ball svg, .wild-ball svg { width:100%; height:100%; filter:drop-shadow(0 4px 6px rgba(0,0,0,.4)); }
+    .enc-ball.thrown { animation:ballArc .55s cubic-bezier(.3,.1,.4,1) forwards; }
+    .enc-ball.landed { bottom:30px; opacity:1; animation:ballDrop .35s ease-in forwards; }
+    .enc-ball.wobble { bottom:22px; opacity:1; animation:ballWobble 1.5s ease-in-out; }
+    .enc-ball.caught { bottom:22px; opacity:1; animation:ballCaught .5s ease-out forwards; }
+    @keyframes ballArc { 0%{ opacity:1; transform:translateY(0) rotate(0); } 60%{ transform:translateY(-190px) rotate(420deg); } 100%{ opacity:1; transform:translateY(-110px) rotate(720deg); } }
+    @keyframes ballDrop { 0%{ transform:translateY(-80px); } 100%{ transform:translateY(8px); } }
+    @keyframes ballWobble { 0%,100%{ transform:rotate(0); } 12%{ transform:rotate(-22deg); } 24%{ transform:rotate(18deg); } 36%{ transform:rotate(0); } 50%{ transform:rotate(-18deg); } 62%{ transform:rotate(14deg); } 74%{ transform:rotate(0); } 86%{ transform:rotate(-10deg); } }
+    @keyframes ballCaught { 0%{ transform:scale(1); } 40%{ transform:scale(1.25); filter:drop-shadow(0 0 16px #ffe27a); } 100%{ transform:scale(1); filter:drop-shadow(0 0 10px #ffe27a); } }
+    .enc-name { font-size:24px; font-weight:800; letter-spacing:-.01em; }
+    .enc-sub { font-size:13.5px; color:var(--fg-dim); margin-top:4px; min-height:19px; }
+    .enc-actions { display:flex; flex-direction:column; gap:8px; margin-top:16px; min-height:96px; }
+    .enc-throw { display:flex; align-items:center; justify-content:center; gap:10px; border:none; border-radius:999px; background:var(--accent); color:#1a0e08; font-size:16px; font-weight:800; min-height:52px; cursor:pointer; }
+    .enc-throw svg { width:24px; height:24px; }
+    .enc-throw:active { transform:scale(.97); }
+    .enc-run { border:none; background:rgba(223,238,255,.07); color:var(--fg); font-size:14px; font-weight:600; border-radius:999px; min-height:44px; cursor:pointer; }
+
+    /* Pokédex sheet */
+    .ed-av.dex { background:linear-gradient(160deg,#ff6b5e,#c93b31); }
+    .ed-av.dex svg { width:24px; height:24px; }
+    .dex-progress { height:6px; border-radius:3px; background:rgba(223,238,255,.08); margin:-4px 0 14px; overflow:hidden; flex-shrink:0; }
+    .dex-progress i { display:block; height:100%; background:linear-gradient(90deg,#ff6b5e,#ff8a63); border-radius:3px; }
+    .dex-grid2 { flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(3,1fr); gap:8px; align-content:start; padding-bottom:12px; }
+    .dex-cell { position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; border:none; background:rgba(223,238,255,.045); border-radius:18px; padding:8px 4px 10px; color:var(--fg); font-family:inherit; cursor:pointer; }
+    .dex-cell img { width:78px; height:78px; object-fit:contain; }
+    .dex-cell.unknown { cursor:default; background:rgba(223,238,255,.025); }
+    .dex-cell.unknown img { filter:brightness(0); opacity:.28; }
+    .dex-no { font-size:10.5px; font-weight:700; color:var(--fg-dim); }
+    .dex-nm { font-size:12.5px; font-weight:700; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 4px; }
+    .dex-cell.unknown .dex-nm { color:rgba(223,238,255,.3); }
+    .dex-badge { position:absolute; top:6px; right:8px; font-size:13px; color:#ff6b8b; }
+    .dex-cell:active { transform:scale(.96); }
+
+    /* Pokémon detail sheet */
+    .pdx2 { align-items:center; text-align:center; position:relative; }
+    .pdx2-x { position:absolute; top:14px; right:16px; }
+    .pdx2-stage { position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center; }
+    .pdx2-stage .buddy-img { width:180px; height:180px; }
+    .pdx2-no { font-size:12px; font-weight:700; color:var(--fg-dim); }
+    .pdx2-name { font-size:26px; font-weight:800; letter-spacing:-.015em; margin:2px 0 8px; }
+    .pdx2-types { display:flex; gap:6px; justify-content:center; min-height:24px; }
+    .pdx2-types .pdx-type-pip { font-size:12px; font-weight:700; text-transform:capitalize; color:#fff; border-radius:999px; padding:4px 12px; letter-spacing:0; }
+    .pdx2-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; margin:16px 0 4px; }
+    .pdx2-grid div { background:rgba(223,238,255,.05); border-radius:14px; padding:9px 6px; display:flex; flex-direction:column; gap:2px; }
+    .pdx2-grid span { font-size:11px; font-weight:600; color:var(--fg-dim); }
+    .pdx2-grid b { font-size:16px; font-weight:800; }
+    .pdx2-caught { font-size:13px; color:var(--fg-dim); margin-top:10px; }
+    .pdx2 .as-save { width:100%; position:static; box-shadow:none; }
+
+    /* Wandering Pokémon: HOME art with a hop, real Poké Ball catch */
+    @keyframes w2Right { from{ transform:translateX(-100px); } to{ transform:translateX(calc(100vw + 100px)); } }
+    @keyframes w2Left  { from{ transform:translateX(calc(100vw + 100px)); } to{ transform:translateX(-100px); } }
+    .wander2 { image-rendering:auto !important; filter:drop-shadow(0 6px 8px rgba(0,0,0,.5)); }
+    .wander2 img { width:100%; height:100%; object-fit:contain; animation:wHop .5s ease-in-out infinite alternate; pointer-events:none; }
+    @keyframes wHop { from{ translate:0 0; } to{ translate:0 -7px; } }
+    .wander2.absorbed img { transition:transform .4s ease-in, opacity .4s; transform:scale(.1) !important; opacity:0; }
+    .wild-ball { position:fixed; z-index:500; width:34px; height:34px; pointer-events:none; animation:ballWobble 1.5s ease-in-out; }
+    .wild-ball.caught { animation:ballCaught .5s ease-out forwards; }
+
+    /* Toast: small pill above the nav */
+    .toast { bottom:calc(96px + env(safe-area-inset-bottom)) !important; box-shadow:0 8px 24px rgba(0,0,0,.4) !important; background:#e8f1ff !important; color:#0a1929 !important; border-radius:999px !important; font-size:13.5px !important; font-weight:700; letter-spacing:0 !important; padding:11px 18px !important; max-width:88vw; text-align:center; }
+    .toast { opacity:0; transition:transform .22s, opacity .22s !important; }
+    .toast.show { opacity:1; }
+
+    /* Budget tab */
+    .gil-pane { gap:12px; }
+    .gil-pane > * { flex-shrink:0; }
+    .gil-view { display:flex; flex-direction:column; gap:12px; font-family:'Inter',sans-serif; }
+    .gil-view > * { flex-shrink:0; }
+    .gil-tabs { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin:0 -2px; padding:0 2px; }
+    .gil-tabs::-webkit-scrollbar { display:none; }
+    .gil-tabs button { flex-shrink:0; border:none; border-radius:999px; background:rgba(223,238,255,.06); color:var(--fg-dim); font-family:inherit; font-size:13.5px; font-weight:600; padding:8px 14px; min-height:38px; cursor:pointer; }
+    .gil-tabs button.active { background:var(--fg); color:var(--bg); }
+    .gil-hero2 { background:linear-gradient(150deg,rgba(127,255,176,.12),rgba(223,238,255,.04) 60%); border-radius:24px; padding:16px 16px 14px; }
+    .gil-hero2 .gil-hero-lbl { font-size:12.5px; font-weight:600; color:var(--fg-dim); margin-bottom:4px; }
+    .gil-hero2 .gil-hero-num { font-size:42px; font-weight:800; letter-spacing:-.025em; }
+    .gil-hero2 .gil-hero-delta { font-size:12px; }
+    .gil-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .gil-act { display:flex; align-items:center; justify-content:center; gap:8px; border:none; border-radius:999px; font-family:inherit; font-size:14.5px; font-weight:700; min-height:46px; cursor:pointer; }
+    .gil-act span { font-size:20px; font-weight:800; line-height:1; }
+    .gil-act.exp { background:rgba(255,128,128,.16); color:#ffb0b0; }
+    .gil-act.inc { background:rgba(127,255,176,.16); color:var(--green); }
+    .gil-act:active { transform:scale(.97); }
+    .gil-week { display:flex; flex-direction:column; align-items:stretch; text-align:left; border:none; color:var(--fg); font-family:inherit; cursor:pointer; width:100%; }
+    .gil-edit { margin-left:auto; font-size:12.5px; font-weight:700; color:var(--accent2); }
+    .gil-week-nums { display:flex; gap:20px; }
+    .gil-week-nums > span { display:flex; flex-direction:column; }
+    .gil-week-nums b { font-size:26px; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.015em; }
+    .gil-week-nums b.inc { color:var(--green); } .gil-week-nums b.exp { color:var(--red); }
+    .gil-week-nums i { font-style:normal; font-size:12px; font-weight:500; color:var(--fg-dim); }
+    .gil-bar { display:block; height:8px; border-radius:4px; background:rgba(223,238,255,.08); margin-top:12px; overflow:hidden; }
+    .gil-bar i { display:block; height:100%; border-radius:4px; background:linear-gradient(90deg,#7fffb0,#66c8ff); }
+    .gil-bar i.over { background:linear-gradient(90deg,#ff8a63,#ff6b6b); }
+    .gil-cats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .gil-cat { display:flex; align-items:center; gap:10px; background:rgba(223,238,255,.045); border-radius:16px; padding:10px 12px; }
+    .gil-cat-ic { width:34px; height:34px; border-radius:17px; background:rgba(223,238,255,.07); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+    .gil-cat-l { font-size:12px; font-weight:600; color:var(--fg-dim); }
+    .gil-cat-v { font-size:16px; font-weight:800; }
+    .gil-txns { display:flex; flex-direction:column; gap:6px; }
+    .gil-txn { display:flex; align-items:center; gap:12px; background:rgba(223,238,255,.045); border-radius:16px; padding:10px 8px 10px 12px; cursor:pointer; }
+    .gil-txn-ic { width:38px; height:38px; border-radius:19px; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+    .gil-txn-note { font-size:14.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .gil-txn-amt { font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
+    .gil-txn-amt.inc { color:var(--green); } .gil-txn-amt.exp { color:var(--fg); }
+    .gil-txn-del { width:30px; height:30px; border-radius:15px; border:none; background:none; color:var(--fg-dim); font-size:13px; cursor:pointer; flex-shrink:0; }
+    .gil-due { display:flex; align-items:center; gap:12px; width:100%; border:none; text-align:left; cursor:pointer; background:rgba(255,138,99,.12); border-radius:18px; padding:10px 12px; color:var(--fg); font-family:inherit; }
+    /* other budget sub-tabs inherit the softer look */
+    .gil-view .bento-tile, .gil-view .budget-txn { background:rgba(223,238,255,.045) !important; border:none !important; border-radius:16px !important; }
+    .gil-view .budget-type-btn, .gil-view .mini-btn, .gil-view .budget-mode-btn { border:none !important; border-radius:999px !important; background:rgba(223,238,255,.07) !important; color:var(--fg) !important; font-family:inherit !important; font-size:13px !important; font-weight:600; padding:8px 14px !important; }
+    .gil-view .mob-inp, .gil-view .save-inp, .gil-view .budget-cat-sel, .gil-view .budget-limit-inp, .gil-view input, .gil-view select { border:none !important; border-radius:12px !important; background:rgba(10,25,41,.6) !important; box-shadow:inset 0 0 0 1px rgba(223,238,255,.12); color:var(--fg) !important; font-family:inherit !important; font-size:15px !important; padding:10px 12px !important; }
+    .gil-view .mob-add-btn { border-radius:999px !important; }
+    .gil-view .m-label, .gil-view .bento-label, .gil-view .save-label { font-family:inherit !important; font-size:11px !important; font-weight:700; letter-spacing:.06em !important; color:var(--fg-dim) !important; }
+
+    /* Pop-ups: every classic .modal becomes a bottom sheet in the same style */
+    .overlay:not(.add-sheet-ov) { align-items:flex-end !important; background:rgba(3,8,16,.6) !important; }
+    .overlay:not(.add-sheet-ov) > .modal { width:100% !important; max-width:520px !important; border-radius:24px 24px 0 0 !important; box-shadow:0 -10px 40px rgba(0,0,0,.4) !important; background:var(--surface) !important; padding:10px 18px calc(18px + env(safe-area-inset-bottom)) !important; max-height:92vh; max-height:92dvh; overflow-y:auto; animation:asUp .22s ease-out; border:none !important; }
+    .overlay:not(.add-sheet-ov) > .modal::before { content:''; display:block; width:40px; height:5px; border-radius:3px; background:rgba(223,238,255,.25); margin:0 auto 12px; }
+    .modal-title { font-size:19px !important; font-weight:800 !important; letter-spacing:-.01em; text-transform:none; border-bottom:none !important; padding-bottom:0 !important; margin-bottom:14px !important; }
+    .modal-btns { gap:8px !important; margin-top:16px !important; }
+    .modal-btn { border:none !important; border-radius:999px !important; background:rgba(223,238,255,.08) !important; color:var(--fg) !important; font-family:inherit !important; font-size:15px !important; font-weight:700 !important; letter-spacing:0 !important; min-height:48px; padding:0 18px !important; box-shadow:none !important; }
+    .modal-btn.ok { background:var(--accent) !important; color:#1a0e08 !important; }
+    .modal-btn.danger, .modal-btn.del { background:rgba(255,128,128,.16) !important; color:#ffb0b0 !important; }
+    .m-inp, .m-sel, .overlay .mini-inp { border:none !important; border-radius:12px !important; background:rgba(10,25,41,.6) !important; box-shadow:inset 0 0 0 1px rgba(223,238,255,.12) !important; font-family:inherit !important; font-size:16px !important; font-weight:500 !important; padding:11px 12px !important; min-height:44px; }
+    .m-label { font-size:11px !important; font-weight:700; letter-spacing:.06em; opacity:1 !important; color:var(--fg-dim); }
+    .key-info { font-size:13.5px !important; line-height:1.5 !important; color:var(--fg-dim) !important; }
+
+    /* Money pad */
+    #moneyPadModal .modal-title { text-align:center; }
+    #moneyPadModal button:not(.modal-btn) { border:none !important; font-family:inherit !important; }
+    #moneyPadModal .moneypad-display { font-size:52px !important; font-weight:800 !important; letter-spacing:-.02em; margin:0 0 12px !important; }
+    #moneyPadModal .moneypad-key { border-radius:18px !important; background:rgba(223,238,255,.06) !important; box-shadow:none !important; font-size:24px !important; font-weight:600 !important; min-height:58px; color:var(--fg) !important; }
+    #moneyPadModal .moneypad-key:active { background:rgba(223,238,255,.16) !important; transform:scale(.97); }
+    #moneyPadModal .moneypad-grid { gap:8px !important; }
+    #moneyPadModal .moneypad-chips { gap:8px !important; justify-content:center; margin-bottom:8px !important; }
+    #moneyPadModal .moneypad-chip { width:44px !important; height:44px !important; font-size:19px !important; border:none !important; background:rgba(223,238,255,.07) !important; }
+    #moneyPadModal .moneypad-chip.active { background:rgba(255,138,99,.22) !important; box-shadow:inset 0 0 0 2px var(--accent) !important; }
+    #moneyPadModal .budget-type-btn { border:none !important; border-radius:999px !important; background:rgba(223,238,255,.07) !important; color:var(--fg-dim) !important; font-size:14px !important; font-weight:700 !important; padding:9px 18px !important; }
+    #moneyPadModal .budget-type-btn.active.expense { background:rgba(255,128,128,.9) !important; color:#2a0d0d !important; }
+    #moneyPadModal .budget-type-btn.active.income { background:var(--green) !important; color:#0d2a1a !important; }
+
+    /* Time wheel */
+    #timeWheelModal .modal-title { text-align:center; }
+
+    /* Day popup (was the Pokédex console) */
+    .pdx-modal { background:var(--surface) !important; box-shadow:0 -10px 40px rgba(0,0,0,.4) !important; border-radius:24px 24px 0 0 !important; width:100% !important; max-width:520px !important; }
+    .pdx-header { background:none !important; padding:16px 18px 6px !important; }
+    .pdx-led, .pdx-led-sm { display:none !important; }
+    .pdx-title-bar { font-size:19px !important; font-weight:800; color:var(--fg) !important; }
+    .pdx-body { min-height:0 !important; }
+    .pdx-left { width:112px !important; background:none !important; border-right:none !important; padding:4px 0 10px 12px !important; }
+    .pdx-poke-img { width:96px !important; height:96px !important; image-rendering:auto !important; object-fit:contain; }
+    .pdx-poke-num { font-size:11px !important; color:var(--fg-dim) !important; opacity:1 !important; }
+    .pdx-poke-name { font-size:13px !important; font-weight:700; text-transform:none !important; }
+    .pdx-date-label { display:none; }
+    .pdx-section-hd { font-size:11px !important; font-weight:700; letter-spacing:.06em !important; color:var(--fg-dim); opacity:1 !important; }
+    .pdx-right { padding:6px 16px 12px 8px !important; }
+    .pdx-footer { background:none !important; border-top:none !important; padding:6px 18px calc(18px + env(safe-area-inset-bottom)) !important; gap:8px !important; }
+    .dev-item { background:rgba(223,238,255,.045); border-radius:14px; padding:9px 10px !important; gap:8px !important; margin-bottom:6px; align-items:center; }
+    .dev-item > span[style*="font-size:16px"] { font-size:14.5px !important; }
+    .dev-time { font-size:12.5px !important; font-weight:700; color:var(--accent2) !important; }
+    .dev-del { border:none !important; background:rgba(223,238,255,.07) !important; border-radius:50% !important; width:30px; height:30px; color:var(--fg-dim) !important; }
+
+    /* day popup: one clean sheet (no double padding) */
+    #dayModal > .modal.pdx-modal { padding:10px 0 0 !important; }
+    #dayModal .pdx-header { padding:4px 20px 8px !important; }
+    #dayModal .pdx-body { flex-direction:column; }
+    #dayModal .pdx-left { width:auto !important; flex-direction:row !important; justify-content:flex-start !important; gap:12px; padding:0 20px 6px !important; }
+    #dayModal .pdx-left .pdx-poke-img { width:64px !important; height:64px !important; }
+    #dayModal .pdx-poke-num { order:3; margin:0 !important; }
+    #dayModal .pdx-right { padding:6px 20px 8px !important; max-height:46vh !important; }
+    #dayModal .pdx-footer .modal-btn { white-space:nowrap; }
+    .dev-item .dev-dot { border-radius:50%; }
+    .dev-item > span[style*="padding:2px 4px"] { border-radius:999px !important; padding:3px 9px !important; font-size:11px !important; font-weight:700; }
+    .theme-preset-btn { border-radius:16px !important; box-shadow:none !important; font-size:11px !important; font-weight:700; letter-spacing:0 !important; padding:10px 4px 8px !important; }
+    .theme-preset-btn.active { box-shadow:inset 0 0 0 2px #fff !important; }
+    .color-pick-row input[type=color] { border-radius:10px; overflow:hidden; }
+    .color-pick-label { font-size:12.5px !important; font-weight:600; opacity:.8 !important; text-transform:capitalize; }
+    #pushStatus, #settingsModal .push-status { font-size:13px !important; font-weight:500 !important; }
+
     .mob-wiki-drawer {
       position:absolute; inset:0; z-index:20;
       display:flex; flex-direction:column;
@@ -1065,47 +1339,47 @@
        icon-chip transactions) on top of the site-wide base styles. ── */
     #mobBudgetView { font-family:'Inter',system-ui,sans-serif; }
     #mobBudgetView .budget-tabs { gap:4px; margin-bottom:14px; background:rgba(223,238,255,.05); padding:3px; border-radius:var(--r-pill); }
-    #mobBudgetView .budget-tab  { font-family:'Inter'; font-size:10px; font-weight:600; letter-spacing:.02em; padding:7px 0; background:none; border:none; color:var(--fg-dim); }
+    #mobBudgetView .budget-tab  { font-family:'Inter',sans-serif; font-size:10px; font-weight:600; letter-spacing:.02em; padding:7px 0; background:none; border:none; color:var(--fg-dim); }
     #mobBudgetView .budget-tab.active { color:var(--bg); background:var(--fg); border-color:transparent; }
 
     .gil-hero { padding:4px 2px 18px; }
-    .gil-hero-lbl { font-family:'Inter'; font-size:11px; font-weight:500; color:var(--fg-dim); margin-bottom:4px; }
-    .gil-hero-num { font-family:'Inter'; font-variant-numeric:tabular-nums; font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1; display:flex; align-items:baseline; gap:2px; }
-    .gil-hero-delta { display:inline-flex; align-items:center; gap:4px; margin-top:9px; font-family:'Inter'; font-size:11px; font-weight:600; padding:3px 9px; border-radius:var(--r-pill); }
+    .gil-hero-lbl { font-family:'Inter',sans-serif; font-size:11px; font-weight:500; color:var(--fg-dim); margin-bottom:4px; }
+    .gil-hero-num { font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1; display:flex; align-items:baseline; gap:2px; }
+    .gil-hero-delta { display:inline-flex; align-items:center; gap:4px; margin-top:9px; font-family:'Inter',sans-serif; font-size:11px; font-weight:600; padding:3px 9px; border-radius:var(--r-pill); }
     .gil-hero-delta.up   { color:var(--green); background:rgba(127,255,176,.12); }
     .gil-hero-delta.down { color:var(--red); background:rgba(255,148,148,.12); }
     .gil-hero-delta.flat { color:var(--fg-dim); background:rgba(223,238,255,.06); }
     .gil-spark { display:block; margin-top:14px; width:100%; height:36px; }
 
     .gil-quick-row { display:flex; gap:8px; padding:0 2px 16px; }
-    .gil-qbtn { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:11px 0 9px; border-radius:var(--r-md); border:none; cursor:pointer; background:rgba(223,238,255,.045); transition:transform .1s; font-family:'Inter'; }
+    .gil-qbtn { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:11px 0 9px; border-radius:var(--r-md); border:none; cursor:pointer; background:rgba(223,238,255,.045); transition:transform .1s; font-family:'Inter',sans-serif; }
     .gil-qbtn:active { transform:scale(.96); }
     .gil-qbtn .gqi { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; }
     .gil-qbtn.expense .gqi { background:rgba(255,148,148,.14); color:var(--red); }
     .gil-qbtn.income  .gqi { background:rgba(127,255,176,.14); color:var(--green); }
     .gil-qbtn span.gql { font-size:10.5px; font-weight:600; color:var(--fg-dim); }
 
-    #mobBudgetView .m-label, #mobBudgetView .bento-label { font-family:'Inter'; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+    #mobBudgetView .m-label, #mobBudgetView .bento-label { font-family:'Inter',sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
     #mobBudgetView .bento-tile { background:rgba(223,238,255,.045); border:none; }
-    #mobBudgetView .bento-val { font-family:'Inter'; font-variant-numeric:tabular-nums; font-weight:700; }
+    #mobBudgetView .bento-val { font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-weight:700; }
     #mobBudgetView .bento-hero .bento-val { font-size:24px; }
-    #mobBudgetView .bento-sub { font-family:'Inter'; font-size:10px; font-weight:500; }
+    #mobBudgetView .bento-sub { font-family:'Inter',sans-serif; font-size:10px; font-weight:500; }
 
     #mobBudgetView .budget-txn { display:flex; align-items:center; gap:10px; padding:9px 6px; background:none; }
     #mobBudgetView .budget-txn-icon { width:34px; height:34px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; background:rgba(223,238,255,.07); }
-    #mobBudgetView .budget-txn-note { font-family:'Inter'; font-size:13.5px; font-weight:600; }
-    #mobBudgetView .budget-txn-amt { font-family:'Inter'; font-variant-numeric:tabular-nums; font-weight:700; font-size:14px; }
+    #mobBudgetView .budget-txn-note { font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; }
+    #mobBudgetView .budget-txn-amt { font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-weight:700; font-size:14px; }
 
-    #mobBudgetView .mob-inp, #mobBudgetView .budget-cat-sel, #mobBudgetView .budget-limit-inp { font-family:'Inter'; font-size:12.5px; background:rgba(223,238,255,.05); border:none; }
+    #mobBudgetView .mob-inp, #mobBudgetView .budget-cat-sel, #mobBudgetView .budget-limit-inp { font-family:'Inter',sans-serif; font-size:12.5px; background:rgba(223,238,255,.05); border:none; }
     #mobBudgetView .mob-add-btn { border-radius:var(--r-sm); }
-    #mobBudgetView .budget-type-btn { font-family:'Inter'; font-size:11px; font-weight:600; border:none; background:rgba(223,238,255,.05); }
+    #mobBudgetView .budget-type-btn { font-family:'Inter',sans-serif; font-size:11px; font-weight:600; border:none; background:rgba(223,238,255,.05); }
     #mobBudgetView .budget-type-btn.active.expense { background:var(--red); color:#2a0d0d; border-color:transparent; }
     #mobBudgetView .budget-type-btn.active.income  { background:var(--green); color:#0d2a1a; border-color:transparent; }
-    #mobBudgetView .mini-btn { font-family:'Inter'; font-size:10.5px; font-weight:600; background:rgba(223,238,255,.06); box-shadow:none; }
-    #mobBudgetView .save-label { font-family:'Inter'; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
-    #mobBudgetView .save-inp { font-family:'Inter'; font-size:14px; background:rgba(223,238,255,.05); border:none; }
-    #mobBudgetView .budget-empty { font-family:'Inter'; font-size:13px; font-weight:500; }
-    #mobBudgetView .budget-month { font-family:'Inter'; font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--fg-dim); }
+    #mobBudgetView .mini-btn { font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; background:rgba(223,238,255,.06); box-shadow:none; }
+    #mobBudgetView .save-label { font-family:'Inter',sans-serif; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; }
+    #mobBudgetView .save-inp { font-family:'Inter',sans-serif; font-size:14px; background:rgba(223,238,255,.05); border:none; }
+    #mobBudgetView .budget-empty { font-family:'Inter',sans-serif; font-size:13px; font-weight:500; }
+    #mobBudgetView .budget-month { font-family:'Inter',sans-serif; font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--fg-dim); }
 
     /* Quick GIL: fast per-card add/subtract pills on the Home tab */
     .quickgil-row  { display:flex; flex-direction:column; gap:6px; }
@@ -1162,64 +1436,45 @@
 
   <!-- ══════════════ MOBILE LAYOUT (only layout — desktop DS-console skin removed) ══════════════ -->
 
-  <!-- Top Pokémon strip -->
-  <div class="mob-poke-strip top" id="mobPokeTop">
-    <div class="mob-poke-track" id="mobPokeTopTrack"></div>
-  </div>
-
   <!-- Tab content -->
   <div class="mob-tab-content" id="mobTabContent">
 
     <!-- HOME tab -->
-    <div class="mob-tab-pane active" id="mobTabHome">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0;">
-        <div class="mob-home-date" id="mobDate" style="opacity:.8;margin-bottom:0;text-align:left;">—</div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="openPokedexModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">📖 DEX</button>
-          <button onclick="openSettingsModal()" style="background:none;border:1px solid rgba(223,238,255,.2);color:rgba(223,238,255,.6);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;padding:7px 10px;border-radius:var(--r-md);">⚙</button>
-        </div>
+    <div class="mob-tab-pane active home-pane" id="mobTabHome">
+      <div class="home-hd">
+        <div class="home-hd-txt"><div class="home-day" id="homeDay">Today</div><div class="home-date"><span id="homeDate"></span><span id="mobDate" hidden></span></div></div>
+        <button type="button" class="ed-round" onclick="openPokedexModal()" aria-label="Pokédex"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12a10 10 0 0 1 20 0z" fill="#ff5a4e"/><path d="M2 12h20" stroke="#10141c" stroke-width="2"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#10141c" stroke-width="2"/></svg></button>
+        <button type="button" class="ed-round" onclick="openSettingsModal()" aria-label="Settings">⚙</button>
       </div>
 
-      <div class="mob-bento">
-        <div class="mc-card span-2">
-          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>TODAY'S QUESTS</span>
-            <span class="mob-home-count-pill" id="mobHomeQuestCount">0/0</span>
-          </div>
-          <div class="mob-quest-list" id="mobHomeQuestList"></div>
-          <div class="mob-add-row">
-            <select id="mobHomeRankSel" class="mob-rank-sel" onchange="onQuestRankChange('mobHome')"><option value="S">S</option><option value="B" selected>B</option></select>
-            <button type="button" class="mob-time-trigger" id="mobHomeTimeSel" onclick="openTimeWheel('mobHome')">🕐</button>
-            <input type="text" class="mob-inp" id="mobHomeTaskInp" placeholder="New quest...">
-            <button class="mob-add-btn" onclick="addMobTask()">+</button>
-          </div>
-        </div>
+      <div class="buddy-card" id="buddyCard"></div>
 
-        <div class="mc-card span-2">
-          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>GIL WALLET</span>
-            <span id="mobHomeGilAmt" style="font-family:'Inter',sans-serif;font-size:24px;;font-weight:600">$0</span>
-          </div>
-          <div class="quickgil-row" id="mobQuickGilRow"></div>
-          <button class="mob-home-link" onclick="goToMobTab('gil')" style="margin-top:2px;">Open full wallet →</button>
+      <div class="home-card">
+        <div class="home-card-hd">
+          <span class="home-card-t">Today's quests</span>
+          <span class="home-count" id="mobHomeQuestCount">0/0</span>
+          <button type="button" class="home-add" onclick="openAddSheetAs('quest')">+ Add</button>
         </div>
+        <div class="tl-list home-tl" id="mobHomeQuestList"></div>
+      </div>
 
-        <div class="mc-card" onclick="openPokedexModal()" style="cursor:pointer;">
-          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>POKÉDEX</span>
-            <span class="mob-home-count-pill" id="mobHomeDexCount">0/0</span>
-          </div>
-          <div class="mob-home-poke-preview" id="mobHomeDexPreview"></div>
+      <div class="home-card" onclick="if(!event.target.closest('button'))goToMobTab('gil')">
+        <div class="home-card-hd">
+          <span class="home-card-t">Wallet</span>
+          <span class="home-gil" id="mobHomeGilAmt">$0</span>
         </div>
+        <div class="quickgil-row" id="mobQuickGilRow"></div>
+      </div>
 
-        <div class="mc-card" onclick="goToMobTab('claude')" style="cursor:pointer;">
-          <div class="mob-home-card-label" style="display:flex;justify-content:space-between;align-items:center;">
-            <span>▲ ED</span>
-            <div class="server-dot" id="mobHomeServerDot"></div>
-          </div>
-          <div class="mob-home-next-title" style="font-size:15px;font-style:italic;line-height:1.3;">Chat, tasks & wiki</div>
-          <button class="mob-home-link">Open ED →</button>
-        </div>
+      <div class="home-row2">
+        <button type="button" class="home-mini" onclick="openPokedexModal()">
+          <span class="home-mini-hd"><span class="ed-pill-ic"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12a10 10 0 0 1 20 0z" fill="#ff5a4e"/><path d="M2 12h20" stroke="#10141c" stroke-width="2"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#10141c" stroke-width="2"/></svg></span><span>Pokédex</span><span class="home-mini-count" id="mobHomeDexCount">0/0</span></span>
+          <span class="home-dex-thumbs" id="mobHomeDexPreview"></span>
+        </button>
+        <button type="button" class="home-mini" onclick="goToMobTab('claude')">
+          <span class="home-mini-hd"><span class="cm-av">🧠</span><span>Ask ED</span><span class="server-dot" id="mobHomeServerDot"></span></span>
+          <span class="home-mini-s">Calendar, tasks, budget &amp; wiki</span>
+        </button>
       </div>
     </div>
 
@@ -1288,13 +1543,9 @@
     </div>
 
     <!-- BUDGET tab -->
-    <div class="mob-tab-pane" id="mobTabGil">
-      <div class="mob-tab-hd">
-        <span>💰 WEEKLY BUDGET</span>
-      </div>
-      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
-        <div id="mobBudgetView" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;"></div>
-      </div>
+    <div class="mob-tab-pane gil-pane" id="mobTabGil">
+      <div class="home-hd"><div class="home-hd-txt"><div class="home-day">Budget</div><div class="home-date" id="gilSubhead">This week</div></div></div>
+      <div id="mobBudgetView" class="gil-view"></div>
     </div>
 
     <!-- CLAUDE tab (merged: ED chat + Wiki drawer) -->
@@ -1350,26 +1601,21 @@
 
   </div><!-- /mob-tab-content -->
 
-  <!-- Bottom Pokémon strip (reverse) -->
-  <div class="mob-poke-strip bottom" id="mobPokeBottom">
-    <div class="mob-poke-track mob-poke-track-rev" id="mobPokeBottomTrack"></div>
-  </div>
-
   <!-- 5-tab bottom nav -->
   <nav class="mob-nav" id="mobNav">
     <button class="mob-nav-btn active" data-tab="home" onclick="switchMobTab('home',this)">
-      <span class="nav-icon">🏠</span><span>HOME</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 10.5L12 3.8l8.5 6.7V20a1 1 0 0 1-1 1h-5v-6h-5v6h-5a1 1 0 0 1-1-1z"/></svg><span>Home</span>
     </button>
     <button class="mob-nav-btn" data-tab="cal" onclick="switchMobTab('cal',this)">
-      <span class="nav-icon">📅</span><span>CAL</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>Calendar</span>
     </button>
     <button class="mob-nav-btn" data-tab="gil" onclick="switchMobTab('gil',this)">
-      <span class="nav-icon">💰</span><span>GIL</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="7.5" width="17" height="12.5" rx="3"/><circle cx="16" cy="13.8" r="1.4"/></svg><span>Budget</span>
     </button>
     <button class="mob-nav-btn" data-tab="claude" onclick="switchMobTab('claude',this)">
-      <span class="nav-icon">🧠</span><span>ED</span>
+      <svg class="nav-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg><span>ED</span>
     </button>
-  </nav>
+</nav>
 
 </div><!-- /console -->
 
@@ -1440,7 +1686,7 @@
       <div class="pdx-right">
         <div class="pdx-date-label" id="pdxDateLabel">—</div>
         <div>
-          <div class="pdx-section-hd">ENCOUNTERS</div>
+          <div class="pdx-section-hd">On this day</div>
           <div class="dev-list" id="devList"></div>
         </div>
         <div class="pdx-add-form" style="display:none;" aria-hidden="true">
@@ -1474,8 +1720,8 @@
       </div>
     </div>
     <div class="pdx-footer">
-      <button class="modal-btn ok" style="flex:1;" onclick="closeModal('dayModal');openAddSheet(dayModalDate)">＋ ADD TO THIS DAY</button>
-      <button class="modal-btn" style="flex:1;" onclick="closeModal('dayModal')">CLOSE</button>
+      <button class="modal-btn ok" style="flex:1;" onclick="closeModal('dayModal');openAddSheet(dayModalDate)">+ Add to this day</button>
+      <button class="modal-btn" style="flex:1;" onclick="closeModal('dayModal')">Close</button>
     </div>
   </div>
 </div>
@@ -1533,7 +1779,7 @@
 <!-- EDIT MISSION MODAL -->
 <div class="overlay" id="editMissionModal">
   <div class="modal">
-    <div class="modal-title">✎ EDIT MISSION</div>
+    <div class="modal-title">Edit mission</div>
     <div class="m-field"><div class="m-label">Time</div><input id="editMissTime" class="m-inp" type="time"></div>
     <div class="m-field"><div class="m-label">Title</div><input id="editMissTitle" class="m-inp" type="text" placeholder="Mission name..."></div>
     <div class="m-field"><div class="m-label">Type</div>
@@ -1546,7 +1792,7 @@
 <!-- QUEST TIME WHEEL MODAL -->
 <div class="overlay" id="timeWheelModal">
   <div class="modal time-wheel-modal">
-    <div class="modal-title">◆ SET TIME</div>
+    <div class="modal-title">Set time</div>
     <div class="wheel-row">
       <div class="wheel-col" id="wheelHour"></div>
       <div class="wheel-col" id="wheelMin"></div>
@@ -1554,8 +1800,8 @@
       <div class="wheel-center-line"></div>
     </div>
     <div class="modal-btns">
-      <button class="modal-btn sm" onclick="clearTimeWheel()">CLEAR</button>
-      <button class="modal-btn ok" onclick="confirmTimeWheel()">SET</button>
+      <button class="modal-btn sm" onclick="clearTimeWheel()">Clear</button>
+      <button class="modal-btn ok" onclick="confirmTimeWheel()">Set</button>
     </div>
   </div>
 </div>
@@ -1563,18 +1809,18 @@
 <!-- QUICK MONEY PAD MODAL -->
 <div class="overlay" id="moneyPadModal">
   <div class="modal moneypad-modal">
-    <div class="modal-title" id="moneyPadTitle">◆ ADD GIL</div>
+    <div class="modal-title" id="moneyPadTitle">Add money</div>
     <div class="moneypad-display" id="moneyPadDisplay">$0</div>
     <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px;">
-      <button class="budget-type-btn expense" data-type="expense" onclick="setMoneyPadType('expense')">− EXPENSE</button>
-      <button class="budget-type-btn income" data-type="income" onclick="setMoneyPadType('income')">+ INCOME</button>
+      <button class="budget-type-btn expense" data-type="expense" onclick="setMoneyPadType('expense')">− Expense</button>
+      <button class="budget-type-btn income" data-type="income" onclick="setMoneyPadType('income')">+ Income</button>
     </div>
     <div class="moneypad-chips" id="moneyPadChips"></div>
     <input id="moneyPadNote" class="m-inp" type="text" placeholder="Note (optional)" style="margin:8px 0;">
     <div class="moneypad-grid" id="moneyPadGrid"></div>
     <div class="modal-btns">
-      <button class="modal-btn sm" onclick="closeModal('moneyPadModal')">CANCEL</button>
-      <button class="modal-btn ok" onclick="confirmMoneyPad()">CONFIRM</button>
+      <button class="modal-btn sm" onclick="closeModal('moneyPadModal')">Cancel</button>
+      <button class="modal-btn ok" onclick="confirmMoneyPad()">Confirm</button>
     </div>
   </div>
 </div>
@@ -1582,7 +1828,7 @@
 <!-- EDIT EVENT MODAL -->
 <div class="overlay" id="editEventModal">
   <div class="modal">
-    <div class="modal-title" id="editEvModalTitle">✎ EDIT EVENT</div>
+    <div class="modal-title" id="editEvModalTitle">Edit event</div>
     <div class="m-field" id="editEvScopeRow" style="display:none;">
       <div class="m-label">Apply to</div>
       <div style="display:flex;gap:14px;font-size:13px;color:var(--fg);">
@@ -1620,24 +1866,24 @@
 <!-- INGEST MODAL -->
 <div class="overlay" id="ingestModal">
   <div class="modal">
-    <div class="modal-title">✨ QUICK INGEST</div>
+    <div class="modal-title">Quick ingest</div>
     <p style="font-size:14px;color:var(--fg-dim);margin-bottom:8px;">Enter filename from your <strong style="color:var(--accent);">raw/</strong> folder:</p>
     <input id="ingestFile" class="m-inp" type="text" placeholder="e.g. karpathy-llm-wiki.md" style="margin:6px 0;" onkeydown="if(event.key==='Enter')doIngest()">
     <p style="font-size:13px;color:var(--fg-dim);">Copies a prompt — paste into Claude CLI or Claude.ai.</p>
-    <div class="modal-btns"><button class="modal-btn ok" onclick="doIngest()">Copy Prompt</button><button class="modal-btn" onclick="closeModal('ingestModal')">Cancel</button></div>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="doIngest()">Copy prompt</button><button class="modal-btn" onclick="closeModal('ingestModal')">Cancel</button></div>
   </div>
 </div>
 
 <!-- API KEY MODAL -->
 <div class="overlay" id="keyModal">
   <div class="modal">
-    <div class="modal-title">⚙ API KEY SETUP</div>
+    <div class="modal-title">API key</div>
     <div class="key-form">
       <p class="key-info">Enter your Anthropic API key to enable Claude chat.<br>Get one at <strong style="color:var(--accent);">console.anthropic.com</strong></p>
       <input id="keyInp" class="key-inp" type="password" placeholder="sk-ant-api03-..." onkeydown="if(event.key==='Enter')saveKey()">
       <p class="key-info" id="keyStatus" style="color:rgba(223,238,255,.35);font-size:11px;"></p>
     </div>
-    <div class="modal-btns"><button class="modal-btn ok" onclick="saveKey()">Save Key</button><button class="modal-btn" onclick="closeModal('keyModal')">Cancel</button></div>
+    <div class="modal-btns"><button class="modal-btn ok" onclick="saveKey()">Save key</button><button class="modal-btn" onclick="closeModal('keyModal')">Cancel</button></div>
   </div>
 </div>
 
@@ -1727,7 +1973,7 @@
 </style>
 <div class="overlay" id="settingsModal">
   <div class="modal" style="width:500px;">
-    <div class="modal-title">⚙ SETTINGS</div>
+    <div class="modal-title">Settings</div>
     <div class="m-label" style="margin-bottom:8px;">THEME PRESET</div>
     <div class="theme-presets" id="themePresets"></div>
     <div class="m-label" style="margin-bottom:8px;">CUSTOM COLORS</div>
@@ -1744,7 +1990,7 @@
       <div id="settingsKeyLocal">
         <div style="display:flex;gap:6px;">
           <input id="settingsKeyInp" class="m-inp" type="password" placeholder="sk-ant-..." style="flex:1;">
-          <button class="modal-btn sm ok" onclick="saveKeyFromSettings()">SAVE</button>
+          <button class="modal-btn sm ok" onclick="saveKeyFromSettings()">Save</button>
         </div>
       </div>
       <div id="settingsKeyCloud" style="display:none;">
@@ -1761,12 +2007,12 @@
     </div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(223,238,255,.1);">
       <div class="m-label" style="margin-bottom:6px;">EVENT NOTIFICATIONS</div>
-      <button class="modal-btn sm ok" id="pushToggleBtn" onclick="togglePushSubscription()" style="width:100%;">🔔 ENABLE NOTIFICATIONS</button>
+      <button class="modal-btn sm ok" id="pushToggleBtn" onclick="togglePushSubscription()" style="width:100%;">🔔 Turn on notifications</button>
       <div id="pushStatus" style="font-family:'Inter',sans-serif;font-size:15px;opacity:.6;margin-top:6px;line-height:1.4;;font-weight:600"></div>
     </div>
     <div class="modal-btns" style="margin-top:14px;">
-      <button class="modal-btn ok" onclick="saveTheme()">APPLY THEME</button>
-      <button class="modal-btn" onclick="closeModal('settingsModal')">CLOSE</button>
+      <button class="modal-btn ok" onclick="saveTheme()">Apply theme</button>
+      <button class="modal-btn" onclick="closeModal('settingsModal')">Close</button>
     </div>
   </div>
 </div>
@@ -1858,13 +2104,6 @@ function fmtTime(t) { if(!t)return''; const[h,m]=t.split(':').map(Number); retur
   setTimeout(()=>{o.classList.add('fade');setTimeout(()=>o.remove(),500);},1800);
 })();
 
-// Mobile poke strips
-(function(){
-  ['mobPokeTopTrack','mobPokeBottomTrack'].forEach(trackId=>{
-    const t=document.getElementById(trackId); if(!t)return;
-    [...POKE_IDS,...POKE_IDS].forEach(id=>{const img=document.createElement('img');img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;img.alt=`#${id}`;img.loading='lazy';t.appendChild(img);});
-  });
-})();
 
 // Seeded week pokemon
 function seededRng(seed){let s=seed|0;return()=>{s=Math.imul(s^(s>>>16),0x45d9f3b);s=Math.imul(s^(s>>>16),0x45d9f3b);s^=(s>>>16);return(s>>>0)/0x100000000;};}
@@ -1900,43 +2139,213 @@ function renderHomePokemon(){
   getPokeName(id).then(name=>{const ne=document.getElementById('homePokeNameEl');if(ne)ne.textContent=name.toUpperCase();});
 }
 
+// ══════════════════════════════════════════════════════════════
+// POKÉMON — HOME art, buddy, wild encounters, Pokédex
+// Inspired by Pokémon GO buddies (hearts, levels), Finch (the pet reflects
+// your day) and Pokémon Sleep (real activity turns into encounters).
+// ══════════════════════════════════════════════════════════════
+const SPRITE_BASE='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+function homeArt(id,shiny){ return `${SPRITE_BASE}/other/home/${shiny?'shiny/':''}${id}.png`; }
+const BALL_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12a10 10 0 0 1 20 0z" fill="#ff5a4e"/><path d="M2 12h20" stroke="#10141c" stroke-width="2"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#10141c" stroke-width="2"/></svg>';
+try{ Object.assign(POKE_NAMES, JSON.parse(localStorage.getItem('mc.pokeNames')||'{}')); }catch{}
+function rememberName(id,name){ POKE_NAMES[id]=name; try{ localStorage.setItem('mc.pokeNames',JSON.stringify(POKE_NAMES)); }catch{} }
+function pokeLabel(id){ return POKE_NAMES[id]||`#${String(id).padStart(3,'0')}`; }
+function fillName(id,elId){ getPokeName(id).then(n=>{ if(n&&!n.startsWith('#')) rememberName(id,n); const el=document.getElementById(elId); if(el) el.textContent=n; }); }
+
+function recordCatch(id,shiny){
+  if(!APP.caughtPoke) APP.caughtPoke={};
+  const k=String(id);
+  if(!APP.caughtPoke[k]) APP.caughtPoke[k]={count:0,firstCaught:TODAY(),shiny:false};
+  APP.caughtPoke[k].count++; APP.caughtPoke[k].lastCaught=TODAY();
+  if(shiny) APP.caughtPoke[k].shiny=true;
+  patchData({caughtPoke:APP.caughtPoke});
+  renderMobHomeDex();
+}
+
+// ── BUDDY ──
+const BUDDY_LEVELS=[{min:0,name:'Good Buddy'},{min:30,name:'Great Buddy'},{min:90,name:'Ultra Buddy'},{min:200,name:'Best Buddy'}];
+const BUDDY_DAILY_CAP=10, BUDDY_PET_CAP=3;
+const STARTERS=[25,133,1,4,7];
+function buddyLevel(h){ let i=0; BUDDY_LEVELS.forEach((l,j)=>{ if(h>=l.min) i=j; }); return i; }
+function buddyToday(){ const b=APP.buddy; if(!b) return null; if(!b.today||b.today.date!==TODAY()) b.today={date:TODAY(),hearts:0,pets:0}; return b.today; }
+function setBuddy(id){
+  const shiny=!!(APP.caughtPoke||{})[String(id)]?.shiny;
+  const prev=APP.buddy;
+  APP.buddy={ id, shiny, hearts: prev&&prev.id===id?prev.hearts:0, since:TODAY(), today:{date:TODAY(),hearts:0,pets:0} };
+  if(!(APP.caughtPoke||{})[String(id)]) recordCatch(id,false);
+  patchData({buddy:APP.buddy});
+  renderBuddy();
+}
+function addBuddyHearts(n){
+  const b=APP.buddy; if(!b) return 0;
+  const t=buddyToday(); const give=Math.max(0,Math.min(n,BUDDY_DAILY_CAP-t.hearts));
+  if(!give) return 0;
+  const before=buddyLevel(b.hearts);
+  b.hearts+=give; t.hearts+=give;
+  patchData({buddy:b});
+  const after=buddyLevel(b.hearts);
+  if(after>before) setTimeout(()=>{ playSfx('levelup'); showToast(`${pokeLabel(b.id)} is now your ${BUDDY_LEVELS[after].name}! ♥`); },500);
+  return give;
+}
+function buddyMood(){
+  const tasks=getTasksForDate(TODAY()), done=tasks.filter(t=>t.done).length;
+  const name=pokeLabel(APP.buddy.id);
+  if(!tasks.length) return {face:'😊',text:`${name} is ready when you are.`};
+  if(done===tasks.length) return {face:'🤩',text:`All ${tasks.length} quests done — ${name} is thrilled!`};
+  if(done===0) return {face:'🙂',text:`${tasks.length} quest${tasks.length>1?'s':''} today. ${name} is cheering you on.`};
+  return {face:'😄',text:`${done} of ${tasks.length} done — ${tasks.length-done} to go!`};
+}
+function renderBuddy(){
+  const el=document.getElementById('buddyCard'); if(!el) return;
+  const b=APP.buddy;
+  if(!b){
+    el.innerHTML=`<div class="buddy-pick"><div class="buddy-pick-t">Choose a buddy</div><div class="buddy-pick-s">Your buddy hangs out here, cheers you on, and levels up as you finish quests.</div>
+      <div class="buddy-pick-row">${STARTERS.map(id=>`<button type="button" onclick="setBuddy(${id})"><img src="${homeArt(id)}" alt="" loading="lazy"><span id="bpName${id}">${esc(pokeLabel(id))}</span></button>`).join('')}</div></div>`;
+    STARTERS.forEach(id=>fillName(id,'bpName'+id));
+    return;
+  }
+  const t=buddyToday(), lvl=buddyLevel(b.hearts), next=BUDDY_LEVELS[lvl+1];
+  const pct=next?Math.round((b.hearts-BUDDY_LEVELS[lvl].min)/(next.min-BUDDY_LEVELS[lvl].min)*100):100;
+  const mood=buddyMood();
+  el.innerHTML=`
+    <div class="buddy-stage" onclick="petBuddy(event)">
+      <div class="buddy-glow"></div>
+      <img class="buddy-img" id="buddyImg" src="${homeArt(b.id,b.shiny)}" alt="Your buddy">
+      <div class="buddy-shadow"></div>
+    </div>
+    <div class="buddy-info">
+      <div class="buddy-name"><span id="buddyName">${esc(pokeLabel(b.id))}</span>${b.shiny?' <span class="buddy-shiny">✨</span>':''}</div>
+      <div class="buddy-level">${BUDDY_LEVELS[lvl].name}</div>
+      <div class="buddy-bar"><i style="width:${pct}%"></i></div>
+      <div class="buddy-hearts">♥ ${b.hearts}${next?` / ${next.min}`:''} <span>· ${t.hearts}/${BUDDY_DAILY_CAP} today</span></div>
+      <div class="buddy-bubble">${mood.face} ${esc(mood.text)}</div>
+    </div>
+    <button type="button" class="buddy-swap" onclick="event.stopPropagation();openPokedexModal('caught')" aria-label="Change buddy">⇄</button>`;
+  fillName(b.id,'buddyName');
+}
+function petBuddy(ev){
+  const b=APP.buddy; if(!b) return;
+  const img=document.getElementById('buddyImg');
+  if(img){ img.classList.remove('hop'); void img.offsetWidth; img.classList.add('hop'); }
+  const stage=ev.currentTarget, r=stage.getBoundingClientRect();
+  for(let i=0;i<3;i++){
+    const h=document.createElement('span'); h.className='buddy-heart'; h.textContent='♥';
+    h.style.left=(r.width/2-10+(i-1)*22+Math.random()*10)+'px'; h.style.animationDelay=(i*90)+'ms';
+    stage.appendChild(h); setTimeout(()=>h.remove(),1300);
+  }
+  playSfx('xp');
+  const t=buddyToday();
+  if(t.pets<BUDDY_PET_CAP){ t.pets++; addBuddyHearts(1); }
+  setTimeout(renderBuddy,650);
+}
+
+// ── WILD ENCOUNTER (after finishing a quest) ──
+const ENCOUNTER_POOL={S:[6,9,3,149,143,131,130,94,248,445,448,373,376,635,706],B:[25,133,39,52,54,175,113,196,197,35,183,216,225,393,390,258,252,255,722,725,728,810,813,816]};
+function maybeEncounter(rank){
+  const chance=rank==='S'?1:0.4;
+  if(Math.random()>chance) return;
+  const pool=ENCOUNTER_POOL[rank]||ENCOUNTER_POOL.B;
+  const id=pool[Math.floor(Math.random()*pool.length)], shiny=Math.random()<0.05;
+  setTimeout(()=>openEncounter(id,shiny,rank),700);
+}
+function openEncounter(id,shiny,rank){
+  document.getElementById('encounterOv')?.remove();
+  const ov=document.createElement('div'); ov.className='enc-ov'; ov.id='encounterOv';
+  ov.innerHTML=`<div class="enc-card${shiny?' shiny':''}">
+      <div class="enc-kicker">${rank==='S'?'Quest reward':'A wild Pokémon appeared!'}</div>
+      <div class="enc-stage"><div class="enc-glow"></div><img class="enc-img" id="encImg" src="${homeArt(id,shiny)}" alt=""><div class="enc-ball" id="encBall">${BALL_SVG}</div></div>
+      <div class="enc-name"><span id="encName">${esc(pokeLabel(id))}</span>${shiny?' ✨':''}</div>
+      <div class="enc-sub" id="encSub">${shiny?'It’s shiny! ':''}${(APP.caughtPoke||{})[String(id)]?'You’ve caught one before.':'New to your Pokédex!'}</div>
+      <div class="enc-actions" id="encActions">
+        <button type="button" class="enc-throw" onclick="throwBall(${id},${shiny})">${BALL_SVG}<span>Throw Poké Ball</span></button>
+        <button type="button" class="enc-run" onclick="document.getElementById('encounterOv').remove()">Let it go</button>
+      </div></div>`;
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+  fillName(id,'encName');
+  playSfx(shiny?'shiny':'xp');
+}
+function throwBall(id,shiny){
+  const ball=document.getElementById('encBall'), img=document.getElementById('encImg'), acts=document.getElementById('encActions');
+  if(!ball||!img) return;
+  acts.innerHTML='';
+  ball.classList.add('thrown');
+  setTimeout(()=>{ img.classList.add('absorbed'); ball.classList.add('landed'); },520);
+  setTimeout(()=>ball.classList.add('wobble'),900);
+  setTimeout(()=>{
+    ball.classList.add('caught'); playSfx(shiny?'shiny':'catch');
+    recordCatch(id,shiny);
+    const name=pokeLabel(id);
+    document.getElementById('encSub').textContent=`Gotcha! ${name} was added to your Pokédex.`;
+    const buddyBtn=APP.buddy&&APP.buddy.id===id?'':`<button type="button" class="enc-run" onclick="setBuddy(${id});document.getElementById('encounterOv').remove();showToast('${esc(name).replace(/'/g,"\\'")} is your new buddy ♥')">Make buddy</button>`;
+    acts.innerHTML=`<button type="button" class="enc-throw done" onclick="document.getElementById('encounterOv').remove()"><span>Nice!</span></button>${buddyBtn}`;
+  },2500);
+}
+
+// ── POKÉDEX (sheet) ──
+let dexFilter='all';
+function openPokedexModal(filter){
+  if(filter) dexFilter=filter;
+  document.getElementById('dexOv')?.remove();
+  const ov=document.createElement('div'); ov.className='overlay add-sheet-ov active'; ov.id='dexOv';
+  ov.innerHTML=`<div class="add-sheet mc-sheet tall dex-sheet"><div class="as-grab"></div>
+    <div class="sh-hd"><div class="ed-av dex">${BALL_SVG}</div><div class="ed-hd-txt"><div class="ed-name">Pokédex</div><div class="ed-status" id="dexCountTxt"></div></div><button type="button" class="as-x" onclick="document.getElementById('dexOv').remove()" aria-label="Close">✕</button></div>
+    <div class="dex-progress"><i id="dexBar"></i></div>
+    <div class="cal-seg sh-seg" id="dexSeg"><button type="button" data-f="all" onclick="setDexFilter('all')">All</button><button type="button" data-f="caught" onclick="setDexFilter('caught')">Caught</button></div>
+    <div class="dex-grid2" id="dexGrid"></div></div>`;
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+  renderDexGrid();
+}
+function setDexFilter(f){ dexFilter=f; renderDexGrid(); }
+function renderDexGrid(){
+  const caught=APP.caughtPoke||{}, ids=POKE_IDS.filter(id=>caught[String(id)]), total=POKE_IDS.length;
+  const extra=Object.keys(caught).map(Number).filter(id=>!POKE_IDS.includes(id));
+  const nCaught=ids.length+extra.length;
+  document.getElementById('dexCountTxt').textContent=`${nCaught} caught · ${total} to find`;
+  document.getElementById('dexBar').style.width=Math.min(100,Math.round(ids.length/total*100))+'%';
+  document.querySelectorAll('#dexSeg button').forEach(b=>b.classList.toggle('active',b.dataset.f===dexFilter));
+  const list=dexFilter==='caught'?[...ids,...extra].sort((a,b)=>a-b):POKE_IDS;
+  const buddyId=APP.buddy?.id;
+  document.getElementById('dexGrid').innerHTML=list.length?list.map(id=>{
+    const c=caught[String(id)];
+    if(!c) return `<div class="dex-cell unknown"><img src="${homeArt(id)}" alt="" loading="lazy"><span class="dex-no">#${String(id).padStart(3,'0')}</span><span class="dex-nm">???</span></div>`;
+    return `<button type="button" class="dex-cell" onclick="openPokedexSheet(${id})"><img src="${homeArt(id,c.shiny)}" alt="" loading="lazy">
+      ${buddyId===id?'<span class="dex-badge">♥</span>':c.shiny?'<span class="dex-badge">✨</span>':''}
+      <span class="dex-no">#${String(id).padStart(3,'0')}${c.count>1?` · ${c.count}×`:''}</span><span class="dex-nm" id="dexNm${id}">${esc(pokeLabel(id))}</span></button>`;
+  }).join(''):`<div class="home-empty" style="grid-column:1/-1">Nothing caught yet — finish a quest or tap a wandering Pokémon.</div>`;
+  list.filter(id=>caught[String(id)]&&!POKE_NAMES[id]).slice(0,40).forEach(id=>fillName(id,'dexNm'+id));
+}
+
 // ── POKÉDEX BOTTOM SHEET ──
 async function openPokedexSheet(id){
   playSfx('xp');
-  const bg=document.createElement('div');bg.className='pdx-sheet-bg';
-  const sheet=document.createElement('div');sheet.className='pdx-sheet';
-  sheet.innerHTML=`
-    <div class="pdx-sh-header">
-      <img class="pdx-sh-sprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png" alt="">
-      <div class="pdx-sh-meta">
-        <div class="pdx-sh-name" id="_pdxName">LOADING...</div>
-        <div class="pdx-sh-num">#${String(id).padStart(3,'0')}</div>
-        <div class="pdx-sh-types" id="_pdxTypes"></div>
-      </div>
-    </div>
-    <div class="pdx-sh-grid" id="_pdxGrid"></div>
-    <button class="pdx-sh-close" onclick="this.closest('.pdx-sheet-bg').remove()">◀ CLOSE</button>
-  `;
-  bg.appendChild(sheet);
-  bg.addEventListener('click',e=>{if(e.target===bg)bg.remove();});
-  document.body.appendChild(bg);
+  document.getElementById('pdxOv')?.remove();
+  const c=(APP.caughtPoke||{})[String(id)];
+  const ov=document.createElement('div'); ov.className='overlay add-sheet-ov active'; ov.id='pdxOv'; ov.style.zIndex=160;
+  ov.innerHTML=`<div class="add-sheet mc-sheet pdx2"><div class="as-grab"></div>
+    <button type="button" class="as-x pdx2-x" onclick="document.getElementById('pdxOv').remove()" aria-label="Close">✕</button>
+    <div class="pdx2-stage"><div class="buddy-glow"></div><img class="buddy-img" src="${homeArt(id,c?.shiny)}" alt=""></div>
+    <div class="pdx2-no">#${String(id).padStart(3,'0')}${c?.shiny?' · ✨ Shiny':''}</div>
+    <div class="pdx2-name" id="_pdxName">${esc(pokeLabel(id))}</div>
+    <div class="pdx2-types" id="_pdxTypes"></div>
+    <div class="pdx2-grid" id="_pdxGrid"></div>
+    ${c?`<div class="pdx2-caught">Caught ${c.count}× · first on ${esc(new Date(c.firstCaught+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}))}</div>`:''}
+    ${c&&APP.buddy?.id!==id?`<button type="button" class="as-save" onclick="setBuddy(${id});document.getElementById('pdxOv').remove();document.getElementById('dexOv')?.remove();showToast('New buddy ♥')">Make buddy ♥</button>`:''}
+    ${c&&APP.buddy?.id===id?`<div class="pdx2-caught" style="color:var(--accent)">♥ This is your buddy</div>`:''}
+  </div>`;
+  ov.addEventListener('click',e=>{ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
   try{
     const r=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
     const d=await r.json();
-    const name=d.name.toUpperCase().replace(/-/g,' ');
-    const types=d.types.map(t=>t.type.name);
-    const height=(d.height/10).toFixed(1);
-    const weight=(d.weight/10).toFixed(1);
-    const hp =d.stats.find(s=>s.stat.name==='hp')?.base_stat||'—';
-    const atk=d.stats.find(s=>s.stat.name==='attack')?.base_stat||'—';
-    const spd=d.stats.find(s=>s.stat.name==='speed')?.base_stat||'—';
-    const def=d.stats.find(s=>s.stat.name==='defense')?.base_stat||'—';
-    const n=document.getElementById('_pdxName');if(n)n.textContent=name;
+    const stat=n=>d.stats?.find(s=>s.stat.name===n)?.base_stat??'—';
     const ty=document.getElementById('_pdxTypes');
-    if(ty)ty.innerHTML=types.map(t=>`<span class="pdx-type-pip" style="background:${TYPE_COLORS[t]||'#777'};">${t.toUpperCase()}</span>`).join('');
+    if(ty) ty.innerHTML=(d.types||[]).map(t=>`<span class="pdx-type-pip" style="background:${TYPE_COLORS[t.type.name]||'#777'};">${t.type.name}</span>`).join('');
     const gr=document.getElementById('_pdxGrid');
-    if(gr)gr.innerHTML=[['HP',hp],['ATK',atk],['DEF',def],['SPD',spd],['HEIGHT',height+'m'],['WEIGHT',weight+'kg'],['#',String(id).padStart(3,'0')],['GEN',id<=151?'I':id<=251?'II':id<=386?'III':id<=493?'IV':id<=649?'V':id<=721?'VI':id<=809?'VII':'VIII+']].map(([l,v])=>`<div class="pdx-sh-stat"><div class="pdx-sh-sl">${l}</div><div class="pdx-sh-sv">${v}</div></div>`).join('');
+    if(gr) gr.innerHTML=[['HP',stat('hp')],['Attack',stat('attack')],['Defense',stat('defense')],['Speed',stat('speed')],['Height',(d.height/10).toFixed(1)+' m'],['Weight',(d.weight/10).toFixed(1)+' kg']].map(([l,v])=>`<div><span>${l}</span><b>${v}</b></div>`).join('');
   }catch{}
+  getPokeName(id).then(n=>{ const e=document.getElementById('_pdxName'); if(e) e.textContent=n; });
 }
 
 // ── MISSINGNO ──
@@ -1976,31 +2385,29 @@ function spawnWanderPoke(forceId, forceSize){
   const size=forceSize||(50+Math.floor(Math.random()*30));
   const goRight=Math.random()<0.5;
   const isShiny=!forceId&&Math.random()<0.05;
-  const el=document.createElement('img');
-  el.className='wander-poke';
-  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${isShiny?'shiny/':''}${id}.png`;
-  el.style.cssText=`width:${size}px;height:${size}px;top:${40+Math.floor(Math.random()*(window.innerHeight-120))}px;left:0;pointer-events:auto;cursor:pointer;`;
+  const el=document.createElement('div');
+  el.className='wander-poke wander2';
+  el.innerHTML=`<img src="${homeArt(id,isShiny)}" alt="" draggable="false" style="${goRight?'transform:scaleX(-1)':''}">`;
+  el.style.cssText=`width:${size}px;height:${size}px;top:${90+Math.floor(Math.random()*(window.innerHeight-260))}px;left:0;pointer-events:auto;cursor:pointer;`;
   if(isShiny) el.style.filter='drop-shadow(0 0 6px gold) drop-shadow(0 0 12px gold)';
   const dur=9+Math.random()*9;
-  el.style.animation=`${goRight?'wanderRight':'wanderLeft'} ${dur}s linear forwards`;
+  el.style.animation=`${goRight?'w2Right':'w2Left'} ${dur}s linear forwards`;
   let caught=false;
   el.addEventListener('click',ev=>{
     if(caught)return; caught=true;
     ev.stopPropagation();
     playSfx(isShiny?'shiny':'catch');
     // Persist catch to Pokédex
-    if(!APP.caughtPoke) APP.caughtPoke={};
-    const key=String(id);
-    if(!APP.caughtPoke[key]) APP.caughtPoke[key]={count:0,firstCaught:TODAY(),shiny:false};
-    APP.caughtPoke[key].count++;
-    if(isShiny) APP.caughtPoke[key].shiny=true;
-    patchData({caughtPoke:APP.caughtPoke});
-    const ball=document.createElement('div');
-    ball.style.cssText=`position:fixed;z-index:500;pointer-events:none;font-size:52px;line-height:1;left:${ev.clientX-26}px;top:${ev.clientY-26}px;animation:pokeballThrow .8s ease-out forwards;`;
-    ball.textContent='⚾';
+    recordCatch(id,isShiny);
+    const r=el.getBoundingClientRect();
+    const ball=document.createElement('div'); ball.className='wild-ball'; ball.innerHTML=BALL_SVG;
+    ball.style.left=(r.left+r.width/2-17)+'px'; ball.style.top=(r.top+r.height/2-17)+'px';
     document.body.appendChild(ball);
-    el.remove(); wanderActive--;
-    setTimeout(()=>{ball.remove();showToast(isShiny?`✨ SHINY #${id} caught!`:`Gotcha! #${id} caught!`);},900);
+    el.style.animationPlayState='paused'; el.classList.add('absorbed');
+    setTimeout(()=>{ el.remove(); wanderActive--; },450);
+    renderMobHomeDex();
+    setTimeout(()=>{ ball.classList.add('caught'); },1500);
+    setTimeout(()=>{ ball.remove(); getPokeName(id).then(n=>{ rememberName(id,n); showToast(isShiny?`✨ Shiny ${n} caught!`:`Gotcha! ${n} caught!`); }); },2100);
   });
   document.body.appendChild(el);
   setTimeout(()=>{if(!caught){el.remove();wanderActive--;}},dur*1000+400);
@@ -2022,40 +2429,6 @@ function triggerKonamiEgg(){
   showToast('✨ LEGENDARY ENCOUNTER!');
 }
 
-// ── POKÉDEX MODAL ──
-function openPokedexModal(){
-  const caught=APP.caughtPoke||{};
-  const ids=Object.keys(caught).map(Number).sort((a,b)=>a-b);
-  const total=POKE_IDS.length;
-  const bg=document.createElement('div');
-  bg.className='dex-modal-bg';
-  bg.onclick=()=>bg.remove();
-  const modal=document.createElement('div');
-  modal.className='dex-modal';
-  modal.onclick=ev=>ev.stopPropagation();
-  const gridHTML=ids.length?ids.map(id=>{
-    const d=caught[String(id)];
-    const src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${d.shiny?'shiny/':''}${id}.png`;
-    const shinyBadge=d.shiny?`<span style="font-size:8px;">✨</span>`:'';
-    return`<div class="dex-grid-item" onclick="document.querySelector('.dex-modal-bg').remove();openPokedexSheet(${id})">
-      <img src="${src}" alt="#${id}" loading="lazy">
-      ${shinyBadge}
-      <div class="dex-gi-num">#${String(id).padStart(3,'0')}</div>
-      ${d.count>1?`<div class="dex-gi-num" style="color:var(--accent);">${d.count}×</div>`:''}
-    </div>`;
-  }).join(''):`<div style="grid-column:1/-1;text-align:center;font-family:'Inter',sans-serif;font-size:20px;color:var(--fg-dim);padding:28px 12px;;font-weight:600">No Pokémon caught yet.<br>Click wandering Pokémon to catch them!</div>`;
-  modal.innerHTML=`
-    <div class="dex-modal-hd">
-      <div>
-        <div class="dex-modal-title">📖 POKÉDEX</div>
-        <div class="dex-modal-count">${ids.length} / ${total} caught</div>
-      </div>
-      <button class="dex-modal-close" onclick="this.closest('.dex-modal-bg').remove()">✕ CLOSE</button>
-    </div>
-    <div class="dex-grid">${gridHTML}</div>`;
-  bg.appendChild(modal);
-  document.body.appendChild(bg);
-}
 
 // ── CLOCK ──
 function updateClock(){
@@ -2164,10 +2537,44 @@ function goToMobTab(tab){
 }
 
 function renderMobHomeQuests(){
-  const tasks=getTasksForDate(TODAY());
+  const key=TODAY(), d=new Date(key+'T00:00:00');
+  const hd=document.getElementById('homeDay'); if(hd) hd.textContent=d.toLocaleDateString('en-US',{weekday:'long'});
+  const hdt=document.getElementById('homeDate'); if(hdt) hdt.textContent=d.toLocaleDateString('en-US',{month:'long',day:'numeric'});
+  const tasks=getTasksForDate(key);
   const ce=document.getElementById('mobHomeQuestCount'); if(ce)ce.textContent=`${tasks.filter(t=>t.done).length}/${tasks.length}`;
-  renderTasksInto(document.getElementById('mobHomeQuestList'), tasks, true);
+  renderQuestTimeline(document.getElementById('mobHomeQuestList'), key);
+  if(typeof renderBuddy==='function') renderBuddy();
 }
+// Today's quests on Home, drawn with the calendar's timeline pieces
+function renderQuestTimeline(el, key){
+  if(!el) return;
+  const items=calItemsForDate(key).filter(x=>x.task).map(x=>({...x,e:null}));
+  if(!items.length){ el.innerHTML=`<div class="home-empty">No quests yet today. <button type="button" onclick="openAddSheetAs('quest')">Add one</button></div>`; return; }
+  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), isToday=key===TODAY();
+  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
+  let html='';
+  if(untimed.length) html+=`<div class="tl-anytime">`+untimed.map(it=>`<div class="tl-row${it.task.done?' done':''}">
+      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+      ${tlCheck(it)}</div>`).join('')+`</div>`;
+  let nowPlaced=!isToday;
+  const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
+  let rows='';
+  timed.forEach(it=>{
+    const start=tlMins(it.time);
+    if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
+    const past=isToday && start+TL_QUEST_MIN<=nowMin;
+    const [hm,ap]=fmtTime(it.time).split(' ');
+    rows+=`<div class="tl-row${it.task.done?' done':''}${past?' past':''}">
+      <div class="tl-time">${hm}<small>${ap}</small></div>
+      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+      ${tlCheck(it)}</div>`;
+  });
+  if(!nowPlaced && timed.length) rows+=nowRow();
+  el.innerHTML=html+(timed.length?`<div class="tl-sched">${rows}</div>`:'');
+}
+function openAddSheetAs(type){ asLastType=type; openAddSheet(TODAY()); }
 
 function renderMobCalQuests(){
   const key=selectedKey||TODAY();
@@ -2205,15 +2612,10 @@ function renderMobQuickGil(){
 
 function renderMobHomeDex(){
   const caught=APP.caughtPoke||{};
-  const ids=Object.keys(caught).map(Number).sort((a,b)=>a-b);
+  const ids=Object.keys(caught).map(Number).sort((a,b)=>(caught[b].lastCaught||caught[b].firstCaught||'').localeCompare(caught[a].lastCaught||caught[a].firstCaught||'')||b-a);
   const ce=document.getElementById('mobHomeDexCount'); if(ce)ce.textContent=`${ids.length}/${POKE_IDS.length}`;
   const el=document.getElementById('mobHomeDexPreview'); if(!el)return;
-  if(!ids.length){ el.innerHTML='<div class="empty" style="grid-column:1/-1;">None caught yet</div>'; return; }
-  el.innerHTML=ids.slice(-6).reverse().map(id=>{
-    const d=caught[String(id)];
-    const src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${d.shiny?'shiny/':''}${id}.png`;
-    return `<img src="${src}" alt="#${id}" loading="lazy">`;
-  }).join('');
+  el.innerHTML=ids.length?ids.slice(0,4).map(id=>`<img src="${homeArt(id,caught[String(id)].shiny)}" alt="" loading="lazy">`).join(''):'<span class="home-mini-s">Catch your first one!</span>';
 }
 
 function renderMobHomeTeasers(){
@@ -2276,9 +2678,9 @@ async function refreshPushStatus(){
   }
   const sub = swReg ? await swReg.pushManager.getSubscription() : null;
   if(sub){
-    btn.textContent='🔕 DISABLE NOTIFICATIONS'; el.textContent='Notifications are ON — you\'ll get a push ~30 min before calendar events.';
+    btn.textContent='🔕 Turn off notifications'; el.textContent='Notifications are ON — you\'ll get a push ~30 min before calendar events.';
   } else {
-    btn.textContent='🔔 ENABLE NOTIFICATIONS'; el.textContent='Off. Tap to get reminders before calendar events.';
+    btn.textContent='🔔 Turn on notifications'; el.textContent='Off. Tap to get reminders before calendar events.';
   }
 }
 
@@ -2695,7 +3097,7 @@ function renderDaySummaryInto(key,el,isMob){
   }
 }
 
-function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`◆ ${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 function renderDevList(key){
   const oneoff=((APP.events||{})[key]||[]).map((e,i)=>({e,oneoffIdx:i}));
   const recurring=(APP.recurringEvents||[]).filter(rec=>occursOn(rec,key)).map(rec=>({e:occurrenceForDate(rec,key),oneoffIdx:null}));
@@ -2973,7 +3375,7 @@ let editEvKey='', editEvIdx=-1, editEvMode='oneoff', editEvRecurringId=null;
 function openEditEvent(key,idx){
   editEvKey=key; editEvIdx=idx; editEvMode='oneoff'; editEvRecurringId=null;
   const ev=(APP.events[key]||[])[idx]; if(!ev)return;
-  document.getElementById('editEvModalTitle').textContent='✎ EDIT EVENT';
+  document.getElementById('editEvModalTitle').textContent='Edit event';
   document.getElementById('editEvScopeRow').style.display='none';
   document.getElementById('editEvTitle').value=ev.title||'';
   document.getElementById('editEvTime').value=ev.time||'';
@@ -2990,7 +3392,7 @@ function editRecurringOccurrence(date,recurringId){
   const rec=(APP.recurringEvents||[]).find(r=>r.id===recurringId); if(!rec)return;
   editEvKey=date; editEvIdx=-1; editEvMode='recurring'; editEvRecurringId=recurringId;
   const occ=occurrenceForDate(rec,date);
-  document.getElementById('editEvModalTitle').textContent='✎ EDIT RECURRING EVENT';
+  document.getElementById('editEvModalTitle').textContent='Edit repeating event';
   document.getElementById('editEvScopeRow').style.display='';
   document.querySelectorAll('input[name="editEvScope"]').forEach(r=>r.checked=(r.value==='occurrence'));
   document.getElementById('editEvTitle').value=occ.title||'';
@@ -3274,7 +3676,8 @@ function toggleTask(i){
     APP.questXp+=xpAmt;
     playSfx('check');
     showXpPop(xpAmt,RANK_COLORS[t.rank||'B']||RANK_COLORS.B);
-    showCompletePoke(t.rank||'B');
+    if(APP.buddy){ const g=addBuddyHearts(2); if(g) showToast(`${pokeLabel(APP.buddy.id)} +${g} ♥`); }
+    maybeEncounter(t.rank||'B');
     if(!APP.taskStats) APP.taskStats={};
     if(!APP.taskStats[t.text]) APP.taskStats[t.text]={count:0,lastDone:null};
     APP.taskStats[t.text].count++;
@@ -3288,6 +3691,7 @@ function toggleTask(i){
   patchData({questXp:APP.questXp});
   saveTasks(); renderMobTasks();
   updateStreakDisplay();
+  renderBuddy();
 }
 function deleteTask(i){
   if(!APP.tasks)return;
@@ -3419,7 +3823,7 @@ function openMoneyPad(accountId, type){
   setMoneyPadType(type);
   const acct=(APP.budget?.accounts||[]).find(a=>a.id===accountId);
   const titleEl=document.getElementById('moneyPadTitle');
-  if(titleEl) titleEl.textContent=`◆ ${acct?acct.name.toUpperCase():'GIL'}`;
+  if(titleEl) titleEl.textContent=acct?acct.name:'Add money';
   const noteEl=document.getElementById('moneyPadNote');
   if(noteEl) noteEl.value='';
   renderMoneyPadDisplay();
@@ -3439,7 +3843,7 @@ function openMoneyPadEdit(id){
   _moneyPadEditId=txn.id;
   setMoneyPadType(txn.type);
   const titleEl=document.getElementById('moneyPadTitle');
-  if(titleEl) titleEl.textContent='✎ EDIT';
+  if(titleEl) titleEl.textContent='Edit transaction';
   const noteEl=document.getElementById('moneyPadNote');
   if(noteEl) noteEl.value=(BUDGET_CATS[txn.category]?.label===txn.note)?'':txn.note;
   renderMoneyPadDisplay();
@@ -3875,21 +4279,18 @@ function buildTrendsHTML(){
 function dueBillsBannerHtml(){
   const due=dueBills();
   if(!due.length)return '';
-  return `<div style="background:rgba(255,138,99,.12);border:1px solid rgba(255,138,99,.3);border-radius:var(--r-md);padding:6px 8px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
-    <span style="font-family:'Inter',sans-serif;font-size:15px;color:var(--accent);;font-weight:600">⚠ ${due.length} bill${due.length>1?'s':''} due</span>
-    <button class="mini-btn" style="font-size:7px;" onclick="switchBudgetTab('bills')">VIEW</button>
-  </div>`;
+  return `<button type="button" class="gil-due" onclick="switchBudgetTab('bills')"><span class="lab-ic asked">📋</span><span class="lab-txt"><span class="lab-title">${due.length} bill${due.length>1?'s':''} due</span><span class="lab-meta">Tap to review</span></span><span class="sh-link-arrow">›</span></button>`;
 }
 const BUDGET_TABS=[
-  {id:'gil',      label:'💰 GIL'},
-  {id:'trends',   label:'📈 TRENDS'},
-  {id:'accounts', label:'🏦 ACCTS'},
-  {id:'bills',    label:'📋 BILLS'},
-  {id:'goals',    label:'🎯 GOALS'},
+  {id:'gil',      label:'Overview'},
+  {id:'trends',   label:'Trends'},
+  {id:'accounts', label:'Accounts'},
+  {id:'bills',    label:'Bills'},
+  {id:'goals',    label:'Goals'},
 ];
 function budgetTabsHtml(tab){
-  return `<div class="budget-tabs" style="margin-bottom:5px;">${BUDGET_TABS.map(t=>
-    `<button class="budget-tab${tab===t.id?' active':''}" onclick="switchBudgetTab('${t.id}')">${t.label}</button>`
+  return `<div class="gil-tabs">${BUDGET_TABS.map(t=>
+    `<button type="button" class="${tab===t.id?'active':''}" onclick="switchBudgetTab('${t.id}')">${t.label}</button>`
   ).join('')}</div>`;
 }
 function buildBudgetTabBody(tab){
@@ -3963,44 +4364,38 @@ function buildMobBudgetGilHTML(){
   const remaining=limit-expense;
   const pct=Math.min(100,Math.round(expense/limit*100));
   const over=expense>limit;
+  const cats=categoryBreakdown(txns);
   const txnRows=txns.length?txns.map(t=>{
     const cat=BUDGET_CATS[t.category]||BUDGET_CATS.other;
-    const color=t.type==='income'?'var(--green)':'var(--red)';
-    const sign=t.type==='income'?'+':'-';
-    return`<div class="budget-txn" onclick="openMoneyPadEdit(${t.id})" style="cursor:pointer;">
-      <span class="budget-txn-icon" style="background:${hexAlpha(cat.color,.15)};">${cat.icon}</span>
-      <span class="budget-txn-note">${esc(t.note)}</span>
-      <span class="budget-txn-amt" style="color:${color};">${sign}$${t.amount.toFixed(2)}</span>
-      <button class="budget-txn-del" onclick="event.stopPropagation();deleteTxn(${t.id})" title="Delete" style="font-size:16px;opacity:1;">✕</button>
+    const inc=t.type==='income';
+    const d=new Date((t.date||'')+'T00:00:00');
+    return`<div class="gil-txn" onclick="openMoneyPadEdit(${t.id})">
+      <span class="gil-txn-ic" style="background:${hexAlpha(cat.color,.18)};">${cat.icon}</span>
+      <span class="lab-txt"><span class="gil-txn-note">${esc(t.note||cat.label)}</span><span class="lab-meta">${esc(cat.label.charAt(0)+cat.label.slice(1).toLowerCase())}${isNaN(d)?'':' · '+d.toLocaleDateString('en-US',{weekday:'short'})}</span></span>
+      <span class="gil-txn-amt ${inc?'inc':'exp'}">${inc?'+':'−'}$${t.amount.toFixed(2)}</span>
+      <button class="gil-txn-del" onclick="event.stopPropagation();deleteTxn(${t.id})" aria-label="Delete">✕</button>
     </div>`;
-  }).join(''):`<div class="budget-empty">No transactions this week.</div>`;
+  }).join(''):`<div class="home-empty">No spending logged this week.</div>`;
   return`
     ${dueBillsBannerHtml()}
-    <div class="gil-hero">
-      <div class="gil-hero-lbl">Balance</div>
-      <div class="gil-hero-num" style="color:${balance>=0?'var(--green)':'var(--red)'};">$<span>${Math.abs(balance).toFixed(0)}</span></div>
+    <div class="gil-hero2">
+      <div class="gil-hero-lbl">Total balance</div>
+      <div class="gil-hero-num" style="color:${balance>=0?'var(--fg)':'var(--red)'};">${balance<0?'−':''}$${Math.abs(balance).toFixed(0)}</div>
       ${gilWeekDeltaHtml()}
       ${buildGilSparkSvg()}
-    </div>
-    <div class="gil-quick-row">
-      <button class="gil-qbtn expense" onclick="quickAddGil('expense')"><div class="gqi">−</div><span class="gql">Expense</span></button>
-      <button class="gil-qbtn income" onclick="quickAddGil('income')"><div class="gqi">+</div><span class="gql">Income</span></button>
-    </div>
-    <div class="bento-grid" style="margin:0 0 10px;">
-      <div class="bento-tile bento-hero" onclick="editWeeklyLimit()" style="cursor:pointer;">
-        <div class="bento-label">SPENT THIS WEEK</div>
-        <div class="bento-val expense">-$${expense.toFixed(2)}</div>
-        <div class="bento-bar-wrap"><div class="bento-bar${over?' over':''}" style="width:${pct}%;"></div></div>
-        <div class="bento-sub">${pct}% of $${limit}/wk · tap to edit</div>
+      <div class="gil-actions">
+        <button type="button" class="gil-act exp" onclick="quickAddGil('expense')"><span>−</span>Expense</button>
+        <button type="button" class="gil-act inc" onclick="quickAddGil('income')"><span>+</span>Income</button>
       </div>
-      <div class="bento-tile">
-        <div class="bento-label">LEFT</div>
-        <div class="bento-val ${remaining>=0?'income':'expense'}">${remaining>=0?'+':'-'}$${Math.abs(remaining).toFixed(2)}</div>
-      </div>
-      ${bentoCatTilesHtml(categoryBreakdown(txns))}
     </div>
-    <div class="m-label" style="margin:4px 0 6px;">Recent</div>
-    <div class="budget-txn-list" style="flex:1;overflow-y:auto;">${txnRows}</div>`;
+    <button type="button" class="home-card gil-week" onclick="editWeeklyLimit()">
+      <span class="home-card-hd"><span class="home-card-t">This week</span><span class="home-count">${pct}% of $${limit}</span><span class="gil-edit">Edit</span></span>
+      <span class="gil-week-nums"><span><b class="${remaining>=0?'inc':'exp'}">${remaining>=0?'':'−'}$${Math.abs(remaining).toFixed(0)}</b><i>${remaining>=0?'left to spend':'over budget'}</i></span><span><b>$${expense.toFixed(0)}</b><i>spent</i></span></span>
+      <span class="gil-bar"><i class="${over?'over':''}" style="width:${pct}%"></i></span>
+    </button>
+    ${cats.length?`<div class="sh-label" style="margin-top:6px">Where it went</div><div class="gil-cats">${cats.slice(0,6).map(c=>`<div class="gil-cat"><span class="gil-cat-ic">${c.icon}</span><span class="lab-txt"><span class="gil-cat-l">${esc(c.label.charAt(0)+c.label.slice(1).toLowerCase())}</span><span class="gil-cat-v">$${c.amt.toFixed(0)}</span></span></div>`).join('')}</div>`:''}
+    <div class="sh-label" style="margin-top:6px">Recent</div>
+    <div class="gil-txns">${txnRows}</div>`;
 }
 
 function buildMobBudgetHTML(){
@@ -4029,7 +4424,7 @@ function showCompletePoke(rank){
   const id=pool[Math.floor(Math.random()*pool.length)];
   const el=document.createElement('img');
   el.className='task-poke-flash';
-  el.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+  el.src=homeArt(id);
   el.style.left=(window.innerWidth/2-40)+'px';
   el.style.top =(window.innerHeight/2-60)+'px';
   document.body.appendChild(el);
@@ -4135,7 +4530,7 @@ async function sendChatCommon(msg, scrollId, btnId){
   try {
     const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
     const d=await r.json(); hideTyping(scrollId);
-    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
+    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
     else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,scrollId); openModal('settingsModal'); }
     else if(d.error){ appendChatMsg('sys','⚠ '+(d.message||('Error: '+d.error)),scrollId); }
     else {
@@ -4230,7 +4625,7 @@ async function sendRedChatCommon(msg){
   try{
     const r=await fetch(`${SERVER}/api/red-chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:redChatHistory}),signal:AbortSignal.timeout(60000)});
     const d=await r.json(); hideTyping('redChatScroll');
-    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open ⚙ Settings → API Key and paste a key from console.anthropic.com.','redChatScroll'); openModal('settingsModal'); }
+    if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open Settings → API Key and paste a key from console.anthropic.com.','redChatScroll'); openModal('settingsModal'); }
     else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,'redChatScroll'); openModal('settingsModal'); }
     else if(d.error){ appendChatMsg('sys','⚠ '+(d.message||('Error: '+d.error)),'redChatScroll'); }
     else{
@@ -4665,7 +5060,7 @@ function dateSeedPoke(dateStr){
 function openDayModal(key,date){
   dayModalDate=key;
   const mon=MONTHS_S[date.getMonth()]; const d=date.getDate(); const yr=date.getFullYear();
-  document.getElementById('dayModalTitle').textContent=`${mon} ${d}, ${yr}`;
+  document.getElementById('dayModalTitle').textContent=date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   document.getElementById('pdxDateLabel').textContent=`${mon} ${String(d).padStart(2,'0')} ${yr}`;
   ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('devKind').value='focus';
@@ -4679,10 +5074,11 @@ function openDayModal(key,date){
   // Pokédex pokemon for this date
   const pokeId=dateSeedPoke(key);
   const img=document.getElementById('pdxPokeImg');
-  img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokeId}.png`;
+  img.src=homeArt(pokeId);
   document.getElementById('pdxPokeNum').textContent=`#${String(pokeId).padStart(3,'0')}`;
   document.getElementById('pdxPokeName').textContent='———';
-  getPokeName(pokeId).then(name=>{ const el=document.getElementById('pdxPokeName'); if(el)el.textContent=name.toUpperCase(); });
+  getPokeName(pokeId).then(name=>{ const el=document.getElementById('pdxPokeName'); if(el)el.textContent=name; });
+  document.getElementById('pdxPokeNum').textContent=`Today's Pokémon · #${String(pokeId).padStart(3,'0')}`;
 
   // Restart scan animation
   const scan=document.getElementById('pdxScan');
