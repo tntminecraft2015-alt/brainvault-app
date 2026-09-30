@@ -879,3 +879,10 @@ Calendar events synced
 **Pages created:** [[daily-tasks-2026-09-30]]
 
 Tasks synced for 2026-09-30: 0/1 complete
+
+## [2026-09-30] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-09-30-design-research-end-to-end-daily-income-logging-reminder]]
+
+Design research: End-to-End Daily Income Logging: Quick Entry, Smart Reminders & Friction-Free Flows (3 findings)
