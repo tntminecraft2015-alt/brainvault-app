@@ -662,6 +662,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-09-30-design-research-gamification-patterns-in-personal-produc",
+      "findingIndex": 0,
+      "threadId": "thread-1790808860908-0-loss-aversion-over-points-streaks-minima",
+      "findingTitle": "Loss Aversion Over Points: Streaks' Minimalist Psychology",
+      "findingDescription": "Duolingo and Streaks tap into loss aversion, where people are more motivated to avoid losing progress than to gain rewards, making a long streak feel like something valuable that users must protect. Critically, Streaks deliberately avoids points and levels, contributing to its focus on intrinsic motivation; the primary goal is to build habits, not accumulate external rewards, which helps prevent users from becoming overly focused on extrinsic incentives. Streaks work through habit formation and ",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
       "id": "2026-09-30-design-research-revisions-1790808117446",
       "findingIndex": 1,
       "threadId": "thread-1790807197955-0-one-tap-notification-to-log-pre-filled-f",
@@ -1614,10 +1625,10 @@
       "source_title": "How Streaks Leverages Gamification to Boost Retention (2025) + Gamification Productivity Apps",
       "source_url": "https://trophy.so/blog/streaks-gamification-case-study",
       "mockup_html": "<style>body { font-family: -apple-system; background: #f5f5f5; padding: 20px; margin: 0; } .streak-card { background: white; border-radius: 12px; padding: 24px; max-width: 280px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); } .habit { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; } .circle { width: 56px; height: 56px; border-radius: 50%; background: #e8f4fd; border: 2px solid #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #0ea5e9; font-size: 18px; } .label { font-size: 13px; color: #666; } .habit:nth-child(1) .circle { background: #dcfce7; border-color: #22c55e; color: #22c55e; } </style> <div class='streak-card'> <div class='habit'> <div><div class='label'>Morning Run</div></div> <div class='circle'>17</div> </div> <div class='habit'> <div><div class='label'>Meditation</div></div> <div class='circle'>9</div> </div> <div class='habit'> <div><div class='label'>Read</div></div> <div class='circle'>23</div> </div> <p style='margin-top: 20px; font-size: 12px; color: #999; text-align: center;'>No points. No levels. Just days in a row you don't want to break.</p> </div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
