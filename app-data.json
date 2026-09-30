@@ -642,6 +642,17 @@
   "designFeedback": [
     {
       "id": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "findingIndex": 2,
+      "threadId": "thread-1790807197955-2-motivational-micro-feedback-loop-celebra",
+      "findingTitle": "Motivational Micro-Feedback Loop: Celebration + Running Total Visibility",
+      "findingDescription": "Every save comes with instant feedback—a quick animation, a positive message like 'Nice! Logged $85 for today', and even a haptic buzz, making logging feel as satisfying as earning. After each entry, get a simple summary: today's total, this week's running total, and a clean chart of weekly earnings. This combines immediate affirmation (satisfying the moment of logging) with concrete progress visibility (showing accumulated impact over a week)—critical for maintaining daily habit compliance in i",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
+      "id": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
       "findingIndex": 1,
       "threadId": "thread-1790807197955-1-prefilled-favorites-library-tap-to-prefi",
       "findingTitle": "Prefilled Favorites Library: Tap to Prefill, Save to Persist",
@@ -1543,10 +1554,10 @@
       "source_title": "Tip Tracker: Fast Earnings Logger (iOS App Store)",
       "source_url": "https://apps.apple.com/app/id6744293760",
       "mockup_html": "<style>\n  body { font-family: VT323, monospace; background: #0a1929; color: #dfeeff; padding: 20px; margin: 0; }\n  .feedback { background: #1e3a5f; border: 2px solid #7fffb0; border-radius: 8px; padding: 16px; margin-bottom: 16px; text-align: center; }\n  .emoji { font-size: 32px; margin-bottom: 8px; }\n  .msg { font-size: 14px; color: #7fffb0; margin-bottom: 4px; font-weight: bold; }\n  .sparkle { color: #66c8ff; font-size: 12px; }\n  .summary { background: #12253c; padding: 12px; border-radius: 6px; }\n  .row { display: flex; justify-content: space-between; font-size: 12px; margin: 6px 0; }\n  .label { color: #8fd6ff; }\n  .value { color: #ff8a63; font-weight: bold; }\n</style>\n<div class=\"feedback\">\n  <div class=\"emoji\">✨</div>\n  <div class=\"msg\">Logged $425 for today</div>\n  <div class=\"sparkle\">nice work!</div>\n</div>\n<div class=\"summary\">\n  <div class=\"row\"><span class=\"label\">TODAY</span> <span class=\"value\">$425</span></div>\n  <div class=\"row\"><span class=\"label\">THIS WEEK</span> <span class=\"value\">$2,180</span></div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
