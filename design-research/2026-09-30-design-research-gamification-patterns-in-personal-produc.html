@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Gamification Patterns in Personal Productivity Apps: Loss Aversion Over Rewards, Minimalism Over Complexity, and the Burnout Boundary</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Gamification Patterns in Personal Productivity Apps: Loss Aversion Over Rewards, Minimalism Over Complexity, and the Burnout Boundary</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">The key to effective gamification is finding the "bliss point" where an experience is just rewarding enough to keep users coming back, with small but consistent dopamine hits turning mundane tasks into addictive routines. But burnout happens when users fixate on metrics instead of meaningful results, and the streak mentality creates anxiety when life interrupts routines. The most successful apps (Streaks, Productive) lean into loss aversion and structure over extrinsic points, while the most engaging ones (Habitica) add punishment mechanics—but only for users who've already committed.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings · focus: Gamification Patterns in Personal Productivity Apps</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Loss Aversion Over Points: Streaks' Minimalist Psychology</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Duolingo and Streaks tap into loss aversion, where people are more motivated to avoid losing progress than to gain rewards, making a long streak feel like something valuable that users must protect. Critically, Streaks deliberately avoids points and levels, contributing to its focus on intrinsic motivation; the primary goal is to build habits, not accumulate external rewards, which helps prevent users from becoming overly focused on extrinsic incentives. Streaks work through habit formation and loss aversion: short, low-friction actions repeated daily create sticky behavior, while loss aversion—being more motivated to avoid losing something than gaining something equivalent—turns a streak from a counter into a commitment device.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://trophy.so/blog/streaks-gamification-case-study" target="_blank" rel="noopener" style="color:#ff8a63;">How Streaks Leverages Gamification to Boost Retention (2025) + Gamification Productivity Apps</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;body { font-family: -apple-system; background: #f5f5f5; padding: 20px; margin: 0; } .streak-card { background: white; border-radius: 12px; padding: 24px; max-width: 280px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); } .habit { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; } .circle { width: 56px; height: 56px; border-radius: 50%; background: #e8f4fd; border: 2px solid #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #0ea5e9; font-size: 18px; } .label { font-size: 13px; color: #666; } .habit:nth-child(1) .circle { background: #dcfce7; border-color: #22c55e; color: #22c55e; } &lt;/style&gt; &lt;div class='streak-card'&gt; &lt;div class='habit'&gt; &lt;div&gt;&lt;div class='label'&gt;Morning Run&lt;/div&gt;&lt;/div&gt; &lt;div class='circle'&gt;17&lt;/div&gt; &lt;/div&gt; &lt;div class='habit'&gt; &lt;div&gt;&lt;div class='label'&gt;Meditation&lt;/div&gt;&lt;/div&gt; &lt;div class='circle'&gt;9&lt;/div&gt; &lt;/div&gt; &lt;div class='habit'&gt; &lt;div&gt;&lt;div class='label'&gt;Read&lt;/div&gt;&lt;/div&gt; &lt;div class='circle'&gt;23&lt;/div&gt; &lt;/div&gt; &lt;p style='margin-top: 20px; font-size: 12px; color: #999; text-align: center;'&gt;No points. No levels. Just days in a row you don't want to break.&lt;/p&gt; &lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>The Burnout Boundary: When Gamification Becomes Obligation</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habit apps overwhelmingly rely on extrinsic motivators and often produce dependency on the reward system itself, not the habit. A 2024 meta-analysis found gamified programs added only trivial fitness gains over non-gamified ones, and a 2025 analysis found the engagement boost fades as trials run past six months. Poor implementation reduces work to point-hunting, burnout happens, and the streak mentality creates anxiety—while deep focus suffers as quick wins take priority over sustained effort. Best practices include letting users opt out of challenges, providing multiple gameplay paths, avoiding harsh penalties for missed tasks, and keeping failure low-pressure and forgiving.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://trophy.so/blog/productivity-gamification-examples" target="_blank" rel="noopener" style="color:#ff8a63;">Gamified Productivity Apps: 8 Examples Analyzed (2026) + GearBrain Analysis</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;body { font-family: system-ui; background: #fafafa; padding: 20px; margin: 0; } .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; } .box { padding: 16px; border-radius: 8px; font-size: 13px; } .burnout { background: #fee2e2; border: 1px solid #fecaca; } .healthy { background: #dcfce7; border: 1px solid #86efac; } .label { font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; } ul { margin: 8px 0 0 0; padding-left: 16px; } li { margin: 4px 0; line-height: 1.4; } &lt;/style&gt; &lt;div class='comparison'&gt; &lt;div class='box burnout'&gt; &lt;div class='label'&gt;❌ Burnout Zone&lt;/div&gt; &lt;ul&gt; &lt;li&gt;Streak breaks = punishment&lt;/li&gt; &lt;li&gt;Points always visible&lt;/li&gt; &lt;li&gt;Missed day = anxiety&lt;/li&gt; &lt;li&gt;No way to pause&lt;/li&gt; &lt;li&gt;Comparison pressure&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;div class='box healthy'&gt; &lt;div class='label'&gt;✓ Sustainable&lt;/div&gt; &lt;ul&gt; &lt;li&gt;Streak breaks = restart&lt;/li&gt; &lt;li&gt;Progress over points&lt;/li&gt; &lt;li&gt;Miss = try again tomorrow&lt;/li&gt; &lt;li&gt;Grace periods OK&lt;/li&gt; &lt;li&gt;Personal journey&lt;/li&gt; &lt;/ul&gt; &lt;/div&gt; &lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Punishment vs. Reward Timing: When Consequences Work, and When They Backfire</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habitica's RPG mechanics with punishment (lost hit points) suit users who have already committed, not those still forming a habit. Collaborative ally and quest mechanics outperform competition for emotionally significant behavior. Minimalist systems like Streaks build early habits; richer systems like Habitica retain the long tail. The pattern: streaks use loss aversion to build daily habits, variable rewards use dopamine anticipation to drive repeat actions, and progress bars use the Zeigarnik effect to pull users toward completion—each mechanic maps to a psychological principle. But if a streak breaks, there's no consequence beyond a reset counter—no reason to start again except willpower.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://habi.app/insights/streaks-alternatives/" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification Productivity Apps: 8 Examples Analyzed (2026) + Streaks Alternatives</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;body { font-family: system-ui; background: #0a1322; color: #dfeeff; padding: 20px; margin: 0; } .quest-row { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 3px solid #0ea5e9; } .icon { font-size: 24px; } .content { flex: 1; } .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; } .desc { font-size: 12px; color: rgba(223,238,255,0.6); } .reward { background: #1e3a5f; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; } .early { border-left-color: #22c55e; } .committed { border-left-color: #f59e0b; } .reset { border-left-color: #ef4444; opacity: 0.7; } &lt;/style&gt; &lt;div class='quest-row early'&gt; &lt;div class='icon'&gt;🌱&lt;/div&gt; &lt;div class='content'&gt; &lt;div class='title'&gt;Early-stage: Streaks (no penalty)&lt;/div&gt; &lt;div class='desc'&gt;Just don't break the chain. Visual feedback only.&lt;/div&gt; &lt;/div&gt; &lt;div class='reward'&gt;Intrinsic&lt;/div&gt; &lt;/div&gt; &lt;div class='quest-row committed'&gt; &lt;div class='icon'&gt;⚔️&lt;/div&gt; &lt;div class='content'&gt; &lt;div class='title'&gt;Committed: Habitica (lose HP)&lt;/div&gt; &lt;div class='desc'&gt;Punishment works once you've invested identity.&lt;/div&gt; &lt;/div&gt; &lt;div class='reward'&gt;+Extrinsic&lt;/div&gt; &lt;/div&gt; &lt;div class='quest-row reset'&gt; &lt;div class='icon'&gt;↺&lt;/div&gt; &lt;div class='content'&gt; &lt;div class='title'&gt;After break: Willpower gap&lt;/div&gt; &lt;div class='desc'&gt;Reset streak alone isn't enough to restart.&lt;/div&gt; &lt;/div&gt; &lt;div class='reward'&gt;Friction&lt;/div&gt; &lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">NEXT ▶</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-09-30-design-research-gamification-patterns-in-personal-produc";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Loss Aversion Over Points: Streaks' Minimalist Psychology","description":"Duolingo and Streaks tap into loss aversion, where people are more motivated to avoid losing progress than to gain rewards, making a long streak feel like something valuable that users must protect. Critically, Streaks deliberately avoids points and levels, contributing to its focus on intrinsic motivation; the primary goal is to build habits, not accumulate external rewards, which helps prevent users from becoming overly focused on extrinsic incentives. Streaks work through habit formation and loss aversion: short, low-friction actions repeated daily create sticky behavior, while loss aversion—being more motivated to avoid losing something than gaining something equivalent—turns a streak from a counter into a commitment device.","source_title":"How Streaks Leverages Gamification to Boost Retention (2025) + Gamification Productivity Apps","source_url":"https://trophy.so/blog/streaks-gamification-case-study","mockup_html":"\u003cstyle>body { font-family: -apple-system; background: #f5f5f5; padding: 20px; margin: 0; } .streak-card { background: white; border-radius: 12px; padding: 24px; max-width: 280px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); } .habit { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; } .circle { width: 56px; height: 56px; border-radius: 50%; background: #e8f4fd; border: 2px solid #0ea5e9; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #0ea5e9; font-size: 18px; } .label { font-size: 13px; color: #666; } .habit:nth-child(1) .circle { background: #dcfce7; border-color: #22c55e; color: #22c55e; } \u003c/style> \u003cdiv class='streak-card'> \u003cdiv class='habit'> \u003cdiv>\u003cdiv class='label'>Morning Run\u003c/div>\u003c/div> \u003cdiv class='circle'>17\u003c/div> \u003c/div> \u003cdiv class='habit'> \u003cdiv>\u003cdiv class='label'>Meditation\u003c/div>\u003c/div> \u003cdiv class='circle'>9\u003c/div> \u003c/div> \u003cdiv class='habit'> \u003cdiv>\u003cdiv class='label'>Read\u003c/div>\u003c/div> \u003cdiv class='circle'>23\u003c/div> \u003c/div> \u003cp style='margin-top: 20px; font-size: 12px; color: #999; text-align: center;'>No points. No levels. Just days in a row you don't want to break.\u003c/p> \u003c/div>","threadId":"thread-1790808860908-0-loss-aversion-over-points-streaks-minima"},{"title":"The Burnout Boundary: When Gamification Becomes Obligation","description":"Habit apps overwhelmingly rely on extrinsic motivators and often produce dependency on the reward system itself, not the habit. A 2024 meta-analysis found gamified programs added only trivial fitness gains over non-gamified ones, and a 2025 analysis found the engagement boost fades as trials run past six months. Poor implementation reduces work to point-hunting, burnout happens, and the streak mentality creates anxiety—while deep focus suffers as quick wins take priority over sustained effort. Best practices include letting users opt out of challenges, providing multiple gameplay paths, avoiding harsh penalties for missed tasks, and keeping failure low-pressure and forgiving.","source_title":"Gamified Productivity Apps: 8 Examples Analyzed (2026) + GearBrain Analysis","source_url":"https://trophy.so/blog/productivity-gamification-examples","mockup_html":"\u003cstyle>body { font-family: system-ui; background: #fafafa; padding: 20px; margin: 0; } .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; } .box { padding: 16px; border-radius: 8px; font-size: 13px; } .burnout { background: #fee2e2; border: 1px solid #fecaca; } .healthy { background: #dcfce7; border: 1px solid #86efac; } .label { font-weight: 600; margin-bottom: 8px; font-size: 11px; text-transform: uppercase; } ul { margin: 8px 0 0 0; padding-left: 16px; } li { margin: 4px 0; line-height: 1.4; } \u003c/style> \u003cdiv class='comparison'> \u003cdiv class='box burnout'> \u003cdiv class='label'>❌ Burnout Zone\u003c/div> \u003cul> \u003cli>Streak breaks = punishment\u003c/li> \u003cli>Points always visible\u003c/li> \u003cli>Missed day = anxiety\u003c/li> \u003cli>No way to pause\u003c/li> \u003cli>Comparison pressure\u003c/li> \u003c/ul> \u003c/div> \u003cdiv class='box healthy'> \u003cdiv class='label'>✓ Sustainable\u003c/div> \u003cul> \u003cli>Streak breaks = restart\u003c/li> \u003cli>Progress over points\u003c/li> \u003cli>Miss = try again tomorrow\u003c/li> \u003cli>Grace periods OK\u003c/li> \u003cli>Personal journey\u003c/li> \u003c/ul> \u003c/div> \u003c/div>","threadId":"thread-1790808860908-1-the-burnout-boundary-when-gamification-b"},{"title":"Punishment vs. Reward Timing: When Consequences Work, and When They Backfire","description":"Habitica's RPG mechanics with punishment (lost hit points) suit users who have already committed, not those still forming a habit. Collaborative ally and quest mechanics outperform competition for emotionally significant behavior. Minimalist systems like Streaks build early habits; richer systems like Habitica retain the long tail. The pattern: streaks use loss aversion to build daily habits, variable rewards use dopamine anticipation to drive repeat actions, and progress bars use the Zeigarnik effect to pull users toward completion—each mechanic maps to a psychological principle. But if a streak breaks, there's no consequence beyond a reset counter—no reason to start again except willpower.","source_title":"Gamification Productivity Apps: 8 Examples Analyzed (2026) + Streaks Alternatives","source_url":"https://habi.app/insights/streaks-alternatives/","mockup_html":"\u003cstyle>body { font-family: system-ui; background: #0a1322; color: #dfeeff; padding: 20px; margin: 0; } .quest-row { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; border-left: 3px solid #0ea5e9; } .icon { font-size: 24px; } .content { flex: 1; } .title { font-weight: 600; font-size: 14px; margin-bottom: 4px; } .desc { font-size: 12px; color: rgba(223,238,255,0.6); } .reward { background: #1e3a5f; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; } .early { border-left-color: #22c55e; } .committed { border-left-color: #f59e0b; } .reset { border-left-color: #ef4444; opacity: 0.7; } \u003c/style> \u003cdiv class='quest-row early'> \u003cdiv class='icon'>🌱\u003c/div> \u003cdiv class='content'> \u003cdiv class='title'>Early-stage: Streaks (no penalty)\u003c/div> \u003cdiv class='desc'>Just don't break the chain. Visual feedback only.\u003c/div> \u003c/div> \u003cdiv class='reward'>Intrinsic\u003c/div> \u003c/div> \u003cdiv class='quest-row committed'> \u003cdiv class='icon'>⚔️\u003c/div> \u003cdiv class='content'> \u003cdiv class='title'>Committed: Habitica (lose HP)\u003c/div> \u003cdiv class='desc'>Punishment works once you've invested identity.\u003c/div> \u003c/div> \u003cdiv class='reward'>+Extrinsic\u003c/div> \u003c/div> \u003cdiv class='quest-row reset'> \u003cdiv class='icon'>↺\u003c/div> \u003cdiv class='content'> \u003cdiv class='title'>After break: Willpower gap\u003c/div> \u003cdiv class='desc'>Reset streak alone isn't enough to restart.\u003c/div> \u003c/div> \u003cdiv class='reward'>Friction\u003c/div> \u003c/div>","threadId":"thread-1790808860908-2-punishment-vs-reward-timing-when-consequ"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
