@@ -732,6 +732,137 @@
     .cal-fab { position:sticky; bottom:14px; align-self:flex-end; margin-top:auto; width:56px; height:56px; border-radius:50%; border:none; background:var(--accent); color:#1a0e08; font-size:30px; font-weight:600; line-height:1; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.45); flex-shrink:0; z-index:5; }
     .cal-fab:active { transform:scale(.94); }
 
+    /* ══════════════════════════════════════
+       ED + RED — same language as the calendar: soft cards, pills, sheets
+    ══════════════════════════════════════ */
+    .ed-pane { padding-bottom:10px; }
+    .ed-hd, .sh-hd { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+    .ed-hd { margin:2px 0 12px; }
+    .sh-hd { margin:0 0 14px; }
+    .sh-hd.compact { margin-bottom:10px; gap:10px; }
+    .ed-av { width:42px; height:42px; border-radius:21px; background:linear-gradient(160deg,#4a90d9,#2d5f9a); display:flex; align-items:center; justify-content:center; font-size:21px; flex-shrink:0; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+    .ed-av.red { background:linear-gradient(160deg,#ff8a63,#d8563a); }
+    .ed-av.sm { width:32px; height:32px; font-size:16px; }
+    .ed-hd-txt { flex:1; min-width:0; }
+    .ed-name { font-size:19px; font-weight:700; letter-spacing:-.01em; color:var(--fg); display:flex; align-items:center; gap:8px; }
+    .ed-name.sm { font-size:15.5px; }
+    .ed-status { font-size:12px; font-weight:500; color:var(--fg-dim); margin-top:2px; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ed-status .server-dot { width:7px; height:7px; }
+    .ed-round { width:36px; height:36px; border-radius:50%; border:none; background:rgba(223,238,255,.07); color:var(--fg); font-size:16px; cursor:pointer; flex-shrink:0; }
+    .ed-round.sm { width:32px; height:32px; font-size:13px; }
+    .ed-shortcuts { display:flex; gap:8px; margin-bottom:12px; overflow-x:auto; scrollbar-width:none; flex-shrink:0; padding-bottom:2px; }
+    .ed-shortcuts::-webkit-scrollbar { display:none; }
+    .ed-pill { position:relative; display:flex; align-items:center; gap:8px; flex-shrink:0; border:none; border-radius:var(--r-pill); background:rgba(223,238,255,.06); color:var(--fg); font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; padding:6px 14px 6px 6px; min-height:40px; cursor:pointer; }
+    .ed-pill:active { transform:scale(.97); }
+    .ed-pill-ic { width:28px; height:28px; border-radius:14px; background:rgba(223,238,255,.08); display:inline-flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .ed-pill-ic.red { background:rgba(255,138,99,.2); }
+    .ed-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); }
+    .ed-count { min-width:20px; height:20px; border-radius:10px; background:var(--accent); color:#1a0e08; font-size:11px; font-weight:800; line-height:20px; text-align:center; padding:0 6px; }
+
+    .ed-msgs { flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:4px 0 8px; -webkit-overflow-scrolling:touch; }
+    .cm { display:flex; align-items:flex-end; gap:8px; max-width:100%; }
+    .cm-you { justify-content:flex-end; }
+    .cm-sys { justify-content:center; }
+    .cm-av { width:28px; height:28px; border-radius:14px; background:linear-gradient(160deg,#4a90d9,#2d5f9a); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .cm-av.red { background:linear-gradient(160deg,#ff8a63,#d8563a); }
+    .cm-bubble { max-width:82%; padding:10px 14px; border-radius:20px; font-size:15.5px; font-weight:500; line-height:1.45; color:var(--fg); background:rgba(223,238,255,.07); overflow-wrap:anywhere; }
+    .cm-claude .cm-bubble { border-bottom-left-radius:6px; }
+    .cm-you .cm-bubble { background:var(--accent); color:#1a0e08; border-bottom-right-radius:6px; font-weight:600; }
+    .cm-bubble strong { font-weight:700; }
+    .cm-bubble pre { white-space:pre-wrap; background:var(--bg); border-radius:10px; padding:8px 10px; margin:6px 0; font-size:13px; }
+    .cm-note { font-size:12.5px; color:var(--fg-dim); text-align:center; padding:4px 12px; max-width:90%; }
+    .cm-claude { flex-wrap:wrap; }
+    .cm-actions { flex-basis:100%; display:flex; flex-wrap:wrap; gap:6px; padding-left:36px; margin-top:-2px; }
+    .cm-chip { font-size:12px; font-weight:600; color:var(--green); background:rgba(127,255,176,.1); border-radius:var(--r-pill); padding:5px 10px; }
+    .cm-typing { display:flex; gap:4px; align-items:center; padding:14px 16px; }
+    .cm-typing i { width:7px; height:7px; border-radius:50%; background:var(--fg-dim); animation:cmDot 1.1s infinite ease-in-out; }
+    .cm-typing i:nth-child(2){ animation-delay:.15s; } .cm-typing i:nth-child(3){ animation-delay:.3s; }
+    @keyframes cmDot { 0%,80%,100%{ transform:translateY(0); opacity:.4; } 40%{ transform:translateY(-4px); opacity:1; } }
+
+    .ed-welcome { margin:auto 0; text-align:center; padding:24px 16px; }
+    .ed-welcome-av { width:64px; height:64px; border-radius:32px; margin:0 auto 14px; background:linear-gradient(160deg,#4a90d9,#2d5f9a); display:flex; align-items:center; justify-content:center; font-size:32px; box-shadow:0 8px 24px rgba(0,0,0,.3); }
+    .ed-welcome-av.red { background:linear-gradient(160deg,#ff8a63,#d8563a); }
+    .ed-welcome-t { font-size:20px; font-weight:700; }
+    .ed-welcome-s { font-size:14px; color:var(--fg-dim); margin-top:6px; line-height:1.5; }
+
+    .ed-suggest { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding:2px 0 10px; flex-shrink:0; }
+    .ed-suggest::-webkit-scrollbar { display:none; }
+    .ed-suggest.hide { display:none; }
+    .ed-suggest button { flex-shrink:0; border:none; border-radius:var(--r-pill); background:rgba(223,238,255,.07); color:var(--fg); font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; padding:9px 14px; min-height:40px; cursor:pointer; white-space:nowrap; }
+    .ed-composer { display:flex; align-items:flex-end; gap:8px; background:rgba(223,238,255,.06); border-radius:26px; padding:6px 6px 6px 16px; flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(223,238,255,.08); }
+    .ed-composer:focus-within { box-shadow:inset 0 0 0 1.5px rgba(223,238,255,.3); }
+    .ed-inp { flex:1; background:none; border:none; outline:none; resize:none; color:var(--fg); font-family:'Inter',sans-serif; font-size:16px; font-weight:500; line-height:1.4; padding:9px 0; max-height:140px; }
+    .ed-inp::placeholder { color:rgba(223,238,255,.35); }
+    .ed-send { width:40px; height:40px; border-radius:50%; border:none; background:var(--accent); color:#1a0e08; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+    .ed-send:disabled { opacity:.4; }
+    .ed-send:active { transform:scale(.94); }
+
+    /* sheets shared by Red's Lab, the queue, learnings, slideshow */
+    .mc-sheet.tall { height:88vh; height:88dvh; }
+    .mc-sheet { display:flex; flex-direction:column; }
+    .sh-seg { align-self:flex-start; margin-bottom:14px; }
+    .sh-seg button { font-size:13px; padding:7px 16px; min-height:34px; }
+    .sh-label { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-dim); margin:4px 0 10px; display:flex; align-items:center; gap:8px; }
+    .lab-view { display:none; flex-direction:column; flex:1; min-height:0; }
+    .lab-view.active { display:flex; }
+    #labResearch { overflow-y:auto; }
+    .lab-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .lab-card { display:flex; align-items:center; gap:12px; width:100%; border:none; text-align:left; cursor:pointer; background:rgba(223,238,255,.045); border-radius:var(--r-lg); padding:12px 14px; color:var(--fg); font-family:'Inter',sans-serif; min-height:64px; }
+    .lab-card:active { transform:scale(.985); background:rgba(223,238,255,.08); }
+    .lab-card.unviewed { box-shadow:inset 0 0 0 1.5px rgba(255,138,99,.45); }
+    .lab-ic { width:40px; height:40px; border-radius:20px; display:flex; align-items:center; justify-content:center; font-size:19px; flex-shrink:0; background:rgba(223,238,255,.08); }
+    .lab-ic.daily { background:rgba(240,196,25,.18); } .lab-ic.ed { background:rgba(74,144,217,.25); } .lab-ic.asked { background:rgba(255,138,99,.2); } .lab-ic.rev { background:rgba(127,255,176,.14); }
+    .lab-txt { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+    .lab-title { font-size:15px; font-weight:600; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .lab-meta { font-size:12px; font-weight:500; color:var(--fg-dim); }
+    .lab-new { font-size:11px; font-weight:800; color:#1a0e08; background:var(--accent); border-radius:var(--r-pill); padding:3px 8px; flex-shrink:0; }
+    .lab-card.busy { cursor:default; margin-bottom:8px; }
+    .lab-spin { width:18px; height:18px; border-radius:50%; border:2.5px solid rgba(223,238,255,.25); border-top-color:#8fc4ff; animation:labSpin .8s linear infinite; }
+    @keyframes labSpin { to { transform:rotate(360deg); } }
+    .sh-link { display:flex; align-items:center; gap:10px; width:100%; border:none; background:none; color:var(--fg); font-family:'Inter',sans-serif; font-size:14px; font-weight:600; padding:10px 2px; cursor:pointer; text-align:left; margin-top:auto; }
+    .sh-link-arrow { margin-left:auto; color:var(--fg-dim); font-size:18px; }
+    .lab-ask-intro { font-size:13.5px; color:var(--fg-dim); line-height:1.5; margin-bottom:6px; flex-shrink:0; }
+    .lab-chat { padding-top:8px; }
+    .ed-send.red { background:linear-gradient(160deg,#ff8a63,#d8563a); }
+
+    .slides-sheet { height:94vh; height:94dvh; padding-top:12px; }
+
+    .learn-body { overflow-y:auto; flex:1; font-size:14.5px; font-weight:500; line-height:1.45; }
+    .learn-body .m-label { font-size:11px; font-weight:700; letter-spacing:.06em; opacity:1; color:var(--fg-dim); margin:18px 0 8px !important; }
+    .learn-body .m-label:first-child { margin-top:0 !important; }
+
+    .cq-list { overflow-y:auto; flex:1; }
+    .cq-row { border-radius:var(--r-lg); background:rgba(223,238,255,.045); margin-bottom:8px; }
+    .cq-row-head { padding:12px 14px; }
+    .cq-title-text { font-size:15px; }
+    .cq-row-preview { font-size:13px; font-weight:500; }
+    .cq-date { font-size:11.5px; }
+    .cq-status { font-size:11px; font-weight:700; padding:4px 9px; }
+    .cq-detail-desc, .cq-detail-notes { font-size:14px; font-weight:500; }
+    .cq-section-label { font-size:11px; font-weight:700; letter-spacing:.06em; }
+
+    .cq-empty-card { text-align:center; padding:28px 16px; background:rgba(223,238,255,.035); border-radius:var(--r-lg); margin-bottom:12px; }
+    .cq-empty-ic { width:48px; height:48px; border-radius:24px; margin:0 auto 10px; background:rgba(127,255,176,.14); color:var(--green); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:800; }
+    .cq-empty-t { font-size:16px; font-weight:700; }
+    .cq-empty-s { font-size:13px; color:var(--fg-dim); margin-top:4px; line-height:1.45; }
+    .cq-toggle-done { display:flex; align-items:center; gap:6px; border:none; background:rgba(223,238,255,.06); color:var(--fg); font-family:'Inter',sans-serif; font-size:13px; font-weight:600; border-radius:var(--r-pill); padding:9px 14px; margin:4px 0 12px; cursor:pointer; letter-spacing:0; }
+    .cq-toggle-done span { color:var(--fg-dim); }
+
+    #changeQueueModal .cq2 { display:flex; align-items:flex-start; gap:12px; padding:12px 14px; }
+    #changeQueueModal .cq2 .lab-ic { width:36px; height:36px; font-size:16px; }
+    .cq2-txt { flex:1; min-width:0; }
+    .cq2-title { font-size:15px; font-weight:600; line-height:1.3; color:var(--fg); }
+    .cq2-meta { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:500; color:var(--fg-dim); margin-top:5px; }
+    .cq2-meta .cq-status { font-size:11px; }
+    .cq2-preview { font-size:13px; font-weight:500; color:var(--fg-dim); margin-top:6px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    #changeQueueModal .cq-chevron { margin-top:10px; }
+    #changeQueueModal .cq-row.open .cq-row-detail { padding:0 14px 14px 62px; }
+    #changeQueueModal .cq-detail-desc, #changeQueueModal .cq-detail-notes { font-size:14px; font-weight:500; line-height:1.5; }
+    #changeQueueModal .cq-detail-label { font-size:11px; font-weight:700; letter-spacing:.06em; }
+    #changeQueueModal .cq-cancel-btn { font-size:12.5px; font-weight:600; border-radius:var(--r-pill); padding:9px 14px; }
+    #changeQueueModal .cq-row-head { min-height:0; }
+    .cq-row.open .cq2-preview { display:none; }
+
     .mob-wiki-drawer {
       position:absolute; inset:0; z-index:20;
       display:flex; flex-direction:column;
@@ -1167,24 +1298,35 @@
     </div>
 
     <!-- CLAUDE tab (merged: ED chat + Wiki drawer) -->
-    <div class="mob-tab-pane" id="mobTabClaude" style="position:relative;">
-      <div class="mob-tab-hd">
-        <span>🧠 ED</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="mob-wiki-btn" onclick="openChangeQueue()" style="position:relative;">🛠 QUEUE<span id="cqBadgeMob" class="cq-badge" style="display:none;"></span></button>
-          <button class="mob-wiki-btn" onclick="openDesignLab()">🎨 LAB</button>
-          <button class="mob-wiki-btn" onclick="openWikiDrawer()">📚 WIKI</button>
-          <div class="server-dot" id="mobServerDot"></div>
-          <button onclick="openModal('keyModal')" style="font-family:'Inter',sans-serif;font-size:10.5px;background:none;border:none;color:rgba(223,238,255,.4);cursor:pointer;">⚙</button>
+    <div class="mob-tab-pane ed-pane" id="mobTabClaude" style="position:relative;">
+      <div class="ed-hd">
+        <div class="ed-av">🧠</div>
+        <div class="ed-hd-txt">
+          <div class="ed-name">ED</div>
+          <div class="ed-status"><span class="server-dot" id="mobServerDot"></span><span>Your assistant · calendar, tasks, budget, wiki</span></div>
         </div>
+        <button type="button" class="ed-round" onclick="openModal('keyModal')" aria-label="Settings">⚙</button>
       </div>
-      <div class="mc-card" style="flex:1;min-height:0;display:flex;flex-direction:column;">
-        <div class="mob-chat-msgs" id="mobChatMsgs"></div>
-        <div class="mob-chat-inp-row">
-          <textarea class="mob-chat-inp" id="mobChatInp" placeholder="Ask Claude..." rows="2"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
-          <button class="mob-send-btn" id="mobSendBtn" onclick="sendMobChat()">▶</button>
-        </div>
+      <div class="ed-shortcuts">
+        <button type="button" class="ed-pill" onclick="openDesignLab()"><span class="ed-pill-ic red">🎨</span>Red's Lab<span class="ed-dot" id="redLabDot" style="display:none;"></span></button>
+        <button type="button" class="ed-pill" onclick="openChangeQueue()"><span class="ed-pill-ic">🛠</span>Queue<span id="cqBadgeMob" class="ed-count" style="display:none;"></span></button>
+        <button type="button" class="ed-pill" onclick="openWikiDrawer()"><span class="ed-pill-ic">📚</span>Wiki</button>
+      </div>
+
+      <div class="ed-msgs" id="mobChatMsgs"></div>
+
+      <div class="ed-suggest" id="edSuggest">
+        <button type="button" onclick="edSuggest('What do I have tomorrow?')">What do I have tomorrow?</button>
+        <button type="button" onclick="edSuggest('Add a task to ')">Add a task…</button>
+        <button type="button" onclick="edSuggest('Log an expense: ')">Log an expense…</button>
+        <button type="button" onclick="edSuggest('Have Red research ')">Have Red research…</button>
+      </div>
+      <div class="ed-composer">
+        <textarea class="ed-inp" id="mobChatInp" placeholder="Message ED…" rows="1"
+          oninput="edGrow(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
+        <button type="button" class="ed-send" id="mobSendBtn" onclick="sendMobChat()" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
 
       <div class="mob-wiki-drawer" id="mobWikiDrawer">
@@ -1500,52 +1642,74 @@
 </div>
 
 <!-- DESIGN LAB MODAL -->
-<div class="overlay" id="designLabModal">
-  <div class="modal" style="width:560px;max-width:95vw;">
-    <div class="modal-title">🎨 DESIGN LAB</div>
-    <p class="key-info" style="margin-bottom:10px;">Chat with Red — ED's research counterpart — about anything you want researched, design lens included. It comes back with a slideshow of findings + mockups, and also files a wiki page. Auto-runs daily too. Rate findings on the scale to send Red back to refine them.</p>
-    <div id="redChatScroll" style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
-    <div style="display:flex;gap:6px;margin-bottom:14px;">
-      <input id="redChatInp" class="m-inp" type="text" placeholder="Tell Red what to look into..." style="flex:1;" onkeydown="if(event.key==='Enter')sendRedChat();">
-      <button class="modal-btn ok" id="redChatSendBtn" onclick="sendRedChat()">▶</button>
+<div class="overlay add-sheet-ov" id="designLabModal" onclick="if(event.target===this)closeModal('designLabModal')">
+  <div class="add-sheet mc-sheet tall">
+    <div class="as-grab"></div>
+    <div class="sh-hd">
+      <div class="ed-av red">🎨</div>
+      <div class="ed-hd-txt"><div class="ed-name">Red</div><div class="ed-status">Design research · new ideas every day</div></div>
+      <button type="button" class="as-x" onclick="closeModal('designLabModal')" aria-label="Close">✕</button>
     </div>
-    <div class="m-label" style="margin-bottom:8px;display:flex;align-items:center;gap:6px;">PAST RESEARCH <span class="dl-live-dot" title="Checking for new research while this is open"></span></div>
-    <div id="dlList" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
-    <div class="modal-btns"><button class="modal-btn" onclick="openRedLearnings()">🧠 WHAT RED'S LEARNED</button><button class="modal-btn" onclick="closeModal('designLabModal')">CLOSE</button></div>
+    <div class="cal-seg sh-seg" id="labSeg">
+      <button type="button" data-v="research" onclick="setLabView('research')">Research</button>
+      <button type="button" data-v="ask" onclick="setLabView('ask')">Ask Red</button>
+    </div>
+
+    <div class="lab-view" id="labResearch">
+      <div id="labActive"></div>
+      <div class="sh-label">Research <span class="dl-live-dot" title="Checking for new research while this is open"></span></div>
+      <div class="lab-list" id="dlList"></div>
+      <button type="button" class="sh-link" onclick="openRedLearnings()"><span class="ed-pill-ic">🧠</span><span>What Red's learned from your ratings</span><span class="sh-link-arrow">›</span></button>
+    </div>
+
+    <div class="lab-view" id="labAsk">
+      <div class="lab-ask-intro">Tell Red what you want looked into — the app or any topic. Red may ask a question or two, then comes back with findings and mockups here.</div>
+      <div class="ed-msgs lab-chat" id="redChatScroll"></div>
+      <div class="ed-composer">
+        <textarea class="ed-inp" id="redChatInp" rows="1" placeholder="What should Red research?" oninput="edGrow(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendRedChat();}"></textarea>
+        <button type="button" class="ed-send red" id="redChatSendBtn" onclick="sendRedChat()" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5.5 11.5L12 5l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- RED'S LEARNINGS MODAL -->
-<div class="overlay" id="redLearningsModal">
-  <div class="modal" style="width:520px;max-width:95vw;max-height:85vh;display:flex;flex-direction:column;">
-    <div class="modal-title">🧠 WHAT RED'S LEARNED</div>
-    <div id="redLearningsBody" style="overflow-y:auto;flex:1;font-family:'Inter',sans-serif;font-size:16px;line-height:1.4;;font-weight:600"></div>
-    <div class="modal-btns"><button class="modal-btn" onclick="closeModal('redLearningsModal')">CLOSE</button></div>
+<div class="overlay add-sheet-ov" id="redLearningsModal" onclick="if(event.target===this)closeModal('redLearningsModal')">
+  <div class="add-sheet mc-sheet tall">
+    <div class="as-grab"></div>
+    <div class="sh-hd">
+      <div class="ed-av red">🧠</div>
+      <div class="ed-hd-txt"><div class="ed-name">What Red's learned</div><div class="ed-status">From how you've rated its ideas</div></div>
+      <button type="button" class="as-x" onclick="closeModal('redLearningsModal')" aria-label="Close">✕</button>
+    </div>
+    <div id="redLearningsBody" class="learn-body"></div>
   </div>
 </div>
 
 <!-- DESIGN LAB SLIDESHOW MODAL -->
-<div class="overlay" id="dlSlideshowModal">
-  <div class="modal" style="width:min(96vw,900px);height:min(90vh,640px);padding:0;overflow:hidden;display:flex;flex-direction:column;">
-    <div class="modal-title" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
-      <span>◆ SLIDESHOW <span id="dlSlideshowLiveDot" class="dl-live-dot" style="display:none;" title="Watching for Red's revisions"></span></span>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <button id="dlPauseBtn" onclick="toggleSlideshowPause()" title="Pause live refresh" style="background:none;border:none;color:var(--fg-dim);font-size:15px;cursor:pointer;line-height:1;">⏸</button>
-        <button onclick="closeModal('dlSlideshowModal')" style="background:none;border:none;color:var(--fg-dim);font-size:16px;cursor:pointer;line-height:1;">✕</button>
-      </div>
+<div class="overlay add-sheet-ov" id="dlSlideshowModal">
+  <div class="add-sheet mc-sheet slides-sheet">
+    <div class="sh-hd compact">
+      <div class="ed-av red sm">🎨</div>
+      <div class="ed-hd-txt"><div class="ed-name sm">Red's research <span id="dlSlideshowLiveDot" class="dl-live-dot" style="display:none;" title="Watching for Red's revisions"></span></div></div>
+      <button type="button" id="dlPauseBtn" class="ed-round sm" onclick="toggleSlideshowPause()" title="Pause live refresh" aria-label="Pause live refresh">⏸</button>
+      <button type="button" class="as-x" onclick="closeModal('dlSlideshowModal')" aria-label="Close">✕</button>
     </div>
     <div id="dlRevisionBanner" class="dl-revision-banner" style="display:none;"></div>
-    <iframe id="dlSlideshowFrame" style="flex:1;border:none;width:100%;transition:opacity .22s;"></iframe>
+    <iframe id="dlSlideshowFrame" style="flex:1;border:none;width:100%;transition:opacity .22s;border-radius:16px;background:var(--bg);"></iframe>
   </div>
 </div>
 
 <!-- CHANGE QUEUE MODAL -->
-<div class="overlay" id="changeQueueModal">
-  <div class="modal" style="width:520px;max-width:95vw;">
-    <div class="modal-title">🛠 CHANGE QUEUE</div>
-    <p class="key-info" style="margin-bottom:10px;">Things waiting for Claude Code — from ED chat or Red's Design Lab. Tap a row for the full spec. Nothing implements until you say "run the queue."</p>
-    <div id="cqList" style="max-height:420px;overflow-y:auto;"></div>
-    <div class="modal-btns"><button class="modal-btn" onclick="closeModal('changeQueueModal')">CLOSE</button></div>
+<div class="overlay add-sheet-ov" id="changeQueueModal" onclick="if(event.target===this)closeModal('changeQueueModal')">
+  <div class="add-sheet mc-sheet tall">
+    <div class="as-grab"></div>
+    <div class="sh-hd">
+      <div class="ed-av">🛠</div>
+      <div class="ed-hd-txt"><div class="ed-name">Change queue</div><div class="ed-status">Waiting for Claude Code</div></div>
+      <button type="button" class="as-x" onclick="closeModal('changeQueueModal')" aria-label="Close">✕</button>
+    </div>
+    <div id="cqList" class="cq-list"></div>
   </div>
 </div>
 
@@ -3889,7 +4053,7 @@ function switchMobTab(tab, btn){
   const pane=document.getElementById(map[tab]); if(pane)pane.classList.add('active');
   document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  if(tab==='claude')setTimeout(()=>document.getElementById('mobChatInp')?.focus(),60);
+  if(tab==='claude'){ setTimeout(()=>document.getElementById('mobChatInp')?.focus(),60); refreshRedLabDot(); }
   if(tab==='cal')     { renderMobMonthGrid(); renderMobTimeline(); renderMobCalQuests(); }
   if(tab==='home')    { renderMobHomeTeasers(); }
 }
@@ -3915,20 +4079,51 @@ function closeWikiDrawer(){
 // ══════════════════════════════════════════════════════════════
 let chatHistory=[];
 
+function chatAvatar(label){ return label==='RED' ? '<div class="cm-av red">🎨</div>' : '<div class="cm-av">🧠</div>'; }
 function appendChatMsg(role,text,elId,label){
   const scrollId = elId||'chatScroll';
   const scroll=document.getElementById(scrollId); if(!scroll)return;
   const who=role==='user'?'you':role==='claude'?'claude':'sys';
-  const lbl=label||(role==='user'?'YOU':role==='claude'?'ED':'SYSTEM');
-  const div=document.createElement('div'); div.className='chat-msg';
-  div.innerHTML=`<span class="chat-msg-who ${who}">${lbl}</span><div class="chat-bubble ${who}">${formatChatText(text)}</div>`;
+  const div=document.createElement('div'); div.className='cm cm-'+who;
+  if(who==='sys') div.innerHTML=`<div class="cm-note">${formatChatText(text)}</div>`;
+  else if(who==='you') div.innerHTML=`<div class="cm-bubble">${formatChatText(text)}</div>`;
+  else div.innerHTML=`${chatAvatar(label)}<div class="cm-bubble">${formatChatText(text)}</div>`;
   scroll.appendChild(div); scroll.scrollTop=scroll.scrollHeight;
+  if(scrollId==='redChatScroll' && who!=='sys') document.getElementById('redWelcome')?.remove();
+  if(scrollId==='mobChatMsgs' && who!=='sys'){ document.getElementById('edSuggest')?.classList.add('hide'); document.getElementById('edWelcome')?.remove(); }
+  return div;
+}
+// Small "✓ done" chips under ED's reply for anything it actually did
+function appendActionChips(msgEl, actions){
+  const label=a=>({
+    queued:`Queued for Claude Code · ${a.title}`, removed:`Removed from queue · ${a.title}`,
+    memory_saved:'Remembered that', memory_forgotten:'Forgot that',
+    task_added:`Task added · ${a.text}`, expense_logged:a.txn?`Logged $${a.txn.amount.toFixed(2)} · ${a.txn.category}`:'Expense logged',
+    calendar_event_added:`Added to calendar · ${a.title}`, calendar_event_edited:'Calendar event updated', calendar_event_deleted:'Calendar event deleted',
+    red_research_assigned:`Sent to Red · ${a.topic}`,
+  })[a.type];
+  const items=(actions||[]).map(label).filter(Boolean);
+  if(!msgEl || !items.length) return;
+  const row=document.createElement('div'); row.className='cm-actions';
+  row.innerHTML=items.map(t=>`<span class="cm-chip">✓ ${esc(t)}</span>`).join('');
+  msgEl.appendChild(row);
+  const sc=msgEl.parentElement; if(sc) sc.scrollTop=sc.scrollHeight;
+}
+function edGrow(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,140)+'px'; }
+function edSuggest(text){
+  const inp=document.getElementById('mobChatInp'); if(!inp) return;
+  if(/(to |: |research )$/.test(text)){ inp.value=text; inp.focus(); edGrow(inp); inp.setSelectionRange(text.length,text.length); }
+  else { inp.value=text; sendMobChat(); }
+}
+function renderEdWelcome(){
+  const el=document.getElementById('mobChatMsgs'); if(!el || el.children.length) return;
+  el.innerHTML=`<div class="ed-welcome" id="edWelcome"><div class="ed-welcome-av">🧠</div><div class="ed-welcome-t">Hey — what do you need?</div><div class="ed-welcome-s">I can check your calendar, add tasks and events, log spending, search your wiki, queue app changes, or send Red off to research something.</div></div>`;
 }
 function formatChatText(text){
   return esc(text).replace(/```([\s\S]*?)```/g,'<pre>$1</pre>').replace(/`([^`]+)`/g,'<code style="background:var(--bg);padding:1px 4px;font-size:11px;">$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
 }
 let typingEls={};
-function showTyping(elId,label){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='chat-msg';t.innerHTML=`<span class="chat-msg-who claude">${label||'ED'}</span><div class="chat-bubble claude typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
+function showTyping(elId,label){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='cm cm-claude';t.innerHTML=`${chatAvatar(label)}<div class="cm-bubble cm-typing"><i></i><i></i><i></i></div>`;scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
 function hideTyping(elId){ const t=typingEls[elId||'chatScroll'];if(t){t.remove();delete typingEls[elId||'chatScroll'];} }
 
 async function sendChatCommon(msg, scrollId, btnId){
@@ -3944,21 +4139,10 @@ async function sendChatCommon(msg, scrollId, btnId){
     else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,scrollId); openModal('settingsModal'); }
     else if(d.error){ appendChatMsg('sys','⚠ '+(d.message||('Error: '+d.error)),scrollId); }
     else {
-      appendChatMsg('claude',d.response,scrollId);
+      const msgEl=appendChatMsg('claude',d.response,scrollId);
+      appendActionChips(msgEl, d.toolActions);
       chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response});
       if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
-      (d.toolActions||[]).forEach(a=>{
-        if(a.type==='queued')            showToast(`Queued for Claude Code: "${a.title}" ◆`);
-        if(a.type==='removed')           showToast(`Removed from queue: "${a.title}" ◆`);
-        if(a.type==='memory_saved')      showToast(`ED remembered that ◆`);
-        if(a.type==='memory_forgotten')  showToast(`ED forgot that ◆`);
-        if(a.type==='task_added')        showToast(`Added task: "${a.text}" ◆`);
-        if(a.type==='expense_logged')    showToast(`Logged $${a.txn.amount.toFixed(2)} (${a.txn.category}) ◆`);
-        if(a.type==='calendar_event_added')   showToast(`Added "${a.title}" to your calendar ◆`);
-        if(a.type==='calendar_event_edited')  showToast(`Calendar event updated ◆`);
-        if(a.type==='calendar_event_deleted') showToast(`Calendar event deleted ◆`);
-        if(a.type==='red_research_assigned')  showToast(`Sent to Red: "${a.topic}" ◆`);
-      });
       if((d.toolActions||[]).some(a=>a.type==='queued'||a.type==='removed')){
         if(document.getElementById('changeQueueModal')?.classList.contains('active')) await loadChangeQueueList();
         else refreshChangeQueueBadge();
@@ -4033,7 +4217,7 @@ function formatWikiMd(md){
     .replace(/\n/g,'<br>');
 }
 
-function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
+function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; edGrow(inp); sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
 
 // ── RED CHAT (briefing conversation before a research run) ──
 let redChatHistory=[];
@@ -4063,7 +4247,7 @@ async function sendRedChatCommon(msg){
   }catch(e){ hideTyping('redChatScroll'); appendChatMsg('sys','Request failed: '+(e.message||'timeout'),'redChatScroll'); }
   document.getElementById('redChatSendBtn')?.removeAttribute('disabled');
 }
-function sendRedChat(){ const inp=document.getElementById('redChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; sendRedChatCommon(msg); }
+function sendRedChat(){ const inp=document.getElementById('redChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; edGrow(inp); sendRedChatCommon(msg); }
 
 // ══════════════════════════════════════════════════════════════
 // DESIGN LAB
@@ -4080,18 +4264,54 @@ let _slideshowPollTimer=null;
 let _slideshowPaused=false;
 let _slideshowSwapTimer=null;
 
+let labView='research';
+function setLabView(v){
+  labView=v;
+  document.querySelectorAll('#labSeg button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  document.getElementById('labResearch').classList.toggle('active',v==='research');
+  document.getElementById('labAsk').classList.toggle('active',v==='ask');
+  if(v==='ask'){
+    const sc=document.getElementById('redChatScroll');
+    if(sc && !sc.children.length) sc.innerHTML=`<div class="ed-welcome" id="redWelcome"><div class="ed-welcome-av red">🎨</div><div class="ed-welcome-t">What should I dig into?</div><div class="ed-welcome-s">e.g. "budget screens I can read at a glance" or "how other apps do streaks".</div></div>`;
+    setTimeout(()=>document.getElementById('redChatInp')?.focus(),80);
+  }
+}
+function dlKind(r){
+  if(r.isRevision) return {ic:'🔁',label:'Revisions',cls:'rev'};
+  if(r.assignedBy==='ED') return {ic:'🧠',label:'From ED',cls:'ed'};
+  if(r.auto) return {ic:'☀️',label:'Daily',cls:'daily'};
+  return {ic:'💬',label:'You asked',cls:'asked'};
+}
+async function renderLabActive(){
+  const el=document.getElementById('labActive'); if(!el) return;
+  try{
+    const r=await fetch(`${SERVER}/api/data`,{signal:AbortSignal.timeout(8000)}); const d=await r.json();
+    const act=(d.redAssignments||[]).filter(a=>a.status==='queued'||a.status==='running');
+    el.innerHTML=act.length?`<div class="sh-label">In progress</div>`+act.map(a=>`<div class="lab-card busy">
+      <span class="lab-ic ed"><span class="lab-spin"></span></span>
+      <span class="lab-txt"><span class="lab-title">${esc(a.topic)}</span><span class="lab-meta">${a.status==='running'?'Red is researching now…':'Queued'} · from ED</span></span></div>`).join(''):'';
+  }catch{ el.innerHTML=''; }
+}
+async function refreshRedLabDot(){
+  try{ const r=await fetch(`${SERVER}/api/design-research`,{signal:AbortSignal.timeout(6000)}); const d=await r.json();
+    const dot=document.getElementById('redLabDot'); if(dot) dot.style.display=(d.runs||[]).some(x=>!x.viewed)?'':'none'; }catch{}
+}
 async function openDesignLab(){
   openModal('designLabModal');
+  setLabView(labView);
+  renderLabActive();
   await loadDesignResearchList();
   clearInterval(_dlPollTimer);
   _dlPollTimer=setInterval(checkDlListForNewRuns,10000);
 }
 function dlRowHtml(r,isNew){
-  return`
-    <div class="wiki-row${isNew?' dl-row-new':''}" id="dlRow-${r.id}" style="cursor:pointer;" onclick="openSlideshow('${r.id}')">
-      <div style="font-family:'Inter',sans-serif;font-size:18px;color:var(--fg);;font-weight:600">${r.viewed?'':'<span class="dl-unviewed-dot" style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;"></span>'}${r.isRevision?'🔁 ':''}${esc(r.title)}${r.isRevision?' <span style="opacity:.5;font-size:13px;">(revisions)</span>':r.auto?' <span style="opacity:.5;font-size:13px;">(daily)</span>':r.assignedBy==='ED'?' <span style="opacity:.6;font-size:13px;color:var(--accent2);">(from ED)</span>':''}</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;opacity:.55;;font-weight:600">${esc(r.date)}${r.topic?' · '+esc(r.topic):''} · ${r.findingsCount||0} findings</div>
-    </div>`;
+  const k=dlKind(r); const d=new Date((r.date||'')+'T00:00:00');
+  const when=isNaN(d)?(r.date||''):d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  return `<button type="button" class="lab-card${isNew?' dl-row-new':''}${r.viewed?'':' unviewed'}" id="dlRow-${r.id}" onclick="openSlideshow('${r.id}')">
+      <span class="lab-ic ${k.cls}">${k.ic}</span>
+      <span class="lab-txt"><span class="lab-title">${esc(r.title)}</span><span class="lab-meta">${k.label} · ${esc(when)} · ${r.findingsCount||0} findings</span></span>
+      ${r.viewed?'':'<span class="lab-new">New</span>'}
+    </button>`;
 }
 async function loadDesignResearchList(){
   const list=document.getElementById('dlList');
@@ -4132,7 +4352,8 @@ async function openRedLearnings(){
       const pct=Math.round((count/maxCount)*100);
       return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;opacity:.8;"><span>${esc(label)}</span><span>${count}</span></div><div style="background:rgba(223,238,255,.08);border-radius:4px;height:8px;overflow:hidden;"><div style="background:var(--accent);height:100%;width:${pct}%;"></div></div></div>`;
     }).join('');
-    const statusRows=Object.entries(d.statusCounts).map(([status,count])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;"><span style="opacity:.75;">${esc(status)}</span><span>${count}</span></div>`).join('')||'<div style="opacity:.5;">No ideas tracked yet.</div>';
+    const STATUS_NAMES={awaiting_rating:'Waiting for your rating',generating:'Red is revising',ready_to_ship:'Revision ready',shipped:'Shown to you',queued:'Queued for Claude Code',scrapped:'Scrapped',discarded:'Scrapped',resolved:'Accepted (Got it)',revision_failed:'Revision failed',done:'Done'};
+    const statusRows=Object.entries(d.statusCounts).map(([status,count])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(223,238,255,.06);"><span style="opacity:.8;">${esc(STATUS_NAMES[status]||status.replace(/_/g,' '))}</span><span style="font-weight:700;">${count}</span></div>`).join('')||'<div style="opacity:.5;">No ideas tracked yet.</div>';
     const feedbackRows=d.recentFeedback.length?d.recentFeedback.map(f=>`<div style="padding:6px 0;border-bottom:1px solid rgba(223,238,255,.08);"><div style="opacity:.9;">"${esc(f.title)}" → <span style="color:var(--accent);">${esc(f.ratingLabel)}</span></div>${f.comment?`<div style="opacity:.6;font-size:14px;">— "${esc(f.comment)}"</div>`:''}<div style="opacity:.4;font-size:12px;">${esc(f.date)}</div></div>`).join(''):'<div style="opacity:.5;">No feedback given yet.</div>';
     const runRows=d.recentRuns.length?d.recentRuns.map(r=>`<div style="padding:3px 0;opacity:.8;">${esc(r.date)} — "${esc(r.title)}"${r.topic?` <span style="opacity:.55;">(focus: ${esc(r.topic)})</span>`:''}</div>`).join(''):'<div style="opacity:.5;">No research runs yet.</div>';
     body.innerHTML=`
@@ -4154,8 +4375,8 @@ async function openRedLearnings(){
 function openSlideshow(id){
   document.getElementById('dlSlideshowFrame').src=`${SERVER}/api/design-research/${id}`;
   openModal('dlSlideshowModal');
-  const dot=document.querySelector(`#dlRow-${CSS.escape(id)} .dl-unviewed-dot`);
-  if(dot) dot.remove();
+  const card=document.getElementById(`dlRow-${id}`);
+  if(card){ card.classList.remove('unviewed'); card.querySelector('.lab-new')?.remove(); }
   _slideshowKnownIds=new Set(_dlKnownIds.size?_dlKnownIds:[id]);
   _slideshowPaused=false;
   updateSlideshowPauseBtn();
@@ -4251,26 +4472,21 @@ function cqRowHtml(r){
   const hasSpec=desc||details;
   return`
     <div class="cq-row${open?' open':''}" id="cqRow-${esc(r.id)}">
-      <div class="cq-row-head" onclick="toggleCqDetail('${esc(r.id)}')">
-        <div class="cq-row-title">
-          <span class="cq-src-icon">${srcIcon}</span>
-          <div style="min-width:0;flex:1;">
-            <div class="cq-title-text">${esc(r.title)}</div>
-            ${desc?`<div class="cq-row-preview">${esc(desc)}</div>`:''}
-          </div>
+      <div class="cq-row-head cq2" onclick="toggleCqDetail('${esc(r.id)}')">
+        <span class="lab-ic ${r.source==='Design Lab'?'asked':'ed'}">${srcIcon}</span>
+        <div class="cq2-txt">
+          <div class="cq2-title">${esc(r.title)}</div>
+          <div class="cq2-meta"><span class="cq-status ${r.status==='pending'?'pending':'done'}">${r.status==='pending'?'Waiting':esc(r.status[0].toUpperCase()+r.status.slice(1))}</span>${esc(r.source==='Design Lab'?'From Red':'From ED')} · ${esc((()=>{const d=new Date((r.date||'')+'T00:00:00');return isNaN(d)?(r.date||''):d.toLocaleDateString('en-US',{month:'short',day:'numeric'});})())}</div>
+          ${desc&&r.status==='pending'?`<div class="cq2-preview">${esc(desc)}</div>`:''}
         </div>
-        <div class="cq-row-meta">
-          <span class="cq-date">${esc(r.date)}</span>
-          <span class="cq-status ${r.status==='pending'?'pending':'done'}">${r.status==='pending'?'PENDING':esc(r.status).toUpperCase()}</span>
-          <span class="cq-chevron">▾</span>
-        </div>
+        <span class="cq-chevron">▾</span>
       </div>
       <div class="cq-row-detail">
         <div class="cq-detail-desc">${hasSpec?esc(desc||'(no summary saved)'):'No spec text was saved for this one — check change-requests/'+esc(r.id)+'.md, or ask ED to re-describe it.'}</div>
         ${details?`<div class="cq-detail-label">IMPLEMENTATION NOTES</div><div class="cq-detail-notes">${esc(details)}</div>`:''}
         <div class="cq-detail-footer">
           <span class="cq-detail-path">${esc(r.source||'ED chat')} · change-requests/${esc(r.id)}.md</span>
-          ${r.status==='pending'?`<button class="cq-cancel-btn" onclick="event.stopPropagation();cancelQueuedChange('${esc(r.id)}','${esc((r.title||'').replace(/'/g,"\\'"))}')">✕ CANCEL</button>`:''}
+          ${r.status==='pending'?`<button class="cq-cancel-btn" onclick="event.stopPropagation();cancelQueuedChange('${esc(r.id)}','${esc((r.title||'').replace(/'/g,"\\'"))}')">Cancel request</button>`:''}
         </div>
       </div>
     </div>`;
@@ -4291,11 +4507,11 @@ function renderCqList(){
   const pending=_cqCache.filter(r=>r.status==='pending');
   const done=_cqCache.filter(r=>r.status!=='pending');
   updateCqBadge(pending.length);
-  if(!_cqCache.length){ list.innerHTML='<div class="cq-empty">Nothing queued yet — ask ED, or hit "+ QUEUE THIS DESIGN" on a Design Lab finding.</div>'; return; }
+  if(!_cqCache.length){ list.innerHTML='<div class="cq-empty-card"><div class="cq-empty-ic">✓</div><div class="cq-empty-t">Nothing queued yet</div><div class="cq-empty-s">Ask ED for an app change, or tap "Got it ✓" on one of Red\'s ideas.</div></div>'; return; }
   let html='';
-  html+=pending.length?pending.map(cqRowHtml).join(''):'<div class="cq-empty">No pending requests — you\'re all caught up.</div>';
+  html+=pending.length?`<div class="sh-label">Waiting · ${pending.length}</div>`+pending.map(cqRowHtml).join(''):'<div class="cq-empty-card"><div class="cq-empty-ic">✓</div><div class="cq-empty-t">All caught up</div><div class="cq-empty-s">Nothing is waiting. New requests from ED and Red show up here.</div></div>';
   if(done.length){
-    html+=`<button class="cq-toggle-done" onclick="toggleCqDone()">${_cqShowDone?'▴ HIDE':'▾ SHOW'} ${done.length} DONE</button>`;
+    html+=`<button class="cq-toggle-done" onclick="toggleCqDone()">${_cqShowDone?'Hide':'Show'} ${done.length} finished <span>${_cqShowDone?'▴':'▾'}</span></button>`;
     if(_cqShowDone) html+=done.map(cqRowHtml).join('');
   }
   list.innerHTML=html;
@@ -4488,7 +4704,7 @@ document.getElementById('schedTitle')?.addEventListener('keydown',e=>{if(e.key==
 document.getElementById('mobSchedTitle')?.addEventListener('keydown',e=>{if(e.key==='Enter')addSchedItem();});
 
 // ── SEED WELCOME CHAT ──
-appendChatMsg('sys','Connected to BrainVault. Ask me anything about your wiki.','mobChatMsgs');
+renderEdWelcome();
 
 // ── INIT ──
 renderHomePokemon();

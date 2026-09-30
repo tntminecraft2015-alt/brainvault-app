@@ -2050,9 +2050,9 @@ function buildSlideshowHtml(id, topic, result) {
 <body>
   <div class="slides" id="slides">${slidesHtml}</div>
   <div class="nav">
-    <button id="prevBtn" onclick="go(-1)">◀ PREV</button>
+    <button id="prevBtn" onclick="go(-1)">‹ Back</button>
     <div class="dots" id="dots"></div>
-    <button id="nextBtn" onclick="next()">NEXT ▶</button>
+    <button id="nextBtn" onclick="next()">Next ›</button>
   </div>
 <script>
   const RESEARCH_ID = ${jsonForScript(id)};
@@ -2145,7 +2145,7 @@ function buildSlideshowHtml(id, topic, result) {
     document.getElementById('prevBtn').disabled = cur === 0;
     const nextBtn = document.getElementById('nextBtn');
     nextBtn.disabled = false;
-    nextBtn.textContent = cur === total - 1 ? 'DONE ✓' : 'NEXT ▶';
+    nextBtn.textContent = cur === total - 1 ? 'Done ✓' : 'Next ›';
   }
   function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
   function next() {
@@ -2450,13 +2450,50 @@ app.delete('/api/change-requests/:id', async (req, res) => {
   }
 });
 
+// ── Slideshow theme ───────────────────────────────────────────────────────────
+// Slideshows are saved as standalone HTML when Red creates them, so their look is
+// frozen at creation time. This is layered on top when one is served, so every
+// slideshow — old and new — matches the app (Inter, soft cards, pill buttons).
+const SLIDESHOW_THEME_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root{ --bg:#0a1929; --fg:#dfeeff; --dim:rgba(223,238,255,.55); --card:rgba(223,238,255,.05); --accent:#ff8a63; }
+body{ font-family:'Inter',system-ui,sans-serif !important; background:var(--bg) !important; }
+.slide{ padding:22px 20px 18px !important; justify-content:flex-start !important; }
+.slide-kicker{ align-self:flex-start; font-family:'Inter',sans-serif !important; font-size:11px !important; font-weight:700; letter-spacing:.06em !important; text-transform:uppercase; color:var(--accent) !important; opacity:1 !important; background:rgba(255,138,99,.14); border-radius:999px; padding:5px 11px; margin-bottom:12px !important; }
+.slide h1{ font-family:'Inter',sans-serif !important; font-size:23px !important; font-weight:800 !important; letter-spacing:-.015em; line-height:1.2; margin:0 0 14px !important; }
+.slide-body, .slide-body p{ font-family:'Inter',sans-serif !important; }
+.slide-body p{ font-size:15px !important; line-height:1.55 !important; color:rgba(223,238,255,.88); font-weight:450; }
+.slide-body p[style*="monospace"]{ font-size:12.5px !important; color:var(--dim) !important; opacity:1 !important; }
+.slide-body a{ color:var(--accent) !important; font-weight:600; text-decoration:none; }
+.mockup-frame{ border:none !important; border-radius:18px !important; box-shadow:0 10px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(223,238,255,.08) !important; }
+.rate-row{ margin-top:18px !important; background:var(--card); border-radius:18px; padding:14px; }
+.rate-label{ font-family:'Inter',sans-serif !important; font-size:11px !important; font-weight:700; letter-spacing:.06em !important; opacity:1 !important; color:var(--dim); margin-bottom:10px !important; }
+.rate-btns{ display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important; }
+.rate-btn{ font-family:'Inter',sans-serif !important; font-size:13.5px !important; font-weight:600; border:none !important; border-radius:999px !important; background:rgba(223,238,255,.08) !important; color:var(--fg) !important; padding:11px 10px !important; min-height:44px; flex:none !important; }
+.rate-btn.got-it{ grid-column:1 / -1; order:-1; background:var(--accent) !important; color:#1a0e08 !important; font-weight:800; font-size:15px !important; min-height:48px; }
+.rate-btn.sel{ background:#dfeeff !important; color:#0a1929 !important; }
+.rate-btn.failed{ background:rgba(255,64,64,.25) !important; color:#ffb3b3 !important; }
+.rate-tweak-box textarea{ font-family:'Inter',sans-serif !important; font-size:15px !important; border:none !important; border-radius:14px !important; background:rgba(10,25,41,.7) !important; box-shadow:inset 0 0 0 1px rgba(223,238,255,.15); padding:10px 12px !important; }
+.send-tweak-btn{ font-family:'Inter',sans-serif !important; font-size:14px !important; font-weight:800 !important; border-radius:999px !important; padding:11px 18px !important; }
+.rate-status{ font-family:'Inter',sans-serif !important; font-size:13px !important; font-weight:600; color:#7fffb0 !important; }
+.nav{ background:transparent !important; border-top:none !important; padding:10px 16px calc(12px + env(safe-area-inset-bottom)) !important; }
+.nav button{ font-family:'Inter',sans-serif !important; font-size:14px !important; font-weight:700; border:none !important; border-radius:999px !important; background:rgba(223,238,255,.08) !important; color:var(--fg) !important; padding:12px 20px !important; min-height:46px; }
+#nextBtn{ background:var(--accent) !important; color:#1a0e08 !important; }
+.nav button:disabled{ opacity:.3 !important; }
+.dot{ width:8px !important; height:8px !important; transition:width .2s; }
+.dot.active{ width:22px !important; border-radius:4px !important; }
+`;
+
 app.get('/api/design-research/:id', (req, res) => {
   const { id } = req.params;
   if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).send('Invalid id');
   const html = readVault(`design-research/${id}.html`);
   if (!html) return res.status(404).send('Not found');
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send(html);
+  let themed = html.includes('</head>') ? html.replace('</head>', `<style id="mc-slide-theme">${SLIDESHOW_THEME_CSS}</style></head>`) : html;
+  // older slideshows bake in "◀ PREV / NEXT ▶" — relabel them to match the app
+  if (themed.includes('</body>')) themed = themed.replace('</body>', `<script>(function(){if(typeof render!=='function')return;var o=render;render=function(){o();var p=document.getElementById('prevBtn'),n=document.getElementById('nextBtn');if(p)p.textContent='\u2039 Back';if(n)n.textContent=/done/i.test(n.textContent)?'Done \u2713':'Next \u203a';};render();})();</script></body>`);
+  res.send(themed);
 
   // Mark viewed as a side effect of actually opening the slideshow — don't block the response on it.
   const data = getAppData();
