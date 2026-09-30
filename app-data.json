@@ -1726,5 +1726,99 @@
       "icon": "🎯"
     }
   ],
-  "recurringEvents": []
+  "recurringEvents": [
+    {
+      "id": "rec-1790806694374",
+      "title": "Math",
+      "time": "10:00",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        1,
+        3,
+        5
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-09-30",
+      "endDate": "2026-12-20",
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1790806694376",
+      "title": "Film",
+      "time": "12:00",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        1
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-09-30",
+      "endDate": "2026-12-20",
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1790806694378",
+      "title": "History",
+      "time": "15:00",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        1
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-09-30",
+      "endDate": "2026-12-20",
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1790806694379",
+      "title": "Psych",
+      "time": "10:30",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        2,
+        4
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-09-30",
+      "endDate": "2026-12-20",
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1790806694380",
+      "title": "English",
+      "time": "12:00",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        2
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-09-30",
+      "endDate": "2026-12-20",
+      "exceptions": {}
+    }
+  ]
 }
