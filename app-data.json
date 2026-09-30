@@ -458,6 +458,15 @@
   "lastDesignResearchAutoRun": "2026-09-30",
   "changeRequests": [
     {
+      "id": "2026-09-30-crossfade-card-swap-with-mockup-persiste",
+      "date": "2026-09-30",
+      "title": "Crossfade Card Swap with Mockup Persistence",
+      "status": "pending",
+      "source": "Design Lab",
+      "description": "Liked this Design Lab finding from Red and queued it for implementation.",
+      "details": "When a Design Lab finding gets revised, the old card fades out (150ms) while the new card fades in simultaneously, maintaining visual continuity. The iframe mockup beneath cross-fades rather than reloading, preserving scroll position so readers mid-inspection don't lose their place. This creates a sense of seamless update without jolting the viewer—alive but restrained, fitting the JRPG aesthetic of gradual state shifts.\n\nSource: [Animated Slideshow Carousel Transitions](https://www.presentation-process.com/animated-slideshow-in-powerpoint.html)\n\nRed's mockup for this finding — treat this as the concrete visual reference, not just the prose above:\n```html\n<style>body{margin:0;background:#0a1929;font-family:VT323,monospace;color:#dfeeff;padding:20px;}.card{background:#12253c;border:2px solid #ff8a63;border-radius:10px;padding:16px;margin-bottom:16px;opacity:1;transition:opacity 150ms ease-in-out;}.card.fade-out{opacity:0;}.card.fade-in{opacity:1;animation:fadeInCard 150ms ease-in-out;}.iframe-wrap{background:#1e3a5f;border:2px solid #7fffb0;border-radius:10px;height:120px;overflow:hidden;position:relative;margin-top:12px;}.iframe-wrap iframe{width:100%;height:100%;border:none;opacity:1;transition:opacity 150ms ease-in-out;}.iframe-wrap iframe.fade-out{opacity:0;}.iframe-wrap iframe.fade-in{animation:fadeInFrame 150ms ease-in-out;}.label{font-size:8px;text-transform:uppercase;color:#8fd6ff;letter-spacing:1px;margin-bottom:6px;}.title{font-size:14px;color:#ff8a63;margin:0;}.desc{font-size:12px;color:#dfeeff;margin:6px 0 0 0;line-height:1.3;}@keyframes fadeInCard{from{opacity:0;}to{opacity:1;}}@keyframes fadeInFrame{from{opacity:0;}to{opacity:1;}}</style><div class='card'><div class='label'>Finding #2</div><h2 class='title'>Crossfade Update</h2><p class='desc'>Old card fades. New card enters. Scroll preserved.</p><div class='iframe-wrap'><iframe src='about:blank'></iframe></div></div>\n```"
+    },
+    {
       "id": "2026-09-30-redesign-add-quest-event-modal-for-clean",
       "date": "2026-09-30",
       "title": "Redesign add quest/event modal for cleaner UX",
@@ -640,6 +649,17 @@
     }
   ],
   "designFeedback": [
+    {
+      "id": "2026-09-30-design-research-revisions-1790808117446",
+      "findingIndex": 0,
+      "threadId": "thread-1786517286746-1-seamless-fade-and-replace-slide-transiti",
+      "findingTitle": "Crossfade Card Swap with Mockup Persistence",
+      "findingDescription": "When a Design Lab finding gets revised, the old card fades out (150ms) while the new card fades in simultaneously, maintaining visual continuity. The iframe mockup beneath cross-fades rather than reloading, preserving scroll position so readers mid-inspection don't lose their place. This creates a sense of seamless update without jolting the viewer—alive but restrained, fitting the JRPG aesthetic of gradual state shifts.",
+      "rating": 5,
+      "ratingLabel": "Got it",
+      "comment": "",
+      "date": "2026-09-30"
+    },
     {
       "id": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
       "findingIndex": 2,
@@ -1286,13 +1306,13 @@
       "source_title": "Animated Slideshow Carousel Transitions",
       "source_url": "https://www.presentation-process.com/animated-slideshow-in-powerpoint.html",
       "mockup_html": "<style>body{margin:0;background:#0a1929;font-family:VT323,monospace;color:#dfeeff;padding:20px;}.card{background:#12253c;border:2px solid #ff8a63;border-radius:10px;padding:16px;margin-bottom:16px;opacity:1;transition:opacity 150ms ease-in-out;}.card.fade-out{opacity:0;}.card.fade-in{opacity:1;animation:fadeInCard 150ms ease-in-out;}.iframe-wrap{background:#1e3a5f;border:2px solid #7fffb0;border-radius:10px;height:120px;overflow:hidden;position:relative;margin-top:12px;}.iframe-wrap iframe{width:100%;height:100%;border:none;opacity:1;transition:opacity 150ms ease-in-out;}.iframe-wrap iframe.fade-out{opacity:0;}.iframe-wrap iframe.fade-in{animation:fadeInFrame 150ms ease-in-out;}.label{font-size:8px;text-transform:uppercase;color:#8fd6ff;letter-spacing:1px;margin-bottom:6px;}.title{font-size:14px;color:#ff8a63;margin:0;}.desc{font-size:12px;color:#dfeeff;margin:6px 0 0 0;line-height:1.3;}@keyframes fadeInCard{from{opacity:0;}to{opacity:1;}}@keyframes fadeInFrame{from{opacity:0;}to{opacity:1;}}</style><div class='card'><div class='label'>Finding #2</div><h2 class='title'>Crossfade Update</h2><p class='desc'>Old card fades. New card enters. Scroll preserved.</p><div class='iframe-wrap'><iframe src='about:blank'></iframe></div></div>",
-      "status": "awaiting_rating",
+      "status": "resolved",
       "revisionCount": 1,
-      "lastRating": 3,
-      "lastRatingLabel": "Almost there",
+      "lastRating": 5,
+      "lastRatingLabel": "Got it",
       "lastComment": "",
       "createdDate": "2026-08-12",
-      "updatedDate": "2026-08-12",
+      "updatedDate": "2026-09-30",
       "originResearchId": "2026-08-12-design-research-auto-reloading-or-auto-refreshing-design"
     },
     "thread-1786517286746-2-pause-on-interact-with-manual-refresh-fa": {
