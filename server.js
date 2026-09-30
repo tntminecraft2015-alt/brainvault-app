@@ -63,53 +63,132 @@ async function ghGet(ghPath) {
   return r.json();
 }
 
-async function ghPut(ghPath, content, isRetry = false) {
-  const body = { message: `sync: ${ghPath}`, content: Buffer.from(content).toString('base64') };
-  if (shaStore[ghPath]) body.sha = shaStore[ghPath];
-  const r = await fetch(`${GH_API}/${ghPath}`, {
-    method:  'PUT',
-    headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-    body:    JSON.stringify(body),
-  });
-  if (!r.ok) {
-    const errBody = await r.text().catch(() => '');
-    // 409/422 = sha mismatch (our cached sha is stale, usually because another write to this
-    // same path landed since we last fetched it). Previously this failure was silently
-    // swallowed — fileStore already had the new content, so the app believed the save had
-    // succeeded while GitHub never actually got it. Refetch the real sha and retry once.
-    if (!isRetry && (r.status === 409 || r.status === 422)) {
-      console.error(`ghPut sha conflict on ${ghPath} (${r.status}) — refetching sha and retrying once`);
-      const fresh = await ghGet(ghPath);
-      if (fresh?.sha) { shaStore[ghPath] = fresh.sha; return ghPut(ghPath, content, true); }
-    }
-    console.error(`ghPut failed for ${ghPath}: ${r.status} ${errBody}`);
-    recordSync(ghPath, 'write', false, `${r.status} ${errBody}`);
-    return;
-  }
-  const data = await r.json();
-  if (data?.content?.sha) shaStore[ghPath] = data.content.sha;
-  recordSync(ghPath, 'write', true);
+// ── Serialized GitHub writes ─────────────────────────────────────────────────
+// Every PUT/DELETE through the contents API creates a commit on the branch. When
+// several land at once (e.g. Design Lab writing a report, log.md, app-data.json and
+// the chat log in the same second), GitHub rejects all but one with
+// 409 "is at <commit> but expected <commit>" — the branch head moved underneath
+// them. That is a branch race, not a stale file sha, so refetching the file sha
+// and retrying immediately just races again (and for a brand-new file the refetch
+// 404s and the old code gave up). Fix: run all writes through a single queue so
+// only one commit is in flight at a time, and retry conflicts with backoff.
+let ghWriteChain = Promise.resolve();
+function enqueueGhWrite(fn) {
+  const run = ghWriteChain.then(fn, fn);
+  ghWriteChain = run.catch(() => {});
+  return run;
 }
 
-async function ghDelete(ghPath) {
-  let sha = shaStore[ghPath];
-  if (!sha) {
-    const meta = await ghGet(ghPath);
-    if (!meta) return true; // nothing on GitHub at this path — already effectively deleted
-    sha = meta.sha;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const GH_MAX_ATTEMPTS = 4;
+const failedWrites = new Set(); // paths whose latest content never reached GitHub
+
+function ghPut(ghPath, content) {
+  return enqueueGhWrite(() => ghPutNow(ghPath, content));
+}
+
+async function ghPutNow(ghPath, content) {
+  let lastErr = '';
+  for (let attempt = 1; attempt <= GH_MAX_ATTEMPTS; attempt++) {
+    const body = { message: `sync: ${ghPath}`, content: Buffer.from(content).toString('base64') };
+    if (shaStore[ghPath]) body.sha = shaStore[ghPath];
+    let r;
+    try {
+      r = await fetch(`${GH_API}/${ghPath}`, {
+        method:  'PUT',
+        headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+        body:    JSON.stringify(body),
+      });
+    } catch (err) {
+      lastErr = `network: ${err.message}`;
+      await sleep(500 * attempt);
+      continue;
+    }
+    if (r.ok) {
+      const data = await r.json().catch(() => null);
+      if (data?.content?.sha) shaStore[ghPath] = data.content.sha;
+      failedWrites.delete(ghPath);
+      recordSync(ghPath, 'write', true);
+      if (attempt > 1) console.log(`ghPut ok for ${ghPath} after ${attempt} attempts`);
+      return true;
+    }
+    lastErr = `${r.status} ${await r.text().catch(() => '')}`;
+    const retryable = r.status === 409 || r.status === 422 || r.status >= 500 || r.status === 403;
+    if (!retryable || attempt === GH_MAX_ATTEMPTS) break;
+    // Re-sync the file's real sha: a 404 means the file doesn't exist yet, so the
+    // PUT must be sent WITHOUT a sha (a create), not with a stale one.
+    if (r.status === 409 || r.status === 422) {
+      const fresh = await ghGetMeta(ghPath);
+      if (fresh === 404) delete shaStore[ghPath];
+      else if (fresh?.sha) shaStore[ghPath] = fresh.sha;
+    }
+    console.error(`ghPut conflict on ${ghPath} (${r.status}), attempt ${attempt}/${GH_MAX_ATTEMPTS} — retrying`);
+    await sleep(400 * attempt + Math.floor(Math.random() * 300));
   }
-  const r = await fetch(`${GH_API}/${ghPath}`, {
-    method:  'DELETE',
-    headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ message: `remove: ${ghPath}`, sha }),
-  });
-  if (!r.ok) {
-    console.error(`ghDelete failed for ${ghPath}: ${r.status} ${await r.text().catch(() => '')}`);
+  console.error(`ghPut failed for ${ghPath}: ${lastErr}`);
+  recordSync(ghPath, 'write', false, lastErr);
+  failedWrites.add(ghPath);
+  return false;
+}
+
+// Metadata lookup that distinguishes "doesn't exist" (404) from other failures,
+// and doesn't mark a normal new-file 404 as a read error in /api/status.
+async function ghGetMeta(ghPath) {
+  try {
+    const r = await fetch(`${GH_API}/${ghPath}`, {
+      headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json' },
+    });
+    if (r.status === 404) return 404;
+    if (!r.ok) return null;
+    return r.json();
+  } catch { return null; }
+}
+
+// Anything that exhausted its retries is re-attempted with its latest in-memory
+// content, so a bad minute on GitHub doesn't silently lose data until restart.
+setInterval(() => {
+  if (!USE_GITHUB || !failedWrites.size) return;
+  for (const ghPath of [...failedWrites]) {
+    if (writeQueue[ghPath] || fileStore[ghPath] === undefined) continue;
+    console.log(`  Retrying earlier failed write: ${ghPath}`);
+    ghPut(ghPath, fileStore[ghPath]).catch(console.error);
+  }
+}, 60_000).unref();
+
+function ghDelete(ghPath) {
+  return enqueueGhWrite(() => ghDeleteNow(ghPath));
+}
+
+async function ghDeleteNow(ghPath) {
+  for (let attempt = 1; attempt <= GH_MAX_ATTEMPTS; attempt++) {
+    let sha = shaStore[ghPath];
+    if (!sha) {
+      const meta = await ghGetMeta(ghPath);
+      if (meta === 404) { delete fileStore[ghPath]; failedWrites.delete(ghPath); return true; }
+      if (!meta?.sha) return false;
+      sha = meta.sha;
+    }
+    const r = await fetch(`${GH_API}/${ghPath}`, {
+      method:  'DELETE',
+      headers: { Authorization: `token ${GH_TOKEN}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ message: `remove: ${ghPath}`, sha }),
+    });
+    if (r.ok) {
+      delete fileStore[ghPath];
+      delete shaStore[ghPath];
+      failedWrites.delete(ghPath);
+      return true;
+    }
+    const errText = await r.text().catch(() => '');
+    if ((r.status === 409 || r.status === 422) && attempt < GH_MAX_ATTEMPTS) {
+      delete shaStore[ghPath];
+      await sleep(400 * attempt + Math.floor(Math.random() * 300));
+      continue;
+    }
+    console.error(`ghDelete failed for ${ghPath}: ${r.status} ${errText}`);
     return false;
   }
-  delete fileStore[ghPath];
-  delete shaStore[ghPath];
-  return true;
+  return false;
 }
 
 async function loadDir(dir) {
@@ -141,7 +220,10 @@ async function initStore() {
 function ghWrite(ghPath, content) {
   fileStore[ghPath] = content;
   clearTimeout(writeQueue[ghPath]);
-  writeQueue[ghPath] = setTimeout(() => ghPut(ghPath, content).catch(console.error), 600);
+  writeQueue[ghPath] = setTimeout(() => {
+    delete writeQueue[ghPath];
+    ghPut(ghPath, fileStore[ghPath]).catch(console.error);
+  }, 600);
 }
 
 // ── DUAL-MODE FILE HELPERS ────────────────────────────────────────────────────
@@ -395,7 +477,7 @@ app.get('/', (req, res) => res.sendFile(path.join(VAULT, 'mission-control.html')
 
 app.get('/api/status', (req, res) => {
   const sync = USE_GITHUB ? Object.entries(syncStatus).map(([path, s]) => ({ path, ...s })) : [];
-  res.json({ ok: true, hasKey: !!getApiKey(), mode: USE_GITHUB ? 'cloud' : 'local', date: today(), sync });
+  res.json({ ok: true, hasKey: !!getApiKey(), mode: USE_GITHUB ? 'cloud' : 'local', date: today(), pendingWrites: [...failedWrites], sync });
 });
 
 app.post('/api/set-key', (req, res) => {
