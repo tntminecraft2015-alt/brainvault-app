@@ -40,9 +40,31 @@
         "location": "",
         "kind": "social"
       }
+    ],
+    "2026-10-01": [
+      {
+        "id": 1790806801398,
+        "title": "Therapy",
+        "time": "14:00",
+        "location": "",
+        "kind": "focus",
+        "notify": false,
+        "notifyLeadMin": null,
+        "linkedTaskId": 1790806801853
+      }
     ]
   },
-  "tasks": [],
+  "tasks": [
+    {
+      "id": 1790806801853,
+      "text": "Therapy",
+      "done": false,
+      "rank": "B",
+      "date": "2026-10-01",
+      "time": "14:00",
+      "linkedEventId": 1790806801398
+    }
+  ],
   "streakDays": [],
   "timelineChecks": {
     "2026-05-14": {
