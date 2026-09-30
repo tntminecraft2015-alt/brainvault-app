@@ -175,6 +175,11 @@
     "current": 40
   },
   "caughtPoke": {
+    "39": {
+      "count": 1,
+      "firstCaught": "2026-09-30",
+      "shiny": false
+    },
     "54": {
       "count": 1,
       "firstCaught": "2026-08-10",
