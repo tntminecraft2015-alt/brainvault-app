@@ -631,6 +631,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-09-30-design-research-end-to-end-daily-income-logging-reminder",
+      "findingIndex": 0,
+      "threadId": "thread-1790807197955-0-one-tap-notification-to-log-pre-filled-f",
+      "findingTitle": "One-Tap Notification-to-Log: Pre-Filled Fast-Confirm from Push",
+      "findingDescription": "Pre-filled confirmation buttons (e.g., 'Confirm R$ X' with default income amount) paired with an 'Adjust' link directly accessible from a push notification enable users to log routine income without opening a full form. Apps like Tip Tracker prompt 'How much did you make in tips today?' and let users log in under 10 seconds—this pattern combines notification-triggered micro-forms with an optional \"go deeper\" path. Ideal for recurring paychecks or predictable daily/weekly income patterns.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-09-30"
+    },
+    {
       "id": "2026-08-27-design-research-daily",
       "findingIndex": 2,
       "threadId": "thread-1787873979570-2-quiet-streak-display-informational-not-c",
@@ -1476,10 +1487,10 @@
       "source_title": "Moneto: Phase 4 Income Reminder Design & Tip Tracker (iOS App Store)",
       "source_url": "https://github.com/GuiCezaF/Moneto/issues/12",
       "mockup_html": "<style>\n  body { font-family: VT323, monospace; background: #0a1929; color: #dfeeff; padding: 20px; margin: 0; }\n  .notify-card { background: #12253c; border: 2px solid #ff8a63; border-radius: 8px; padding: 16px; max-width: 320px; }\n  .notify-title { font-size: 12px; text-transform: uppercase; color: #8fd6ff; margin-bottom: 12px; letter-spacing: 1px; }\n  .amount { font-size: 28px; font-weight: bold; margin: 12px 0; color: #ff8a63; }\n  .btn-confirm { width: 100%; background: #7fffb0; color: #070b14; padding: 12px; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 8px; }\n  .btn-adjust { width: 100%; background: transparent; color: #8fd6ff; padding: 8px; border: 1px dashed #8fd6ff; border-radius: 4px; font-size: 12px; cursor: pointer; }\n</style>\n<div class=\"notify-card\">\n  <div class=\"notify-title\">📬 Income Logged</div>\n  <div class=\"amount\">+$425.50</div>\n  <button class=\"btn-confirm\">✓ CONFIRM</button>\n  <button class=\"btn-adjust\">⚙ Adjust Amount</button>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
       "lastComment": "",
       "createdDate": "2026-09-30",
       "updatedDate": "2026-09-30",
