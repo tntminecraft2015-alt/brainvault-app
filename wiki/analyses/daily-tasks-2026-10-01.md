@@ -11,7 +11,8 @@ tags: [tasks, daily-log]
 |------|------|--------|
 | B | Therapy | ⬜ Pending | Daily |
 | B | Pay insurance | ⬜ Pending | Daily |
+| B | Trey recording | ⬜ Pending | Daily |
 
-**Completion:** 0/2 (0%)
+**Completion:** 0/3 (0%)
 
-_Last synced: 10/1/2026, 5:06:44 PM_
+_Last synced: 10/1/2026, 5:07:31 PM_
