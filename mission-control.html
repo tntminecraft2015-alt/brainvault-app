@@ -5275,6 +5275,13 @@ setInterval(() => {
   .farm-cz-s { font-size:12px; color:var(--fg-dim); }
   .farm-name-inp { width:100%; box-sizing:border-box; border:none; border-radius:14px; background:rgba(10,25,41,.6); box-shadow:inset 0 0 0 1px rgba(223,238,255,.14); color:var(--fg); font-family:inherit; font-size:16px; font-weight:700; padding:12px 14px; outline:none; }
   .farm-name-inp:focus { box-shadow:inset 0 0 0 2px var(--accent2); }
+  .farm-maps { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .farm-map { border:none; border-radius:18px; background:rgba(223,238,255,.05); padding:6px 6px 10px; display:flex; flex-direction:column; gap:2px; color:var(--fg); font-family:inherit; text-align:left; cursor:pointer; }
+  .farm-map .fmap-art { position:relative; display:block; aspect-ratio:16/10; border-radius:12px; overflow:hidden; margin-bottom:6px; }
+  .farm-map .fmap-art svg { position:absolute; inset:0; width:100%; height:100%; }
+  .farm-map .fmap-t { font-size:13.5px; font-weight:800; padding:0 4px; }
+  .farm-map .fmap-s { font-size:11.5px; color:var(--fg-dim); padding:0 4px; }
+  .farm-map.on { background:rgba(127,255,176,.1); box-shadow:inset 0 0 0 2px var(--green); }
   .farm-who { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
   .farm-who-b { position:relative; border:none; border-radius:18px; background:rgba(223,238,255,.05); padding:8px 4px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; color:var(--fg); font-family:inherit; cursor:pointer; }
   .farm-who-b .farm-port { width:54px; height:54px; }
@@ -5565,16 +5572,23 @@ const FARM_DECOS = [
 ];
 const FARM_LANTERNS=[{l:63.5,t:30},{l:63.5,t:52},{l:63.5,t:74}];
 function farmCustom(){ const f=farmState(); f.custom=f.custom||{}; const c=f.custom;
-  c.name=c.name||''; c.season=c.season||'auto'; c.tod=c.tod||'auto'; c.barn=c.barn||'red'; c.fence=c.fence||'wood'; c.path=c.path||'dirt';
+  c.name=c.name||''; c.map=FARM_MAPS[c.map]?c.map:'meadow'; c.season=c.season||'auto'; c.tod=c.tod||'auto'; c.barn=c.barn||'red'; c.fence=c.fence||'wood'; c.path=c.path||'dirt';
   c.owned=c.owned||['sign']; c.show=c.show||{sign:true}; return c; }
 function farmSeasonNow(){ const c=farmCustom(); if(c.season!=='auto') return c.season; const m=new Date().getMonth(); return m<2||m===11?'winter':m<5?'spring':m<8?'summer':'autumn'; }
 function farmTimeOfDay(){ const c=(APP.farm&&APP.farm.custom)||{}; if(c.tod&&c.tod!=='auto') return c.tod; const h=new Date().getHours(); return h>=20||h<6?'night':h>=17?'evening':'day'; }
 function farmShows(id){ const c=farmCustom(); return c.owned.includes(id)&&c.show[id]!==false; }
 function farmSeeded(seed){ let s=seed>>>0||1; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
 
-function farmBgSVG(tod,S){
-  const k=FARM_SKY[tod], P=FARM_SEASONS[S], c=farmCustom(), r=farmSeeded(11), id=tod+S;
-  let tufts='', speck='', fl='', stars='', snow='';
+const FARM_MAPS = {
+  meadow:  {name:'Meadow Ranch',  desc:'Rolling hills and open fields', tree:'round', tint:null},
+  seaside: {name:'Seaside Cove',  desc:'A sandy shore by the ocean',    tree:'palm',  tint:'rgba(255,236,190,.07)'},
+  forest:  {name:'Forest Glade',  desc:'A clearing in the deep woods',  tree:'pine',  tint:'rgba(8,40,24,.2)'},
+  mountain:{name:'Mountain Valley',desc:'Tall peaks and cool air',      tree:'pine',  tint:'rgba(120,150,180,.06)'}
+};
+function farmBgSVG(tod,S,map,tag){
+  map=FARM_MAPS[map]?map:'meadow';
+  const k=FARM_SKY[tod], P=FARM_SEASONS[S], c=farmCustom(), r=farmSeeded(11), id=tod+S+map+(tag||'');
+  let tufts='', speck='', fl='', stars='', snow='', extra='';
   for(let i=0;i<70;i++){ const x=r()*400, y=135+r()*265, s=.7+r()*.8;
     tufts+=`<path d="M${x.toFixed(1)} ${y.toFixed(1)}l${(-3*s).toFixed(1)} ${(-7*s).toFixed(1)}M${x.toFixed(1)} ${y.toFixed(1)}l${(1*s).toFixed(1)} ${(-9*s).toFixed(1)}M${x.toFixed(1)} ${y.toFixed(1)}l${(4*s).toFixed(1)} ${(-6*s).toFixed(1)}"/>`; }
   for(let i=0;i<150;i++){ speck+=`<ellipse cx="${(r()*400).toFixed(1)}" cy="${(126+r()*274).toFixed(1)}" rx="${(1+r()*2.6).toFixed(1)}" ry="${(.6+r()*1.2).toFixed(1)}" fill="${P.speck[i%2]}" opacity="${(.35+r()*.4).toFixed(2)}"/>`; }
@@ -5589,21 +5603,54 @@ function farmBgSVG(tod,S){
             : `<circle cx="78" cy="38" r="40" fill="#cfd8ff" opacity=".08"/><circle cx="78" cy="38" r="15" fill="#f4f1d6"/><circle cx="85" cy="33" r="13" fill="${k.s1}"/>`;
   const cloud=(x,y,s,o)=>`<g transform="translate(${x} ${y}) scale(${s})" opacity="${o}"><ellipse cx="0" cy="6" rx="30" ry="9" fill="#fff"/><ellipse cx="-10" cy="0" rx="14" ry="11" fill="#fff"/><ellipse cx="8" cy="-3" rx="17" ry="14" fill="#fff"/><ellipse cx="0" cy="9" rx="28" ry="5" fill="#dbe9f3"/></g>`;
   const clouds = tod==='night' ? `<g class="fs-clouds" opacity=".25">${cloud(210,50,1,.6)}</g>` : `<g class="fs-clouds">${cloud(180,38,1,tod==='day'?.95:.55)}${cloud(330,66,.7,tod==='day'?.9:.5)}${cloud(40,84,.55,tod==='day'?.8:.4)}</g>`;
-  const treeline=[...Array(26)].map((_,i)=>`<circle cx="${i*16+4}" cy="${104+((i*7)%5)}" r="${9+((i*5)%4)}"/>`).join('');
+  const night=tod==='night', eve=tod==='evening';
+  // ── backdrop per map ──
+  let back='';
+  if(map==='meadow'){
+    const treeline=[...Array(26)].map((_,i)=>`<circle cx="${i*16+4}" cy="${104+((i*7)%5)}" r="${9+((i*5)%4)}"/>`).join('');
+    back=`<path d="M0 96 C50 74 110 88 160 80 S260 60 320 76 S380 82 400 78 V150 H0Z" fill="${P.hills[0]}" opacity="${night?.55:.85}"/>
+      <g fill="${P.leaf[2]}" opacity="${P.snow?.55:.75}">${treeline}</g>
+      <path d="M0 110 C60 92 120 108 180 100 S300 84 400 106 V150 H0Z" fill="${P.hills[1]}"/>
+      <path d="M0 124 C80 106 150 124 230 114 S350 104 400 118 V150 H0Z" fill="${P.hills[2]}"/>`;
+  } else if(map==='seaside'){
+    const sea1=night?'#132a5a':eve?'#5d63a8':'#2f93cf', sea2=night?'#1d3d72':eve?'#e49a8e':'#7fd0ee';
+    const sand=P.snow?'#e9eef2':'#f1dca6', sandD=P.snow?'#d3dee6':'#e2c385';
+    back=`<defs><linearGradient id="fsSea${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sea1}"/><stop offset="1" stop-color="${sea2}"/></linearGradient></defs>
+      <rect y="86" width="400" height="44" fill="url(#fsSea${id})"/>
+      <path d="M296 88 c10-12 30-14 44 0z" fill="${night?'#24405a':'#5e9a7a'}" opacity=".85"/><path d="M318 77 v11 M318 77 c-6-2-10 1-12 4 M318 77 c6-2 10 1 12 4" stroke="${night?'#24405a':'#4c7f5f'}" stroke-width="1.6" fill="none"/>
+      ${sun.includes('300')?'<path d="M276 96 h48" stroke="#ffd48a" stroke-width="3" opacity=".5"/>':''}
+      <g class="farm-shimmer" stroke="#fff" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"><path d="M30 98 q8-3 16 0M120 104 q8-3 16 0M210 96 q8-3 16 0M60 114 q8-3 16 0M250 110 q8-3 16 0M350 102 q8-3 16 0"/></g>
+      <path d="M0 116 C60 108 120 120 200 112 S330 106 400 114 V150 H0Z" fill="${sand}"/>
+      <path d="M0 116 C60 108 120 120 200 112 S330 106 400 114" stroke="#fff" stroke-width="2.4" fill="none" opacity=".8"/>
+      <path d="M0 126 C90 118 170 130 260 122 S360 118 400 124 V150 H0Z" fill="${sandD}"/>`;
+    extra+=[...Array(8)].map((_,i)=>{ const x=(i*53+20)%400, y=150+((i*71)%220); return `<path d="M${x} ${y} a4 4 0 0 1 8 0 l-4 3z" fill="${['#ffd1c2','#fff4e6','#ffc2dc'][i%3]}" opacity=".9"/>`; }).join('');
+  } else if(map==='forest'){
+    const d1=night?'#123024':P.snow?'#5f7f72':S==='autumn'?'#7a5a2a':'#2a6a3e', d2=night?'#183a2a':P.snow?'#7a988b':S==='autumn'?'#9a6a2e':'#357c47', d3=night?'#1f4632':P.snow?'#93aea2':S==='autumn'?'#b9802f':'#3f8f52';
+    const row=(y,col,h,step,off)=>[...Array(Math.ceil(420/step))].map((_,i)=>{ const x=i*step+off-10, hh=h+((i*13)%9); return `<path d="M${x} ${y} l${step*.6} ${-hh} l${step*.6} ${hh}z" fill="${col}"/>`; }).join('');
+    const caps=(y,h,step,off)=>[...Array(Math.ceil(420/step))].map((_,i)=>{ const x=i*step+off-10, hh=h+((i*13)%9), tx=x+step*.6, ty=y-hh; return `<path d="M${tx} ${ty} l-4 7 l4 -1.5 l4 1.5z" fill="#fff"/>`; }).join('');
+    back=`${row(108,d1,46,22,0)}${P.snow?caps(108,46,22,0):''}${row(116,d2,40,20,9)}${P.snow?caps(116,40,20,9):''}${row(126,d3,30,18,4)}${P.snow?caps(126,30,18,4):''}`;
+    extra+=[...Array(9)].map((_,i)=>{ const x=(i*47+30)%400, y=160+((i*83)%220); return `<g transform="translate(${x} ${y})"><rect x="-1.2" y="-2" width="2.4" height="5" rx="1" fill="#f3ead8"/><path d="M-5 -1 a5 4.4 0 0 1 10 0z" fill="${i%2?'#e04a3f':'#d98a3a'}"/><circle cx="-2" cy="-3" r=".9" fill="#fff"/><circle cx="1.6" cy="-2.4" r=".8" fill="#fff"/></g>`; }).join('');
+  } else if(map==='mountain'){
+    const m1=night?'#2a3456':eve?'#7a6f9a':'#8aa0bf', m2=night?'#232c49':eve?'#6a5f88':'#7186a8', cap='#f6f9fc';
+    back=`<path d="M-10 118 L60 40 L110 92 L170 26 L240 100 L300 48 L410 118Z" fill="${m1}"/>
+      <path d="M60 40 L46 56 L56 54 L62 60 L70 52 L78 58Z M170 26 L154 46 L164 44 L172 52 L180 42 L190 50Z M300 48 L286 64 L296 62 L302 68 L310 60 L318 66Z" fill="${cap}" opacity="${night?.7:.95}"/>
+      <path d="M-10 126 L40 84 L90 112 L150 74 L210 116 L270 82 L330 110 L410 86 V140 H-10Z" fill="${m2}"/>
+      <path d="M0 124 C80 106 150 124 230 114 S350 104 400 118 V150 H0Z" fill="${P.hills[2]}"/>
+      <path d="M198 116 q4 -40 2 -60" stroke="#cfe8ff" stroke-width="3" fill="none" opacity="${night?.3:.6}"/>`;
+    extra+=[...Array(10)].map((_,i)=>{ const x=(i*61+15)%400, y=150+((i*67)%230); return `<ellipse cx="${x}" cy="${y}" rx="${3+i%3}" ry="${2+i%2}" fill="#9a958c" opacity=".8"/>`; }).join('');
+  }
   const pathD="M318 128 C300 190 250 210 210 260 S170 360 160 400";
   const path = c.path==='stone'
     ? `<path d="${pathD}" stroke="${P.snow?'#c9d6e0':'#b9b2a4'}" stroke-width="30" fill="none" stroke-linecap="round"/><path d="${pathD}" stroke="${P.snow?'#e6eef4':'#d8d2c4'}" stroke-width="22" fill="none" stroke-linecap="round" stroke-dasharray="9 5"/>`
     : `<path d="${pathD}" stroke="${P.snow?'#d9e4ec':'#cfae72'}" stroke-width="30" fill="none" stroke-linecap="round"/><path d="${pathD}" stroke="${P.snow?'#eef4f8':'#e4c891'}" stroke-width="23" fill="none" stroke-linecap="round"/><path d="${pathD}" stroke="${P.snow?'#fff':'#efd8a8'}" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="2 14" opacity=".7"/>`;
+  const mt=FARM_MAPS[map].tint;
   return `<svg class="fs-bg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <defs>${sky}${sunG}<linearGradient id="fsG${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.g1}"/><stop offset="1" stop-color="${P.g2}"/></linearGradient>
       <pattern id="fsM${id}" width="44" height="44" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><rect width="22" height="44" fill="${P.stripe}"/></pattern></defs>
-    <rect width="400" height="150" fill="url(#fsS${id})"/>${stars}${sun}${clouds}
-    <path d="M0 96 C50 74 110 88 160 80 S260 60 320 76 S380 82 400 78 V150 H0Z" fill="${P.hills[0]}" opacity="${tod==='night'?.55:.85}"/>
-    <g fill="${P.leaf[2]}" opacity="${P.snow?.55:.75}">${treeline}</g>
-    <path d="M0 110 C60 92 120 108 180 100 S300 84 400 106 V150 H0Z" fill="${P.hills[1]}"/>
-    <path d="M0 124 C80 106 150 124 230 114 S350 104 400 118 V150 H0Z" fill="${P.hills[2]}"/>
-    <rect y="122" width="400" height="278" fill="url(#fsG${id})"/><rect y="122" width="400" height="278" fill="url(#fsM${id})"/>
-    ${speck}${path}<g stroke="${P.tuft}" stroke-width="1.6" stroke-linecap="round" fill="none">${tufts}</g>${fl}${snow}
+    <rect width="400" height="150" fill="url(#fsS${id})"/>${stars}${sun}${clouds}${back}
+    <rect y="${map==='seaside'?132:122}" width="400" height="278" fill="url(#fsG${id})"/><rect y="${map==='seaside'?132:122}" width="400" height="278" fill="url(#fsM${id})"/>
+    ${mt?`<rect y="122" width="400" height="278" fill="${mt}"/>`:''}
+    ${speck}${path}<g stroke="${P.tuft}" stroke-width="1.6" stroke-linecap="round" fill="none">${tufts}</g>${fl}${extra}${snow}
     ${k.tint?`<rect width="400" height="400" fill="${k.tint}"/>`:''}
   </svg>`;
 }
@@ -5622,7 +5669,15 @@ const FARM_ART = {
   mailbox:`<svg viewBox="0 0 40 64" aria-hidden="true"><ellipse cx="20" cy="61" rx="11" ry="3" fill="rgba(0,0,0,.2)"/><rect x="16.5" y="28" width="7" height="34" rx="1.5" fill="#a77b52"/><rect x="16.5" y="28" width="2.5" height="34" fill="rgba(255,255,255,.2)"/>
     <path d="M4 32 V20 a12 12 0 0 1 24 0 V32 Z" fill="#4f8fd6"/><path d="M4 28 h24 v4 h-24z" fill="#3b73b2"/><path d="M8 20 a8 8 0 0 1 8 -8" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/>
     <g class="mb-flag"><rect x="28" y="8" width="3" height="17" rx="1" fill="#c23b31"/><path d="M31 8h10v7H31z" fill="#ff5a4e"/></g></svg>`,
-  tree(S){ const P=FARM_SEASONS[S], [a,b,c2]=P.leaf;
+  tree(S,kind){ const P=FARM_SEASONS[S], [a,b,c2]=P.leaf;
+    if(kind==='palm') return `<svg viewBox="0 0 70 96" aria-hidden="true"><ellipse cx="35" cy="91" rx="20" ry="4" fill="rgba(0,0,0,.2)"/>
+      <path d="M33 90 C30 70 32 50 40 30" stroke="#a5784c" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M33 90 C30 70 32 50 40 30" stroke="#8a6440" stroke-width="7" fill="none" stroke-dasharray="2 5"/>
+      ${[[-150,'#3f9a4f'],[-110,'#4fae5c'],[-60,'#3f9a4f'],[-20,'#4fae5c'],[200,'#357e44']].map(([ang,col])=>`<path d="M40 30 q16 -6 30 8 q-16 -4 -30 -8z" fill="${P.snow?'#6f8f7c':col}" transform="rotate(${ang+180} 40 30)"/>`).join('')}
+      <circle cx="37" cy="34" r="3.4" fill="#7a5534"/><circle cx="43" cy="35" r="3.4" fill="#7a5534"/>${P.snow?'<path d="M28 26 q12 -8 24 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>':''}</svg>`;
+    if(kind==='pine'){ const g1=S==='autumn'?'#3d6e4a':'#2f6a45', g2=S==='autumn'?'#4a7d55':'#3a7d52', g3='#468f5e';
+      return `<svg viewBox="0 0 70 96" aria-hidden="true"><ellipse cx="35" cy="91" rx="22" ry="4.5" fill="rgba(0,0,0,.2)"/><rect x="31.5" y="74" width="7" height="17" rx="2" fill="#6a4a30"/>
+      <path d="M35 34 L60 78 H10Z" fill="${g1}"/><path d="M35 20 L55 58 H15Z" fill="${g2}"/><path d="M35 6 L50 38 H20Z" fill="${g3}"/><path d="M35 6 L50 38 H35Z" fill="rgba(0,0,0,.1)"/>
+      ${P.snow?'<path d="M35 6 L41 19 L37 17 L33 20 L29 17Z M35 22 L46 42 L40 39 L35 43 L29 39 L24 42Z M35 37 L50 62 L43 59 L35 64 L27 59 L20 62Z" fill="#fff"/>':''}</svg>`; }
     const caps=P.snow?`<path d="M14 36 c4-10 14-18 21-18 s17 8 21 18 c-6-4-10-1-14-3 s-9 1-14-1 s-10 2-14 4z" fill="#fff"/><path d="M8 50 c3-5 8-8 14-8 c-3 4-8 5-14 8zM62 50 c-3-5-8-8-14-8 c3 4 8 5 14 8z" fill="#fff"/>`:'';
     const bloom=S==='spring'?[[24,30],[42,24],[30,46],[50,44],[18,52],[38,36]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#fff" opacity=".9"/>`).join(''):'';
     return `<svg viewBox="0 0 70 96" aria-hidden="true"><ellipse cx="35" cy="91" rx="26" ry="5" fill="rgba(0,0,0,.2)"/><rect x="31" y="56" width="8" height="35" rx="2" fill="#7a5534"/><rect x="31" y="56" width="3" height="35" fill="rgba(255,255,255,.15)"/>
@@ -5717,9 +5772,11 @@ function renderFarmRanch(){
   scene.style.cssText=`--barn:${B.barn};--barnP:${B.p};--roof:${B.roof};--door:${B.door}`;
   const now=Date.now(), z=t=>Math.round(t);
   const letterWaiting=!!farmJobMon('letter') && f.letterRead!==TODAY();
-  let h=farmBgSVG(tod,S)+`<div class="farm-fence${c.fence==='picket'?' picket':''}"></div>`;
+  const MAPK=FARM_MAPS[c.map]?c.map:'meadow';
+  let h=farmBgSVG(tod,S,MAPK)+`<div class="farm-fence${c.fence==='picket'?' picket':''}"></div>`;
   const hideTree={tm:farmShows('windmill'), tr:farmShows('scarecrow')};
-  FARM_LAYOUT.trees.forEach(t=>{ if(hideTree[t.id]) return; h+=`<div class="farm-decor farm-art" style="left:${t.l}%;top:${t.t}%;width:${t.w}%;z-index:${z(t.t+12)}">${FARM_ART.tree(S)}</div>`; });
+  const treeKind=FARM_MAPS[MAPK].tree, trees=MAPK==='forest'?FARM_LAYOUT.trees.concat([{l:47,t:5,w:11,id:'f1'},{l:-5,t:44,w:10,id:'f2'}]):FARM_LAYOUT.trees;
+  trees.forEach(t=>{ if(hideTree[t.id]) return; h+=`<div class="farm-decor farm-art" style="left:${t.l}%;top:${t.t}%;width:${t.w}%;z-index:${z(t.t+12)}">${FARM_ART.tree(S,t.id==='tl'&&MAPK==='forest'?'round':treeKind)}</div>`; });
   FARM_DECOS.forEach(d=>{ if(!d.pos||!farmShows(d.id)) return;
     const art=`<span class="farm-art">${FARM_ART.deco(d.id,S,c.name)}</span>`;
     if(d.id==='sign') h+=`<button type="button" class="farm-thing farm-sign" style="left:${d.pos.l}%;top:${d.pos.t}%;width:${d.pos.w}%;z-index:${z(d.pos.t+10)}" onclick="openFarmCustomize()" aria-label="Farm sign: customize your farm">${art}</button>`;
@@ -5791,6 +5848,8 @@ function openFarmCustomize(focus){
     <div style="overflow-y:auto;min-height:0;flex:1;padding-bottom:8px">
     <div class="farm-cz-sec" style="margin-top:4px"><label class="farm-cz-h" for="farmNameInp"><span class="farm-cz-t">Farm name</span><span class="farm-cz-s">Shown on the sign and at the top</span></label>
       <input id="farmNameInp" class="farm-name-inp" maxlength="24" placeholder="My Farm" value="${esc(c.name)}" oninput="setFarmName(this.value)"></div>
+    <div class="farm-cz-sec"><div class="farm-cz-h"><span class="farm-cz-t">Map</span><span class="farm-cz-s">Where your farm is</span></div>
+      <div class="farm-maps">${Object.entries(FARM_MAPS).map(([k,m])=>`<button type="button" class="farm-map${c.map===k?' on':''}" onclick="setFarmCustom('map','${k}')" aria-pressed="${c.map===k}"><span class="fmap-art">${farmBgSVG(farmTimeOfDay(),S,k,'t').replace('viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice"','viewBox="0 10 400 240" preserveAspectRatio="xMidYMin slice"')}</span><span class="fmap-t">${m.name}</span><span class="fmap-s">${m.desc}</span></button>`).join('')}</div></div>
     <div class="farm-cz-sec" id="farmWhoSec"><div class="farm-cz-h"><span class="farm-cz-t">Who’s on the farm</span><span class="farm-cz-s" id="farmWhoCount">${f.out.length} of ${FARM_MAX_OUT}</span></div>
       <div class="farm-who">${ids.length?ids.map(id=>`<button type="button" class="farm-who-b${f.out.includes(id)?' on':''}" id="farmWho${id}" onclick="toggleFarmWho(${id})" aria-pressed="${f.out.includes(id)}">${farmPortrait(id,54)}<span class="nm" id="farmWhoNm${id}">${esc(pokeLabel(id))}</span><span class="ck">✓</span></button>`).join(''):'<div class="farm-empty">No Pokémon yet. Finish quests to meet some!</div>'}</div></div>
     <div class="farm-cz-sec"><div class="farm-cz-h"><span class="farm-cz-t">Season</span></div>${chips('season',[['auto',`Match the calendar (${autoSeason})`],['spring','Spring'],['summer','Summer'],['autumn','Autumn'],['winter','Winter']])}</div>
@@ -6196,6 +6255,7 @@ function meetFarmVisitor(){
   .deco-picnic { width:15% !important; }
   .farm-who { grid-template-columns:repeat(6,minmax(0,1fr)); }
   .farm-decos { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .farm-maps { grid-template-columns:repeat(4,minmax(0,1fr)); }
   .farm-jobmini { display:block; }
   .farm-jobs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
   .farm-hgrid { grid-template-columns:repeat(4,minmax(0,1fr)); }
