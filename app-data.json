@@ -2276,24 +2276,6 @@
       }
     },
     {
-      "id": "rec-1790806694380",
-      "title": "English",
-      "time": "12:00",
-      "location": "",
-      "kind": "focus",
-      "notify": false,
-      "notifyLeadMin": null,
-      "freq": "weekly",
-      "daysOfWeek": [
-        2
-      ],
-      "dayOfMonth": null,
-      "interval": 1,
-      "startDate": "2026-09-30",
-      "endDate": "2026-12-20",
-      "exceptions": {}
-    },
-    {
       "id": "rec-1790807951527",
       "title": "Pay rent",
       "time": null,
@@ -2307,6 +2289,25 @@
       "interval": 1,
       "startDate": "2026-10-01",
       "endDate": null,
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1790865328016",
+      "title": "English",
+      "time": "12:00",
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        2,
+        4
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-06",
+      "endDate": "2026-12-20",
       "exceptions": {}
     }
   ],
