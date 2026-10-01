@@ -91,6 +91,16 @@
         "kind": "routine",
         "notify": false,
         "notifyLeadMin": null
+      },
+      {
+        "id": 1790874451672,
+        "title": "Trey recording",
+        "time": "13:00",
+        "location": "",
+        "kind": "meeting",
+        "notify": false,
+        "notifyLeadMin": null,
+        "linkedTaskId": 1790874451369
       }
     ],
     "2026-10-03": [
@@ -133,6 +143,15 @@
       "date": "2026-10-03",
       "time": "09:00",
       "linkedEventId": 1790874404545
+    },
+    {
+      "id": 1790874451369,
+      "text": "Trey recording",
+      "done": false,
+      "rank": "B",
+      "date": "2026-10-02",
+      "time": "13:00",
+      "linkedEventId": 1790874451672
     }
   ],
   "streakDays": [],
