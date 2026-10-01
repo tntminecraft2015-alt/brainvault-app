@@ -52,6 +52,26 @@
         "notifyLeadMin": 30,
         "linkedTaskId": 1790806801853
       }
+    ],
+    "2026-10-08": [
+      {
+        "id": "ev-1790865243364",
+        "title": "Psych Exam",
+        "time": null,
+        "location": "",
+        "kind": "focus",
+        "notify": false,
+        "notifyLeadMin": null
+      },
+      {
+        "id": "ev-1790865243366",
+        "title": "Chapter Assignments Due",
+        "time": null,
+        "location": "",
+        "kind": "focus",
+        "notify": false,
+        "notifyLeadMin": null
+      }
     ]
   },
   "tasks": [
@@ -2249,7 +2269,11 @@
       "interval": 1,
       "startDate": "2026-09-30",
       "endDate": "2026-12-20",
-      "exceptions": {}
+      "exceptions": {
+        "2026-10-06": {
+          "skip": true
+        }
+      }
     },
     {
       "id": "rec-1790806694380",
