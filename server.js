@@ -13,7 +13,7 @@ const WIKI      = path.join(VAULT, 'wiki');
 const DATA_FILE = path.join(VAULT, 'app-data.json');
 
 app.use(cors());
-app.use(express.json({ limit: '4mb' }));
+app.use(express.json({ limit: '16mb' }));
 app.use(express.static(VAULT));
 
 // ── CLOUD MODE (GitHub file store) ────────────────────────────────────────────
@@ -1254,7 +1254,7 @@ const RED_TOOL_HANDLERS = {
   },
 };
 
-async function runChatTurn(anthropic, system, tools, messages, toolHandlers, maxRounds = 4) {
+async function runChatTurn(anthropic, system, tools, messages, toolHandlers, maxRounds = 4, maxTokens = 2048) {
   let finalText = '';
   let usage = null;
   const toolActions = [];
@@ -1264,7 +1264,7 @@ async function runChatTurn(anthropic, system, tools, messages, toolHandlers, max
   for (let round = 0; round < maxRounds; round++) {
     const resp = await anthropic.messages.create({
       model:      'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      max_tokens: maxTokens,
       system,
       tools,
       messages,
@@ -1291,12 +1291,20 @@ async function runChatTurn(anthropic, system, tools, messages, toolHandlers, max
 app.post('/api/chat', async (req, res) => {
   const key = getApiKey();
   if (!key) return res.status(401).json({ error: 'NO_KEY', message: 'No API key found.' });
-  const { message, history = [] } = req.body;
-  if (!message) return res.status(400).json({ error: 'Empty message' });
+  const { message = '', history = [] } = req.body;
+  // Photos from the chat composer: [{ mediaType: 'image/jpeg', data: '<base64>' }], up to 4.
+  const images = (Array.isArray(req.body.images) ? req.body.images : [])
+    .filter(im => im && typeof im.data === 'string' && /^image\/(jpeg|png|gif|webp)$/.test(im.mediaType || ''))
+    .slice(0, 4);
+  if (!message && !images.length) return res.status(400).json({ error: 'Empty message' });
   const anthropic = makeClient(key);
   try {
+    const userText = message || (images.length > 1 ? 'Here are some pictures.' : 'Here is a picture.');
+    const userContent = images.length
+      ? [...images.map(im => ({ type: 'image', source: { type: 'base64', media_type: im.mediaType, data: im.data } })), { type: 'text', text: userText }]
+      : userText;
     const messages = [...history.map(m => ({ role: m.role, content: m.content })),
-                       { role: 'user', content: message }];
+                       { role: 'user', content: userContent }];
     const tools = [
       { type: 'web_search_20250305', name: 'web_search', max_uses: 5 },
       QUEUE_CHANGE_TOOL,
@@ -1310,8 +1318,13 @@ app.post('/api/chat', async (req, res) => {
       DELETE_CALENDAR_EVENT_TOOL,
       ASSIGN_RED_RESEARCH_TOOL,
     ];
-    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildSystemPrompt(message), tools, messages, ED_TOOL_HANDLERS);
-    saveConversation(message, responseText);
+    const system = buildSystemPrompt(message) + (images.length ? `\n\n# PHOTOS IN THIS MESSAGE
+The user attached ${images.length} photo${images.length > 1 ? 's' : ''} (often a screenshot or picture of a work schedule, class timetable, receipt, flyer or note). Read them carefully and literally — every row, date, day name and start/end time. Never guess or invent anything you can't actually read; say which parts were blurry or cut off.
+If it is a schedule: first list what you found in a short readable list (day + date, start–end time, role/location if shown), resolving dates against today's date (if no year is shown, use the upcoming occurrence). If the schedule shows several people, only pull out the user's shifts — ask which name is theirs if it isn't obvious.
+Only add things to the calendar when the user has asked you to (e.g. "add my shifts"); otherwise end by offering to. When adding a shift, call add_calendar_event once per shift with title "Work" plus the time range (e.g. "Work 9:00 AM–5:00 PM", or the role if shown, like "Barista 9:00 AM–5:00 PM"), time = the start time, location if shown, and kind "routine". Before adding, check the calendar context above and don't add a shift that's already there.
+If it's a receipt you may offer to log it with log_expense; for anything else, just help with what's in the picture.` : '');
+    const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, system, tools, messages, ED_TOOL_HANDLERS, images.length ? 6 : 4, images.length ? 4096 : 2048);
+    saveConversation(images.length ? `${message}${message ? ' ' : ''}[sent ${images.length} photo${images.length > 1 ? 's' : ''}]` : message, responseText);
     res.json({ response: responseText, tokens: usage, toolActions });
   } catch (err) {
     console.error('Claude API error:', err.status, err.message);

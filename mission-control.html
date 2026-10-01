@@ -789,7 +789,22 @@
     .ed-suggest::-webkit-scrollbar { display:none; }
     .ed-suggest.hide { display:none; }
     .ed-suggest button { flex-shrink:0; border:none; border-radius:var(--r-pill); background:rgba(223,238,255,.07); color:var(--fg); font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; padding:9px 14px; min-height:40px; cursor:pointer; white-space:nowrap; }
-    .ed-composer { display:flex; align-items:flex-end; gap:8px; background:rgba(223,238,255,.06); border-radius:26px; padding:6px 6px 6px 16px; flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(223,238,255,.08); }
+    .ed-composer { display:flex; align-items:flex-end; gap:6px; background:rgba(223,238,255,.06); border-radius:26px; padding:6px; flex-shrink:0; box-shadow:inset 0 0 0 1px rgba(223,238,255,.08); }
+    .ed-composer.drop { box-shadow:inset 0 0 0 2px var(--accent2); background:rgba(102,200,255,.08); }
+    .ed-attach { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--fg-dim); cursor:pointer; flex-shrink:0; }
+    .ed-attach:hover, .ed-attach:active { color:var(--fg); background:rgba(223,238,255,.08); }
+    .ed-attach:focus-within { outline:2px solid var(--accent2); }
+    .ed-photos { display:flex; gap:8px; padding:0 4px 8px; overflow-x:auto; flex-shrink:0; }
+    .ed-photos[hidden] { display:none; }
+    .ed-ph { position:relative; flex-shrink:0; width:64px; height:64px; border-radius:14px; overflow:hidden; box-shadow:0 0 0 1px rgba(223,238,255,.15); }
+    .ed-ph img { width:100%; height:100%; object-fit:cover; display:block; }
+    .ed-ph button { position:absolute; right:3px; top:3px; width:22px; height:22px; border-radius:11px; border:none; background:rgba(10,25,41,.8); color:#fff; font-size:12px; line-height:22px; padding:0; cursor:pointer; }
+    .cm-you-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:4px; max-width:82%; margin-left:auto; }
+    .cm-you-wrap .cm-bubble { max-width:100%; }
+    .cm-photos { display:flex; flex-wrap:wrap; gap:6px; justify-content:flex-end; }
+    .cm-photos img { width:132px; max-height:180px; object-fit:cover; border-radius:16px; cursor:zoom-in; box-shadow:0 0 0 1px rgba(223,238,255,.12); }
+    .ed-photo-view { position:fixed; inset:0; z-index:400; background:rgba(3,8,16,.9); display:flex; align-items:center; justify-content:center; padding:20px; cursor:zoom-out; }
+    .ed-photo-view img { max-width:100%; max-height:100%; border-radius:12px; }
     .ed-composer:focus-within { box-shadow:inset 0 0 0 1.5px rgba(223,238,255,.3); }
     .ed-inp { flex:1; background:none; border:none; outline:none; resize:none; color:var(--fg); font-family:'Inter',sans-serif; font-size:16px; font-weight:500; line-height:1.4; padding:9px 0; max-height:140px; }
     .ed-inp::placeholder { color:rgba(223,238,255,.35); }
@@ -1595,9 +1610,15 @@
         <button type="button" onclick="edSuggest('What do I have tomorrow?')">What do I have tomorrow?</button>
         <button type="button" onclick="edSuggest('Add a task to ')">Add a task…</button>
         <button type="button" onclick="edSuggest('Log an expense: ')">Log an expense…</button>
+        <button type="button" onclick="edSuggest('Read my work schedule and add my shifts to the calendar');document.getElementById('edPhotoInp').click()">Read my work schedule…</button>
         <button type="button" onclick="edSuggest('Have Red research ')">Have Red research…</button>
       </div>
-      <div class="ed-composer">
+      <div class="ed-photos" id="edPhotos" hidden></div>
+      <div class="ed-composer" id="edComposer">
+        <label class="ed-attach" title="Add a photo" aria-label="Add a photo">
+          <input type="file" id="edPhotoInp" accept="image/*" multiple hidden onchange="edAddPhotos(this.files);this.value=''">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H8l1.5-2h5L16 6h1.5A2.5 2.5 0 0 1 20 8.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg>
+        </label>
         <textarea class="ed-inp" id="mobChatInp" placeholder="Message ED…" rows="1"
           oninput="edGrow(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMobChat();}"></textarea>
         <button type="button" class="ed-send" id="mobSendBtn" onclick="sendMobChat()" aria-label="Send">
@@ -4553,14 +4574,21 @@ let typingEls={};
 function showTyping(elId,label){ const scroll=document.getElementById(elId||'chatScroll');if(!scroll)return; const t=document.createElement('div');t.className='cm cm-claude';t.innerHTML=`${chatAvatar(label)}<div class="cm-bubble cm-typing"><i></i><i></i><i></i></div>`;scroll.appendChild(t);scroll.scrollTop=scroll.scrollHeight;typingEls[elId||'chatScroll']=t; }
 function hideTyping(elId){ const t=typingEls[elId||'chatScroll'];if(t){t.remove();delete typingEls[elId||'chatScroll'];} }
 
-async function sendChatCommon(msg, scrollId, btnId){
-  if(!msg.trim())return;
+async function sendChatCommon(msg, scrollId, btnId, imgs){
+  imgs=imgs||[];
+  if(!msg.trim()&&!imgs.length)return;
   if(!serverOnline){ appendChatMsg('sys','Server offline — start the server to use Claude chat.',scrollId); return; }
-  appendChatMsg('user',msg,scrollId);
+  const youEl=appendChatMsg('user',msg||' ',scrollId);
+  if(imgs.length&&youEl){ const b=youEl.querySelector('.cm-bubble'); const wrap=document.createElement('div'); wrap.className='cm-you-wrap';
+    wrap.innerHTML=`<div class="cm-photos">${imgs.map(u=>`<img src="${u}" alt="Photo you sent" onclick="edViewPhoto(this.src)">`).join('')}</div>`;
+    if(b&&msg) wrap.appendChild(b); else b?.remove();
+    youEl.appendChild(wrap); const sc=document.getElementById(scrollId); if(sc) sc.scrollTop=sc.scrollHeight; }
   document.getElementById(btnId)?.setAttribute('disabled','1');
   showTyping(scrollId);
   try {
-    const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory}),signal:AbortSignal.timeout(60000)});
+    const images=imgs.map(u=>({mediaType:u.slice(5,u.indexOf(';')),data:u.slice(u.indexOf(',')+1)}));
+    const r=await fetch(`${SERVER}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history:chatHistory,images}),signal:AbortSignal.timeout(imgs.length?150000:60000)});
+    if(r.status===413){ hideTyping(scrollId); appendChatMsg('sys','⚠ That photo is too big to send. Try a screenshot or crop it a bit.',scrollId); document.getElementById(btnId)?.removeAttribute('disabled'); return; }
     const d=await r.json(); hideTyping(scrollId);
     if(d.error==='NO_KEY'){ appendChatMsg('sys',d.message||'No API key configured. Open Settings → API Key and paste a key from console.anthropic.com.',scrollId); openModal('settingsModal'); }
     else if(d.error==='RATE_LIMIT'||d.error==='AUTH_ERROR'){ appendChatMsg('sys','⚠ '+d.message,scrollId); openModal('settingsModal'); }
@@ -4568,7 +4596,7 @@ async function sendChatCommon(msg, scrollId, btnId){
     else {
       const msgEl=appendChatMsg('claude',d.response,scrollId);
       appendActionChips(msgEl, d.toolActions);
-      chatHistory.push({role:'user',content:msg},{role:'assistant',content:d.response});
+      chatHistory.push({role:'user',content:imgs.length?`${msg}${msg?' ':''}[sent ${imgs.length} photo${imgs.length>1?'s':''}]`:msg},{role:'assistant',content:d.response});
       if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
       if((d.toolActions||[]).some(a=>a.type==='queued'||a.type==='removed')){
         if(document.getElementById('changeQueueModal')?.classList.contains('active')) await loadChangeQueueList();
@@ -4644,7 +4672,40 @@ function formatWikiMd(md){
     .replace(/\n/g,'<br>');
 }
 
-function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=inp?.value.trim();if(!msg)return; inp.value=''; edGrow(inp); sendChatCommon(msg,'mobChatMsgs','mobSendBtn'); }
+function sendMobChat(){ const inp=document.getElementById('mobChatInp'); const msg=(inp?.value||'').trim(); const imgs=edPendingPhotos.slice(); if(!msg&&!imgs.length)return; inp.value=''; edGrow(inp); edPendingPhotos=[]; renderEdPhotos(); sendChatCommon(msg,'mobChatMsgs','mobSendBtn',imgs); }
+// ── Photos for ED (work schedules, receipts, flyers…) ──
+let edPendingPhotos=[];
+function edShrinkPhoto(file){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file), img=new Image();
+    img.onload=()=>{ const MAX=2000, sc=Math.min(1,MAX/Math.max(img.naturalWidth,img.naturalHeight));
+      const cv=document.createElement('canvas'); cv.width=Math.round(img.naturalWidth*sc); cv.height=Math.round(img.naturalHeight*sc);
+      const ctx=cv.getContext('2d'); ctx.fillStyle='#fff'; ctx.fillRect(0,0,cv.width,cv.height); ctx.drawImage(img,0,0,cv.width,cv.height);
+      URL.revokeObjectURL(url); resolve(cv.toDataURL('image/jpeg',0.86)); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); reject(new Error('unreadable')); };
+    img.src=url; });
+}
+async function edAddPhotos(files){
+  const list=[...(files||[])].filter(f=>(f.type||'').startsWith('image/')||/\.(heic|heif|jpe?g|png|webp)$/i.test(f.name||''));
+  if(!list.length){ showToast('That isn’t a photo. Try a screenshot or a JPG.'); return; }
+  for(const f of list){
+    if(edPendingPhotos.length>=4){ showToast('Up to 4 photos per message'); break; }
+    try{ edPendingPhotos.push(await edShrinkPhoto(f)); }catch{ showToast('Couldn’t open that photo. Try a screenshot or a JPG.'); }
+  }
+  renderEdPhotos(); document.getElementById('mobChatInp')?.focus();
+}
+function renderEdPhotos(){
+  const el=document.getElementById('edPhotos'); if(!el) return;
+  el.hidden=!edPendingPhotos.length;
+  el.innerHTML=edPendingPhotos.map((u,i)=>`<div class="ed-ph"><img src="${u}" alt="Photo ${i+1}"><button type="button" onclick="edPendingPhotos.splice(${i},1);renderEdPhotos()" aria-label="Remove photo ${i+1}">✕</button></div>`).join('');
+}
+function edViewPhoto(src){ const v=document.createElement('div'); v.className='ed-photo-view'; v.innerHTML=`<img src="${src}" alt="">`; v.onclick=()=>v.remove(); document.body.appendChild(v); }
+// Paste or drop photos straight into the chat (handy on the laptop)
+document.addEventListener('paste',e=>{ if(!document.getElementById('mobTabClaude')?.classList.contains('active')) return; const fs=[...(e.clipboardData?.files||[])].filter(f=>(f.type||'').startsWith('image/')); if(fs.length){ e.preventDefault(); edAddPhotos(fs); } });
+(()=>{ const pane=document.getElementById('mobTabClaude'), comp=()=>document.getElementById('edComposer'); if(!pane) return;
+  pane.addEventListener('dragover',e=>{ if([...(e.dataTransfer?.items||[])].some(i=>i.kind==='file')){ e.preventDefault(); comp()?.classList.add('drop'); } });
+  pane.addEventListener('dragleave',e=>{ if(!pane.contains(e.relatedTarget)) comp()?.classList.remove('drop'); });
+  pane.addEventListener('drop',e=>{ comp()?.classList.remove('drop'); const fs=[...(e.dataTransfer?.files||[])]; if(fs.length){ e.preventDefault(); edAddPhotos(fs); } }); })();
 
 // ── RED CHAT (briefing conversation before a research run) ──
 let redChatHistory=[];
