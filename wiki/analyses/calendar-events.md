@@ -1,8 +1,8 @@
 ---
 type: analysis
 title: "Calendar Events"
-last_updated: "2026-09-30"
-synced_at: "9/30/2026, 10:39:11 PM"
+last_updated: "2026-10-01"
+synced_at: "10/1/2026, 2:34:03 PM"
 tags: [calendar, events]
 ---
 
@@ -16,6 +16,8 @@ tags: [calendar, events]
 | 2026-05-20 | 14:00 | Apartment Tour 2 | errand |  |
 | 2026-05-27 | 12:00 | Trey bday casino | social |  |
 | 2026-10-01 | 14:00 | Therapy | meeting |  |
+| 2026-10-08 | — | Psych Exam | focus |  |
+| 2026-10-08 | — | Chapter Assignments Due | focus |  |
 
 ## Recurring Events
 
@@ -26,6 +28,6 @@ tags: [calendar, events]
 | History | every Mon at 15:00, from 2026-09-30 until 2026-12-20 | focus |  |
 | Math | every Mon & Wed & Fri at 10:00, from 2026-09-30 until 2026-12-20 | focus |  |
 | Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
-| Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 | focus |  |
+| Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
 
-_Last synced: 9/30/2026, 10:39:11 PM_
+_Last synced: 10/1/2026, 2:34:03 PM_
