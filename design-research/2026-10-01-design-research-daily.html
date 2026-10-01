@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Active Grids, Retention Mechanics &amp; Accessible Depth</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Active Grids, Retention Mechanics &amp; Accessible Depth</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Bento grids continue as a 2026 standard, but the innovation shift is toward "active" tiles that expand or reveal on interaction—essential for dashboards with dense information. Habit trackers confirm that minimalist streak mechanics (Streaks app) match Mission Control's current identity better than full RPG systems, while neumorphic depth (with high-contrast safeguards) offers tactile affordance without abandoning the retro JRPG look.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Active Bento Grid: Interactive Tiles Over Static Cards</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">In 2026, bento grids have evolved from static layouts into "active grids" where tiles are highly interactive—hovering over them expands them, plays video, or reveals secondary data layers. Mission Control's current quest/calendar/wallet cards are static; adding subtle expand-on-hover states (task details, event peek, breakdown sparkline) could deepen engagement without breaking the grid structure or adding new rows.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://writerdock.in/blog/bento-grids-and-beyond-7-ui-trends-dominating-web-design-2026" target="_blank" rel="noopener" style="color:#ff8a63;">Bento Grids &amp; Beyond: 7 UI Trends Dominating Web Design 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;div style=&quot;display:grid;grid-template-columns:1fr 1fr;gap:12px&quot;&gt;
+    &lt;div style=&quot;background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer;position:relative;overflow:hidden&quot; onmouseover=&quot;this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(255,138,99,0.2)'&quot; onmouseout=&quot;this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'&quot;&gt;
+      &lt;div style=&quot;font-size:11px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px&quot;&gt;TODAY'S QUESTS&lt;/div&gt;
+      &lt;div style=&quot;font-size:16px;font-weight:bold;color:#d3f0ff;margin-bottom:4px&quot;&gt;3/5 Complete&lt;/div&gt;
+      &lt;div style=&quot;font-size:10px;color:#8fd6ff;opacity:0.7&quot;&gt;S-Rank: Design mockup → +50 XP&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer&quot; onmouseover=&quot;this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(102,200,255,0.2)'&quot; onmouseout=&quot;this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'&quot;&gt;
+      &lt;div style=&quot;font-size:11px;color:#66c8ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px&quot;&gt;GIL WALLET&lt;/div&gt;
+      &lt;div style=&quot;font-size:16px;font-weight:bold;color:#7fffb0&quot;&gt;$1,247.50&lt;/div&gt;
+      &lt;div style=&quot;font-size:10px;color:#66c8ff;opacity:0.7&quot;&gt;Week: +$312 ↗&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;margin-top:12px;font-size:9px;color:#8fd6ff;opacity:0.6&quot;&gt;hover tiles to expand →&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Streak Over Points: Minimalist Chain Visualization for Retention</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Streaks (Apple's App of the Year 2021) uses a single-chain visualization as the most successful minimal gamification mechanic in habit tracking, producing strong retention among users who want simplicity. Mission Control's day-streak counter is already in place; emphasizing the unbroken chain visually (a growing counter with a single satisfying animation on mark) aligns better with user feedback patterns (past ratings show "Not even close" on complex gamification) than adding badges or levels.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification in Habit Tracking Apps: Examples and Results</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;div style=&quot;background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 2px #1e3a5f;text-align:center&quot;&gt;
+    &lt;div style=&quot;font-size:10px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px&quot;&gt;DAY STREAK&lt;/div&gt;
+    &lt;div style=&quot;display:flex;justify-content:center;gap:6px;margin-bottom:12px&quot;&gt;
+      &lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1&quot;&gt;&lt;/div&gt;
+      &lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1&quot;&gt;&lt;/div&gt;
+      &lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1&quot;&gt;&lt;/div&gt;
+      &lt;div style=&quot;width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:0.5&quot;&gt;&lt;/div&gt;
+      &lt;div style=&quot;width:24px;height:24px;background:#1e3a5f;border-radius:6px;opacity:0.3&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div style=&quot;font-size:20px;font-weight:bold;color:#7fffb0;margin-bottom:4px&quot;&gt;12&lt;/div&gt;
+    &lt;div style=&quot;font-size:10px;color:#8fd6ff;opacity:0.7&quot;&gt;days in a row · mark today to continue&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Neumorphic Depth as Affordance: Inset Shadows for Clarity Without Losing Retro Style</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Neumorphism uses inset and outset shadows to create depth: inset shadows make elements look pressed into the surface, with paired light and dark shadows adding subtle depth while staying minimal. Mission Control already has hard-shadow JRPG borders; swapping or layering in subtle inset shadows on interactive cards (quest rows, event blocks, input fields) can signal affordance—what can be clicked or toggled—without breaking the retro aesthetic. Pair with adequate contrast per WCAG to avoid the neumorphism trap.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://clay.global/blog/neumorphism-ui" target="_blank" rel="noopener" style="color:#ff8a63;">How to Master Neumorphism in UI Design (With Examples)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff&quot;&gt;
+  &lt;div style=&quot;background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;margin-bottom:8px;cursor:pointer;transition:all 0.15s&quot;&gt;
+    &lt;div style=&quot;display:flex;justify-content:space-between;align-items:center&quot;&gt;
+      &lt;div style=&quot;display:flex;gap:8px;align-items:center&quot;&gt;
+        &lt;div style=&quot;width:12px;height:12px;background:#ff8a63;border-radius:3px&quot;&gt;&lt;/div&gt;
+        &lt;div style=&quot;font-size:12px;color:#dfeeff&quot;&gt;Finish design research&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div style=&quot;font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px&quot;&gt;+50 XP&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;cursor:pointer;transition:all 0.15s;opacity:0.6&quot;&gt;
+    &lt;div style=&quot;display:flex;justify-content:space-between;align-items:center&quot;&gt;
+      &lt;div style=&quot;display:flex;gap:8px;align-items:center&quot;&gt;
+        &lt;div style=&quot;width:12px;height:12px;background:#4a90d9;border-radius:3px&quot;&gt;&lt;/div&gt;
+        &lt;div style=&quot;font-size:12px;color:#dfeeff&quot;&gt;Weekly schedule review&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div style=&quot;font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px&quot;&gt;+15 XP&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div style=&quot;font-size:8px;color:#8fd6ff;opacity:0.5;margin-top:12px&quot;&gt;inset shadows signal depth &amp; affordance&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">‹ Back</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">Next ›</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-10-01-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Active Bento Grid: Interactive Tiles Over Static Cards","description":"In 2026, bento grids have evolved from static layouts into \"active grids\" where tiles are highly interactive—hovering over them expands them, plays video, or reveals secondary data layers. Mission Control's current quest/calendar/wallet cards are static; adding subtle expand-on-hover states (task details, event peek, breakdown sparkline) could deepen engagement without breaking the grid structure or adding new rows.","source_title":"Bento Grids & Beyond: 7 UI Trends Dominating Web Design 2026","source_url":"https://writerdock.in/blog/bento-grids-and-beyond-7-ui-trends-dominating-web-design-2026","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  \u003cdiv style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px\">\n    \u003cdiv style=\"background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer;position:relative;overflow:hidden\" onmouseover=\"this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(255,138,99,0.2)'\" onmouseout=\"this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'\">\n      \u003cdiv style=\"font-size:11px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px\">TODAY'S QUESTS\u003c/div>\n      \u003cdiv style=\"font-size:16px;font-weight:bold;color:#d3f0ff;margin-bottom:4px\">3/5 Complete\u003c/div>\n      \u003cdiv style=\"font-size:10px;color:#8fd6ff;opacity:0.7\">S-Rank: Design mockup → +50 XP\u003c/div>\n    \u003c/div>\n    \u003cdiv style=\"background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer\" onmouseover=\"this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(102,200,255,0.2)'\" onmouseout=\"this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'\">\n      \u003cdiv style=\"font-size:11px;color:#66c8ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px\">GIL WALLET\u003c/div>\n      \u003cdiv style=\"font-size:16px;font-weight:bold;color:#7fffb0\">$1,247.50\u003c/div>\n      \u003cdiv style=\"font-size:10px;color:#66c8ff;opacity:0.7\">Week: +$312 ↗\u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003cdiv style=\"margin-top:12px;font-size:9px;color:#8fd6ff;opacity:0.6\">hover tiles to expand →\u003c/div>\n\u003c/div>","threadId":"thread-1790865144089-0-active-bento-grid-interactive-tiles-over"},{"title":"Streak Over Points: Minimalist Chain Visualization for Retention","description":"Streaks (Apple's App of the Year 2021) uses a single-chain visualization as the most successful minimal gamification mechanic in habit tracking, producing strong retention among users who want simplicity. Mission Control's day-streak counter is already in place; emphasizing the unbroken chain visually (a growing counter with a single satisfying animation on mark) aligns better with user feedback patterns (past ratings show \"Not even close\" on complex gamification) than adding badges or levels.","source_title":"Gamification in Habit Tracking Apps: Examples and Results","source_url":"https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  \u003cdiv style=\"background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 2px #1e3a5f;text-align:center\">\n    \u003cdiv style=\"font-size:10px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px\">DAY STREAK\u003c/div>\n    \u003cdiv style=\"display:flex;justify-content:center;gap:6px;margin-bottom:12px\">\n      \u003cdiv style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\">\u003c/div>\n      \u003cdiv style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\">\u003c/div>\n      \u003cdiv style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\">\u003c/div>\n      \u003cdiv style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:0.5\">\u003c/div>\n      \u003cdiv style=\"width:24px;height:24px;background:#1e3a5f;border-radius:6px;opacity:0.3\">\u003c/div>\n    \u003c/div>\n    \u003cdiv style=\"font-size:20px;font-weight:bold;color:#7fffb0;margin-bottom:4px\">12\u003c/div>\n    \u003cdiv style=\"font-size:10px;color:#8fd6ff;opacity:0.7\">days in a row · mark today to continue\u003c/div>\n  \u003c/div>\n\u003c/div>","threadId":"thread-1790865144090-1-streak-over-points-minimalist-chain-visu"},{"title":"Neumorphic Depth as Affordance: Inset Shadows for Clarity Without Losing Retro Style","description":"Neumorphism uses inset and outset shadows to create depth: inset shadows make elements look pressed into the surface, with paired light and dark shadows adding subtle depth while staying minimal. Mission Control already has hard-shadow JRPG borders; swapping or layering in subtle inset shadows on interactive cards (quest rows, event blocks, input fields) can signal affordance—what can be clicked or toggled—without breaking the retro aesthetic. Pair with adequate contrast per WCAG to avoid the neumorphism trap.","source_title":"How to Master Neumorphism in UI Design (With Examples)","source_url":"https://clay.global/blog/neumorphism-ui","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  \u003cdiv style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;margin-bottom:8px;cursor:pointer;transition:all 0.15s\">\n    \u003cdiv style=\"display:flex;justify-content:space-between;align-items:center\">\n      \u003cdiv style=\"display:flex;gap:8px;align-items:center\">\n        \u003cdiv style=\"width:12px;height:12px;background:#ff8a63;border-radius:3px\">\u003c/div>\n        \u003cdiv style=\"font-size:12px;color:#dfeeff\">Finish design research\u003c/div>\n      \u003c/div>\n      \u003cdiv style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+50 XP\u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003cdiv style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;cursor:pointer;transition:all 0.15s;opacity:0.6\">\n    \u003cdiv style=\"display:flex;justify-content:space-between;align-items:center\">\n      \u003cdiv style=\"display:flex;gap:8px;align-items:center\">\n        \u003cdiv style=\"width:12px;height:12px;background:#4a90d9;border-radius:3px\">\u003c/div>\n        \u003cdiv style=\"font-size:12px;color:#dfeeff\">Weekly schedule review\u003c/div>\n      \u003c/div>\n      \u003cdiv style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+15 XP\u003c/div>\n    \u003c/div>\n  \u003c/div>\n  \u003cdiv style=\"font-size:8px;color:#8fd6ff;opacity:0.5;margin-top:12px\">inset shadows signal depth & affordance\u003c/div>\n\u003c/div>","threadId":"thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'Done ✓' : 'Next ›';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
