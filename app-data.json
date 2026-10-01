@@ -197,6 +197,12 @@
     "current": 40
   },
   "caughtPoke": {
+    "4": {
+      "count": 1,
+      "firstCaught": "2026-09-30",
+      "shiny": false,
+      "lastCaught": "2026-09-30"
+    },
     "39": {
       "count": 1,
       "firstCaught": "2026-09-30",
@@ -2233,5 +2239,16 @@
         "Punishment vs. Reward Timing: When Consequences Work, and When They Backfire"
       ]
     }
-  ]
+  ],
+  "buddy": {
+    "id": 4,
+    "shiny": false,
+    "hearts": 0,
+    "since": "2026-09-30",
+    "today": {
+      "date": "2026-09-30",
+      "hearts": 0,
+      "pets": 0
+    }
+  }
 }
