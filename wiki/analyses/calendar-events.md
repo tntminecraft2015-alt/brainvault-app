@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-10-01"
-synced_at: "10/1/2026, 5:06:44 PM"
+synced_at: "10/1/2026, 5:07:31 PM"
 tags: [calendar, events]
 ---
 
@@ -18,6 +18,7 @@ tags: [calendar, events]
 | 2026-10-01 | 14:00 | Therapy | meeting |  |
 | 2026-10-01 | 16:00 | Work | routine |  |
 | 2026-10-02 | 17:00 | Work | routine |  |
+| 2026-10-02 | 13:00 | Trey recording | meeting |  |
 | 2026-10-03 | 15:00 | Work | routine |  |
 | 2026-10-03 | 09:00 | Pay insurance | errand |  |
 | 2026-10-08 | — | Psych Exam | focus |  |
@@ -34,4 +35,4 @@ tags: [calendar, events]
 | Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
 
-_Last synced: 10/1/2026, 5:06:44 PM_
+_Last synced: 10/1/2026, 5:07:31 PM_
