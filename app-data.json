@@ -51,6 +51,15 @@
         "notify": true,
         "notifyLeadMin": 30,
         "linkedTaskId": 1790806801853
+      },
+      {
+        "id": "ev-1790874362921",
+        "title": "Work",
+        "time": "16:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
       }
     ],
     "2026-10-08": [
@@ -69,6 +78,28 @@
         "time": null,
         "location": "",
         "kind": "focus",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-02": [
+      {
+        "id": "ev-1790874362924",
+        "title": "Work",
+        "time": "17:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-03": [
+      {
+        "id": "ev-1790874362925",
+        "title": "Work",
+        "time": "15:00",
+        "location": "",
+        "kind": "routine",
         "notify": false,
         "notifyLeadMin": null
       }
