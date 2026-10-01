@@ -5606,38 +5606,77 @@ function farmBgSVG(tod,S,map,tag){
   const night=tod==='night', eve=tod==='evening';
   // ── backdrop per map ──
   let back='';
+  const haze=k.s3, hz=(o)=>`<rect width="400" height="150" fill="${haze}" opacity="${o}"/>`;
+  const pine=(x,y,h,col,capCol)=>{ const w=h*.42;
+    return `<path d="M${x} ${y-h} L${x+w*.55} ${y-h*.55} L${x+w*.3} ${y-h*.55} L${x+w*.8} ${y-h*.18} L${x+w*.45} ${y-h*.18} L${x+w} ${y} L${x-w} ${y} L${x-w*.45} ${y-h*.18} L${x-w*.8} ${y-h*.18} L${x-w*.3} ${y-h*.55} L${x-w*.55} ${y-h*.55}Z" fill="${col}"/>`
+      +(capCol?`<path d="M${x} ${y-h} L${x+w*.38} ${y-h*.66} L${x+w*.12} ${y-h*.7} L${x} ${y-h*.62} L${x-w*.12} ${y-h*.7} L${x-w*.38} ${y-h*.66}Z" fill="${capCol}"/>`:''); };
+  const birds=(night?'':`<g stroke="${eve?'#3a2a4a':'#3b4a5c'}" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".7"><path d="M150 30 q4 -4 8 0 q4 -4 8 0"/><path d="M172 22 q3 -3 6 0 q3 -3 6 0"/><path d="M136 40 q3 -3 6 0 q3 -3 6 0"/></g>`);
   if(map==='meadow'){
-    const treeline=[...Array(26)].map((_,i)=>`<circle cx="${i*16+4}" cy="${104+((i*7)%5)}" r="${9+((i*5)%4)}"/>`).join('');
-    back=`<path d="M0 96 C50 74 110 88 160 80 S260 60 320 76 S380 82 400 78 V150 H0Z" fill="${P.hills[0]}" opacity="${night?.55:.85}"/>
-      <g fill="${P.leaf[2]}" opacity="${P.snow?.55:.75}">${treeline}</g>
-      <path d="M0 110 C60 92 120 108 180 100 S300 84 400 106 V150 H0Z" fill="${P.hills[1]}"/>
-      <path d="M0 124 C80 106 150 124 230 114 S350 104 400 118 V150 H0Z" fill="${P.hills[2]}"/>`;
+    const fields={spring:['#cfe8a6','#efe28e','#b6dc8f','#f3d3e4'],summer:['#bcd97c','#e3cf6c','#a6cf74','#d9e39a'],autumn:['#dcb65e','#c98a3c','#e4cd84','#b9a052'],winter:['#f1f6fa','#e2ecf3','#f7fafc','#dbe6ee']}[S];
+    const rows=[[0,96,70,92,140,98,0,104],[70,92,170,86,200,94,140,98],[170,86,260,78,280,88,200,94],[260,78,400,84,400,92,280,88],[0,104,140,98,150,108,0,112],[140,98,200,94,230,104,150,108],[200,94,280,88,300,100,230,104],[280,88,400,92,400,104,300,100]];
+    const patch=rows.map((q,i)=>`<path d="M${q[0]} ${q[1]} L${q[2]} ${q[3]} L${q[4]} ${q[5]} L${q[6]} ${q[7]}Z" fill="${fields[i%4]}"/>`).join('');
+    const hedges=`<g stroke="${P.snow?'#9fb3a8':'#4c7d47'}" stroke-width="2.2" stroke-linecap="round" opacity=".85" fill="none"><path d="M0 104 L140 98 L280 88 L400 92"/><path d="M70 92 L140 98 L150 108M170 86 L200 94 L230 104M260 78 L280 88 L300 100"/></g>`;
+    const clumps=[...Array(9)].map((_,i)=>{ const x=20+i*46, y=92+((i*7)%10); return `<circle cx="${x}" cy="${y-6}" r="${7+(i%3)}" fill="${P.leaf[i%3]}"/><circle cx="${x+6}" cy="${y-3}" r="${5+(i%2)}" fill="${P.leaf[(i+1)%3]}"/>`; }).join('');
+    const bales=(S==='summer'||S==='autumn')?[[44,120],[70,118],[112,121]].map(([x,y])=>`<ellipse cx="${x}" cy="${y+5}" rx="9" ry="2" fill="rgba(0,0,0,.18)"/><rect x="${x-8}" y="${y-6}" width="16" height="11" rx="5.5" fill="#e3bd62"/><ellipse cx="${x+6}" cy="${y-.5}" rx="3" ry="5.5" fill="#cfa44a"/><path d="M${x+6} ${y-3} a2 2 0 1 1 0 4" stroke="#b88d3a" fill="none"/>`).join(''):'';
+    back=`<path d="M0 84 C70 66 150 74 220 68 S350 60 400 70 V150 H0Z" fill="${P.hills[0]}"/>${hz(night?.35:.42)}
+      <path d="M0 100 C60 84 130 90 200 84 S330 74 400 86 V150 H0Z" fill="${P.hills[1]}"/>${patch}${hedges}${hz(night?.12:.15)}
+      ${clumps}<path d="M0 118 C80 104 150 120 230 112 S350 104 400 116 V150 H0Z" fill="${P.hills[2]}"/>${bales}${birds}`;
   } else if(map==='seaside'){
-    const sea1=night?'#132a5a':eve?'#5d63a8':'#2f93cf', sea2=night?'#1d3d72':eve?'#e49a8e':'#7fd0ee';
-    const sand=P.snow?'#e9eef2':'#f1dca6', sandD=P.snow?'#d3dee6':'#e2c385';
-    back=`<defs><linearGradient id="fsSea${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sea1}"/><stop offset="1" stop-color="${sea2}"/></linearGradient></defs>
-      <rect y="86" width="400" height="44" fill="url(#fsSea${id})"/>
-      <path d="M296 88 c10-12 30-14 44 0z" fill="${night?'#24405a':'#5e9a7a'}" opacity=".85"/><path d="M318 77 v11 M318 77 c-6-2-10 1-12 4 M318 77 c6-2 10 1 12 4" stroke="${night?'#24405a':'#4c7f5f'}" stroke-width="1.6" fill="none"/>
-      ${sun.includes('300')?'<path d="M276 96 h48" stroke="#ffd48a" stroke-width="3" opacity=".5"/>':''}
-      <g class="farm-shimmer" stroke="#fff" stroke-width="1.4" fill="none" opacity=".55" stroke-linecap="round"><path d="M30 98 q8-3 16 0M120 104 q8-3 16 0M210 96 q8-3 16 0M60 114 q8-3 16 0M250 110 q8-3 16 0M350 102 q8-3 16 0"/></g>
-      <path d="M0 116 C60 108 120 120 200 112 S330 106 400 114 V150 H0Z" fill="${sand}"/>
-      <path d="M0 116 C60 108 120 120 200 112 S330 106 400 114" stroke="#fff" stroke-width="2.4" fill="none" opacity=".8"/>
-      <path d="M0 126 C90 118 170 130 260 122 S360 118 400 124 V150 H0Z" fill="${sandD}"/>`;
-    extra+=[...Array(8)].map((_,i)=>{ const x=(i*53+20)%400, y=150+((i*71)%220); return `<path d="M${x} ${y} a4 4 0 0 1 8 0 l-4 3z" fill="${['#ffd1c2','#fff4e6','#ffc2dc'][i%3]}" opacity=".9"/>`; }).join('');
+    const sea1=night?'#0f2552':eve?'#4e5aa0':'#1f7fc2', sea2=night?'#1b3a70':eve?'#e59a8e':'#69c6ec';
+    const sand=P.snow?'#e9eef2':'#f3dfaa', wet=P.snow?'#cdd9e2':'#dcc08a';
+    const glitX=tod==='evening'?300:tod==='day'?64:84;
+    const glit=[...Array(9)].map((_,i)=>`<rect x="${glitX-10+((i*7)%20)}" y="${90+i*3.6}" width="${10-i*.7}" height="1.4" rx=".7" fill="${night?'#e8ecff':'#fff6cf'}" opacity="${.85-i*.07}"/>`).join('');
+    const beam=(night||eve)?`<path d="M136 56 L-60 26 L-60 78Z" fill="url(#fsBeam${id})" class="farm-crystal"/>`:'';
+    back=`<defs><linearGradient id="fsSea${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sea1}"/><stop offset="1" stop-color="${sea2}"/></linearGradient>
+        <linearGradient id="fsBeam${id}" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff3b0" stop-opacity=".75"/><stop offset="1" stop-color="#fff3b0" stop-opacity="0"/></linearGradient></defs>
+      <rect y="84" width="400" height="48" fill="url(#fsSea${id})"/><rect y="84" width="400" height="2" fill="${haze}" opacity=".6"/>${glit}
+      <g transform="translate(92 0)"><path d="M96 88 C104 70 124 62 150 66 C164 68 176 78 182 88Z" fill="${night?'#1e3550':P.snow?'#cfdde6':'#6aa27d'}"/><path d="M96 88 C110 80 130 80 150 84 L182 88Z" fill="${night?'#182b42':'#8a7a64'}"/>
+      <rect x="132" y="44" width="8" height="24" fill="#f4f1ea"/><rect x="132" y="50" width="8" height="4" fill="#d9483f"/><rect x="132" y="59" width="8" height="4" fill="#d9483f"/><path d="M130 44 h12 l-2 -4 h-8z" fill="#3b4a5c"/><rect x="133.5" y="40" width="5" height="4" fill="${night||eve?'#ffe28a':'#cfe7f5'}"/>${beam}</g>
+      <g transform="translate(58 98) scale(.8)"><path d="M0 0 h22 l-4 5 h-14z" fill="#f4f1ea"/><path d="M11 -1 V-20 L22 -2Z" fill="#fff"/><path d="M10 -1 V-16 L2 -2Z" fill="#ffd1c2"/></g>
+      <g class="farm-shimmer" stroke="#fff" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"><path d="M30 100 q8-3 16 0M200 104 q8-3 16 0M60 116 q8-3 16 0M250 112 q8-3 16 0M330 100 q8-3 16 0M120 110 q8-3 16 0"/></g>
+      <path d="M0 122 C50 116 110 126 170 120 S300 114 400 122 V150 H0Z" fill="${wet}"/>
+      <path d="M0 122 q10 -4 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" stroke-width="2.4" fill="none" opacity=".9"/>
+      <path d="M0 128 C70 122 150 134 230 126 S350 122 400 128 V150 H0Z" fill="${sand}"/>
+      <ellipse cx="54" cy="130" rx="8" ry="4" fill="#9a958c"/><ellipse cx="62" cy="132" rx="5" ry="3" fill="#b3ada3"/><path d="M212 130 l2 -4 2 4 4 0 -3 3 1 4 -4 -2 -4 2 1 -4 -3 -3z" fill="#ff8a6a"/>
+      ${night?'':`<g stroke="#4a5868" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".7"><path d="M190 46 q4 -4 8 0 q4 -4 8 0"/><path d="M212 38 q3 -3 6 0 q3 -3 6 0"/></g>`}`;
+    extra+=[...Array(8)].map((_,i)=>{ const x=(i*53+20)%400, y=150+((i*71)%220); return `<path d="M${x} ${y} a4 4 0 0 1 8 0 l-4 3z" fill="${['#ffd1c2','#fff4e6','#ffc2dc'][i%3]}" opacity=".9"/>`; }).join('')
+      +[...Array(6)].map((_,i)=>{ const x=30+i*64, y=140+(i%2)*4; return `<path d="M${x} ${y} q-2 -9 -6 -12 M${x} ${y} q1 -10 3 -14 M${x} ${y} q3 -7 8 -9" stroke="${P.snow?'#a9b8c2':'#9aa45a'}" stroke-width="1.6" fill="none" stroke-linecap="round"/>`; }).join('');
   } else if(map==='forest'){
-    const d1=night?'#123024':P.snow?'#5f7f72':S==='autumn'?'#7a5a2a':'#2a6a3e', d2=night?'#183a2a':P.snow?'#7a988b':S==='autumn'?'#9a6a2e':'#357c47', d3=night?'#1f4632':P.snow?'#93aea2':S==='autumn'?'#b9802f':'#3f8f52';
-    const row=(y,col,h,step,off)=>[...Array(Math.ceil(420/step))].map((_,i)=>{ const x=i*step+off-10, hh=h+((i*13)%9); return `<path d="M${x} ${y} l${step*.6} ${-hh} l${step*.6} ${hh}z" fill="${col}"/>`; }).join('');
-    const caps=(y,h,step,off)=>[...Array(Math.ceil(420/step))].map((_,i)=>{ const x=i*step+off-10, hh=h+((i*13)%9), tx=x+step*.6, ty=y-hh; return `<path d="M${tx} ${ty} l-4 7 l4 -1.5 l4 1.5z" fill="#fff"/>`; }).join('');
-    back=`${row(108,d1,46,22,0)}${P.snow?caps(108,46,22,0):''}${row(116,d2,40,20,9)}${P.snow?caps(116,40,20,9):''}${row(126,d3,30,18,4)}${P.snow?caps(126,30,18,4):''}`;
-    extra+=[...Array(9)].map((_,i)=>{ const x=(i*47+30)%400, y=160+((i*83)%220); return `<g transform="translate(${x} ${y})"><rect x="-1.2" y="-2" width="2.4" height="5" rx="1" fill="#f3ead8"/><path d="M-5 -1 a5 4.4 0 0 1 10 0z" fill="${i%2?'#e04a3f':'#d98a3a'}"/><circle cx="-2" cy="-3" r=".9" fill="#fff"/><circle cx="1.6" cy="-2.4" r=".8" fill="#fff"/></g>`; }).join('');
+    const mix=S==='autumn'?['#c9662c','#e0952f','#b84a2a','#d8b04a','#7a8a3a']:S==='winter'?['#4d7366','#5b8274','#41675a']:S==='spring'?['#3f8a52','#4d9a5c','#5aa866','#e79ac0']:['#2f6e44','#3a7d4f','#2a6440','#448a57'];
+    const far=[...Array(24)].map((_,i)=>pine(i*18+4, 96+((i*5)%6), 30+((i*11)%10), night?'#203a40':'#5f8f80', P.snow?'#e8f0f4':null)).join('');
+    const mid=[...Array(20)].map((_,i)=>{ const x=i*21+2, round=S!=='winter'&&i%4===1; return round
+        ? `<rect x="${x-2}" y="102" width="4" height="12" fill="#5a3d28"/><circle cx="${x}" cy="96" r="12" fill="${mix[i%mix.length]}"/><circle cx="${x-4}" cy="92" r="5" fill="rgba(255,255,255,.12)"/>`
+        : pine(x, 114, 40+((i*7)%12), mix[i%mix.length], P.snow?'#fff':null); }).join('');
+    const near=[...Array(14)].map((_,i)=>pine(i*31+12, 126, 30+((i*9)%10), night?'#173426':S==='autumn'?'#7a5a24':'#245a36', P.snow?'#fff':null)).join('');
+    const rays=tod==='day'?`<defs><linearGradient id="fsRay${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbe0" stop-opacity=".55"/><stop offset="1" stop-color="#fffbe0" stop-opacity="0"/></linearGradient></defs>
+      <g class="farm-crystal"><path d="M40 0 L80 0 L200 150 L150 150Z" fill="url(#fsRay${id})"/><path d="M100 0 L120 0 L250 150 L220 150Z" fill="url(#fsRay${id})" opacity=".7"/><path d="M0 10 L20 0 L110 150 L80 150Z" fill="url(#fsRay${id})" opacity=".6"/></g>`:'';
+    back=`${far}${hz(night?.3:.38)}${mid}${hz(night?.08:.1)}${near}
+      <rect y="116" width="400" height="14" fill="${haze}" opacity="${night?.12:.22}"/>
+      ${rays}`;
+    extra+=`<g transform="translate(232 146)"><rect x="-26" y="-6" width="52" height="10" rx="5" fill="#7a5534"/><ellipse cx="26" cy="-1" rx="4" ry="5" fill="#c99a6a"/><ellipse cx="26" cy="-1" rx="2" ry="3" fill="#a77b52"/><path d="M-14 -6 q4 -6 10 -2" stroke="#5cb85c" stroke-width="2" fill="none"/>${P.snow?'<rect x="-26" y="-8" width="52" height="4" rx="2" fill="#fff"/>':''}</g>`+[...Array(9)].map((_,i)=>{ const x=(i*47+30)%400, y=160+((i*83)%220); return `<g transform="translate(${x} ${y})"><rect x="-1.2" y="-2" width="2.4" height="5" rx="1" fill="#f3ead8"/><path d="M-5 -1 a5 4.4 0 0 1 10 0z" fill="${i%2?'#e04a3f':'#d98a3a'}"/><circle cx="-2" cy="-3" r=".9" fill="#fff"/><circle cx="1.6" cy="-2.4" r=".8" fill="#fff"/></g>`; }).join('')
+      +(P.snow?'':[...Array(5)].map((_,i)=>{ const x=20+i*90, y=148+(i%2)*6; return `<g fill="${S==='autumn'?'#a8873a':'#3f8a4a'}"><path d="M${x} ${y} q-10 -8 -16 -2 q8 0 16 2z"/><path d="M${x} ${y} q10 -10 16 -3 q-8 0 -16 3z"/><path d="M${x} ${y} q-2 -12 2 -16 q1 8 -2 16z"/></g>`; }).join(''));
   } else if(map==='mountain'){
-    const m1=night?'#2a3456':eve?'#7a6f9a':'#8aa0bf', m2=night?'#232c49':eve?'#6a5f88':'#7186a8', cap='#f6f9fc';
-    back=`<path d="M-10 118 L60 40 L110 92 L170 26 L240 100 L300 48 L410 118Z" fill="${m1}"/>
-      <path d="M60 40 L46 56 L56 54 L62 60 L70 52 L78 58Z M170 26 L154 46 L164 44 L172 52 L180 42 L190 50Z M300 48 L286 64 L296 62 L302 68 L310 60 L318 66Z" fill="${cap}" opacity="${night?.7:.95}"/>
-      <path d="M-10 126 L40 84 L90 112 L150 74 L210 116 L270 82 L330 110 L410 86 V140 H-10Z" fill="${m2}"/>
-      <path d="M0 124 C80 106 150 124 230 114 S350 104 400 118 V150 H0Z" fill="${P.hills[2]}"/>
-      <path d="M198 116 q4 -40 2 -60" stroke="#cfe8ff" stroke-width="3" fill="none" opacity="${night?.3:.6}"/>`;
-    extra+=[...Array(10)].map((_,i)=>{ const x=(i*61+15)%400, y=150+((i*67)%230); return `<ellipse cx="${x}" cy="${y}" rx="${3+i%3}" ry="${2+i%2}" fill="#9a958c" opacity=".8"/>`; }).join('');
+    const r1=night?'#3a4470':eve?'#9a86b8':'#a9bcd8', r2=night?'#2c3660':eve?'#7c6aa0':'#8ba0c4', r3=night?'#222c4f':eve?'#5f5488':'#6a83ad';
+    const shade=night?'rgba(10,16,40,.35)':'rgba(30,40,80,.18)', snow2=night?'#c9d2ea':'#ffffff', snowS=night?'#9aa6c8':'#d9e4f2';
+    const aurora=night?`<defs><linearGradient id="fsAu${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fffd0" stop-opacity="0"/><stop offset=".5" stop-color="#7fffb0" stop-opacity=".75"/><stop offset="1" stop-color="#b48cff" stop-opacity="0"/></linearGradient></defs>
+      <g class="farm-crystal"><path d="M-10 40 C60 10 120 50 200 24 S330 10 410 36 L410 70 C330 44 260 62 200 56 S60 46 -10 76Z" fill="url(#fsAu${id})"/><path d="M40 20 C110 0 170 30 240 8 S350 0 410 14 L410 40 C340 26 280 40 230 34 S120 30 40 48Z" fill="url(#fsAu${id})" opacity=".6"/></g>`:'';
+    back=`${aurora}
+      <path d="M-10 112 L40 60 L80 80 L130 30 L170 70 L220 22 L270 66 L320 40 L410 100 V150 H-10Z" fill="${r1}"/>
+      <path d="M130 30 L170 70 L150 74 L130 54Z M220 22 L270 66 L246 70 L220 46Z M320 40 L410 100 L370 96 L320 64Z" fill="${shade}"/>
+      <path d="M130 30 L116 44 L126 42 L132 48 L140 40 L146 44Z M220 22 L204 38 L214 36 L222 44 L230 36 L238 40Z M320 40 L306 54 L316 52 L322 58 L330 52 L338 56Z" fill="${snow2}"/>
+      <path d="M130 30 L146 44 L140 40 L132 48Z M220 22 L238 40 L230 36 L222 44Z" fill="${snowS}"/>
+      ${hz(night?.25:.32)}
+      <g opacity="${night?.25:.75}"><ellipse cx="180" cy="62" rx="40" ry="6" fill="#fff"/><ellipse cx="300" cy="70" rx="34" ry="5" fill="#fff"/></g>
+      <path d="M-10 124 L30 90 L70 108 L120 76 L160 104 L200 80 L250 110 L300 84 L350 104 L410 88 V150 H-10Z" fill="${r2}"/>
+      <path d="M120 76 L160 104 L140 106 L120 92Z M300 84 L350 104 L326 106 L300 98Z" fill="${shade}"/>
+      <path d="M120 76 L110 86 L118 85 L122 90 L128 84Z M300 84 L290 94 L298 92 L302 98 L308 92Z" fill="${snow2}" opacity=".95"/>
+      <path d="M196 84 C194 96 198 108 196 120" stroke="#e6f4ff" stroke-width="4" fill="none" opacity="${night?.35:.85}"/><path d="M196 84 C194 96 198 108 196 120" stroke="#fff" stroke-width="1.4" fill="none" stroke-dasharray="3 5" class="farm-shimmer"/>
+      <ellipse cx="196" cy="122" rx="12" ry="3" fill="#fff" opacity="${night?.2:.6}"/>
+      ${[...Array(28)].map((_,i)=>pine(i*15+2, 128-((i*3)%4), 14+((i*7)%7), night?'#1b3a30':S==='autumn'?'#4a6a3a':'#2f6a45', P.snow?'#fff':null)).join('')}
+      ${hz(night?.06:.08)}
+      ${night?'':`<path d="M90 28 q6 -5 12 0 q6 -5 12 0" stroke="#3a3a4a" stroke-width="1.8" fill="none" stroke-linecap="round" opacity=".7"/>`}`;
+    extra+=[...Array(10)].map((_,i)=>{ const x=(i*61+15)%400, y=150+((i*67)%230); return `<ellipse cx="${x}" cy="${y}" rx="${3+i%3}" ry="${2+i%2}" fill="#9a958c" opacity=".8"/><ellipse cx="${x-1}" cy="${y-1}" rx="${1.5+i%2}" ry="1" fill="#c4bfb6" opacity=".8"/>`; }).join('')
+      +(P.snow?'':[...Array(8)].map((_,i)=>{ const x=(i*49+40)%400, y=160+((i*59)%210); return `<g transform="translate(${x} ${y})"><circle r="1.8" cx="-2" fill="#b9a8ff"/><circle r="1.8" cx="2" fill="#b9a8ff"/><circle r="1.8" cy="-2.6" fill="#cbb8ff"/><circle r="1" fill="#fff3a6"/></g>`; }).join(''));
   }
   const pathD="M318 128 C300 190 250 210 210 260 S170 360 160 400";
   const path = c.path==='stone'
@@ -5648,7 +5687,7 @@ function farmBgSVG(tod,S,map,tag){
     <defs>${sky}${sunG}<linearGradient id="fsG${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.g1}"/><stop offset="1" stop-color="${P.g2}"/></linearGradient>
       <pattern id="fsM${id}" width="44" height="44" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><rect width="22" height="44" fill="${P.stripe}"/></pattern></defs>
     <rect width="400" height="150" fill="url(#fsS${id})"/>${stars}${sun}${clouds}${back}
-    <rect y="${map==='seaside'?132:122}" width="400" height="278" fill="url(#fsG${id})"/><rect y="${map==='seaside'?132:122}" width="400" height="278" fill="url(#fsM${id})"/>
+    <rect y="${map==='seaside'?142:122}" width="400" height="278" fill="url(#fsG${id})"/><rect y="${map==='seaside'?142:122}" width="400" height="278" fill="url(#fsM${id})"/>
     ${mt?`<rect y="122" width="400" height="278" fill="${mt}"/>`:''}
     ${speck}${path}<g stroke="${P.tuft}" stroke-width="1.6" stroke-linecap="round" fill="none">${tufts}</g>${fl}${extra}${snow}
     ${k.tint?`<rect width="400" height="400" fill="${k.tint}"/>`:''}
