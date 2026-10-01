@@ -5165,55 +5165,69 @@ setInterval(() => {
   .farm-view.active { display:flex; }
   .farm-ic { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
 
-  /* ── field ── */
-  .farm-ranch, .farm-main, .farm-jobs { display:flex; flex-direction:column; gap:12px; }
-  .farm-scene { position:relative; width:100%; aspect-ratio: 358 / 390; border-radius:22px; overflow:hidden; user-select:none; -webkit-user-select:none;
-    background-color:#244d3a; background-image:linear-gradient(45deg,#2b5a43 25%,transparent 25%,transparent 75%,#2b5a43 75%),linear-gradient(45deg,#2b5a43 25%,transparent 25%,transparent 75%,#2b5a43 75%);
-    background-size:44px 44px; background-position:0 0,22px 22px; box-shadow:inset 0 0 0 1px rgba(223,238,255,.08); }
-  .farm-scene.evening::after, .farm-scene.night::after { content:''; position:absolute; inset:0; pointer-events:none; z-index:6; }
-  .farm-scene.evening::after { background:rgba(60,40,90,.16); }
-  .farm-scene.night::after { background:rgba(10,15,45,.38); }
-  .farm-fence { position:absolute; left:0; right:0; top:3%; height:5%; border-top:3px solid #8a6a48; border-bottom:3px solid #8a6a48; box-sizing:border-box;
-    background:repeating-linear-gradient(90deg,transparent 0 40px,#8a6a48 40px 46px); }
-  .farm-thing { position:absolute; border:none; background:none; padding:0; cursor:pointer; font-family:inherit; color:var(--fg); }
-  .farm-tag { position:absolute; left:50%; transform:translateX(-50%); white-space:nowrap; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:8px; background:rgba(10,25,41,.78); color:var(--fg); pointer-events:none; }
-  .farm-tag.hot { background:var(--accent); color:#1a0e08; }
-  .farm-mailbox { left:4%; top:10%; width:12%; height:17%; z-index:3; }
-  .farm-mailbox .mb-post { position:absolute; left:44%; top:42%; width:12%; height:58%; background:#8a6a48; }
-  .farm-mailbox .mb-box { position:absolute; left:6%; top:18%; width:88%; height:34%; border-radius:12px 12px 4px 4px; background:#4f8fd6; }
-  .farm-mailbox .mb-flag { position:absolute; right:-6%; top:2%; width:26%; height:22%; background:#ff5a4e; transform-origin:0 100%; transition:transform .3s; }
-  .farm-mailbox:not(.has) .mb-flag { transform:rotate(80deg); }
-  .farm-mailbox .farm-tag { top:-18%; }
-  .farm-barn { right:4%; top:9%; width:30%; height:24%; z-index:3; }
-  .farm-barn .bn-roof { position:absolute; left:0; right:0; top:0; height:38%; background:#b8473f; clip-path:polygon(50% 0,100% 100%,0 100%); }
-  .farm-barn .bn-wall { position:absolute; left:6%; right:6%; top:36%; bottom:0; background:#c9574d; border-radius:0 0 6px 6px; box-shadow:inset 0 -6px 0 rgba(0,0,0,.12); }
-  .farm-barn .bn-door { position:absolute; left:34%; width:32%; bottom:0; height:42%; background:#6b2a24; border:3px solid #f2e3cf; border-bottom:none; box-sizing:border-box; border-radius:4px 4px 0 0; }
-  .farm-barn .farm-tag { bottom:-22%; }
-  .farm-spot { width:30%; height:24%; z-index:2; border-radius:18px; }
-  .farm-spot.empty { border:2px dashed rgba(223,238,255,.28); background:rgba(10,25,41,.25); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:2px; font-size:11.5px; font-weight:700; color:rgba(223,238,255,.75); }
-  .farm-spot.empty svg { width:20px; height:20px; }
-  .farm-spot .hb-art { position:absolute; inset:0; border-radius:18px; overflow:hidden; }
-  .farm-spot .farm-tag { bottom:4px; }
-  .farm-visitor { position:absolute; right:-6px; top:-8px; width:30px; height:30px; border-radius:50%; background:rgba(10,25,41,.85); box-shadow:0 0 0 2px #ffe27a; color:#ffe27a; font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; animation:farmBob 1.6s ease-in-out infinite; }
-  @keyframes farmBob { 50% { transform:translateY(-4px); } }
-  .farm-patch { left:67%; top:52%; width:28%; display:grid; grid-template-columns:repeat(2,1fr); gap:6px; z-index:2; }
-  .farm-plot { aspect-ratio:1; border:none; border-radius:8px; background:#5b4330; box-shadow:inset 0 -4px 0 #6e523b; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
-  .farm-plot i { display:block; border-radius:50%; }
-  .farm-plot.seed i { width:16%; height:16%; background:#a4835f; }
-  .farm-plot.grow i { width:28%; height:28%; background:#7fd36a; }
-  .farm-plot.ready i { width:44%; height:44%; background:#ff5a7a; box-shadow:0 0 10px #ff5a7a; animation:farmBob 1.4s ease-in-out infinite; }
-  .farm-patch-tag { position:absolute; left:67%; top:46%; z-index:2; }
-  .farm-patch-tag .farm-tag { position:static; transform:none; display:inline-block; }
-  .farm-gifts { left:19%; top:11%; width:13%; aspect-ratio:1; z-index:4; display:flex; align-items:center; justify-content:center; border-radius:12px; background:#e9c46a; color:#3a2a10; box-shadow:0 0 0 3px rgba(255,226,122,.5); animation:farmBob 1.8s ease-in-out infinite; }
-  .farm-gifts svg { width:60%; height:60%; }
-  .farm-mon { position:absolute; z-index:5; width:15%; max-width:74px; border:none; background:none; padding:0; cursor:pointer; transition:left 2.6s linear, top 2.6s linear; transform:translate(-50%,-100%); }
-  .farm-mon img { display:block; width:100%; height:auto; filter:drop-shadow(0 4px 3px rgba(0,0,0,.35)); transition:transform .2s; }
+  /* ── field: an illustrated diorama that follows the real time of day ── */
+  .farm-scene { position:relative; width:100%; aspect-ratio: 358 / 400; border-radius:24px; overflow:hidden; user-select:none; -webkit-user-select:none;
+    background:#6dbb62; box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 18px 40px rgba(0,0,0,.35); isolation:isolate; }
+  .farm-scene .fs-bg { position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+  .farm-fence { position:absolute; left:-2%; right:-2%; top:27%; height:5.5%; z-index:1; pointer-events:none;
+    background:
+      linear-gradient(#a77b52,#a77b52) 0 22%/100% 3px no-repeat,
+      linear-gradient(#a77b52,#a77b52) 0 70%/100% 3px no-repeat,
+      repeating-linear-gradient(90deg,transparent 0 30px,#b88a5d 30px 35px,transparent 35px 36px); }
+  .tod-evening .farm-fence { filter:brightness(.82) saturate(.85); }
+  .tod-night .farm-fence { filter:brightness(.55) saturate(.7); }
+  .farm-thing { position:absolute; border:none; background:none; padding:0; cursor:pointer; font-family:inherit; color:var(--fg); -webkit-tap-highlight-color:transparent; }
+  .farm-thing svg { display:block; width:100%; height:auto; overflow:visible; }
+  .farm-thing:focus-visible, .farm-mon:focus-visible { outline:2px solid #fff; outline-offset:3px; border-radius:12px; }
+  .farm-art { transition:filter .4s; }
+  .tod-evening .farm-art { filter:brightness(.9) saturate(.92); }
+  .tod-night .farm-art { filter:brightness(.66) saturate(.75); }
+  .farm-thing:active .farm-art { transform:scale(.97); }
+  .farm-decor { position:absolute; pointer-events:none; }
+  .farm-barn { left:63%; top:5%; width:34%; }
+  .farm-barn .bn-window { fill:#5a2a26; transition:fill .4s; }
+  .tod-evening .farm-barn .bn-window, .tod-night .farm-barn .bn-window { fill:#ffd77a; }
+  .tod-night .farm-barn .bn-glow { opacity:1; }
+  .farm-barn .bn-glow { opacity:0; transition:opacity .4s; }
+  .farm-mailbox { left:5%; top:21%; width:9%; }
+  .farm-mailbox .mb-flag { transform-origin:29.5px 24px; transition:transform .35s cubic-bezier(.3,1.4,.5,1); }
+  .farm-mailbox:not(.has) .mb-flag { transform:rotate(90deg); }
+  .farm-mail-bubble { position:absolute; left:55%; top:-40%; width:26px; height:20px; border-radius:7px; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,.25); animation:farmBob 1.8s ease-in-out infinite; }
+  .farm-mail-bubble::after { content:''; position:absolute; left:6px; bottom:-5px; border:5px solid transparent; border-top-color:#fff; border-bottom:0; }
+  .farm-mail-bubble svg { width:16px; height:16px; color:#e8553f; }
+  .farm-spot { width:29%; }
+  .farm-bush { width:13%; }
+  .farm-bush.ready::after { content:''; position:absolute; left:50%; top:-6%; width:6px; height:6px; border-radius:50%; background:#fff; box-shadow:0 0 8px 3px rgba(255,255,255,.7); animation:farmTwinkle 2.2s ease-in-out infinite; pointer-events:none; }
+  @keyframes farmTwinkle { 0%,100% { opacity:0; transform:scale(.4); } 50% { opacity:1; transform:scale(1); } }
+  .farm-gifts { width:8%; animation:farmBob 1.8s ease-in-out infinite; }
+  .farm-visitor { position:absolute; left:50%; top:-14%; transform:translateX(-50%); width:30px; height:30px; border-radius:50%; background:#fff; color:#3b2e7a; font-weight:900; font-size:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 3px #ffe27a, 0 6px 14px rgba(0,0,0,.3); animation:farmBob 1.6s ease-in-out infinite; }
+  @keyframes farmBob { 50% { translate:0 -4px; } }
+  .farm-flame { transform-origin:50px 58px; animation:farmFlicker 1.1s ease-in-out infinite alternate; }
+  @keyframes farmFlicker { 0% { transform:scale(1,1); } 50% { transform:scale(.94,1.08); } 100% { transform:scale(1.05,.95); } }
+  .farm-crystal { animation:farmGlow 2.6s ease-in-out infinite; }
+  @keyframes farmGlow { 50% { opacity:.65; } }
+  .farm-firefly { position:absolute; width:4px; height:4px; border-radius:50%; background:#fff6a8; box-shadow:0 0 8px 3px rgba(255,240,140,.7); z-index:120; pointer-events:none; animation:farmFly 6s ease-in-out infinite; }
+  @keyframes farmFly { 0%,100% { transform:translate(0,0); opacity:.2; } 25% { opacity:1; } 50% { transform:translate(18px,-14px); opacity:.6; } 75% { transform:translate(-10px,-24px); opacity:1; } }
+  .farm-mon { position:absolute; width:15%; max-width:72px; border:none; background:none; padding:0; cursor:pointer; transition:left 2.8s ease-in-out, top 2.8s ease-in-out; transform:translate(-50%,-100%); -webkit-tap-highlight-color:transparent; }
+  .farm-mon img { position:relative; display:block; width:100%; height:auto; transition:transform .25s; }
+  .tod-evening .farm-mon img { filter:brightness(.92); }
+  .tod-night .farm-mon img { filter:brightness(.72) saturate(.85); }
   .farm-mon.flip img { transform:scaleX(-1); }
   .farm-mon.hop img { animation:farmHop .45s ease-out; }
-  @keyframes farmHop { 40% { transform:translateY(-16px); } }
-  .farm-mon .fm-badge { position:absolute; right:-4px; top:-4px; min-width:20px; height:20px; padding:0 5px; box-sizing:border-box; border-radius:10px; font-size:10.5px; font-weight:800; display:flex; align-items:center; justify-content:center; color:#1a0e08; background:var(--accent2); box-shadow:0 0 0 2px var(--bg); }
-  .farm-mon .fm-badge.job { background:var(--accent); }
-  .farm-mon .fm-name { position:absolute; left:50%; top:100%; transform:translateX(-50%); white-space:nowrap; font-size:10.5px; font-weight:700; color:var(--fg); text-shadow:0 1px 2px rgba(0,0,0,.6); }
+  .farm-mon.flip.hop img { animation:farmHopFlip .45s ease-out; }
+  @keyframes farmHop { 40% { transform:translateY(-18%); } }
+  @keyframes farmHopFlip { 0%,100% { transform:scaleX(-1); } 40% { transform:scaleX(-1) translateY(-18%); } }
+  .farm-mon .fm-shadow { position:absolute; left:18%; right:18%; bottom:-3%; height:12%; border-radius:50%; background:rgba(20,40,20,.32); filter:blur(1.5px); }
+  .farm-mon .fm-badge { position:absolute; right:-6%; top:-4%; width:22px; height:22px; border-radius:11px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.3); }
+  .farm-mon .fm-badge svg { width:13px; height:13px; }
+  .farm-mon .fm-badge.want { background:#fff; color:#ff5d8f; }
+  .farm-mon .fm-badge.job { color:#1a0e08; }
+  .farm-mon .fm-name { position:absolute; left:50%; top:calc(100% + 4px); transform:translateX(-50%); white-space:nowrap; font-size:11px; font-weight:800; color:#173018; background:rgba(255,255,255,.9); border-radius:999px; padding:2px 8px; opacity:0; transition:opacity .2s; pointer-events:none; }
+  .farm-mon:hover .fm-name, .farm-mon.show-name .fm-name { opacity:1; }
+  .farm-scene-hud { position:absolute; left:10px; bottom:10px; z-index:150; display:flex; gap:6px; pointer-events:none; }
+  .farm-hud-chip { display:flex; align-items:center; gap:5px; padding:5px 10px; border-radius:999px; background:rgba(10,25,41,.62); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); color:#fff; font-size:12px; font-weight:700; }
+  .farm-hud-chip svg { width:14px; height:14px; }
+  .farm-ranch, .farm-main, .farm-jobs { display:flex; flex-direction:column; gap:12px; }
   .farm-actions { display:flex; gap:8px; }
   .farm-btn { flex:1; min-height:44px; border:none; border-radius:999px; background:rgba(223,238,255,.08); color:var(--fg); font-family:inherit; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; padding:0 14px; cursor:pointer; }
   .farm-btn.primary { background:var(--accent); color:#1a0e08; }
@@ -5232,6 +5246,11 @@ setInterval(() => {
   .farm-jobmini { display:none; }
   .farm-empty { font-size:13px; color:var(--fg-dim); padding:4px 0; }
 
+  .farm-btn.ghost { background:rgba(223,238,255,.06); color:var(--fg-dim); }
+  .farm-port { display:inline-flex; align-items:flex-end; justify-content:center; border-radius:50%; flex-shrink:0; }
+  .farm-port img { width:112%; height:112%; object-fit:contain; margin-bottom:-2%; }
+  .farm-stage { position:relative; width:116px; height:116px; flex-shrink:0; border-radius:50%; display:flex; align-items:flex-end; justify-content:center; background:radial-gradient(circle at 50% 80%, var(--tc) -30%, transparent 62%), linear-gradient(#6fbe64,#3f7f43); box-shadow:inset 0 -12px 0 rgba(0,0,0,.14), 0 10px 24px rgba(0,0,0,.3); }
+  .farm-stage img { width:104px; height:104px; object-fit:contain; margin-bottom:6px; filter:drop-shadow(0 6px 4px rgba(0,0,0,.3)); }
   /* ── helpers ── */
   .farm-job { background:rgba(223,238,255,.045); border-radius:22px; padding:14px; display:flex; flex-direction:column; gap:10px; }
   .farm-job-hd { display:flex; align-items:center; gap:10px; }
@@ -5240,33 +5259,37 @@ setInterval(() => {
   .farm-job-t { font-size:15px; font-weight:800; }
   .farm-job-s { font-size:12px; color:var(--fg-dim); margin-top:1px; }
   .farm-job-mon { margin-left:auto; display:flex; align-items:center; gap:6px; border:none; background:rgba(223,238,255,.06); border-radius:999px; padding:3px 10px 3px 3px; color:var(--fg); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; min-height:40px; }
-  .farm-job-mon img { width:34px; height:34px; }
+  .farm-job-mon .farm-port { width:34px; height:34px; }
   .farm-job-mon.none { padding:0 14px; color:var(--accent); }
   .farm-job-body { font-size:13.5px; line-height:1.45; }
   .farm-job-body b { font-weight:800; }
   .farm-job-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .farm-fit { font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px; background:rgba(127,255,176,.14); color:var(--green); }
   .farm-tree { display:flex; align-items:flex-end; gap:12px; }
-  .farm-tree-art { width:54px; height:54px; flex-shrink:0; }
+  .farm-tree-art { width:64px; height:64px; flex-shrink:0; border-radius:16px; background:linear-gradient(#78c56c,#4f9a4d); }
   .farm-bar { height:6px; border-radius:6px; background:rgba(223,238,255,.1); overflow:hidden; flex:1; }
   .farm-bar i { display:block; height:100%; border-radius:6px; background:var(--green); }
   .farm-timer { font-variant-numeric:tabular-nums; font-size:28px; font-weight:800; letter-spacing:-.01em; }
 
   /* ── habitats ── */
   .farm-hgrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-  .farm-hcard { position:relative; border-radius:18px; min-height:96px; padding:10px 12px; box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between; gap:6px; border:none; text-align:left; font-family:inherit; color:var(--fg); cursor:pointer; box-shadow:inset 0 -6px 0 rgba(0,0,0,.18); }
-  .farm-hcard.empty { background:rgba(10,25,41,.35); border:2px dashed rgba(223,238,255,.25); box-shadow:none; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+  .farm-hcard { position:relative; border-radius:20px; padding:8px 8px 12px; box-sizing:border-box; display:flex; flex-direction:column; gap:8px; border:none; text-align:left; font-family:inherit; color:var(--fg); cursor:pointer; background:rgba(223,238,255,.045); }
+  .farm-hcard .hc-art { border-radius:14px; background:linear-gradient(#78c56c,#4f9a4d); padding:10px 10px 2px; }
+  .farm-hcard .hc-art svg { display:block; width:100%; height:auto; overflow:visible; }
+  .farm-hcard .hc-txt { padding:0 6px; }
+  .farm-hcard .farm-visitor { top:6px; left:auto; right:6px; transform:none; }
   .farm-hcard .hc-t { font-size:13px; font-weight:800; }
-  .farm-hcard .hc-s { font-size:11.5px; color:rgba(223,238,255,.85); }
+  .farm-hcard .hc-s { font-size:12px; color:var(--fg-dim); margin-top:2px; }
   .farm-build { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
   .farm-bitem { display:flex; gap:10px; align-items:center; padding:10px; border-radius:16px; background:rgba(223,238,255,.06); border:none; color:var(--fg); font-family:inherit; text-align:left; cursor:pointer; }
   .farm-bitem:disabled { opacity:.5; cursor:default; }
-  .farm-bitem .bi-sw { width:34px; height:34px; border-radius:10px; flex-shrink:0; }
+  .farm-bitem .bi-sw, .farm-book-row .bi-sw { width:52px; flex-shrink:0; border-radius:10px; background:linear-gradient(#78c56c,#4f9a4d); padding:4px 4px 0; box-sizing:border-box; }
+  .farm-bi-art svg { display:block; width:100%; height:auto; }
   .farm-bitem .bi-t { font-size:13px; font-weight:800; }
   .farm-bitem .bi-s { font-size:11.5px; color:var(--fg-dim); }
   .farm-book-row { display:flex; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid rgba(223,238,255,.08); }
   .farm-book-row:last-child { border-bottom:none; }
-  .farm-book-row .bi-sw { width:30px; height:30px; border-radius:9px; flex-shrink:0; }
+  .farm-book-row .bi-sw.locked { filter:grayscale(1) brightness(.45); }
   .farm-book-row .bk-t { font-size:13.5px; font-weight:700; }
   .farm-book-row .bk-s { font-size:12px; color:var(--fg-dim); }
 
@@ -5281,7 +5304,7 @@ setInterval(() => {
   .farm-pick { display:flex; flex-direction:column; gap:6px; overflow-y:auto; min-height:0; }
   .farm-pick-row { display:flex; align-items:center; gap:10px; padding:6px 10px 6px 6px; border-radius:16px; background:rgba(223,238,255,.05); border:none; color:var(--fg); font-family:inherit; text-align:left; cursor:pointer; min-height:56px; }
   .farm-pick-row:disabled { opacity:.45; cursor:default; }
-  .farm-pick-row img { width:44px; height:44px; flex-shrink:0; }
+  .farm-pick-row > img { width:44px; height:44px; flex-shrink:0; }
   .farm-pick-row .pr-t { font-size:14px; font-weight:700; }
   .farm-pick-row .pr-s { font-size:12px; color:var(--fg-dim); }
   .farm-pick-row .pr-r { margin-left:auto; display:flex; align-items:center; gap:6px; }
@@ -5442,80 +5465,168 @@ function renderFarm(){
 }
 function setFarmView(v){ farmView=v; renderFarm(); }
 
-function farmHabitatArt(h){
-  const art={
-    pond:`<div style="position:absolute;left:12%;right:12%;top:18%;bottom:26%;border-radius:50%;background:#2f6d9a;box-shadow:inset 0 0 0 4px #3d82b3"></div>`,
-    grass:`<div style="position:absolute;inset:14% 10% 26%;background:repeating-linear-gradient(90deg,#4f9a4a 0 6px,transparent 6px 11px);clip-path:polygon(0 100%,8% 20%,16% 100%,24% 10%,32% 100%,40% 25%,48% 100%,56% 5%,64% 100%,72% 22%,80% 100%,88% 12%,96% 100%)"></div>`,
-    fire:`<div style="position:absolute;left:38%;top:18%;width:24%;height:42%;border-radius:50% 50% 45% 45%;background:#ff8a4c;box-shadow:0 0 18px #ff8a4c"></div><div style="position:absolute;left:30%;right:30%;top:60%;height:10%;background:#6b4a2e;border-radius:4px"></div>`,
-    bench:`<div style="position:absolute;left:16%;right:16%;top:30%;height:22%;border-radius:10px;background:#e7b7d4"></div><div style="position:absolute;left:20%;width:6%;top:52%;height:16%;background:#8a6a48"></div><div style="position:absolute;right:20%;width:6%;top:52%;height:16%;background:#8a6a48"></div>`,
-    moon:`<div style="position:absolute;left:30%;top:16%;width:40%;height:46%;border-radius:46% 54% 40% 50%;background:#8f8bb0;box-shadow:0 0 16px rgba(185,168,255,.5)"></div>`,
-    rocks:`<div style="position:absolute;left:14%;top:30%;width:30%;height:30%;border-radius:40%;background:#9a9086"></div><div style="position:absolute;left:44%;top:22%;width:38%;height:38%;border-radius:45%;background:#b0a69a"></div>`,
-    flowers:`<div style="position:absolute;inset:18% 12% 28%;background:radial-gradient(circle,#ffd1ec 0 4px,transparent 5px) 0 0/16px 16px,radial-gradient(circle,#fff3a6 0 3px,transparent 4px) 8px 8px/16px 16px"></div>`
-  }[h.id]||'';
-  return `<div class="hb-art" style="background:${h.col}">${art}</div>`;
+// ── illustrated farm art (hand-drawn SVG, no image files) ──
+const FARM_PAL = {
+  day:     {sky1:'#79c0ee',sky2:'#cdeaf8',hill1:'#86c987',hill2:'#69b46c',g1:'#6fbe64',g2:'#4f9a4d',path:'#e4c891',pathE:'#cfae72',tuft:'#5aa653'},
+  evening: {sky1:'#46508f',sky2:'#ff9f7a',hill1:'#6b8f6a',hill2:'#57805b',g1:'#5f9e58',g2:'#3f7744',path:'#cfae7f',pathE:'#b8956a',tuft:'#4d8a4a'},
+  night:   {sky1:'#0b1430',sky2:'#24326a',hill1:'#2d4c48',hill2:'#25413c',g1:'#30593f',g2:'#1f3f2c',path:'#6e6553',pathE:'#5c5446',tuft:'#2a4f37'}
+};
+function farmSeeded(seed){ let s=seed>>>0||1; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function farmBgSVG(tod){
+  const p=FARM_PAL[tod], r=farmSeeded(7);
+  let tufts='';
+  for(let i=0;i<60;i++){ const x=r()*400, y=135+r()*265, s=.7+r()*.8;
+    tufts+=`<path d="M${x.toFixed(1)} ${y.toFixed(1)}l${(-3*s).toFixed(1)} ${(-7*s).toFixed(1)}M${x.toFixed(1)} ${y.toFixed(1)}l${(1*s).toFixed(1)} ${(-9*s).toFixed(1)}M${x.toFixed(1)} ${y.toFixed(1)}l${(4*s).toFixed(1)} ${(-6*s).toFixed(1)}"/>`; }
+  let flowers='';
+  if(tod!=='night') for(let i=0;i<16;i++){ const x=r()*400, y=150+r()*240; flowers+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.1" fill="${['#fff','#ffe680','#ffc2dc'][i%3]}"/>`; }
+  let stars='';
+  if(tod==='night') for(let i=0;i<34;i++){ stars+=`<circle cx="${(r()*400).toFixed(1)}" cy="${(r()*96).toFixed(1)}" r="${(.5+r()*1.2).toFixed(1)}" fill="#fff" opacity="${(.35+r()*.6).toFixed(2)}"/>`; }
+  const sun = tod==='day' ? `<circle cx="70" cy="44" r="30" fill="#fff6c9" opacity=".35"/><circle cx="70" cy="44" r="18" fill="#fff3b0"/>`
+            : tod==='evening' ? `<circle cx="300" cy="104" r="34" fill="#ffd48a" opacity=".35"/><circle cx="300" cy="104" r="20" fill="#ffc46b"/>`
+            : `<circle cx="78" cy="40" r="15" fill="#f4f1d6"/><circle cx="85" cy="35" r="13" fill="${p.sky1}"/>`;
+  const clouds = tod==='night' ? '' : `<g fill="#fff" opacity="${tod==='day'?.9:.45}"><ellipse cx="180" cy="40" rx="26" ry="9"/><ellipse cx="196" cy="34" rx="16" ry="10"/><ellipse cx="166" cy="36" rx="12" ry="8"/><ellipse cx="330" cy="64" rx="20" ry="7"/><ellipse cx="342" cy="59" rx="12" ry="8"/></g>`;
+  return `<svg class="fs-bg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs><linearGradient id="fsSky${tod}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.sky1}"/><stop offset="1" stop-color="${p.sky2}"/></linearGradient>
+    <linearGradient id="fsGr${tod}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.g1}"/><stop offset="1" stop-color="${p.g2}"/></linearGradient></defs>
+    <rect width="400" height="140" fill="url(#fsSky${tod})"/>${stars}${sun}${clouds}
+    <path d="M0 108 C60 78 120 96 180 88 S300 70 400 96 V150 H0Z" fill="${p.hill1}"/>
+    <path d="M0 124 C80 104 150 122 230 110 S350 100 400 116 V150 H0Z" fill="${p.hill2}"/>
+    <rect y="122" width="400" height="278" fill="url(#fsGr${tod})"/>
+    <path d="M318 128 C300 190 250 210 210 260 S170 360 160 400" stroke="${p.pathE}" stroke-width="30" fill="none" stroke-linecap="round"/>
+    <path d="M318 128 C300 190 250 210 210 260 S170 360 160 400" stroke="${p.path}" stroke-width="24" fill="none" stroke-linecap="round"/>
+    <g stroke="${p.tuft}" stroke-width="1.6" stroke-linecap="round" fill="none">${tufts}</g>${flowers}
+  </svg>`;
 }
+const FARM_ART = {
+  barn:`<svg viewBox="0 0 140 112" aria-hidden="true"><ellipse cx="68" cy="106" rx="64" ry="6" fill="rgba(0,0,0,.18)"/>
+    <rect x="110" y="34" width="24" height="70" rx="3" fill="#d3dade"/><path d="M110 54h24M110 74h24M110 94h24" stroke="#b5bec6" stroke-width="2"/><path d="M110 36a12 12 0 0 1 24 0z" fill="#9aa6b0"/>
+    <circle class="bn-glow" cx="60" cy="42" r="26" fill="rgba(255,215,122,.28)"/>
+    <path d="M12 54 L60 24 L108 54 V104 H12Z" fill="#c8524a"/>
+    <path d="M20 58v46M28 52v52M36 47v57M44 42v62M52 37v67M68 37v67M76 42v62M84 47v57M92 52v52M100 58v46" stroke="#b6473f" stroke-width="1.4"/>
+    <path d="M2 56 L60 17 L118 56 L112 61 L60 26 L8 61Z" fill="#8e3a35"/><path d="M3 56 L60 18 L117 56" fill="none" stroke="#f5ebdc" stroke-width="3" stroke-linejoin="round"/>
+    <rect class="bn-window" x="50" y="36" width="20" height="15" rx="2"/><rect x="50" y="36" width="20" height="15" rx="2" fill="none" stroke="#f5ebdc" stroke-width="2.5"/><path d="M60 36v15" stroke="#f5ebdc" stroke-width="2"/>
+    <rect x="40" y="68" width="40" height="36" fill="#7a2f2a"/><path d="M40 68 L80 104 M80 68 L40 104" stroke="#f5ebdc" stroke-width="3"/><rect x="40" y="68" width="40" height="36" fill="none" stroke="#f5ebdc" stroke-width="3"/>
+    <rect x="12" y="101" width="96" height="4" fill="#a3433d"/></svg>`,
+  mailbox:`<svg viewBox="0 0 40 64" aria-hidden="true"><ellipse cx="20" cy="61" rx="11" ry="3" fill="rgba(0,0,0,.2)"/><rect x="16.5" y="28" width="7" height="34" rx="1.5" fill="#a77b52"/>
+    <path d="M4 32 V20 a12 12 0 0 1 24 0 V32 Z" fill="#4f8fd6"/><path d="M4 28 h24 v4 h-24z" fill="#3b73b2"/><path d="M8 20 a8 8 0 0 1 8 -8" stroke="rgba(255,255,255,.45)" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <g class="mb-flag"><rect x="28" y="8" width="3" height="17" rx="1" fill="#c23b31"/><path d="M31 8h10v7H31z" fill="#ff5a4e"/></g></svg>`,
+  tree:`<svg viewBox="0 0 70 96" aria-hidden="true"><ellipse cx="35" cy="91" rx="24" ry="5" fill="rgba(0,0,0,.18)"/><rect x="31" y="56" width="8" height="35" rx="2" fill="#7a5534"/>
+    <circle cx="22" cy="52" r="17" fill="#357c3e"/><circle cx="48" cy="52" r="17" fill="#357c3e"/><circle cx="35" cy="38" r="24" fill="#3f8f47"/><circle cx="35" cy="28" r="17" fill="#4fa556"/><circle cx="28" cy="22" r="6" fill="rgba(255,255,255,.14)"/></svg>`,
+  gift:`<svg viewBox="0 0 30 30" aria-hidden="true"><ellipse cx="15" cy="28" rx="11" ry="2" fill="rgba(0,0,0,.2)"/><rect x="5" y="12" width="20" height="15" rx="2" fill="#ffd166"/><rect x="3" y="8" width="24" height="6" rx="2" fill="#ffbf3f"/><rect x="13" y="8" width="4" height="19" fill="#ef476f"/>
+    <path d="M15 8c-3-5-9-5-8-1 1 3 6 2 8 1zM15 8c3-5 9-5 8-1-1 3-6 2-8 1z" fill="#ef476f"/></svg>`,
+  bush(st){
+    const base=`<ellipse cx="22" cy="35" rx="18" ry="3.2" fill="rgba(0,0,0,.2)"/>`;
+    if(st==='seed') return `<svg viewBox="0 0 44 38" aria-hidden="true">${base}<ellipse cx="22" cy="32" rx="13" ry="5" fill="#7a5a3c"/><ellipse cx="22" cy="31" rx="10" ry="3" fill="#8e6a48"/><path d="M22 31v-8" stroke="#4fa556" stroke-width="2" stroke-linecap="round"/><path d="M22 25c-1-4-5-5-7-4 1 3 4 4 7 4zM22 24c1-4 5-5 7-4-1 3-4 4-7 4z" fill="#5cb85c"/></svg>`;
+    const leaves=`<circle cx="13" cy="24" r="11" fill="#3a8644"/><circle cx="31" cy="24" r="11" fill="#3a8644"/><circle cx="22" cy="15" r="13" fill="#4a9e52"/><circle cx="18" cy="11" r="4.5" fill="rgba(255,255,255,.16)"/>`;
+    const extra= st==='ready' ? [[12,21],[22,10],[31,19],[26,28],[15,30],[33,28]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.3" fill="#ff4f7a"/><circle cx="${x-1}" cy="${y-1}" r="1" fill="#ffd0dc"/>`).join('')
+              : [[13,20],[25,12],[31,23],[20,27]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.8" fill="#f4f7e8"/>`).join('');
+    return `<svg viewBox="0 0 44 38" aria-hidden="true">${base}${leaves}${extra}</svg>`;
+  },
+  habitat(id){
+    const sh=`<ellipse cx="50" cy="66" rx="44" ry="6" fill="rgba(0,0,0,.16)"/>`;
+    const r=farmSeeded(id.length*97);
+    if(id==='pond') return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<ellipse cx="50" cy="46" rx="44" ry="20" fill="#8fbf7a"/><ellipse cx="50" cy="45" rx="40" ry="17" fill="#2f86bf"/><ellipse cx="50" cy="46" rx="34" ry="13" fill="#47a3d9"/>
+      <path d="M28 41 q8 -4 18 0" stroke="#bfe6fb" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M33 49 a6 4 0 1 0 6 -1 l-6 1z" fill="#5cb85c"/><path d="M60 52 a5 3.4 0 1 0 5 -1 l-5 1z" fill="#4fa556"/><circle cx="62" cy="50" r="2" fill="#ff9ec2"/>
+      <path d="M84 47 V24 M88 48 V28 M80 48 V30" stroke="#3f7d3a" stroke-width="2" stroke-linecap="round"/><rect x="82.5" y="22" width="3" height="8" rx="1.5" fill="#7a5534"/><rect x="86.5" y="26" width="3" height="7" rx="1.5" fill="#7a5534"/></svg>`;
+    if(id==='grass'){ let b=''; for(let i=0;i<17;i++){ const x=12+i*4.6, h=22+r()*20, lean=(r()-.5)*10; b+=`<path d="M${x-3} 60 Q${x+lean/2} ${60-h/2} ${x+lean} ${60-h} Q${x+1} ${60-h/2} ${x+3} 60Z" fill="${i%2?'#3f8f47':'#5bb25a'}"/>`; }
+      return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<ellipse cx="50" cy="60" rx="42" ry="8" fill="#4a944a"/>${b}</svg>`; }
+    if(id==='fire') return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<circle cx="50" cy="44" r="30" fill="rgba(255,170,80,.18)"/>
+      ${[[26,58],[33,63],[43,66],[57,66],[67,63],[74,58],[30,52],[70,52]].map(([x,y],i)=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="4.4" fill="${i%2?'#9a958c':'#b3ada3'}"/>`).join('')}
+      <rect x="34" y="54" width="32" height="6" rx="3" fill="#7a5534" transform="rotate(-14 50 57)"/><rect x="34" y="54" width="32" height="6" rx="3" fill="#8e6440" transform="rotate(14 50 57)"/>
+      <g class="farm-flame"><path d="M50 22 C60 34 64 42 62 50 a12 10 0 0 1 -24 0 C36 42 42 34 50 22Z" fill="#ff7a3c"/><path d="M50 32 C56 40 58 45 57 50 a7 6 0 0 1 -14 0 C42 45 45 40 50 32Z" fill="#ffd166"/></g></svg>`;
+    if(id==='bench') return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<rect x="26" y="46" width="4" height="16" fill="#7a5534"/><rect x="70" y="46" width="4" height="16" fill="#7a5534"/>
+      <rect x="20" y="40" width="60" height="7" rx="2" fill="#b0845a"/><rect x="22" y="24" width="56" height="6" rx="2" fill="#9a7048"/><rect x="26" y="30" width="3" height="10" fill="#7a5534"/><rect x="71" y="30" width="3" height="10" fill="#7a5534"/>
+      <rect x="28" y="33" width="20" height="9" rx="4" fill="#f2a5c8"/><rect x="51" y="33" width="20" height="9" rx="4" fill="#a8d4ff"/>
+      <path d="M84 62 h10 l-1.6 -10 h-6.8z" fill="#c76a4a"/><circle cx="89" cy="47" r="4" fill="#ffe680"/><circle cx="85" cy="50" r="3" fill="#5cb85c"/></svg>`;
+    if(id==='moon') return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<path d="M18 64 C16 44 30 26 50 24 C70 22 84 40 82 64Z" fill="#5f5a82"/><path d="M50 24 C66 22 80 36 82 64 H58 C60 48 58 34 50 24Z" fill="#76709e"/>
+      <g class="farm-crystal"><path d="M34 40 l5 -14 5 14 -5 6z" fill="#cbb8ff"/><path d="M58 36 l4 -12 4 12 -4 5z" fill="#e4d9ff"/><path d="M46 50 l3 -9 3 9 -3 4z" fill="#b39cff"/></g>
+      <circle cx="40" cy="30" r="14" fill="rgba(203,184,255,.18)"/></svg>`;
+    if(id==='rocks') return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<ellipse cx="34" cy="52" rx="20" ry="14" fill="#8f897f"/><ellipse cx="30" cy="47" rx="12" ry="7" fill="#a9a398"/>
+      <ellipse cx="64" cy="46" rx="22" ry="18" fill="#a29b90"/><ellipse cx="60" cy="38" rx="13" ry="8" fill="#bdb6aa"/><ellipse cx="84" cy="58" rx="10" ry="7" fill="#8f897f"/>
+      <path d="M48 58 q5 -4 10 0" stroke="#5cb85c" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M70 30 q4 -3 8 0" stroke="#6cc46a" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+    if(id==='flowers'){ let fl=''; const cols=['#ff9ec2','#ffe680','#fff','#cbb8ff','#ff8a7a'];
+      for(let i=0;i<22;i++){ const x=16+r()*68, y=40+r()*20, c=cols[i%cols.length]; fl+=`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><circle cx="0" cy="-2.4" r="2.2" fill="${c}"/><circle cx="2.3" cy="-.7" r="2.2" fill="${c}"/><circle cx="1.4" cy="2" r="2.2" fill="${c}"/><circle cx="-1.4" cy="2" r="2.2" fill="${c}"/><circle cx="-2.3" cy="-.7" r="2.2" fill="${c}"/><circle r="1.4" fill="#f7b733"/></g>`; }
+      return `<svg viewBox="0 0 100 72" aria-hidden="true">${sh}<ellipse cx="50" cy="54" rx="42" ry="14" fill="#7a5a3c"/><ellipse cx="50" cy="51" rx="40" ry="12" fill="#4a944a"/>${fl}</svg>`; }
+    // empty spot: stone ring + sign
+    return `<svg viewBox="0 0 100 72" aria-hidden="true"><ellipse cx="50" cy="52" rx="40" ry="14" fill="rgba(255,255,255,.1)" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-dasharray="5 6"/>
+      <rect x="47.5" y="24" width="5" height="30" rx="1.5" fill="#a77b52"/><rect x="32" y="12" width="36" height="17" rx="4" fill="#c99a6a"/><rect x="32" y="12" width="36" height="17" rx="4" fill="none" stroke="#9a7048" stroke-width="1.5"/>
+      <path d="M50 15.5v10M45 20.5h10" stroke="#5a3d22" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+  }
+};
+const FARM_TYPE_COL = {normal:'#cfc6b2',fire:'#ff8a4c',water:'#5aa9ff',grass:'#6fd38a',electric:'#ffd84d',ice:'#9fe3f0',fighting:'#d9694f',poison:'#b46ad8',ground:'#d8b26a',flying:'#a9b8ff',psychic:'#ff7aa8',bug:'#a8c94a',rock:'#c2ae78',ghost:'#8a7bc4',dragon:'#7a6cff',dark:'#8f7f6f',steel:'#a8b8c8',fairy:'#f2a5d3'};
+function farmPortrait(id,size){ const shiny=!!(APP.caughtPoke||{})[String(id)]?.shiny, c=FARM_TYPE_COL[farmType(id)]||'#cfc6b2';
+  return `<span class="farm-port" style="width:${size}px;height:${size}px;background:radial-gradient(circle at 50% 70%, ${c}55, ${c}1a 70%)"><img src="${homeArt(id,shiny)}" alt="" loading="lazy"></span>`; }
+function farmHabitatArt(h){ return `<span class="farm-art">${FARM_ART.habitat(h.id)}</span>`; }
+
+const FARM_LAYOUT = {
+  spots:[{l:3,t:35},{l:34,t:35},{l:3,t:62},{l:34,t:62}],
+  bushes:[{l:67,t:43},{l:82,t:45},{l:69,t:57},{l:84,t:59}],
+  trees:[{l:-6,t:80,w:22},{l:90,t:72,w:17},{l:20,t:14,w:11}]
+};
 function renderFarmRanch(){
   const f=farmState(), scene=document.getElementById('farmScene'); if(!scene) return;
-  scene.className='farm-scene '+farmTimeOfDay();
+  const tod=farmTimeOfDay(); scene.className='farm-scene tod-'+tod;
   const now=Date.now();
   const letterWaiting=!!farmJobMon('letter') && f.letterRead!==TODAY();
-  const ready=f.plots.filter(t=>t<=now).length;
-  let h=`<div class="farm-fence"></div>
-    <button type="button" class="farm-thing farm-mailbox${letterWaiting?' has':''}" onclick="openFarmLetter()" aria-label="Mailbox"><div class="mb-post"></div><div class="mb-box"></div><div class="mb-flag"></div>${letterWaiting?'<span class="farm-tag hot">1 letter</span>':''}</button>
-    <button type="button" class="farm-thing farm-barn" onclick="openFarmBarn()" aria-label="Barn"><div class="bn-roof"></div><div class="bn-wall"></div><div class="bn-door"></div><span class="farm-tag">Barn · ${Math.max(0,Object.keys(f.mons).length-f.out.length)} resting</span></button>`;
-  FARM_SPOTS.forEach((p,i)=>{
+  const z=t=>Math.round(t);
+  let h=farmBgSVG(tod)+`<div class="farm-fence"></div>`;
+  FARM_LAYOUT.trees.forEach(t=>{ h+=`<div class="farm-decor farm-art" style="left:${t.l}%;top:${t.t}%;width:${t.w}%;z-index:${z(t.t+12)}">${FARM_ART.tree}</div>`; });
+  h+=`<button type="button" class="farm-thing farm-barn" style="z-index:${z(30)}" onclick="openFarmBarn()" aria-label="Barn: ${Math.max(0,Object.keys(f.mons).length-f.out.length)} resting"><span class="farm-art">${FARM_ART.barn}</span></button>`;
+  h+=`<button type="button" class="farm-thing farm-mailbox${letterWaiting?' has':''}" style="z-index:${z(32)}" onclick="openFarmLetter()" aria-label="${letterWaiting?'Mailbox: 1 letter':'Mailbox'}"><span class="farm-art">${FARM_ART.mailbox}</span>${letterWaiting?`<span class="farm-mail-bubble">${farmIc('mail')}</span>`:''}</button>`;
+  FARM_LAYOUT.spots.forEach((p,i)=>{
     const s=f.spots[i];
-    if(!s){ h+=`<button type="button" class="farm-thing farm-spot empty" style="left:${p.l}%;top:${p.t}%" onclick="setFarmView('habitats')">${farmIc('plus')}<span>Build</span></button>`; return; }
-    const hb=FARM_HABITATS.find(x=>x.id===s);
-    const vis=f.visitor&&f.visitor.spot===i?`<span class="farm-visitor">?</span>`:'';
-    h+=`<button type="button" class="farm-thing farm-spot" style="left:${p.l}%;top:${p.t}%" onclick="${vis?'meetFarmVisitor()':`setFarmView('habitats')`}" aria-label="${esc(hb.name)}">${farmHabitatArt(hb)}<span class="farm-tag">${esc(hb.name)}</span>${vis}</button>`;
+    if(!s){ h+=`<button type="button" class="farm-thing farm-spot" style="left:${p.l}%;top:${p.t}%;z-index:${z(p.t+10)}" onclick="setFarmView('habitats')" aria-label="Empty spot: build a habitat">${FARM_ART.habitat('empty')}</button>`; return; }
+    const hb=FARM_HABITATS.find(x=>x.id===s), vis=f.visitor&&f.visitor.spot===i;
+    h+=`<button type="button" class="farm-thing farm-spot" style="left:${p.l}%;top:${p.t}%;z-index:${z(p.t+10)}" onclick="${vis?'meetFarmVisitor()':`openFarmSpot(${i})`}" aria-label="${esc(hb.name)}${vis?': a visitor is here':''}">${farmHabitatArt(hb)}${vis?'<span class="farm-visitor">?</span>':''}</button>`;
   });
-  h+=`<div class="farm-patch-tag"><span class="farm-tag">Berry patch${ready?` · ${ready} ready`:''}</span></div><div class="farm-thing farm-patch">${f.plots.map((t,i)=>{
-      const left=t-now, st=left<=0?'ready':left<FARM_PLOT_HOURS*3600e3/2?'grow':'seed';
-      return `<button type="button" class="farm-plot ${st}" onclick="harvestFarmPlot(${i})" aria-label="${st==='ready'?'Pick berries':'Growing'}"><i></i></button>`; }).join('')}</div>`;
+  f.plots.forEach((t,i)=>{ const p=FARM_LAYOUT.bushes[i]; if(!p) return;
+    const left=t-now, st=left<=0?'ready':left<FARM_PLOT_HOURS*3600e3/2?'grow':'seed';
+    h+=`<button type="button" class="farm-thing farm-bush ${st}" style="left:${p.l}%;top:${p.t}%;z-index:${z(p.t+8)}" onclick="harvestFarmPlot(${i})" aria-label="${st==='ready'?'Pick berries':'Berry bush, still growing'}"><span class="farm-art">${FARM_ART.bush(st)}</span></button>`; });
   const giftN=(f.gifts||[]).reduce((a,g)=>a+g.n,0);
-  if(giftN) h+=`<button type="button" class="farm-thing farm-gifts" onclick="collectFarmGifts()" aria-label="Collect ${giftN} gift berries">${farmIc('gift')}</button>`;
+  if(giftN) h+=`<button type="button" class="farm-thing farm-gifts" style="left:55%;top:28%;z-index:40" onclick="collectFarmGifts()" aria-label="Open ${giftN} gift berries"><span class="farm-art">${FARM_ART.gift}</span></button>`;
   f.out.forEach((id,i)=>{
-    const m=farmDay(farmMon(id)), shiny=!!(APP.caughtPoke||{})[String(id)]?.shiny;
-    const job=farmJobOf(id);
-    const badge=m.pets?'':`<span class="fm-badge">♥?</span>`;
-    const pos=farmMonPos[id]||farmRandomPos(i);
-    farmMonPos[id]=pos;
-    h+=`<button type="button" class="farm-mon${pos.flip?' flip':''}" id="farmMon${id}" style="left:${pos.x}%;top:${pos.y}%" onclick="openFarmMon(${id})" aria-label="${esc(pokeLabel(id))}">
-      <img src="${homeArt(id,shiny)}" alt="" loading="lazy" draggable="false">${job?`<span class="fm-badge job">${farmIc(FARM_JOBS.find(j=>j.id===job).ic)}</span>`:badge}<span class="fm-name" id="farmNm${id}">${esc(pokeLabel(id))}</span></button>`;
+    const m=farmDay(farmMon(id)), shiny=!!(APP.caughtPoke||{})[String(id)]?.shiny, job=farmJobOf(id), J=job&&FARM_JOBS.find(j=>j.id===job);
+    const pos=farmMonPos[id]||farmRandomPos(i); farmMonPos[id]=pos;
+    const badge=!m.pets?`<span class="fm-badge want">${farmIc('heart')}</span>`:J?`<span class="fm-badge job" style="background:${J.col}">${farmIc(J.ic)}</span>`:'';
+    h+=`<button type="button" class="farm-mon${pos.flip?' flip':''}" id="farmMon${id}" style="left:${pos.x}%;top:${pos.y}%;z-index:${z(pos.y+10)}" onclick="openFarmMon(${id})" aria-label="${esc(pokeLabel(id))}">
+      <span class="fm-shadow"></span><img src="${homeArt(id,shiny)}" alt="" loading="lazy" draggable="false">${badge}<span class="fm-name" id="farmNm${id}">${esc(pokeLabel(id))}</span></button>`;
   });
+  if(tod==='night') for(let i=0;i<7;i++) h+=`<span class="farm-firefly" style="left:${8+i*13}%;top:${42+((i*37)%46)}%;animation-delay:${(i*.9).toFixed(1)}s"></span>`;
+  const ready=f.plots.filter(t=>t<=now).length;
+  h+=`<div class="farm-scene-hud">${ready?`<span class="farm-hud-chip">${farmIc('berry','#ff7a9c')}${ready} bush${ready>1?'es':''} ready</span>`:''}${f.visitor?`<span class="farm-hud-chip">${farmIc('star','#ffe27a')}Visitor</span>`:''}</div>`;
   scene.innerHTML=h;
   f.out.forEach(id=>{ if(!POKE_NAMES[id]) fillName(id,'farmNm'+id); });
-  document.querySelectorAll('.farm-mon .fm-badge.job .farm-ic').forEach(s=>{ s.style.width='12px'; s.style.height='12px'; });
-  // actions
+  // actions under the scene
   const unpet=f.out.filter(id=>!farmDay(farmMon(id)).pets).length;
   document.getElementById('farmActions').innerHTML=`
-    <button type="button" class="farm-btn primary" onclick="petAllFarm()" ${unpet?'':'disabled'}>${farmIc('hand')}${unpet?`Pet all`:'Petted'}</button>
-    <button type="button" class="farm-btn" onclick="setFarmView('jobs')">${farmIc('star')}Jobs</button>
+    <button type="button" class="farm-btn primary" onclick="petAllFarm()" ${unpet?'':'disabled'}>${farmIc('hand')}${unpet?'Pet everyone':'Everyone’s happy'}</button>
     <button type="button" class="farm-btn" onclick="openFarmBarn()">${farmIc('box')}Barn</button>`;
-  // news
-  document.getElementById('farmNews').innerHTML = f.news.length ? `<div class="farm-card-hd"><div class="farm-card-t">While you were away</div><button type="button" class="farm-btn sm" onclick="clearFarmNews()">Got it</button></div>${f.news.map(n=>`<div class="farm-line"><div class="fl-ic" style="background:${n.col}22;color:${n.col}">${farmIc(n.ic)}</div><div class="fl-t">${esc(n.t)}</div></div>`).join('')}`
-    : `<div class="farm-card-hd"><div class="farm-card-t">All caught up</div></div><div class="farm-empty">Finish quests to earn berries (S-rank +3, B-rank +1). Tap a Pokémon to pet or feed it.</div>`;
+  document.getElementById('farmNews').innerHTML = f.news.length
+    ? `<div class="farm-card-hd"><div class="farm-card-t">While you were away</div><button type="button" class="farm-btn sm ghost" onclick="clearFarmNews()">Got it</button></div>${f.news.map(n=>`<div class="farm-line"><div class="fl-ic" style="background:${n.col}22;color:${n.col}">${farmIc(n.ic)}</div><div class="fl-t">${esc(n.t)}</div></div>`).join('')}`
+    : `<div class="farm-card-hd"><div class="farm-card-t">Today on the farm</div></div><div class="farm-empty">Finish quests to earn berries: S-rank gives 3, B-rank gives 1. Tap a Pokémon to pet or feed it.</div>`;
   renderFarmJobs(document.getElementById('farmJobMini'),true);
   farmStartWander();
 }
 let farmMonPos={};
-function farmRandomPos(i){ return {x:12+Math.random()*76, y:30+Math.random()*60, flip:Math.random()<.5}; }
+function farmRandomPos(i){ return {x:12+Math.random()*76, y:44+Math.random()*50, flip:Math.random()<.5}; }
 let farmWanderTimer=null;
 function farmStartWander(){
   if(farmWanderTimer) return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   farmWanderTimer=setInterval(()=>{
     const pane=document.getElementById('mobTabFarm');
     if(!pane||!pane.classList.contains('active')||farmView!=='ranch'||document.hidden){ clearInterval(farmWanderTimer); farmWanderTimer=null; return; }
     farmState().out.forEach(id=>{
-      if(Math.random()<0.45) return;
+      if(Math.random()<0.5) return;
       const el=document.getElementById('farmMon'+id), p=farmMonPos[id]; if(!el||!p) return;
-      const nx=Math.max(10,Math.min(90,p.x+(Math.random()-.5)*30)), ny=Math.max(28,Math.min(94,p.y+(Math.random()-.5)*24));
+      const nx=Math.max(10,Math.min(90,p.x+(Math.random()-.5)*28)), ny=Math.max(44,Math.min(95,p.y+(Math.random()-.5)*20));
       p.flip=nx>p.x; p.x=nx; p.y=ny;
-      el.classList.toggle('flip',p.flip); el.style.left=nx+'%'; el.style.top=ny+'%';
+      el.classList.toggle('flip',p.flip); el.style.left=nx+'%'; el.style.top=ny+'%'; el.style.zIndex=Math.round(ny+10);
     });
-  },3200);
+  },3400);
 }
+
 function clearFarmNews(){ farmState().news=[]; farmSave(); renderFarm(); }
 
 // ── care ──
@@ -5569,7 +5680,7 @@ function openFarmMon(id){
   const pts=m.pts||0, toNext=farmHearts(id)>=5?'Max hearts':`${20-pts%20} to the next ♥`;
   farmSheet('farmMonOv',`
     <div class="sh-hd"><div class="ed-hd-txt"></div><button type="button" class="as-x" onclick="document.getElementById('farmMonOv').remove()" aria-label="Close">✕</button></div>
-    <div class="farm-sheet-mon"><img src="${homeArt(id,shiny)}" alt=""><div><div class="farm-sheet-nm"><span id="farmSheetNm">${esc(pokeLabel(id))}</span>${shiny?' <span style="color:#ffe27a">✦</span>':''}</div>
+    <div class="farm-sheet-mon"><div class="farm-stage" style="--tc:${FARM_TYPE_COL[farmType(id)]||'#cfc6b2'}"><img src="${homeArt(id,shiny)}" alt=""></div><div><div class="farm-sheet-nm"><span id="farmSheetNm">${esc(pokeLabel(id))}</span>${shiny?' <span style="color:#ffe27a">✦</span>':''}</div>
       <div class="farm-sheet-sub">${farmType(id).replace(/^./,c=>c.toUpperCase())} type · ${toNext}</div>${farmHeartsHTML(id)}</div></div>
     <div class="farm-lbl">Today</div>
     <div class="farm-line"><div class="fl-ic" style="background:#ff9ec222;color:#ff9ec2">${farmIc('hand')}</div><div class="fl-t">${m.pets?'Petted today':'Wants a pet (+♥)'}</div></div>
@@ -5590,7 +5701,7 @@ function openFarmBarn(){
   farmSheet('farmBarnOv',`
     <div class="sh-hd"><div class="ed-hd-txt"><div class="ed-name">Barn</div><div class="ed-status">${f.out.length}/${FARM_MAX_OUT} out on the ranch · sorted for you</div></div><button type="button" class="as-x" onclick="document.getElementById('farmBarnOv').remove()" aria-label="Close">✕</button></div>
     <div class="farm-pick">${ids.length?ids.map(id=>{ const on=f.out.includes(id), job=farmJobOf(id);
-      return `<button type="button" class="farm-pick-row" onclick="toggleFarmOut(${id})"><img src="${homeArt(id,!!(APP.caughtPoke||{})[String(id)]?.shiny)}" alt="" loading="lazy">
+      return `<button type="button" class="farm-pick-row" onclick="toggleFarmOut(${id})">${farmPortrait(id,44)}
         <div><div class="pr-t" id="farmBarnNm${id}">${esc(pokeLabel(id))}</div><div class="pr-s">${'♥'.repeat(farmHearts(id))||'No hearts yet'}${job?' · '+FARM_JOBS.find(j=>j.id===job).name:''}</div></div>
         <div class="pr-r"><span class="pr-s">${on?'Out':'Resting'}</span><span class="farm-toggle${on?' on':''}"></span></div></button>`; }).join('')
       :'<div class="farm-empty">No Pokémon yet. Finish quests to meet some!</div>'}</div>`,true);
@@ -5637,7 +5748,7 @@ function farmNextEvent(){
 function farmTreeSVG(pct){
   const st=pct>=100?4:pct>=50?3:pct>=25?2:pct>=5?1:0;
   const trunk=['','<path d="M27 50V40" stroke="#8a6a48" stroke-width="3"/>','<path d="M27 50V34" stroke="#8a6a48" stroke-width="4"/>','<path d="M27 50V30" stroke="#8a6a48" stroke-width="5"/>','<path d="M27 50V28" stroke="#8a6a48" stroke-width="5"/>'][st];
-  const top=['<circle cx="27" cy="46" r="4" fill="#a4835f"/>','<path d="M27 40c0-6-5-8-9-8 0 5 4 8 9 8zM27 38c0-5 4-8 9-8 0 5-4 8-9 8z" fill="#7fd36a"/>','<circle cx="27" cy="28" r="10" fill="#6fd38a"/>','<circle cx="27" cy="22" r="15" fill="#5cc27a"/>','<circle cx="27" cy="20" r="17" fill="#5cc27a"/><circle cx="20" cy="18" r="3" fill="#ff5a7a"/><circle cx="33" cy="15" r="3" fill="#ff5a7a"/><circle cx="31" cy="27" r="3" fill="#ff5a7a"/>'][st];
+  const top=['<ellipse cx="27" cy="49" rx="10" ry="3.5" fill="#7a5a3c"/><path d="M27 48v-9" stroke="#4fa556" stroke-width="2.4" stroke-linecap="round"/><path d="M27 41c0-5-4-7-8-6 1 4 4 6 8 6zM27 40c0-5 4-7 8-6-1 4-4 6-8 6z" fill="#6fd38a"/>','<path d="M27 40c0-6-5-8-9-8 0 5 4 8 9 8zM27 38c0-5 4-8 9-8 0 5-4 8-9 8z" fill="#7fd36a"/>','<circle cx="27" cy="28" r="10" fill="#6fd38a"/>','<circle cx="27" cy="22" r="15" fill="#5cc27a"/>','<circle cx="27" cy="20" r="17" fill="#5cc27a"/><circle cx="20" cy="18" r="3" fill="#ff5a7a"/><circle cx="33" cy="15" r="3" fill="#ff5a7a"/><circle cx="31" cy="27" r="3" fill="#ff5a7a"/>'][st];
   return `<svg class="farm-tree-art" viewBox="0 0 54 54" aria-hidden="true"><ellipse cx="27" cy="51" rx="16" ry="3" fill="rgba(0,0,0,.25)"/>${trunk}${top}</svg>`;
 }
 let farmWikiPick=null;
@@ -5646,7 +5757,7 @@ function renderFarmJobs(el,mini){
   const f=farmState();
   el.innerHTML=FARM_JOBS.map(J=>{
     const id=farmJobMon(J.id);
-    const monBtn=id?`<button type="button" class="farm-job-mon" onclick="openFarmJobPicker('${J.id}')"><img src="${homeArt(id,!!(APP.caughtPoke||{})[String(id)]?.shiny)}" alt=""><span class="jm-nm-${id}">${esc(pokeLabel(id))}</span></button>`
+    const monBtn=id?`<button type="button" class="farm-job-mon" onclick="openFarmJobPicker('${J.id}')">${farmPortrait(id,34)}<span class="jm-nm-${id}">${esc(pokeLabel(id))}</span></button>`
                    :`<button type="button" class="farm-job-mon none" onclick="openFarmJobPicker('${J.id}')">Assign</button>`;
     let body='', act='';
     if(!id) body=`<div class="farm-job-body" style="color:var(--fg-dim)">${J.desc}<br><span style="font-size:12px">Best: ${J.fitTxt}</span></div>`;
@@ -5672,7 +5783,7 @@ function openFarmJobPicker(job){
     <div class="farm-empty" style="margin-bottom:10px">${J.desc}</div>
     <div class="farm-pick">${cur?`<button type="button" class="farm-pick-row" onclick="assignFarmJob('${job}',null)"><div style="width:44px;text-align:center">✕</div><div><div class="pr-t">Give ${esc(pokeLabel(cur))} the day off</div><div class="pr-s">Frees up this job</div></div></button>`:''}
     ${ids.map(id=>{ const ok=farmHearts(id)>=1, other=farmJobOf(id);
-      return `<button type="button" class="farm-pick-row" onclick="assignFarmJob('${job}',${id})" ${ok&&id!==cur?'':'disabled'}><img src="${homeArt(id,!!(APP.caughtPoke||{})[String(id)]?.shiny)}" alt="" loading="lazy">
+      return `<button type="button" class="farm-pick-row" onclick="assignFarmJob('${job}',${id})" ${ok&&id!==cur?'':'disabled'}>${farmPortrait(id,44)}
         <div><div class="pr-t" id="farmPickNm${id}">${esc(pokeLabel(id))}</div><div class="pr-s">${id===cur?'On this job':ok?('♥'.repeat(farmHearts(id))+(other?` · now: ${FARM_JOBS.find(j=>j.id===other).name}`:'')):'Needs 1 ♥ first'}</div></div>
         <div class="pr-r">${farmFits(job,id)?'<span class="farm-fit">Great fit</span>':''}</div></button>`; }).join('')}</div>`,true);
   ids.forEach(id=>{ if(!POKE_NAMES[id]) fillName(id,'farmPickNm'+id); if(!FARM_TYPES[id]) farmLoadType(id).then(()=>{}); });
@@ -5739,14 +5850,14 @@ setInterval(()=>{
 function renderFarmHabitats(){
   const f=farmState(), wrap=document.getElementById('farmHabitats'); if(!wrap) return;
   const spots=f.spots.map((s,i)=>{
-    if(!s) return `<button type="button" class="farm-hcard empty" onclick="document.getElementById('farmBuildList').scrollIntoView({behavior:'smooth',block:'nearest'})">${farmIc('plus')} Empty spot</button>`;
+    if(!s) return `<button type="button" class="farm-hcard" onclick="document.getElementById('farmBuildList').scrollIntoView({behavior:'smooth',block:'nearest'})"><div class="hc-art" style="background:rgba(223,238,255,.06)">${FARM_ART.habitat('empty')}</div><div class="hc-txt"><div class="hc-t">Empty spot</div><div class="hc-s">Build something below</div></div></button>`;
     const h=FARM_HABITATS.find(x=>x.id===s), vis=f.visitor&&f.visitor.spot===i;
-    return `<button type="button" class="farm-hcard" style="background:${h.col}" onclick="${vis?'meetFarmVisitor()':`openFarmSpot(${i})`}"><div class="hc-t">${esc(h.name)}</div><div class="hc-s">${vis?'Someone’s here! Tap to meet':`Attracts ${h.types}`}</div>${vis?'<span class="farm-visitor">?</span>':''}</button>`;
+    return `<button type="button" class="farm-hcard" onclick="${vis?'meetFarmVisitor()':`openFarmSpot(${i})`}"><div class="hc-art">${FARM_ART.habitat(h.id)}</div><div class="hc-txt"><div class="hc-t">${esc(h.name)}</div><div class="hc-s">${vis?'Someone’s here! Tap to meet':`Attracts ${esc(h.types)}`}</div></div>${vis?'<span class="farm-visitor">?</span>':''}</button>`;
   }).join('');
   const free=f.spots.indexOf(null);
-  const build=FARM_HABITATS.map(h=>`<button type="button" class="farm-bitem" onclick="buildFarmHabitat('${h.id}')" ${free<0||f.berries<h.cost?'disabled':''}><span class="bi-sw" style="background:${h.col}"></span><span><span class="bi-t">${esc(h.name)}</span><br><span class="bi-s">${h.cost} berries · ${esc(h.types)}</span></span></button>`).join('');
+  const build=FARM_HABITATS.map(h=>`<button type="button" class="farm-bitem" onclick="buildFarmHabitat('${h.id}')" ${free<0||f.berries<h.cost?'disabled':''}><span class="bi-sw farm-bi-art">${FARM_ART.habitat(h.id)}</span><span><span class="bi-t">${esc(h.name)}</span><br><span class="bi-s">${h.cost} berries · ${esc(h.types)}</span></span></button>`).join('');
   const book=FARM_HABITATS.map(h=>{ const met=(f.book[h.id]||[]); const built=f.spots.includes(h.id);
-    return `<div class="farm-book-row"><span class="bi-sw" style="background:${built||met.length?h.col:'#24364d'}"></span><div><div class="bk-t" style="${built||met.length?'':'color:var(--fg-dim)'}">${esc(h.name)}</div><div class="bk-s">${met.length?`Met: ${met.map(id=>esc(pokeLabel(id))).join(', ')}`:built?'Built — waiting for a visitor':'Not built yet'}</div></div></div>`; }).join('');
+    return `<div class="farm-book-row"><span class="bi-sw farm-bi-art${built||met.length?'':' locked'}">${FARM_ART.habitat(h.id)}</span><div><div class="bk-t" style="${built||met.length?'':'color:var(--fg-dim)'}">${esc(h.name)}</div><div class="bk-s">${met.length?`Met: ${met.map(id=>esc(pokeLabel(id))).join(', ')}`:built?'Built — waiting for a visitor':'Not built yet'}</div></div></div>`; }).join('');
   const v=f.visitor;
   wrap.innerHTML=`
     ${v?`<div class="farm-card"><div class="farm-line"><div class="fl-ic" style="background:#ffe27a22;color:#ffe27a">${farmIc('star')}</div><div class="fl-t">Someone’s visiting the ${esc(FARM_HABITATS.find(x=>x.id===f.spots[v.spot])?.name.toLowerCase()||'farm')}!<div class="fl-s">${farmCanMeet()?'You finished a quest today, so you can say hi.':'Finish one quest today to say hi.'}</div></div>${farmCanMeet()?`<button type="button" class="farm-btn sm primary" onclick="meetFarmVisitor()">Meet</button>`:''}</div></div>`:''}
@@ -5763,7 +5874,7 @@ function buildFarmHabitat(hid){
 }
 function openFarmSpot(i){
   const f=farmState(), h=FARM_HABITATS.find(x=>x.id===f.spots[i]);
-  farmSheet('farmSpotOv',`<div class="sh-hd"><span class="bi-sw" style="width:38px;height:38px;border-radius:12px;background:${h.col}"></span><div class="ed-hd-txt"><div class="ed-name">${esc(h.name)}</div><div class="ed-status">Attracts ${esc(h.types)}</div></div><button type="button" class="as-x" onclick="document.getElementById('farmSpotOv').remove()" aria-label="Close">✕</button></div>
+  farmSheet('farmSpotOv',`<div class="sh-hd"><span class="bi-sw farm-bi-art" style="width:64px;border-radius:12px;background:linear-gradient(#78c56c,#4f9a4d);padding:4px 4px 0">${FARM_ART.habitat(h.id)}</span><div class="ed-hd-txt"><div class="ed-name">${esc(h.name)}</div><div class="ed-status">Attracts ${esc(h.types)}</div></div><button type="button" class="as-x" onclick="document.getElementById('farmSpotOv').remove()" aria-label="Close">✕</button></div>
     <div class="farm-empty">Visitors show up on their own, about once every day or two. Clearing this spot gives back half its berries (${Math.floor(h.cost/2)}).</div>
     <div class="farm-actions" style="margin-top:14px"><button type="button" class="farm-btn" onclick="clearFarmSpot(${i})">Clear spot</button><button type="button" class="farm-btn primary" onclick="document.getElementById('farmSpotOv').remove()">Keep it</button></div>`);
 }
@@ -5873,7 +5984,12 @@ function meetFarmVisitor(){
   .mob-tab-pane.farm-pane > .farm-seg { width:auto; margin-left:max(0px, calc((100% - 1300px) / 2)); }
   .farm-ranch { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr); gap:20px; align-items:start; }
   .farm-scene { aspect-ratio: 4 / 3; }
-  .farm-mon { max-width:84px; width:11%; }
+  .farm-mon { max-width:88px; width:11%; }
+  .farm-barn { width:26%; left:68%; top:4%; }
+  .farm-mailbox { width:6.5%; }
+  .farm-spot { width:24%; }
+  .farm-bush { width:10%; }
+  .farm-gifts { width:6%; }
   .farm-jobmini { display:block; }
   .farm-jobs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:start; }
   .farm-hgrid { grid-template-columns:repeat(4,minmax(0,1fr)); }
