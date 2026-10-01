@@ -933,3 +933,10 @@ Design research: Comprehensive Gamification Mechanics: Loss Aversion, Behavioral
 **Pages created:** [[2026-10-01-design-research-daily]]
 
 Design research: General Improvements: Active Grids, Retention Mechanics & Accessible Depth (3 findings)
+
+## [2026-10-01] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[calendar-events]]
+
+Calendar events synced
