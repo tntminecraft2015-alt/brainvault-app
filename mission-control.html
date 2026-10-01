@@ -1476,6 +1476,16 @@
           <span class="home-mini-s">Calendar, tasks, budget &amp; wiki</span>
         </button>
       </div>
+
+      <!-- Laptop-only mini game (hidden on phones via .desk-game) -->
+      <div class="home-card desk-game" id="deskGame">
+        <div class="home-card-hd">
+          <span class="home-card-t">Quest Runner</span>
+          <span class="home-count" id="dgBest">Best 0</span>
+          <span class="dg-help">Space / ↑ / click to jump · ↓ to duck</span>
+        </div>
+        <canvas id="dgCanvas" aria-label="Quest Runner mini game"></canvas>
+      </div>
     </div>
 
     <!-- CAL tab: Structured-style timeline (Day) is primary; Week agenda; Month = classic grid -->
@@ -5121,6 +5131,16 @@ setInterval(() => {
      Applies ONLY on wide screens with a mouse/trackpad (laptops, monitors).
      Phones never match this query, so the phone app is untouched. -->
 <style>
+
+/* Desktop scale steps (same laptop-only condition) */
+:root { --dz:1; }
+.desk-game { display:none; }
+@media (min-width:1024px) and (hover:hover) and (pointer:fine) { :root { --dz:1.05; } }
+@media (min-width:1280px) and (hover:hover) and (pointer:fine) { :root { --dz:1.15; } }
+@media (min-width:1536px) and (hover:hover) and (pointer:fine) { :root { --dz:1.25; } }
+@media (min-width:1800px) and (hover:hover) and (pointer:fine) { :root { --dz:1.35; } }
+/* Short laptop screens: scale less so Home still fits without scrolling */
+@media (min-width:1024px) and (max-height:900px) and (hover:hover) and (pointer:fine) { :root { --dz:1.05; } }
 @media (min-width:1024px) and (hover:hover) and (pointer:fine) {
   html, body { background:var(--bg); }
 
@@ -5181,9 +5201,178 @@ setInterval(() => {
   .overlay:not(.add-sheet-ov) > .modal, .add-sheet, .pdx-modal { border-radius:24px !important; max-width:600px !important; }
   .pdx-sheet { left:50%; right:auto; width:600px; transform:translateX(-50%); border-radius:24px 24px 0 0; }
 
+  /* Scale the whole UI up on big screens so it isn't tiny with acres of space */
+  body { zoom:var(--dz); height:calc(100vh / var(--dz)); }
+  .console { height:100%; }
+
+  /* Home: game card fills the bottom of the dashboard */
+  .home-pane > .desk-game { display:flex; grid-column:1 / -1; grid-row:5; min-height:0; }
+  .home-pane.active { grid-template-rows:auto auto auto auto minmax(190px,1fr); height:100%; }
+  .desk-game #dgCanvas { flex:1; height:auto; min-height:130px; }
+
   /* Hover affordances (no hover on phones) */
   .home-card:hover, .home-mini:hover { background:rgba(223,238,255,.065); }
 }
 </style>
+<!-- ══════════════ QUEST RUNNER (laptop-only mini game) ══════════════ -->
+<style>
+  .desk-game { flex-direction:column; gap:10px; }
+  .desk-game .home-card-hd { display:flex; align-items:center; gap:10px; }
+  .dg-help { margin-left:auto; font-size:12px; color:var(--fg-dim); font-weight:500; }
+  #dgCanvas { width:100%; height:210px; display:block; border-radius:16px; background:rgba(10,25,41,.55); cursor:pointer; }
+</style>
+<script>
+(function(){
+  const mq = matchMedia('(min-width:1024px) and (hover:hover) and (pointer:fine)');
+  const card = document.getElementById('deskGame'), cv = document.getElementById('dgCanvas');
+  if(!card || !cv) return;
+  const ctx = cv.getContext('2d');
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = { fg:css('--fg')||'#dfeeff', accent:css('--accent')||'#ff8a63', acc2:css('--accent2')||'#66c8ff',
+              green:css('--green')||'#7fffb0', red:css('--red')||'#ff8080', dim:'rgba(223,238,255,.18)' };
+  let best = 0; try { best = +localStorage.getItem('mcRunnerBest') || 0; } catch(e) {}
+  const bestEl = document.getElementById('dgBest'); bestEl.textContent = 'Best ' + best;
+
+  // logical world: 600 x 140, scaled to canvas
+  const W = 600, H = 140, GROUND = 118;
+  let S, state, raf = 0, last = 0;
+
+  // Original 10x8 pixel critter (two run frames + duck) — '1' body, '2' eye/accent
+  const SPR = {
+    run1:['..1111....','.111111...','11121111..','11111111.1','1111111111','.11111111.','..1....1..','.11....11.'],
+    run2:['..1111....','.111111...','11121111..','11111111.1','1111111111','.11111111.','..1...1...','..11..11..'],
+    duck:['..........','..........','..1111111.','.111211111','11111111111'.slice(0,10),'1111111111','.1......1.','11.....11.'],
+    jump:['..1111....','.111111...','11121111..','11111111.1','1111111111','.11111111.','.1......1.','..........']
+  };
+  function drawSprite(rows, x, y, px, color){
+    for(let r=0;r<rows.length;r++) for(let c=0;c<rows[r].length;c++){
+      const ch = rows[r][c]; if(ch==='.') continue;
+      ctx.fillStyle = ch==='2' ? '#0a1929' : color;
+      ctx.fillRect(Math.round((x+c*px)*S), Math.round((y+r*px)*S), Math.ceil(px*S), Math.ceil(px*S));
+    }
+  }
+  function reset(){
+    state = { mode:'idle', t:0, speed:210, score:0, coins:0,
+      p:{ y:0, vy:0, duck:false }, obs:[], coinsArr:[], spawn:0.9, coinT:2.2, flash:0, hills: Array.from({length:7},(_,i)=>({x:i*110+Math.random()*40, h:10+Math.random()*16})) };
+  }
+  function resize(){
+    const dpr = window.devicePixelRatio || 1;
+    const r = cv.getBoundingClientRect(), w = r.width, h = r.height; if(!w) return;   // real on-screen size (accounts for page zoom)
+    cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+    S = cv.height / H;            // scale by height; world width follows the canvas aspect
+  }
+  const worldW = () => cv.width / S;
+
+  function jump(){
+    if(state.mode==='idle' || state.mode==='over'){ reset(); state.mode='play'; return; }
+    if(state.p.y===0){ state.p.vy = 430; }
+  }
+  function spawnObs(){
+    const big = state.score > 400 && Math.random()<0.25;
+    if(state.score > 700 && Math.random()<0.22){
+      state.obs.push({ kind:'bird', x:worldW()+20, w:22, h:12, y: GROUND-34-Math.random()*22, f:0 });
+    } else {
+      const n = big ? 2 : 1;
+      state.obs.push({ kind:'block', x:worldW()+20, w:14*n+(n-1)*4, h: big?30:18+Math.random()*12, n });
+    }
+  }
+  function step(dt){
+    const s = state; s.t += dt;
+    s.hills.forEach(h=>{ h.x -= s.speed*0.15*dt; if(h.x < -120){ h.x += 7*110; h.h = 10+Math.random()*16; } });
+    if(s.mode!=='play') return;
+    s.speed = Math.min(520, 210 + s.t*9);
+    s.score += dt*s.speed*0.06;
+    // player physics
+    const p = s.p; p.vy -= 1500*dt; p.y = Math.max(0, p.y + p.vy*dt); if(p.y===0) p.vy = Math.max(0,p.vy);
+    // spawn
+    s.spawn -= dt; if(s.spawn<=0){ spawnObs(); s.spawn = 0.75 + Math.random()*0.9 - Math.min(0.35, s.t*0.006); }
+    s.coinT -= dt; if(s.coinT<=0){ s.coinsArr.push({ x:worldW()+20, y: GROUND-28-Math.random()*40 }); s.coinT = 1.6+Math.random()*2; }
+    s.obs.forEach(o=>{ o.x -= s.speed*dt; o.f += dt; }); s.obs = s.obs.filter(o=>o.x > -40);
+    s.coinsArr.forEach(c=>c.x -= s.speed*dt); s.coinsArr = s.coinsArr.filter(c=>c.x>-20 && !c.got);
+    // hitbox
+    const px=40, pw=30, ph = p.duck ? 18 : 24, py = GROUND - p.y - ph;
+    for(const o of s.obs){
+      const oy = o.kind==='bird' ? o.y : GROUND - o.h;
+      if(px+4 < o.x+o.w && px+pw-4 > o.x && py+4 < oy+o.h && py+ph > oy+2){ gameOver(); return; }
+    }
+    for(const c of s.coinsArr){
+      if(Math.abs((px+pw/2)-c.x) < 18 && Math.abs((py+ph/2)-c.y) < 18){ c.got=true; s.coins++; s.score += 25; s.flash = 0.25; }
+    }
+    s.flash = Math.max(0, s.flash-dt);
+  }
+  function gameOver(){
+    state.mode='over';
+    const sc = Math.floor(state.score);
+    if(sc > best){ best = sc; bestEl.textContent = 'Best ' + best; try{ localStorage.setItem('mcRunnerBest', best); }catch(e){} }
+  }
+  function draw(){
+    const s = state, ww = worldW();
+    ctx.clearRect(0,0,cv.width,cv.height);
+    // background hills
+    ctx.fillStyle = 'rgba(102,200,255,.07)';
+    s.hills.forEach(h=>{ ctx.beginPath(); ctx.ellipse(h.x*S, GROUND*S, 70*S, h.h*S*2, 0, Math.PI, 0); ctx.fill(); });
+    // ground
+    ctx.fillStyle = C.dim; ctx.fillRect(0, GROUND*S, cv.width, Math.max(1, 1.5*S));
+    for(let i=0;i<ww;i+=26){ const x = ((i - (s.t*s.speed)%26) + 26) % (ww+26); ctx.fillRect(x*S, (GROUND+7)*S, 6*S, 1.2*S); }
+    // coins
+    s.coinsArr.forEach(c=>{ ctx.fillStyle = '#ffd34d'; ctx.beginPath(); ctx.arc(c.x*S, c.y*S, 6*S, 0, 7); ctx.fill();
+      ctx.fillStyle='#0a1929'; ctx.font = `700 ${8*S}px Inter,sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('$', c.x*S, c.y*S+0.5*S); });
+    // obstacles: "deadline" blocks and flying bugs
+    s.obs.forEach(o=>{
+      if(o.kind==='block'){
+        for(let k=0;k<o.n;k++){ const bx = o.x + k*18;
+          ctx.fillStyle = C.red; ctx.fillRect(bx*S, (GROUND-o.h)*S, 14*S, o.h*S);
+          ctx.fillStyle = 'rgba(10,25,41,.45)'; ctx.fillRect((bx+3)*S, (GROUND-o.h+4)*S, 8*S, 2*S); }
+      } else {
+        ctx.fillStyle = C.acc2; const flap = Math.sin(o.f*18) > 0 ? -4 : 3;
+        ctx.fillRect(o.x*S, (o.y+4)*S, 22*S, 6*S);
+        ctx.fillRect((o.x+5)*S, (o.y+4+flap)*S, 8*S, 3*S);
+        ctx.fillStyle='#0a1929'; ctx.fillRect((o.x+2)*S, (o.y+5)*S, 2*S, 2*S);
+      }
+    });
+    // player
+    const p = s.p, px=40;
+    const fr = p.duck ? SPR.duck : p.y>0 ? SPR.jump : (Math.floor(s.t*12)%2 ? SPR.run1 : SPR.run2);
+    drawSprite(fr, px, GROUND - p.y - 24, 3, s.flash>0 ? '#ffd34d' : C.accent);
+    // HUD
+    ctx.textBaseline='top'; ctx.textAlign='right'; ctx.fillStyle = C.fg; ctx.font = `700 ${11*S}px Inter,sans-serif`;
+    ctx.fillText(String(Math.floor(s.score)).padStart(5,'0'), (ww-10)*S, 10*S);
+    if(s.coins){ ctx.fillStyle='#ffd34d'; ctx.font = `600 ${9*S}px Inter,sans-serif`; ctx.fillText('$'+s.coins, (ww-10)*S, 25*S); }
+    if(s.mode!=='play'){
+      ctx.textAlign='center'; ctx.fillStyle = C.fg; ctx.font = `700 ${13*S}px Inter,sans-serif`;
+      ctx.fillText(s.mode==='over' ? 'Quest failed — press Space to retry' : 'Press Space or click to start', ww/2*S, 46*S);
+      ctx.fillStyle = 'rgba(223,238,255,.45)'; ctx.font = `500 ${9*S}px Inter,sans-serif`;
+      ctx.fillText('Jump the red deadlines · duck the bugs · grab the coins', ww/2*S, 66*S);
+    }
+  }
+  function visible(){
+    return mq.matches && card.offsetParent !== null && !document.hidden;
+  }
+  function loop(ts){
+    raf = 0;
+    if(!visible()){ last = 0; return; }          // stops itself when hidden / on phones
+    const dt = last ? Math.min(0.05, (ts-last)/1000) : 0; last = ts;
+    step(dt); draw(); raf = requestAnimationFrame(loop);
+  }
+  function kick(){ if(!raf && visible()){ resize(); last = 0; raf = requestAnimationFrame(loop); } }
+
+  function typing(){ const a = document.activeElement; return a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable); }
+  function overlayOpen(){ return !!document.querySelector('.overlay.active, .add-sheet-ov.active, .dex-modal-bg, .pdx-sheet-bg'); }
+  document.addEventListener('keydown', e=>{
+    if(!visible() || typing() || overlayOpen()) return;
+    if(e.code==='Space' || e.code==='ArrowUp'){ e.preventDefault(); jump(); kick(); }
+    else if(e.code==='ArrowDown' && state.mode==='play'){ e.preventDefault(); state.p.duck = true; if(state.p.y>0) state.p.vy -= 400; }
+  });
+  document.addEventListener('keyup', e=>{ if(e.code==='ArrowDown') state.p.duck = false; });
+  cv.addEventListener('pointerdown', e=>{ e.preventDefault(); jump(); kick(); });
+
+  reset();
+  window.addEventListener('resize', ()=>{ resize(); kick(); });
+  mq.addEventListener ? mq.addEventListener('change', kick) : mq.addListener(kick);
+  document.addEventListener('visibilitychange', kick);
+  new MutationObserver(kick).observe(document.getElementById('mobTabHome'), { attributes:true, attributeFilter:['class'] });
+  setTimeout(kick, 300);
+})();
+</script>
 </body>
 </html>
