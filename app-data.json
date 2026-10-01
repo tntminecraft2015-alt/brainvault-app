@@ -321,6 +321,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-01-design-research-daily",
+      "date": "2026-10-01",
+      "topic": "",
+      "title": "General Improvements: Active Grids, Retention Mechanics & Accessible Depth",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
       "date": "2026-09-30",
       "topic": "Comprehensive gamification in apps: mechanics, psychology, patterns, and real-world implementation across productivity, social, fitness, and educational apps",
@@ -489,7 +499,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-09-30",
+  "lastDesignResearchAutoRun": "2026-10-01",
   "changeRequests": [
     {
       "id": "2026-09-30-crossfade-card-swap-with-mockup-persiste",
@@ -1796,6 +1806,57 @@
       "updatedDate": "2026-09-30",
       "originResearchId": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
       "openTopic": true
+    },
+    "thread-1790865144089-0-active-bento-grid-interactive-tiles-over": {
+      "id": "thread-1790865144089-0-active-bento-grid-interactive-tiles-over",
+      "title": "Active Bento Grid: Interactive Tiles Over Static Cards",
+      "description": "In 2026, bento grids have evolved from static layouts into \"active grids\" where tiles are highly interactive—hovering over them expands them, plays video, or reveals secondary data layers. Mission Control's current quest/calendar/wallet cards are static; adding subtle expand-on-hover states (task details, event peek, breakdown sparkline) could deepen engagement without breaking the grid structure or adding new rows.",
+      "source_title": "Bento Grids & Beyond: 7 UI Trends Dominating Web Design 2026",
+      "source_url": "https://writerdock.in/blog/bento-grids-and-beyond-7-ui-trends-dominating-web-design-2026",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <div style=\"display:grid;grid-template-columns:1fr 1fr;gap:12px\">\n    <div style=\"background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer;position:relative;overflow:hidden\" onmouseover=\"this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(255,138,99,0.2)'\" onmouseout=\"this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'\">\n      <div style=\"font-size:11px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px\">TODAY'S QUESTS</div>\n      <div style=\"font-size:16px;font-weight:bold;color:#d3f0ff;margin-bottom:4px\">3/5 Complete</div>\n      <div style=\"font-size:10px;color:#8fd6ff;opacity:0.7\">S-Rank: Design mockup → +50 XP</div>\n    </div>\n    <div style=\"background:#12253c;border-radius:10px;padding:16px;transition:all 0.2s;box-shadow:inset 0 0 0 2px #1e3a5f;cursor:pointer\" onmouseover=\"this.style.transform='scale(1.02)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f, 0 4px 12px rgba(102,200,255,0.2)'\" onmouseout=\"this.style.transform='scale(1)';this.style.boxShadow='inset 0 0 0 2px #1e3a5f'\">\n      <div style=\"font-size:11px;color:#66c8ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px\">GIL WALLET</div>\n      <div style=\"font-size:16px;font-weight:bold;color:#7fffb0\">$1,247.50</div>\n      <div style=\"font-size:10px;color:#66c8ff;opacity:0.7\">Week: +$312 ↗</div>\n    </div>\n  </div>\n  <div style=\"margin-top:12px;font-size:9px;color:#8fd6ff;opacity:0.6\">hover tiles to expand →</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-01",
+      "updatedDate": "2026-10-01",
+      "originResearchId": "2026-10-01-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790865144090-1-streak-over-points-minimalist-chain-visu": {
+      "id": "thread-1790865144090-1-streak-over-points-minimalist-chain-visu",
+      "title": "Streak Over Points: Minimalist Chain Visualization for Retention",
+      "description": "Streaks (Apple's App of the Year 2021) uses a single-chain visualization as the most successful minimal gamification mechanic in habit tracking, producing strong retention among users who want simplicity. Mission Control's day-streak counter is already in place; emphasizing the unbroken chain visually (a growing counter with a single satisfying animation on mark) aligns better with user feedback patterns (past ratings show \"Not even close\" on complex gamification) than adding badges or levels.",
+      "source_title": "Gamification in Habit Tracking Apps: Examples and Results",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <div style=\"background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 2px #1e3a5f;text-align:center\">\n    <div style=\"font-size:10px;color:#8fd6ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px\">DAY STREAK</div>\n    <div style=\"display:flex;justify-content:center;gap:6px;margin-bottom:12px\">\n      <div style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\"></div>\n      <div style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\"></div>\n      <div style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:1\"></div>\n      <div style=\"width:24px;height:24px;background:#7fffb0;border-radius:6px;opacity:0.5\"></div>\n      <div style=\"width:24px;height:24px;background:#1e3a5f;border-radius:6px;opacity:0.3\"></div>\n    </div>\n    <div style=\"font-size:20px;font-weight:bold;color:#7fffb0;margin-bottom:4px\">12</div>\n    <div style=\"font-size:10px;color:#8fd6ff;opacity:0.7\">days in a row · mark today to continue</div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-01",
+      "updatedDate": "2026-10-01",
+      "originResearchId": "2026-10-01-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha": {
+      "id": "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha",
+      "title": "Neumorphic Depth as Affordance: Inset Shadows for Clarity Without Losing Retro Style",
+      "description": "Neumorphism uses inset and outset shadows to create depth: inset shadows make elements look pressed into the surface, with paired light and dark shadows adding subtle depth while staying minimal. Mission Control already has hard-shadow JRPG borders; swapping or layering in subtle inset shadows on interactive cards (quest rows, event blocks, input fields) can signal affordance—what can be clicked or toggled—without breaking the retro aesthetic. Pair with adequate contrast per WCAG to avoid the neumorphism trap.",
+      "source_title": "How to Master Neumorphism in UI Design (With Examples)",
+      "source_url": "https://clay.global/blog/neumorphism-ui",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <div style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;margin-bottom:8px;cursor:pointer;transition:all 0.15s\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center\">\n      <div style=\"display:flex;gap:8px;align-items:center\">\n        <div style=\"width:12px;height:12px;background:#ff8a63;border-radius:3px\"></div>\n        <div style=\"font-size:12px;color:#dfeeff\">Finish design research</div>\n      </div>\n      <div style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+50 XP</div>\n    </div>\n  </div>\n  <div style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;cursor:pointer;transition:all 0.15s;opacity:0.6\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center\">\n      <div style=\"display:flex;gap:8px;align-items:center\">\n        <div style=\"width:12px;height:12px;background:#4a90d9;border-radius:3px\"></div>\n        <div style=\"font-size:12px;color:#dfeeff\">Weekly schedule review</div>\n      </div>\n      <div style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+15 XP</div>\n    </div>\n  </div>\n  <div style=\"font-size:8px;color:#8fd6ff;opacity:0.5;margin-top:12px\">inset shadows signal depth & affordance</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-01",
+      "updatedDate": "2026-10-01",
+      "originResearchId": "2026-10-01-design-research-daily",
+      "openTopic": false
     }
   },
   "designArchive": [
