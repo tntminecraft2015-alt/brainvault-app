@@ -5117,5 +5117,73 @@ setInterval(() => {
   }
 }, 30000);
 </script>
+<!-- ══════════════ DESKTOP / LAPTOP LAYOUT ══════════════
+     Applies ONLY on wide screens with a mouse/trackpad (laptops, monitors).
+     Phones never match this query, so the phone app is untouched. -->
+<style>
+@media (min-width:1024px) and (hover:hover) and (pointer:fine) {
+  html, body { background:var(--bg); }
+
+  /* Shell: left sidebar nav + full-width content instead of a 430px phone column */
+  .console {
+    max-width:none; width:100%; height:100vh; margin:0;
+    display:grid; grid-template-columns:220px minmax(0,1fr); grid-template-rows:minmax(0,1fr);
+    padding-bottom:0;
+  }
+  .mob-tab-content { grid-column:2; grid-row:1; min-height:0; }
+
+  /* Sidebar nav */
+  .mob-nav {
+    grid-column:1; grid-row:1;
+    flex-direction:column; justify-content:flex-start;
+    margin:16px 0 16px 16px !important; padding:12px !important; gap:6px !important;
+    border-radius:24px !important;
+  }
+  .mob-nav-btn {
+    flex:0 0 auto; flex-direction:row !important; justify-content:flex-start;
+    gap:14px !important; padding:12px 16px !important; min-height:52px;
+    font-size:15px !important; border-radius:16px !important;
+  }
+  .mob-nav-btn:hover:not(.active) { background:rgba(223,238,255,.05) !important; color:var(--fg) !important; }
+  .mob-nav-btn .nav-svg { width:22px; height:22px; }
+
+  /* Panes: roomier padding, content centred at a readable width */
+  .mob-tab-pane { padding:32px 48px 24px; }
+  .mob-tab-pane::-webkit-scrollbar { width:8px; }
+  .mob-tab-pane::-webkit-scrollbar-thumb { background:rgba(223,238,255,.12); border-radius:4px; }
+  .mob-tab-pane > *:not(.cal-fab):not(.mob-wiki-drawer) { width:100%; max-width:1100px; margin-left:auto; margin-right:auto; }
+  .cal-fab { margin-right:max(0px, calc((100% - 1100px) / 2)); }
+  .ed-pane > *:not(.mob-wiki-drawer) { max-width:900px; }
+  /* Wiki opens as a side panel instead of covering the whole screen */
+  .mob-wiki-drawer {
+    left:auto; width:min(560px, 100%); padding:24px 24px 16px;
+    background:var(--surface); box-shadow:-16px 0 48px rgba(0,0,0,.45);
+    visibility:hidden; transition:transform .22s ease, visibility 0s linear .22s;
+  }
+  .mob-wiki-drawer.open { visibility:visible; transition:transform .22s ease; }
+
+  /* Home: two-column dashboard */
+  .home-pane.active {
+    display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+    align-content:start; gap:20px; max-width:none;
+  }
+  .home-pane > * { max-width:none; margin:0; }
+  .home-pane { padding-left:max(48px, calc((100% - 1400px) / 2)); padding-right:max(48px, calc((100% - 1400px) / 2)); }
+  .home-pane > :nth-child(1) { grid-column:1 / -1; }            /* header */
+  .home-pane > :nth-child(2) { grid-column:1; grid-row:2; }      /* buddy */
+  .home-pane > :nth-child(3) { grid-column:2; grid-row:2 / span 3; align-self:stretch; } /* today's quests */
+  .home-pane > :nth-child(4) { grid-column:1; grid-row:3; }      /* wallet */
+  .home-pane > :nth-child(5) { grid-column:1; grid-row:4; }      /* pokédex + ED */
+  .home-day { font-size:34px; }
+
+  /* Pop-up sheets: centred dialogs instead of phone bottom-sheets */
+  .overlay:not(.add-sheet-ov), .add-sheet-ov { align-items:center !important; }
+  .overlay:not(.add-sheet-ov) > .modal, .add-sheet, .pdx-modal { border-radius:24px !important; max-width:600px !important; }
+  .pdx-sheet { left:50%; right:auto; width:600px; transform:translateX(-50%); border-radius:24px 24px 0 0; }
+
+  /* Hover affordances (no hover on phones) */
+  .home-card:hover, .home-mini:hover { background:rgba(223,238,255,.065); }
+}
+</style>
 </body>
 </html>
