@@ -102,6 +102,16 @@
         "kind": "routine",
         "notify": false,
         "notifyLeadMin": null
+      },
+      {
+        "id": 1790874404545,
+        "title": "Pay insurance",
+        "time": "09:00",
+        "location": "",
+        "kind": "errand",
+        "notify": false,
+        "notifyLeadMin": null,
+        "linkedTaskId": 1790874404082
       }
     ]
   },
@@ -114,6 +124,15 @@
       "date": "2026-10-01",
       "time": "14:00",
       "linkedEventId": 1790806801398
+    },
+    {
+      "id": 1790874404082,
+      "text": "Pay insurance",
+      "done": false,
+      "rank": "B",
+      "date": "2026-10-03",
+      "time": "09:00",
+      "linkedEventId": 1790874404545
     }
   ],
   "streakDays": [],
