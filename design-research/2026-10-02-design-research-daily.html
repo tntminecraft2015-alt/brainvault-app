@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Subtle Depth Enhancements, Light Gamification Protection &amp; Modern Grid Polish</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Subtle Depth Enhancements, Light Gamification Protection &amp; Modern Grid Polish</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Three research findings focused on deepening Mission Control's existing neumorphic identity without sacrificing usability, adding forgiving streak mechanics that protect against anxiety-driven abandonment, and refining the bento grid layout to maintain visual hierarchy on mobile while respecting content-first sizing principles.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>High-Contrast Neumorphic Depth: Inset Shadows for Clarity Without Blur Loss</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Mission Control already uses inset shadows effectively; this refines the pattern by increasing the shadow-to-background contrast ratio for better dark-mode legibility. Rather than relying on soft, diffused shadows that blur together on dark cyan, hardened inset edges (higher opacity, tighter blur-radius) create tactile affordance while keeping all elements readable at a glance. A secondary accent shadow inside primary insets adds a "pressed key" feel that matches the JRPG aesthetic and clarifies interactive vs. static cards.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://contra.com/p/PYkeMOc7-design-trends-2025-glassmorphism-neumorphism-and-styles-you-need-to-know" target="_blank" rel="noopener" style="color:#ff8a63;">Design Trends 2025: Glassmorphism, Neumorphism &amp; Styles You Need to Know</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh;display:flex;flex-direction:column;gap:20px&quot;&gt;&lt;style&gt;body{margin:0}.card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #8fd6ff, inset -2px -2px 6px rgba(255,255,255,0.08), inset 2px 2px 6px rgba(0,0,0,0.4);color:#dfeeff;font-size:14px}.card h3{margin:0 0 8px 0;color:#66c8ff;font-size:16px;font-family:'Press Start 2P',monospace;letter-spacing:1px}.stat-row{display:flex;justify-content:space-between;margin:6px 0;padding:6px 0;border-bottom:1px solid rgba(223,238,255,0.12)}.stat-row:last-child{border:none}.stat-val{font-weight:bold;color:#ff8a63}.interactive{cursor:pointer;transition:all 80ms ease}.interactive:active{box-shadow:inset 0 0 0 3px #1e3a5f, inset 0 0 0 5px #12253c, inset 0 0 0 7px #1e3a5f, inset -1px -1px 3px rgba(0,0,0,0.6), inset 1px 1px 3px rgba(255,255,255,0.04)}&lt;/style&gt;&lt;div class=&quot;card&quot;&gt;&lt;h3&gt;TODAY'S QUESTS&lt;/h3&gt;&lt;div class=&quot;stat-row&quot;&gt;&lt;span&gt;Morning Run&lt;/span&gt;&lt;span class=&quot;stat-val&quot;&gt;S&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;stat-row&quot;&gt;&lt;span&gt;Log Income&lt;/span&gt;&lt;span class=&quot;stat-val&quot;&gt;B&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;card interactive&quot;&gt;&lt;h3&gt;GIL WALLET&lt;/h3&gt;&lt;div class=&quot;stat-row&quot;&gt;&lt;span&gt;This Week&lt;/span&gt;&lt;span class=&quot;stat-val&quot;&gt;+$847&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;stat-row&quot;&gt;&lt;span&gt;Goal Progress&lt;/span&gt;&lt;span class=&quot;stat-val&quot;&gt;73%&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Forgiving Streak with Loss Mitigation: Skip Token + Partial Progress Visibility</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Streak anxiety occurs when users abandon apps after a single missed day rather than restart, because the mechanic that drove engagement becomes the reason for quitting once it snaps. Mission Control can retain streak motivation while blocking abandonment through a monthly "streak skip" token (one free miss per 30 days, displayed as a regenerating resource) and a faded visual chain that shows partial progress even after a break—showing "28 → 0" or "28 → 8" depending on recovery method chosen, not total erasure.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://habitdoom.com/blog/streak-anxiety-habit-trackers" target="_blank" rel="noopener" style="color:#ff8a63;">Streak Anxiety: Habit Trackers That Forgive (2026)</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh&quot;&gt;&lt;style&gt;body{margin:0}.streak-card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff}.streak-header{font-family:'Press Start 2P',monospace;color:#66c8ff;font-size:14px;margin:0 0 12px 0}.chain-display{display:flex;gap:8px;margin:12px 0;align-items:center}.chain-link{width:28px;height:28px;border-radius:4px;background:#1e3a5f;border:2px solid #ff8a63;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#ff8a63}.chain-link.active{background:#ff8a63;color:#0a1929}.chain-link.faded{opacity:0.4;border-color:rgba(255,138,99,0.3)}.skip-token{display:flex;justify-content:space-between;margin-top:12px;padding:8px;background:rgba(102,200,255,0.08);border-radius:6px;border:1px solid rgba(102,200,255,0.2);font-size:12px;color:#8fd6ff}.skip-label{font-family:'Press Start 2P',monospace;font-size:10px;color:#66c8ff;margin-bottom:4px}.recovery-note{font-size:11px;color:rgba(223,238,255,0.6);margin-top:8px}&lt;/style&gt;&lt;div class=&quot;streak-card&quot;&gt;&lt;div class=&quot;streak-header&quot;&gt;⛓️ 28 DAY STREAK&lt;/div&gt;&lt;div class=&quot;chain-display&quot;&gt;&lt;div class=&quot;chain-link active&quot;&gt;•&lt;/div&gt;&lt;div class=&quot;chain-link active&quot;&gt;•&lt;/div&gt;&lt;div class=&quot;chain-link active&quot;&gt;•&lt;/div&gt;&lt;div class=&quot;chain-link faded&quot;&gt;✕&lt;/div&gt;&lt;div class=&quot;chain-link&quot;&gt;?&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;recovery-note&quot;&gt;↻ Miss today? Use 1 skip token to preserve chain&lt;/div&gt;&lt;div class=&quot;skip-label&quot;&gt;SKIP TOKENS&lt;/div&gt;&lt;div class=&quot;skip-token&quot;&gt;&lt;span&gt;Monthly Allowance&lt;/span&gt;&lt;span style=&quot;color:#7fffb0;font-weight:bold&quot;&gt;1/1&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Content-Earned Bento Spans: Responsive Collapse with Anchor-First Mobile Reflow</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Cell sizes are earned by content inside, gutters and padding hold rhythm, and brands that hold up share the discipline that cells are small only when content earns small. Mission Control's current bento grid already respects this, but the responsive behavior should be explicit: desktop keeps full asymmetry, tablet collapses to 2-column with anchors (quests, wallet) spanning both, mobile stacks as 1-column with the most important card first and padding/gutter ratios scaled proportionally to avoid shrink-induced illegibility.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://brainy.ink/paper/bento-grid-design-guide" target="_blank" rel="noopener" style="color:#ff8a63;">Bento Grid Design: A 2026 Guide to Layouts, Spacing, and When Not to Use Them</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;div style=&quot;background:#0a1929;padding:20px;font-family:'VT323',monospace;min-height:100vh&quot;&gt;&lt;style&gt;body{margin:0}.bento{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px}.card{background:#12253c;border-radius:10px;padding:14px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff;font-size:12px}.card h3{margin:0 0 6px 0;color:#66c8ff;font-family:'Press Start 2P',monospace;font-size:11px}.anchor{grid-column:span 2}.stat{margin:3px 0}.label{color:rgba(223,238,255,.5);font-size:11px}.value{color:#ff8a63;font-weight:bold;display:inline-block;margin-left:4px}@media(max-width:768px){.bento{grid-template-columns:1fr}.anchor{grid-column:span 1}.card{padding:12px;font-size:11px}}&lt;/style&gt;&lt;div class=&quot;bento&quot;&gt;&lt;div class=&quot;card anchor&quot;&gt;&lt;h3&gt;🎯 QUESTS&lt;/h3&gt;&lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;label&quot;&gt;Morning Run&lt;/span&gt;&lt;span class=&quot;value&quot;&gt;S-RANK&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;card&quot;&gt;&lt;h3&gt;📊 DATA&lt;/h3&gt;&lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;label&quot;&gt;This Week&lt;/span&gt;&lt;span class=&quot;value&quot;&gt;+847&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;card&quot;&gt;&lt;h3&gt;🎮 STATUS&lt;/h3&gt;&lt;div class=&quot;stat&quot;&gt;&lt;span class=&quot;label&quot;&gt;Streak&lt;/span&gt;&lt;span class=&quot;value&quot;&gt;28&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">‹ Back</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">Next ›</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-10-02-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"High-Contrast Neumorphic Depth: Inset Shadows for Clarity Without Blur Loss","description":"Mission Control already uses inset shadows effectively; this refines the pattern by increasing the shadow-to-background contrast ratio for better dark-mode legibility. Rather than relying on soft, diffused shadows that blur together on dark cyan, hardened inset edges (higher opacity, tighter blur-radius) create tactile affordance while keeping all elements readable at a glance. A secondary accent shadow inside primary insets adds a \"pressed key\" feel that matches the JRPG aesthetic and clarifies interactive vs. static cards.","source_title":"Design Trends 2025: Glassmorphism, Neumorphism & Styles You Need to Know","source_url":"https://contra.com/p/PYkeMOc7-design-trends-2025-glassmorphism-neumorphism-and-styles-you-need-to-know","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh;display:flex;flex-direction:column;gap:20px\">\u003cstyle>body{margin:0}.card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #8fd6ff, inset -2px -2px 6px rgba(255,255,255,0.08), inset 2px 2px 6px rgba(0,0,0,0.4);color:#dfeeff;font-size:14px}.card h3{margin:0 0 8px 0;color:#66c8ff;font-size:16px;font-family:'Press Start 2P',monospace;letter-spacing:1px}.stat-row{display:flex;justify-content:space-between;margin:6px 0;padding:6px 0;border-bottom:1px solid rgba(223,238,255,0.12)}.stat-row:last-child{border:none}.stat-val{font-weight:bold;color:#ff8a63}.interactive{cursor:pointer;transition:all 80ms ease}.interactive:active{box-shadow:inset 0 0 0 3px #1e3a5f, inset 0 0 0 5px #12253c, inset 0 0 0 7px #1e3a5f, inset -1px -1px 3px rgba(0,0,0,0.6), inset 1px 1px 3px rgba(255,255,255,0.04)}\u003c/style>\u003cdiv class=\"card\">\u003ch3>TODAY'S QUESTS\u003c/h3>\u003cdiv class=\"stat-row\">\u003cspan>Morning Run\u003c/span>\u003cspan class=\"stat-val\">S\u003c/span>\u003c/div>\u003cdiv class=\"stat-row\">\u003cspan>Log Income\u003c/span>\u003cspan class=\"stat-val\">B\u003c/span>\u003c/div>\u003c/div>\u003cdiv class=\"card interactive\">\u003ch3>GIL WALLET\u003c/h3>\u003cdiv class=\"stat-row\">\u003cspan>This Week\u003c/span>\u003cspan class=\"stat-val\">+$847\u003c/span>\u003c/div>\u003cdiv class=\"stat-row\">\u003cspan>Goal Progress\u003c/span>\u003cspan class=\"stat-val\">73%\u003c/span>\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1790957476266-0-high-contrast-neumorphic-depth-inset-sha"},{"title":"Forgiving Streak with Loss Mitigation: Skip Token + Partial Progress Visibility","description":"Streak anxiety occurs when users abandon apps after a single missed day rather than restart, because the mechanic that drove engagement becomes the reason for quitting once it snaps. Mission Control can retain streak motivation while blocking abandonment through a monthly \"streak skip\" token (one free miss per 30 days, displayed as a regenerating resource) and a faded visual chain that shows partial progress even after a break—showing \"28 → 0\" or \"28 → 8\" depending on recovery method chosen, not total erasure.","source_title":"Streak Anxiety: Habit Trackers That Forgive (2026)","source_url":"https://habitdoom.com/blog/streak-anxiety-habit-trackers","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh\">\u003cstyle>body{margin:0}.streak-card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff}.streak-header{font-family:'Press Start 2P',monospace;color:#66c8ff;font-size:14px;margin:0 0 12px 0}.chain-display{display:flex;gap:8px;margin:12px 0;align-items:center}.chain-link{width:28px;height:28px;border-radius:4px;background:#1e3a5f;border:2px solid #ff8a63;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#ff8a63}.chain-link.active{background:#ff8a63;color:#0a1929}.chain-link.faded{opacity:0.4;border-color:rgba(255,138,99,0.3)}.skip-token{display:flex;justify-content:space-between;margin-top:12px;padding:8px;background:rgba(102,200,255,0.08);border-radius:6px;border:1px solid rgba(102,200,255,0.2);font-size:12px;color:#8fd6ff}.skip-label{font-family:'Press Start 2P',monospace;font-size:10px;color:#66c8ff;margin-bottom:4px}.recovery-note{font-size:11px;color:rgba(223,238,255,0.6);margin-top:8px}\u003c/style>\u003cdiv class=\"streak-card\">\u003cdiv class=\"streak-header\">⛓️ 28 DAY STREAK\u003c/div>\u003cdiv class=\"chain-display\">\u003cdiv class=\"chain-link active\">•\u003c/div>\u003cdiv class=\"chain-link active\">•\u003c/div>\u003cdiv class=\"chain-link active\">•\u003c/div>\u003cdiv class=\"chain-link faded\">✕\u003c/div>\u003cdiv class=\"chain-link\">?\u003c/div>\u003c/div>\u003cdiv class=\"recovery-note\">↻ Miss today? Use 1 skip token to preserve chain\u003c/div>\u003cdiv class=\"skip-label\">SKIP TOKENS\u003c/div>\u003cdiv class=\"skip-token\">\u003cspan>Monthly Allowance\u003c/span>\u003cspan style=\"color:#7fffb0;font-weight:bold\">1/1\u003c/span>\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1790957476266-1-forgiving-streak-with-loss-mitigation-sk"},{"title":"Content-Earned Bento Spans: Responsive Collapse with Anchor-First Mobile Reflow","description":"Cell sizes are earned by content inside, gutters and padding hold rhythm, and brands that hold up share the discipline that cells are small only when content earns small. Mission Control's current bento grid already respects this, but the responsive behavior should be explicit: desktop keeps full asymmetry, tablet collapses to 2-column with anchors (quests, wallet) spanning both, mobile stacks as 1-column with the most important card first and padding/gutter ratios scaled proportionally to avoid shrink-induced illegibility.","source_title":"Bento Grid Design: A 2026 Guide to Layouts, Spacing, and When Not to Use Them","source_url":"https://brainy.ink/paper/bento-grid-design-guide","mockup_html":"\u003cdiv style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;min-height:100vh\">\u003cstyle>body{margin:0}.bento{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px}.card{background:#12253c;border-radius:10px;padding:14px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff;font-size:12px}.card h3{margin:0 0 6px 0;color:#66c8ff;font-family:'Press Start 2P',monospace;font-size:11px}.anchor{grid-column:span 2}.stat{margin:3px 0}.label{color:rgba(223,238,255,.5);font-size:11px}.value{color:#ff8a63;font-weight:bold;display:inline-block;margin-left:4px}@media(max-width:768px){.bento{grid-template-columns:1fr}.anchor{grid-column:span 1}.card{padding:12px;font-size:11px}}\u003c/style>\u003cdiv class=\"bento\">\u003cdiv class=\"card anchor\">\u003ch3>🎯 QUESTS\u003c/h3>\u003cdiv class=\"stat\">\u003cspan class=\"label\">Morning Run\u003c/span>\u003cspan class=\"value\">S-RANK\u003c/span>\u003c/div>\u003c/div>\u003cdiv class=\"card\">\u003ch3>📊 DATA\u003c/h3>\u003cdiv class=\"stat\">\u003cspan class=\"label\">This Week\u003c/span>\u003cspan class=\"value\">+847\u003c/span>\u003c/div>\u003c/div>\u003cdiv class=\"card\">\u003ch3>🎮 STATUS\u003c/h3>\u003cdiv class=\"stat\">\u003cspan class=\"label\">Streak\u003c/span>\u003cspan class=\"value\">28\u003c/span>\u003c/div>\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1790957476266-2-content-earned-bento-spans-responsive-co"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'Done ✓' : 'Next ›';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
