@@ -793,6 +793,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-10-01-design-research-daily",
+      "findingIndex": 2,
+      "threadId": "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha",
+      "findingTitle": "Neumorphic Depth as Affordance: Inset Shadows for Clarity Without Losing Retro Style",
+      "findingDescription": "Neumorphism uses inset and outset shadows to create depth: inset shadows make elements look pressed into the surface, with paired light and dark shadows adding subtle depth while staying minimal. Mission Control already has hard-shadow JRPG borders; swapping or layering in subtle inset shadows on interactive cards (quest rows, event blocks, input fields) can signal affordance—what can be clicked or toggled—without breaking the retro aesthetic. Pair with adequate contrast per WCAG to avoid the ne",
+      "rating": 3,
+      "ratingLabel": "Almost there",
+      "comment": "",
+      "date": "2026-10-02"
+    },
+    {
       "id": "2026-09-30-design-research-comprehensive-gamification-in-apps-mecha",
       "findingIndex": 2,
       "threadId": "thread-1790808957925-2-the-compulsion-inflection-when-gamificat",
@@ -1947,13 +1958,13 @@
       "source_title": "How to Master Neumorphism in UI Design (With Examples)",
       "source_url": "https://clay.global/blog/neumorphism-ui",
       "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;color:#dfeeff\">\n  <div style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;margin-bottom:8px;cursor:pointer;transition:all 0.15s\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center\">\n      <div style=\"display:flex;gap:8px;align-items:center\">\n        <div style=\"width:12px;height:12px;background:#ff8a63;border-radius:3px\"></div>\n        <div style=\"font-size:12px;color:#dfeeff\">Finish design research</div>\n      </div>\n      <div style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+50 XP</div>\n    </div>\n  </div>\n  <div style=\"background:#12253c;border-radius:10px;padding:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), inset 0 0 0 2px #1e3a5f;cursor:pointer;transition:all 0.15s;opacity:0.6\">\n    <div style=\"display:flex;justify-content:space-between;align-items:center\">\n      <div style=\"display:flex;gap:8px;align-items:center\">\n        <div style=\"width:12px;height:12px;background:#4a90d9;border-radius:3px\"></div>\n        <div style=\"font-size:12px;color:#dfeeff\">Weekly schedule review</div>\n      </div>\n      <div style=\"font-size:9px;color:#8fd6ff;background:rgba(14,58,95,0.8);padding:2px 6px;border-radius:3px\">+15 XP</div>\n    </div>\n  </div>\n  <div style=\"font-size:8px;color:#8fd6ff;opacity:0.5;margin-top:12px\">inset shadows signal depth & affordance</div>\n</div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 3,
+      "lastRatingLabel": "Almost there",
       "lastComment": "",
       "createdDate": "2026-10-01",
-      "updatedDate": "2026-10-01",
+      "updatedDate": "2026-10-02",
       "originResearchId": "2026-10-01-design-research-daily",
       "openTopic": false
     },
