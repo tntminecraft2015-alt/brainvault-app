@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-10-02-design-research-daily]] — Three research findings focused on deepening Mission Control's existing neumorphic identity without sacrificing usability, adding forgiving 
 - [[daily-tasks-2026-10-01]] — Quest log for 2026-10-01
 - [[chat-2026-10-01]] — Claude conversation log for 2026-10-01
 - [[2026-10-01-design-research-daily]] — Bento grids continue as a 2026 standard, but the innovation shift is toward "active" tiles that expand or reveal on interaction—essential fo
