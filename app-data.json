@@ -410,6 +410,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-02-design-research-daily",
+      "date": "2026-10-02",
+      "topic": "",
+      "title": "General Improvements: Subtle Depth Enhancements, Light Gamification Protection & Modern Grid Polish",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-01-design-research-daily",
       "date": "2026-10-01",
       "topic": "",
@@ -588,7 +598,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-01",
+  "lastDesignResearchAutoRun": "2026-10-02",
   "changeRequests": [
     {
       "id": "2026-09-30-crossfade-card-swap-with-mockup-persiste",
@@ -1945,6 +1955,57 @@
       "createdDate": "2026-10-01",
       "updatedDate": "2026-10-01",
       "originResearchId": "2026-10-01-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790957476266-0-high-contrast-neumorphic-depth-inset-sha": {
+      "id": "thread-1790957476266-0-high-contrast-neumorphic-depth-inset-sha",
+      "title": "High-Contrast Neumorphic Depth: Inset Shadows for Clarity Without Blur Loss",
+      "description": "Mission Control already uses inset shadows effectively; this refines the pattern by increasing the shadow-to-background contrast ratio for better dark-mode legibility. Rather than relying on soft, diffused shadows that blur together on dark cyan, hardened inset edges (higher opacity, tighter blur-radius) create tactile affordance while keeping all elements readable at a glance. A secondary accent shadow inside primary insets adds a \"pressed key\" feel that matches the JRPG aesthetic and clarifies interactive vs. static cards.",
+      "source_title": "Design Trends 2025: Glassmorphism, Neumorphism & Styles You Need to Know",
+      "source_url": "https://contra.com/p/PYkeMOc7-design-trends-2025-glassmorphism-neumorphism-and-styles-you-need-to-know",
+      "mockup_html": "<div style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh;display:flex;flex-direction:column;gap:20px\"><style>body{margin:0}.card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #8fd6ff, inset -2px -2px 6px rgba(255,255,255,0.08), inset 2px 2px 6px rgba(0,0,0,0.4);color:#dfeeff;font-size:14px}.card h3{margin:0 0 8px 0;color:#66c8ff;font-size:16px;font-family:'Press Start 2P',monospace;letter-spacing:1px}.stat-row{display:flex;justify-content:space-between;margin:6px 0;padding:6px 0;border-bottom:1px solid rgba(223,238,255,0.12)}.stat-row:last-child{border:none}.stat-val{font-weight:bold;color:#ff8a63}.interactive{cursor:pointer;transition:all 80ms ease}.interactive:active{box-shadow:inset 0 0 0 3px #1e3a5f, inset 0 0 0 5px #12253c, inset 0 0 0 7px #1e3a5f, inset -1px -1px 3px rgba(0,0,0,0.6), inset 1px 1px 3px rgba(255,255,255,0.04)}</style><div class=\"card\"><h3>TODAY'S QUESTS</h3><div class=\"stat-row\"><span>Morning Run</span><span class=\"stat-val\">S</span></div><div class=\"stat-row\"><span>Log Income</span><span class=\"stat-val\">B</span></div></div><div class=\"card interactive\"><h3>GIL WALLET</h3><div class=\"stat-row\"><span>This Week</span><span class=\"stat-val\">+$847</span></div><div class=\"stat-row\"><span>Goal Progress</span><span class=\"stat-val\">73%</span></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-02",
+      "updatedDate": "2026-10-02",
+      "originResearchId": "2026-10-02-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790957476266-1-forgiving-streak-with-loss-mitigation-sk": {
+      "id": "thread-1790957476266-1-forgiving-streak-with-loss-mitigation-sk",
+      "title": "Forgiving Streak with Loss Mitigation: Skip Token + Partial Progress Visibility",
+      "description": "Streak anxiety occurs when users abandon apps after a single missed day rather than restart, because the mechanic that drove engagement becomes the reason for quitting once it snaps. Mission Control can retain streak motivation while blocking abandonment through a monthly \"streak skip\" token (one free miss per 30 days, displayed as a regenerating resource) and a faded visual chain that shows partial progress even after a break—showing \"28 → 0\" or \"28 → 8\" depending on recovery method chosen, not total erasure.",
+      "source_title": "Streak Anxiety: Habit Trackers That Forgive (2026)",
+      "source_url": "https://habitdoom.com/blog/streak-anxiety-habit-trackers",
+      "mockup_html": "<div style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace;min-height:100vh\"><style>body{margin:0}.streak-card{background:#12253c;border-radius:10px;padding:16px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff}.streak-header{font-family:'Press Start 2P',monospace;color:#66c8ff;font-size:14px;margin:0 0 12px 0}.chain-display{display:flex;gap:8px;margin:12px 0;align-items:center}.chain-link{width:28px;height:28px;border-radius:4px;background:#1e3a5f;border:2px solid #ff8a63;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#ff8a63}.chain-link.active{background:#ff8a63;color:#0a1929}.chain-link.faded{opacity:0.4;border-color:rgba(255,138,99,0.3)}.skip-token{display:flex;justify-content:space-between;margin-top:12px;padding:8px;background:rgba(102,200,255,0.08);border-radius:6px;border:1px solid rgba(102,200,255,0.2);font-size:12px;color:#8fd6ff}.skip-label{font-family:'Press Start 2P',monospace;font-size:10px;color:#66c8ff;margin-bottom:4px}.recovery-note{font-size:11px;color:rgba(223,238,255,0.6);margin-top:8px}</style><div class=\"streak-card\"><div class=\"streak-header\">⛓️ 28 DAY STREAK</div><div class=\"chain-display\"><div class=\"chain-link active\">•</div><div class=\"chain-link active\">•</div><div class=\"chain-link active\">•</div><div class=\"chain-link faded\">✕</div><div class=\"chain-link\">?</div></div><div class=\"recovery-note\">↻ Miss today? Use 1 skip token to preserve chain</div><div class=\"skip-label\">SKIP TOKENS</div><div class=\"skip-token\"><span>Monthly Allowance</span><span style=\"color:#7fffb0;font-weight:bold\">1/1</span></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-02",
+      "updatedDate": "2026-10-02",
+      "originResearchId": "2026-10-02-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1790957476266-2-content-earned-bento-spans-responsive-co": {
+      "id": "thread-1790957476266-2-content-earned-bento-spans-responsive-co",
+      "title": "Content-Earned Bento Spans: Responsive Collapse with Anchor-First Mobile Reflow",
+      "description": "Cell sizes are earned by content inside, gutters and padding hold rhythm, and brands that hold up share the discipline that cells are small only when content earns small. Mission Control's current bento grid already respects this, but the responsive behavior should be explicit: desktop keeps full asymmetry, tablet collapses to 2-column with anchors (quests, wallet) spanning both, mobile stacks as 1-column with the most important card first and padding/gutter ratios scaled proportionally to avoid shrink-induced illegibility.",
+      "source_title": "Bento Grid Design: A 2026 Guide to Layouts, Spacing, and When Not to Use Them",
+      "source_url": "https://brainy.ink/paper/bento-grid-design-guide",
+      "mockup_html": "<div style=\"background:#0a1929;padding:20px;font-family:'VT323',monospace;min-height:100vh\"><style>body{margin:0}.bento{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:800px}.card{background:#12253c;border-radius:10px;padding:14px;box-shadow:inset 0 0 0 3px #8fd6ff,inset 0 0 0 5px #12253c,inset 0 0 0 7px #8fd6ff;color:#dfeeff;font-size:12px}.card h3{margin:0 0 6px 0;color:#66c8ff;font-family:'Press Start 2P',monospace;font-size:11px}.anchor{grid-column:span 2}.stat{margin:3px 0}.label{color:rgba(223,238,255,.5);font-size:11px}.value{color:#ff8a63;font-weight:bold;display:inline-block;margin-left:4px}@media(max-width:768px){.bento{grid-template-columns:1fr}.anchor{grid-column:span 1}.card{padding:12px;font-size:11px}}</style><div class=\"bento\"><div class=\"card anchor\"><h3>🎯 QUESTS</h3><div class=\"stat\"><span class=\"label\">Morning Run</span><span class=\"value\">S-RANK</span></div></div><div class=\"card\"><h3>📊 DATA</h3><div class=\"stat\"><span class=\"label\">This Week</span><span class=\"value\">+847</span></div></div><div class=\"card\"><h3>🎮 STATUS</h3><div class=\"stat\"><span class=\"label\">Streak</span><span class=\"value\">28</span></div></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-02",
+      "updatedDate": "2026-10-02",
+      "originResearchId": "2026-10-02-design-research-daily",
       "openTopic": false
     }
   },
