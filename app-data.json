@@ -416,6 +416,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-03-design-research-daily",
+      "date": "2026-10-03",
+      "topic": "",
+      "title": "General Improvements: Retention Micro-Interactions, Quest Accessibility Polish & Inset-Shadow Affordance Clarity",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-02-design-research-daily",
       "date": "2026-10-02",
       "topic": "",
@@ -604,7 +614,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-02",
+  "lastDesignResearchAutoRun": "2026-10-03",
   "changeRequests": [
     {
       "id": "2026-09-30-crossfade-card-swap-with-mockup-persiste",
@@ -2024,6 +2034,57 @@
       "createdDate": "2026-10-02",
       "updatedDate": "2026-10-02",
       "originResearchId": "2026-10-02-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791049593042-0-haptic-quest-confirmation-gesture-micro-": {
+      "id": "thread-1791049593042-0-haptic-quest-confirmation-gesture-micro-",
+      "title": "Haptic Quest Confirmation: Gesture + Micro-Feedback on Check",
+      "description": "Leading habit trackers (Streaks, Way of Life) use haptic feedback and swipe gestures to make task completion feel tangible and immediate. Mission Control's mobile quests could adopt a subtle upward-swipe-to-confirm gesture with a brief haptic pulse and XP-pop animation, reducing friction for S-rank time-critical logging. This plays into the JRPG identity (satisfying tactile response) while cutting mobile quest-check time from tap→modal→close to a single flick-and-done motion.",
+      "source_title": "Best Habit Tracking Apps in 2026: Streaks & Way of Life analysis",
+      "source_url": "https://buildin.ai/blog/best-apps-for-habit-tracking",
+      "mockup_html": "<div style='font-family:VT323;background:#0a1929;padding:20px;border-radius:10px;'><div style='color:#dfeeff;font-size:14px;margin-bottom:12px;letter-spacing:1px;'>TODAY'S QUESTS</div><div style='background:#12253c;padding:14px;border-radius:8px;margin-bottom:10px;box-shadow:inset 0 0 0 2px #1a2533;display:flex;align-items:center;justify-content:space-between;'><div><div style='color:#8fd6ff;font-size:13px;font-weight:bold;'>Morning Routine</div><div style='color:#8fd6ff;font-size:11px;margin-top:4px;opacity:0.6;'>↑ Swipe up to confirm</div></div><div style='display:flex;gap:6px;align-items:center;'><span style='background:#4a90d9;color:#0a1929;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;'>B</span><span style='color:#7fffb0;font-size:12px;font-weight:bold;'>+15 XP</span></div></div><div style='background:#12253c;padding:14px;border-radius:8px;box-shadow:inset 0 0 0 2px #1a2533;display:flex;align-items:center;justify-content:space-between;'><div><div style='color:#8fd6ff;font-size:13px;font-weight:bold;text-decoration:line-through;opacity:0.6;'>Weekly Review</div><div style='color:#8fd6ff;font-size:11px;margin-top:4px;opacity:0.4;'>✓ Completed (swipe confirmed)</div></div><div style='display:flex;gap:6px;align-items:center;'><span style='background:#e85d3a;color:#0a1929;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;'>S</span><span style='color:#7fffb0;font-size:12px;font-weight:bold;'>+50 XP</span></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791049593042-1-missed-quest-soft-recovery-prompt-make-i": {
+      "id": "thread-1791049593042-1-missed-quest-soft-recovery-prompt-make-i",
+      "title": "Missed Quest Soft Recovery Prompt: 'Make It Up Today' Toggle",
+      "description": "38% of habit tracker users drop off after 90 days, largely due to the harsh reset cycle after a missed day. Mission Control's calendar could add a soft, non-intrusive prompt when viewing a past unchecked quest: a small icon or tooltip offering 'Log it now?' without pressure, letting users retroactively log missed S/B-ranks. This reframes the streak from 'all-or-nothing' to 'forgiving'—matching industry trends toward behavioral economics (loss aversion, not just accumulation) and recovery-friendly design.",
+      "source_title": "Habit Tracker App Market: Retention & Missed-Day Recovery",
+      "source_url": "https://habithuddle.com/blog/habit-tracking-template",
+      "mockup_html": "<div style='font-family:VT323;background:#0a1929;padding:20px;border-radius:10px;'><div style='color:#dfeeff;font-size:14px;margin-bottom:12px;letter-spacing:1px;'>PAST QUEST (Sep 30)</div><div style='background:#12253c;padding:14px;border-radius:8px;box-shadow:inset 0 0 0 2px #1a2533;display:flex;align-items:center;justify-content:space-between;'><div><div style='color:#8fd6ff;font-size:13px;font-weight:bold;'>Review Notes</div><div style='color:#8fd6ff;font-size:11px;margin-top:4px;opacity:0.6;'>Not completed</div></div><div style='display:flex;gap:8px;'><span style='background:#4a90d9;color:#0a1929;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:bold;'>B</span></div></div><div style='background:#1e3a5f;padding:10px;border-radius:6px;margin-top:10px;border-left:3px solid #66c8ff;display:flex;align-items:center;gap:8px;'><span style='color:#66c8ff;font-size:12px;'>💬</span><span style='color:#8fd6ff;font-size:11px;'>Log it today? Catch up with past quests.</span><button style='margin-left:auto;background:#ff8a63;border:none;color:#070b14;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:bold;font-family:Press Start 2P;cursor:pointer;'>+ Log</button></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791049593042-2-inset-shadow-button-states-for-rank-badg": {
+      "id": "thread-1791049593042-2-inset-shadow-button-states-for-rank-badg",
+      "title": "Inset Shadow Button States for Rank Badges: Pressed/Unpressed Clarity",
+      "description": "Neumorphic buttons achieve depth with shadows and highlights creating a tactile appearance, mimicking convex or concave effects. Mission Control's rank badge buttons (S/A/B/C on quest rows, calendar events) could leverage inset-shadow pairs to signal press state without breaking the dark cyan JRPG palette. Unpressed: outset shadow (light top-left, dark bottom-right). Pressed: inset shadow (both shadows flip inward). This maintains dark-mode legibility while signaling interactivity—critical for Mission Control's dense bento grid where affordance is already low-contrast.",
+      "source_title": "Neumorphism UI Design: Inset Shadows for Tactile Affordance",
+      "source_url": "https://www.setproduct.com/blog/neumorphism-design-guide",
+      "mockup_html": "<div style='font-family:VT323;background:#0a1929;padding:20px;border-radius:10px;'><div style='color:#dfeeff;font-size:14px;margin-bottom:12px;letter-spacing:1px;'>RANK BUTTON STATES</div><div style='display:flex;gap:16px;margin-top:12px;'><div style='display:flex;flex-direction:column;gap:8px;'><div style='color:#8fd6ff;font-size:10px;opacity:0.6;text-align:center;'>UNPRESSED</div><button style='background:#e85d3a;color:#0a1929;padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:bold;font-family:Press Start 2P;box-shadow:4px 4px 8px #070b14,-2px -2px 4px #12253c;cursor:pointer;'>S</button></div><div style='display:flex;flex-direction:column;gap:8px;'><div style='color:#8fd6ff;font-size:10px;opacity:0.6;text-align:center;'>PRESSED</div><button style='background:#e85d3a;color:#0a1929;padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:bold;font-family:Press Start 2P;box-shadow:inset 2px 2px 4px #070b14,inset -2px -2px 4px rgba(223,238,255,.12);cursor:pointer;transform:translateY(1px);'>S</button></div><div style='display:flex;flex-direction:column;gap:8px;'><div style='color:#8fd6ff;font-size:10px;opacity:0.6;text-align:center;'>A-RANK</div><button style='background:#f0a020;color:#0a1929;padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:bold;font-family:Press Start 2P;box-shadow:4px 4px 8px #070b14,-2px -2px 4px #12253c;cursor:pointer;'>A</button></div><div style='display:flex;flex-direction:column;gap:8px;'><div style='color:#8fd6ff;font-size:10px;opacity:0.6;text-align:center;'>C-RANK</div><button style='background:#7a8a78;color:#0a1929;padding:8px 12px;border:none;border-radius:6px;font-size:11px;font-weight:bold;font-family:Press Start 2P;box-shadow:4px 4px 8px #070b14,-2px -2px 4px #12253c;cursor:pointer;'>C</button></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-daily",
       "openTopic": false
     }
   },
