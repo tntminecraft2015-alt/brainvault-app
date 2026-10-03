@@ -2685,7 +2685,9 @@
         "joined": "2026-10-01"
       }
     },
-    "jobs": {},
+    "jobs": {
+      "letter": 4
+    },
     "spots": [
       null,
       null,
@@ -2726,7 +2728,8 @@
       "show": {
         "sign": true
       }
-    }
+    },
+    "letterRead": ""
   },
   "notifiedEvents": {}
 }
