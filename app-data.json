@@ -399,6 +399,12 @@
       "firstCaught": "2026-05-28",
       "shiny": false
     },
+    "722": {
+      "count": 1,
+      "firstCaught": "2026-10-03",
+      "shiny": false,
+      "lastCaught": "2026-10-03"
+    },
     "725": {
       "count": 1,
       "firstCaught": "2026-05-15",
