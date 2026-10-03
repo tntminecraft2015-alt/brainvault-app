@@ -2657,7 +2657,5 @@
       }
     }
   },
-  "notifiedEvents": {
-    "2026-10-01|14:00|Therapy": true
-  }
+  "notifiedEvents": {}
 }
