@@ -422,6 +422,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "date": "2026-10-03",
+      "topic": "Useful background helper/automation tasks for a Pokémon farm app that function independently of the graphics/render layer — breeding, training, item management, stat optimization, and offline progress",
+      "title": "Pokémon Farm Backend Automation: Breeding Chains, Offline Sim & Stat Optimization",
+      "findingsCount": 3,
+      "auto": false,
+      "viewed": false,
+      "openTopic": true
+    },
+    {
       "id": "2026-10-03-design-research-daily",
       "date": "2026-10-03",
       "topic": "",
@@ -2092,6 +2102,57 @@
       "updatedDate": "2026-10-03",
       "originResearchId": "2026-10-03-design-research-daily",
       "openTopic": false
+    },
+    "thread-1791049848841-0-deterministic-breeding-chain-solver": {
+      "id": "thread-1791049848841-0-deterministic-breeding-chain-solver",
+      "title": "Deterministic Breeding Chain Solver",
+      "description": "IV inheritance can be controlled via holding items: 3 IVs inherit randomly normally, but the Destiny Knot increases this to 5 inherited IVs. With two perfect parents and a Destiny Knot, the odds of perfect offspring are ~3.1%. A farm app backend should compute viable breeding paths: given a target (e.g., 6 perfect IVs, specific Nature, egg move set), calculate the minimal parent lineage and item strategy to achieve it offline. This is a graph search, not a simulation—precompute paths once and store them.",
+      "source_title": "Random Pokémon Picker Breeding Calculator",
+      "source_url": "https://www.randompokemonpicker.com/tools/breeding-calculator",
+      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>BREEDING PATH</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.6;'><div>Target: 6IV • Hasty • Egg Move</div><div style='margin-top:6px;color:#8fd6ff;'>→ Parent A: 6IV Ditto (Destiny Knot)</div><div style='color:#8fd6ff;'>→ Parent B: 31 Sp.Atk (Power Lens)</div><div style='margin-top:6px;color:#7fffb0;'>Odds: 1 in 32 | ~3 eggs</div><div style='color:#ff8a63;font-size:8px;margin-top:4px;'>⚡ Hatch every 15m offline</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "openTopic": true
+    },
+    "thread-1791049848841-1-time-delta-offline-progression-capped-fu": {
+      "id": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
+      "title": "Time-Delta Offline Progression (Capped, Full-Rate Simulation)",
+      "description": "Offline progression records the skill/action when the game closes, then on return simulates the time away (capped at 24 hours) as if the player had remained active, granting XP, items, and other rewards from that elapsed window. True offline models use a 24-hour cap with full speed for all skills and combat encounters—Melvor Idle, for example, simulates combat with food use and death math at 100% of online rate. The backend stores only `(lastClosedTime, activeAction)` and recomputes on boot—no background threads needed.",
+      "source_title": "Tideward — Offline Progression Comparison",
+      "source_url": "https://tideward.app/offline-progression/",
+      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>⏱ OFFLINE SUMMARY</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.8;'><div>Away 18h 34m | Cap 24h ✓</div><div style='margin-top:6px;'>Leader hunted: <span style='color:#7fffb0;'>+47 EXP</span></div><div>Eggs incubating: <span style='color:#7fffb0;'>2 hatched</span></div><div>Items gathered: <span style='color:#7fffb0;'>18 Poké Balls</span></div><div style='margin-top:6px;color:#ff8a63;font-size:8px;'>Battles: 12 | Food used: 8</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "openTopic": true
+    },
+    "thread-1791049848841-2-stat-formula-inversion-for-auto-training": {
+      "id": "thread-1791049848841-2-stat-formula-inversion-for-auto-training",
+      "title": "Stat Formula Inversion for Auto-Training Targets",
+      "description": "The stat formula is: Stat = ⌊(⌊(2 × Base + IV + ⌊EV/4⌋) × Level / 100⌋ + 5) × Nature⌋. Inverting the formula lets you calculate how many EVs are needed to raise a stat by N points at any level, accounting for Nature and item boosts. A farm app backend should precompute and cache these inversions for every species/level/nature combo, then recommend: 'to hit 180 Attack at Lv. 50, you need 120 EVs (26 Protein, 8 Power Bracer battles, or Pokérus multiplier equivalent).' This decouples UI from math.",
+      "source_title": "Terresquall Blog — Calculating EVs Needed to Raise a Stat",
+      "source_url": "https://blog.terresquall.com/2020/07/calculating-evs-needed-to-raise-a-stat-in-pokemon/",
+      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>EV PLAN</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.6;'><div>Species: Machamp | Lv 50</div><div style='margin-top:6px;'>Goal: 180 Attack</div><div style='background:#1e3a5f;padding:6px;margin-top:6px;border-radius:3px;'><div style='display:flex;justify-content:space-between;'><span>Ev/4 = +stat</span><span style='color:#7fffb0;'>120 EV needed</span></div><div style='font-size:8px;color:#8fd6ff;margin-top:4px;'>• 26× Protein (10 EV ea)</div><div style='font-size:8px;color:#8fd6ff;'>+ 4× Power Bracer (8 EV ea)</div></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-03",
+      "updatedDate": "2026-10-03",
+      "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "openTopic": true
     }
   },
   "designArchive": [
