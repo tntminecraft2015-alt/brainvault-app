@@ -2563,7 +2563,7 @@
     ],
     "mons": {
       "4": {
-        "pts": 20,
+        "pts": 22,
         "joined": "2026-10-01",
         "day": "2026-10-03",
         "pets": 1,
@@ -2729,7 +2729,7 @@
         "sign": true
       }
     },
-    "letterRead": ""
+    "letterRead": "2026-10-03"
   },
   "notifiedEvents": {}
 }
