@@ -975,3 +975,10 @@ Design research: General Improvements: Subtle Depth Enhancements, Light Gamifica
 **Pages created:** [[2026-10-03-design-research-daily]]
 
 Design research: General Improvements: Retention Micro-Interactions, Quest Accessibility Polish & Inset-Shadow Affordance Clarity (3 findings)
+
+## [2026-10-03] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-10-03-design-research-useful-background-helper-automation-task]]
+
+Design research: Pokémon Farm Backend Automation: Breeding Chains, Offline Sim & Stat Optimization (3 findings)
