@@ -2212,13 +2212,13 @@
     },
     "thread-1791049848841-1-time-delta-offline-progression-capped-fu": {
       "id": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
-      "title": "Device-Local Offline Simulation: Full 24h No-Connection Progress Banking",
-      "description": "Tideward simulates offline time entirely on-device so the full 24-hour window works with no connection at all—no server required. The simulator runs on your device with no account, so offline progression computes on a plane, in a tunnel, or with Wi-Fi off. On app close, it timestamps the save file along with active trade, gear, vitality, food, and buffs—then on return calculates elapsed wall-clock time (capped at 24 hours) and simulates what would have happened.",
-      "source_title": "Tideward — Offline Progression Comparison",
-      "source_url": "https://tideward.app/offline-progression/",
-      "mockup_html": "<html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: monospace; background: #0a1929; color: #dfeeff; padding: 20px; } .card { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; } .label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #8fd6ff; margin-bottom: 8px; } .value { font-size: 18px; margin-bottom: 12px; font-weight: bold; color: #66c8ff; } .bar { height: 6px; background: #1e3a5f; border-radius: 3px; overflow: hidden; margin-bottom: 4px; } .fill { height: 100%; background: #7fffb0; transition: width 0.3s; } .summary { font-size: 12px; line-height: 1.4; color: #dfeeff; margin-top: 8px; } .delta { color: #7fffb0; font-weight: bold; }</style></head><body><div class='card'><div class='label'>⏱ Away for 18 hrs</div><div class='value'>Mining: +4,200 XP</div><div class='bar'><div class='fill' style='width: 67%'></div></div><div class='summary'>Ore gained: 84 | Health full | Ready to continue</div></div><div class='card'><div class='label'>🔋 No connection needed</div><div class='value'>All progress computed locally</div><div class='bar'><div class='fill' style='width: 100%'></div></div><div class='summary'>Offline cap: <span class='delta'>24 hours</span> max | No server sync required</div></div></body></html>",
-      "status": "generating",
-      "revisionCount": 1,
+      "title": "Deterministic Tick-Based Catch-Up: Replayed Simulation on Offline Resume",
+      "description": "Instead of storing a single timestamp, the app batches simulation into fixed-duration 'ticks' and replays them on reopen, scaled to fill elapsed wall-clock time. This determinism means offline progress is auditable, reproducible, and handles edge cases (cooldowns, rate limits, compound effects) consistently without server validation. Applied in Antimatter Dimensions at scale for 8+ years.",
+      "source_title": "Antimatter Dimensions - Offline Progress",
+      "source_url": "https://antimatter-dimensions.fandom.com/wiki/Offline_Progress",
+      "mockup_html": "<div style=\"font-family:VT323,monospace;color:#dfeeff;background:#0a1929;padding:20px;border-radius:6px;max-width:300px;\">\n  <div style=\"font-size:14px;margin-bottom:12px;color:#66c8ff;font-weight:bold;\">OFFLINE SIM</div>\n  <div style=\"font-size:11px;line-height:1.6;color:#8fd6ff;margin-bottom:14px;\">\n    <div>Last session: 2:15 PM</div>\n    <div>Now: 11:45 PM (9h 30m elapsed)</div>\n    <div style=\"margin-top:6px;color:#7fffb0;\">→ Replaying 570 ticks @ 1.0s/tick</div>\n  </div>\n  <div style=\"background:#12253c;border-radius:4px;padding:8px;margin-bottom:10px;\">\n    <div style=\"font-size:9px;color:#8fd6ff;margin-bottom:4px;\">QUEST XP ACCRUAL</div>\n    <div style=\"height:4px;background:#1e3a5f;border-radius:2px;overflow:hidden;margin-top:3px;\">\n      <div style=\"height:100%;background:#ff8a63;width:68%;\"></div>\n    </div>\n    <div style=\"font-size:9px;color:#8fd6ff;margin-top:3px;\">+342 XP simulated</div>\n  </div>\n  <div style=\"border-top:1px solid #1e3a5f;padding-top:8px;font-size:10px;color:#8fd6ff;text-align:center;\">\n    ✓ Sync complete\n  </div>\n</div>",
+      "status": "ready_to_ship",
+      "revisionCount": 2,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
       "lastComment": "",
@@ -2226,7 +2226,7 @@
       "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
       "openTopic": true,
-      "mc_relevance": "Mission Control's quest XP reward system could bank time-away progress: close the app on a current quest, return next day, and see simulated XP/completion as if that quest had continued—capped at 24 hours. Needs only local timestamp + stored quest state on close."
+      "mc_relevance": "Quest completion could batch as ticks (e.g. one tick = daily streak check, one scheduled quest completion check); on app reopen after offline, replay the intervening ticks at fast speed and surface a 'caught up X quests' card, with XP and streak changes transparently visible."
     },
     "thread-1791049848841-2-stat-formula-inversion-for-auto-training": {
       "id": "thread-1791049848841-2-stat-formula-inversion-for-auto-training",
