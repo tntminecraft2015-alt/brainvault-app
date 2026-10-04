@@ -422,6 +422,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-04-design-research-daily",
+      "date": "2026-10-04",
+      "topic": "",
+      "title": "General Improvements: Active Grids, Gamification Calibration & Inset-Shadow Affordance for Retro Dark UI",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-03-design-research-useful-background-helper-automation-task",
       "date": "2026-10-03",
       "topic": "Useful background helper/automation tasks for a Pokémon farm app that function independently of the graphics/render layer — breeding, training, item management, stat optimization, and offline progress",
@@ -630,7 +640,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-03",
+  "lastDesignResearchAutoRun": "2026-10-04",
   "changeRequests": [
     {
       "id": "2026-09-30-crossfade-card-swap-with-mockup-persiste",
@@ -2153,6 +2163,57 @@
       "updatedDate": "2026-10-03",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
       "openTopic": true
+    },
+    "thread-1791151326935-0-active-bento-grid-tiles-hover-reveal-lit": {
+      "id": "thread-1791151326935-0-active-bento-grid-tiles-hover-reveal-lit",
+      "title": "Active Bento Grid Tiles: Hover Reveal & Lite Interactivity",
+      "description": "Most bento grids in 2026 sit static or use gentle color shifts on hover. Mission Control already has a bento structure (Gil, Dex, Calendar cards); adding subtle hover-states—like a card edge highlighting or a secondary layer appearing at pointer—keeps the JRPG feel intact while modernizing scannability. A quest card could brighten its rank badge glow, or the calendar tile could show 'N events this week' on hover, all without animations that feel out-of-place in a retro battle menu.",
+      "source_title": "Bento Grids & Beyond: 7 UI Trends Dominating Web Design 2026",
+      "source_url": "https://writerdock.in/blog/bento-grids-and-beyond-7-ui-trends-dominating-web-design-2026",
+      "mockup_html": "<div style='background:#0a1929;padding:24px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff;'><div style='margin-bottom:16px;font-family:\"Press Start 2P\",sans-serif;font-size:9px;letter-spacing:2px;color:#8fd6ff;'>GRID DEMO</div><div style='display:grid;grid-template-columns:1fr 1fr;gap:12px;'><div style='background:#12253c;padding:16px;border-radius:10px;cursor:pointer;transition:all 0.2s;border:2px solid #1e3a5f;'><div style='font-size:12px;margin-bottom:8px;'>TODAY\\'S QUESTS</div><div style='font-size:10px;color:#8fd6ff;'>3 Remaining</div></div><div style='background:#12253c;padding:16px;border-radius:10px;cursor:pointer;transition:all 0.2s;border:2px solid #ff8a63;box-shadow:0 0 8px rgba(255,138,99,0.3);'><div style='font-size:12px;margin-bottom:8px;'>GIL WALLET</div><div style='font-size:10px;color:#7fffb0;'>$ 2,450.00</div></div></div><div style='font-size:9px;color:#8fd6ff;margin-top:12px;opacity:0.7;'>(Hover above: borders brighten, accent glow appears)</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-04",
+      "updatedDate": "2026-10-04",
+      "originResearchId": "2026-10-04-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791151326935-1-quiet-streak-display-loss-aversion-over-": {
+      "id": "thread-1791151326935-1-quiet-streak-display-loss-aversion-over-",
+      "title": "Quiet Streak Display: Loss-Aversion Over Celebration Bloat",
+      "description": "Research shows gamified productivity apps hit a 52% Day-30 dropoff despite points/badges. Mission Control already removed the level counter; next step is making the streak itself the only persistent gamification signal—no pop-ups, no confetti, no 'You're on fire!' notifications. A subtle gray streak count ('📍 Day 47') on the Home card (similar to how Streaks app succeeds) taps loss-aversion psychology without creating compulsion. The streak exists to be *seen*, not celebrated.",
+      "source_title": "Gamification in Habit Tracking: Does It Work? (Research + Real User Data)",
+      "source_url": "https://www.cohorty.app/blog/gamification-in-habit-tracking-does-it-work-research-real-user-data",
+      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff;'><div style='background:#12253c;padding:16px;border-radius:10px;margin-bottom:12px;'><div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;'><div style='font-family:\"Press Start 2P\",sans-serif;font-size:9px;letter-spacing:1px;'>STREAK</div><div style='font-size:10px;color:#8fd6ff;'>📍 Day 47</div></div><div style='background:#0a1929;padding:8px;border-radius:6px;font-size:10px;line-height:1.4;'><div style='color:#7fffb0;margin-bottom:4px;'>• Quest check-in: Today ✓</div><div style='color:#66c8ff;margin-bottom:4px;'>• Logged 2 tasks: Today ✓</div><div style='color:#ff8080;opacity:0.6;'>• No reminders yet</div></div></div><div style='font-size:9px;color:#8fd6ff;opacity:0.7;margin-top:12px;'>No alerts, no points pop-ups — just the streak, visible every day.</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-04",
+      "updatedDate": "2026-10-04",
+      "originResearchId": "2026-10-04-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791151326935-2-inset-shadow-affordance-for-dark-retro-u": {
+      "id": "thread-1791151326935-2-inset-shadow-affordance-for-dark-retro-u",
+      "title": "Inset Shadow Affordance for Dark Retro UI: Clarity Without Losing Depth",
+      "description": "Neumorphic pressed states use inset shadows, where a resting button extrudes outward and on press the shadows move inward so the surface looks pushed into the page—this physical-looking dent reads as 'pressed' even without color change. Mission Control's dark cyan palette can adapt this: quest rank badges and quest checkboxes currently use outline borders for interactivity. Swapping to inset shadows (using the real --bezel-dark and --accent colors already in the palette) makes pressed states obvious while keeping the retro JRPG battle-menu vibe intact. No new colors needed.",
+      "source_title": "How neumorphism UI design works and where it quietly fails",
+      "source_url": "https://www.setproduct.com/blog/neumorphism-design-guide",
+      "mockup_html": "<div style='background:#0a1929;padding:20px;border-radius:10px;font-family:VT323,monospace;color:#dfeeff;'><div style='margin-bottom:16px;'><div style='font-family:\"Press Start 2P\",sans-serif;font-size:9px;letter-spacing:2px;color:#8fd6ff;margin-bottom:12px;'>QUEST AFFORDANCE</div><div style='display:flex;gap:16px;'><div style='flex:1;'><div style='font-size:9px;color:#8fd6ff;margin-bottom:8px;opacity:0.7;'>RESTING</div><div style='background:#0a1929;border:2px solid #1e3a5f;padding:12px;border-radius:6px;text-align:center;'><div style='font-size:10px;margin-bottom:8px;'>S-Rank Quest</div><div style='font-size:10px;color:#ff8a63;'>+50 XP</div></div></div><div style='flex:1;'><div style='font-size:9px;color:#8fd6ff;margin-bottom:8px;opacity:0.7;'>PRESSED</div><div style='background:#0a1929;padding:12px;border-radius:6px;text-align:center;box-shadow:inset 0 2px 4px #070b14, inset 0 -2px 4px rgba(143,214,255,0.1);'><div style='font-size:10px;margin-bottom:8px;color:#dfeeff;'>✓ S-Rank Quest</div><div style='font-size:10px;color:#7fffb0;'>+50 XP</div></div></div></div></div><div style='font-size:9px;color:#8fd6ff;opacity:0.6;margin-top:12px;'>Inset shadow (dark-to-light gradient) signals 'clicked in' without changing palette.</div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-04",
+      "updatedDate": "2026-10-04",
+      "originResearchId": "2026-10-04-design-research-daily",
+      "openTopic": false
     }
   },
   "designArchive": [
