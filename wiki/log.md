@@ -1016,3 +1016,10 @@ Chat session on 2026-10-04
 **Pages created:** [[calendar-events]]
 
 Calendar events synced
+
+## [2026-10-04] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-10-04-design-research-revisions-1791152093526]]
+
+Design research: Revisions: "Inset Shadows for Interactive Affordance", "Device-Local Offline Simulation: F… (2 findings)
