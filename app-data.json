@@ -851,6 +851,17 @@
   "designFeedback": [
     {
       "id": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "findingIndex": 1,
+      "threadId": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
+      "findingTitle": "Time-Delta Offline Progression (Capped, Full-Rate Simulation)",
+      "findingDescription": "Offline progression records the skill/action when the game closes, then on return simulates the time away (capped at 24 hours) as if the player had remained active, granting XP, items, and other rewards from that elapsed window. True offline models use a 24-hour cap with full speed for all skills and combat encounters—Melvor Idle, for example, simulates combat with food use and death math at 100% of online rate. The backend stores only `(lastClosedTime, activeAction)` and recomputes on boot—no b",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-10-04"
+    },
+    {
+      "id": "2026-10-03-design-research-useful-background-helper-automation-task",
       "findingIndex": 0,
       "threadId": "thread-1791049848841-0-deterministic-breeding-chain-solver",
       "findingTitle": "Deterministic Breeding Chain Solver",
@@ -2163,13 +2174,13 @@
       "source_title": "Tideward — Offline Progression Comparison",
       "source_url": "https://tideward.app/offline-progression/",
       "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>⏱ OFFLINE SUMMARY</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.8;'><div>Away 18h 34m | Cap 24h ✓</div><div style='margin-top:6px;'>Leader hunted: <span style='color:#7fffb0;'>+47 EXP</span></div><div>Eggs incubating: <span style='color:#7fffb0;'>2 hatched</span></div><div>Items gathered: <span style='color:#7fffb0;'>18 Poké Balls</span></div><div style='margin-top:6px;color:#ff8a63;font-size:8px;'>Battles: 12 | Food used: 8</div></div></div>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 2,
+      "lastRatingLabel": "Kind of",
       "lastComment": "",
       "createdDate": "2026-10-03",
-      "updatedDate": "2026-10-03",
+      "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
       "openTopic": true
     },
