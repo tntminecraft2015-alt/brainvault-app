@@ -996,3 +996,9 @@ Chat session on 2026-10-03
 **Pages created:** [[2026-10-04-design-research-daily]]
 
 Design research: General Improvements: Active Grids, Gamification Calibration & Inset-Shadow Affordance for Retro Dark UI (3 findings)
+
+## [2026-10-04] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Show Current Day Events on Home Screen
