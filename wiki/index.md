@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-10-04-design-research-revisions-1791152093526]] — 2 ideas Red reworked based on your feedback.
 - [[chat-2026-10-04]] — Claude conversation log for 2026-10-04
 - [[2026-10-04-design-research-daily]] — This research explores three practical improvements grounded in 2026 trends: interactive bento grid tiles that respond to hover without brea
 - [[chat-2026-10-03]] — Claude conversation log for 2026-10-03
