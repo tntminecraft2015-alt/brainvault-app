@@ -861,6 +861,17 @@
   "designFeedback": [
     {
       "id": "2026-10-04-design-research-revisions-1791152093526",
+      "findingIndex": 1,
+      "threadId": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
+      "findingTitle": "Device-Local Offline Simulation: Full 24h No-Connection Progress Banking",
+      "findingDescription": "Tideward simulates offline time entirely on-device so the full 24-hour window works with no connection at all—no server required. The simulator runs on your device with no account, so offline progression computes on a plane, in a tunnel, or with Wi-Fi off. On app close, it timestamps the save file along with active trade, gear, vitality, food, and buffs—then on return calculates elapsed wall-clock time (capped at 24 hours) and simulates what would have happened.",
+      "rating": 2,
+      "ratingLabel": "Kind of",
+      "comment": "",
+      "date": "2026-10-04"
+    },
+    {
+      "id": "2026-10-04-design-research-revisions-1791152093526",
       "findingIndex": 0,
       "threadId": "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha",
       "findingTitle": "Inset Shadows for Interactive Affordance",
@@ -2206,7 +2217,7 @@
       "source_title": "Tideward — Offline Progression Comparison",
       "source_url": "https://tideward.app/offline-progression/",
       "mockup_html": "<html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: monospace; background: #0a1929; color: #dfeeff; padding: 20px; } .card { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; } .label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #8fd6ff; margin-bottom: 8px; } .value { font-size: 18px; margin-bottom: 12px; font-weight: bold; color: #66c8ff; } .bar { height: 6px; background: #1e3a5f; border-radius: 3px; overflow: hidden; margin-bottom: 4px; } .fill { height: 100%; background: #7fffb0; transition: width 0.3s; } .summary { font-size: 12px; line-height: 1.4; color: #dfeeff; margin-top: 8px; } .delta { color: #7fffb0; font-weight: bold; }</style></head><body><div class='card'><div class='label'>⏱ Away for 18 hrs</div><div class='value'>Mining: +4,200 XP</div><div class='bar'><div class='fill' style='width: 67%'></div></div><div class='summary'>Ore gained: 84 | Health full | Ready to continue</div></div><div class='card'><div class='label'>🔋 No connection needed</div><div class='value'>All progress computed locally</div><div class='bar'><div class='fill' style='width: 100%'></div></div><div class='summary'>Offline cap: <span class='delta'>24 hours</span> max | No server sync required</div></div></body></html>",
-      "status": "awaiting_rating",
+      "status": "generating",
       "revisionCount": 1,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
