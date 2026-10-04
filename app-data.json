@@ -850,6 +850,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "findingIndex": 0,
+      "threadId": "thread-1791049848841-0-deterministic-breeding-chain-solver",
+      "findingTitle": "Deterministic Breeding Chain Solver",
+      "findingDescription": "IV inheritance can be controlled via holding items: 3 IVs inherit randomly normally, but the Destiny Knot increases this to 5 inherited IVs. With two perfect parents and a Destiny Knot, the odds of perfect offspring are ~3.1%. A farm app backend should compute viable breeding paths: given a target (e.g., 6 perfect IVs, specific Nature, egg move set), calculate the minimal parent lineage and item strategy to achieve it offline. This is a graph search, not a simulation—precompute paths once and st",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-10-04"
+    },
+    {
       "id": "2026-10-01-design-research-daily",
       "findingIndex": 2,
       "threadId": "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha",
@@ -2135,13 +2146,13 @@
       "source_title": "Random Pokémon Picker Breeding Calculator",
       "source_url": "https://www.randompokemonpicker.com/tools/breeding-calculator",
       "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>BREEDING PATH</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.6;'><div>Target: 6IV • Hasty • Egg Move</div><div style='margin-top:6px;color:#8fd6ff;'>→ Parent A: 6IV Ditto (Destiny Knot)</div><div style='color:#8fd6ff;'>→ Parent B: 31 Sp.Atk (Power Lens)</div><div style='margin-top:6px;color:#7fffb0;'>Odds: 1 in 32 | ~3 eggs</div><div style='color:#ff8a63;font-size:8px;margin-top:4px;'>⚡ Hatch every 15m offline</div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-10-03",
-      "updatedDate": "2026-10-03",
+      "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
       "openTopic": true
     },
