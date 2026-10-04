@@ -989,3 +989,10 @@ Design research: Pokémon Farm Backend Automation: Breeding Chains, Offline Sim 
 **Pages created:** [[chat-2026-10-03]]
 
 Chat session on 2026-10-03
+
+## [2026-10-04] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-10-04-design-research-daily]]
+
+Design research: General Improvements: Active Grids, Gamification Calibration & Inset-Shadow Affordance for Retro Dark UI (3 findings)
