@@ -851,6 +851,17 @@
   "designFeedback": [
     {
       "id": "2026-10-03-design-research-useful-background-helper-automation-task",
+      "findingIndex": 2,
+      "threadId": "thread-1791049848841-2-stat-formula-inversion-for-auto-training",
+      "findingTitle": "Stat Formula Inversion for Auto-Training Targets",
+      "findingDescription": "The stat formula is: Stat = ⌊(⌊(2 × Base + IV + ⌊EV/4⌋) × Level / 100⌋ + 5) × Nature⌋. Inverting the formula lets you calculate how many EVs are needed to raise a stat by N points at any level, accounting for Nature and item boosts. A farm app backend should precompute and cache these inversions for every species/level/nature combo, then recommend: 'to hit 180 Attack at Lv. 50, you need 120 EVs (26 Protein, 8 Power Bracer battles, or Pokérus multiplier equivalent).' This decouples UI from math.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-10-04"
+    },
+    {
+      "id": "2026-10-03-design-research-useful-background-helper-automation-task",
       "findingIndex": 1,
       "threadId": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
       "findingTitle": "Time-Delta Offline Progression (Capped, Full-Rate Simulation)",
@@ -2191,13 +2202,13 @@
       "source_title": "Terresquall Blog — Calculating EVs Needed to Raise a Stat",
       "source_url": "https://blog.terresquall.com/2020/07/calculating-evs-needed-to-raise-a-stat-in-pokemon/",
       "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>EV PLAN</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.6;'><div>Species: Machamp | Lv 50</div><div style='margin-top:6px;'>Goal: 180 Attack</div><div style='background:#1e3a5f;padding:6px;margin-top:6px;border-radius:3px;'><div style='display:flex;justify-content:space-between;'><span>Ev/4 = +stat</span><span style='color:#7fffb0;'>120 EV needed</span></div><div style='font-size:8px;color:#8fd6ff;margin-top:4px;'>• 26× Protein (10 EV ea)</div><div style='font-size:8px;color:#8fd6ff;'>+ 4× Power Bracer (8 EV ea)</div></div></div></div>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 0,
-      "lastRating": null,
-      "lastRatingLabel": null,
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-10-03",
-      "updatedDate": "2026-10-03",
+      "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
       "openTopic": true
     },
