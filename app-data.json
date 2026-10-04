@@ -428,6 +428,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-04-design-research-revisions-1791152093526",
+      "date": "2026-10-04",
+      "topic": "",
+      "title": "Revisions: \"Inset Shadows for Interactive Affordance\", \"Device-Local Offline Simulation: F…",
+      "findingsCount": 2,
+      "auto": true,
+      "isRevision": true,
+      "viewed": false
+    },
+    {
       "id": "2026-10-04-design-research-daily",
       "date": "2026-10-04",
       "topic": "",
@@ -2048,7 +2058,7 @@
       "source_title": "How to Master Neumorphism in UI Design (With Examples)",
       "source_url": "https://clay.global/blog/neumorphism-ui",
       "mockup_html": "<!DOCTYPE html><html><head><style>body{margin:0;padding:20px;background:#0a1929;font-family:'VT323',monospace;font-size:16px}h3{color:#8fd6ff;font-family:'Press Start 2P',sans-serif;font-size:9px;margin:0 0 12px;text-transform:uppercase}.demo{display:flex;flex-direction:column;gap:16px}.card-set{display:flex;gap:12px}.card{width:140px;padding:12px;background:#12253c;border:2px solid #ff8a63;color:#dfeeff;font-size:14px;cursor:pointer;transition:all .15s}.card.static{box-shadow:inset 0 0 0 3px #1a2533,inset 0 0 0 5px #12253c,inset 0 0 0 7px #ff8a63}.card.neumorphic{box-shadow:inset 2px 2px 4px rgba(139,214,255,.1),inset -2px -2px 4px rgba(0,0,0,.3),0 0 0 3px #1a2533,0 0 0 5px #12253c,0 0 0 7px #ff8a63}.card.neumorphic:hover{box-shadow:inset 1px 1px 3px rgba(139,214,255,.15),inset -1px -1px 3px rgba(0,0,0,.4),0 0 0 3px #1a2533,0 0 0 5px #12253c,0 0 0 7px #ff8a63;background:#1e3a5f}.input-row{display:flex;gap:8px;align-items:center}.input-field{flex:1;padding:8px;background:#12253c;border:1px solid #66c8ff;color:#dfeeff;font-family:'VT323',monospace;font-size:12px;box-shadow:inset 1px 1px 2px rgba(139,214,255,.08),inset -1px -1px 2px rgba(0,0,0,.2)}.btn{padding:6px 10px;background:#ff8a63;color:#070b14;border:none;font-family:'VT323',monospace;font-size:12px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.3)}.label-compare{color:#8fd6ff;font-size:11px;font-weight:bold}</style></head><body><h3>Standard vs. Neumorphic Inset</h3><div class='demo'><div><span class='label-compare'>← Standard JRPG Border (no inset)</span><div class='card-set'><div class='card static'>Quest</div><div class='card static'>Event</div></div></div><div><span class='label-compare'>Neumorphic Inset (signals affordance) →</span><div class='card-set'><div class='card neumorphic'>Quest</div><div class='card neumorphic'>Event</div></div></div><div style='margin-top:8px'><span class='label-compare'>Input Field with Inset Depth</span><div class='input-row'><input class='input-field' value='Quick add...'><button class='btn'>▶ ADD</button></div></div></div></body></html>",
-      "status": "ready_to_ship",
+      "status": "awaiting_rating",
       "revisionCount": 1,
       "lastRating": 3,
       "lastRatingLabel": "Almost there",
@@ -2180,20 +2190,21 @@
     },
     "thread-1791049848841-1-time-delta-offline-progression-capped-fu": {
       "id": "thread-1791049848841-1-time-delta-offline-progression-capped-fu",
-      "title": "Time-Delta Offline Progression (Capped, Full-Rate Simulation)",
-      "description": "Offline progression records the skill/action when the game closes, then on return simulates the time away (capped at 24 hours) as if the player had remained active, granting XP, items, and other rewards from that elapsed window. True offline models use a 24-hour cap with full speed for all skills and combat encounters—Melvor Idle, for example, simulates combat with food use and death math at 100% of online rate. The backend stores only `(lastClosedTime, activeAction)` and recomputes on boot—no background threads needed.",
+      "title": "Device-Local Offline Simulation: Full 24h No-Connection Progress Banking",
+      "description": "Tideward simulates offline time entirely on-device so the full 24-hour window works with no connection at all—no server required. The simulator runs on your device with no account, so offline progression computes on a plane, in a tunnel, or with Wi-Fi off. On app close, it timestamps the save file along with active trade, gear, vitality, food, and buffs—then on return calculates elapsed wall-clock time (capped at 24 hours) and simulates what would have happened.",
       "source_title": "Tideward — Offline Progression Comparison",
       "source_url": "https://tideward.app/offline-progression/",
-      "mockup_html": "<div style='background:#0a1929;color:#dfeeff;padding:12px;font-family:VT323;border-radius:6px;'><div style='font-size:11px;font-weight:bold;margin-bottom:8px;letter-spacing:0.5px;'>⏱ OFFLINE SUMMARY</div><div style='background:#12253c;padding:8px;border-radius:4px;font-size:9px;line-height:1.8;'><div>Away 18h 34m | Cap 24h ✓</div><div style='margin-top:6px;'>Leader hunted: <span style='color:#7fffb0;'>+47 EXP</span></div><div>Eggs incubating: <span style='color:#7fffb0;'>2 hatched</span></div><div>Items gathered: <span style='color:#7fffb0;'>18 Poké Balls</span></div><div style='margin-top:6px;color:#ff8a63;font-size:8px;'>Battles: 12 | Food used: 8</div></div></div>",
-      "status": "generating",
-      "revisionCount": 0,
+      "mockup_html": "<html><head><style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: monospace; background: #0a1929; color: #dfeeff; padding: 20px; } .card { background: #12253c; border-radius: 8px; padding: 16px; margin-bottom: 12px; } .label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #8fd6ff; margin-bottom: 8px; } .value { font-size: 18px; margin-bottom: 12px; font-weight: bold; color: #66c8ff; } .bar { height: 6px; background: #1e3a5f; border-radius: 3px; overflow: hidden; margin-bottom: 4px; } .fill { height: 100%; background: #7fffb0; transition: width 0.3s; } .summary { font-size: 12px; line-height: 1.4; color: #dfeeff; margin-top: 8px; } .delta { color: #7fffb0; font-weight: bold; }</style></head><body><div class='card'><div class='label'>⏱ Away for 18 hrs</div><div class='value'>Mining: +4,200 XP</div><div class='bar'><div class='fill' style='width: 67%'></div></div><div class='summary'>Ore gained: 84 | Health full | Ready to continue</div></div><div class='card'><div class='label'>🔋 No connection needed</div><div class='value'>All progress computed locally</div><div class='bar'><div class='fill' style='width: 100%'></div></div><div class='summary'>Offline cap: <span class='delta'>24 hours</span> max | No server sync required</div></div></body></html>",
+      "status": "awaiting_rating",
+      "revisionCount": 1,
       "lastRating": 2,
       "lastRatingLabel": "Kind of",
       "lastComment": "",
       "createdDate": "2026-10-03",
       "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-03-design-research-useful-background-helper-automation-task",
-      "openTopic": true
+      "openTopic": true,
+      "mc_relevance": "Mission Control's quest XP reward system could bank time-away progress: close the app on a current quest, return next day, and see simulated XP/completion as if that quest had continued—capped at 24 hours. Needs only local timestamp + stored quest state on close."
     },
     "thread-1791049848841-2-stat-formula-inversion-for-auto-training": {
       "id": "thread-1791049848841-2-stat-formula-inversion-for-auto-training",
