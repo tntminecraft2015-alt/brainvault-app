@@ -2660,7 +2660,11 @@
       "interval": 1,
       "startDate": "2026-10-06",
       "endDate": "2026-12-20",
-      "exceptions": {}
+      "exceptions": {
+        "2026-10-06": {
+          "skip": true
+        }
+      }
     }
   ],
   "redAssignments": [
