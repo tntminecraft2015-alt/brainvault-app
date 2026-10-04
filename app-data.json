@@ -860,6 +860,17 @@
   ],
   "designFeedback": [
     {
+      "id": "2026-10-04-design-research-revisions-1791152093526",
+      "findingIndex": 0,
+      "threadId": "thread-1790865144090-2-neumorphic-depth-as-affordance-inset-sha",
+      "findingTitle": "Inset Shadows for Interactive Affordance",
+      "findingDescription": "Neumorphic inset shadows (light shadow at top-left, dark at bottom-right) layered subtly beneath Mission Control's hard JRPG borders create depth and signal interactivity on quest rows, event cards, and inputs without breaking retro style. Pair with strong text contrast to avoid neumorphism's accessibility trap. This makes clickable elements visually distinct from static labels at a glance.",
+      "rating": 1,
+      "ratingLabel": "Not even close",
+      "comment": "",
+      "date": "2026-10-04"
+    },
+    {
       "id": "2026-10-03-design-research-useful-background-helper-automation-task",
       "findingIndex": 2,
       "threadId": "thread-1791049848841-2-stat-formula-inversion-for-auto-training",
@@ -2058,13 +2069,13 @@
       "source_title": "How to Master Neumorphism in UI Design (With Examples)",
       "source_url": "https://clay.global/blog/neumorphism-ui",
       "mockup_html": "<!DOCTYPE html><html><head><style>body{margin:0;padding:20px;background:#0a1929;font-family:'VT323',monospace;font-size:16px}h3{color:#8fd6ff;font-family:'Press Start 2P',sans-serif;font-size:9px;margin:0 0 12px;text-transform:uppercase}.demo{display:flex;flex-direction:column;gap:16px}.card-set{display:flex;gap:12px}.card{width:140px;padding:12px;background:#12253c;border:2px solid #ff8a63;color:#dfeeff;font-size:14px;cursor:pointer;transition:all .15s}.card.static{box-shadow:inset 0 0 0 3px #1a2533,inset 0 0 0 5px #12253c,inset 0 0 0 7px #ff8a63}.card.neumorphic{box-shadow:inset 2px 2px 4px rgba(139,214,255,.1),inset -2px -2px 4px rgba(0,0,0,.3),0 0 0 3px #1a2533,0 0 0 5px #12253c,0 0 0 7px #ff8a63}.card.neumorphic:hover{box-shadow:inset 1px 1px 3px rgba(139,214,255,.15),inset -1px -1px 3px rgba(0,0,0,.4),0 0 0 3px #1a2533,0 0 0 5px #12253c,0 0 0 7px #ff8a63;background:#1e3a5f}.input-row{display:flex;gap:8px;align-items:center}.input-field{flex:1;padding:8px;background:#12253c;border:1px solid #66c8ff;color:#dfeeff;font-family:'VT323',monospace;font-size:12px;box-shadow:inset 1px 1px 2px rgba(139,214,255,.08),inset -1px -1px 2px rgba(0,0,0,.2)}.btn{padding:6px 10px;background:#ff8a63;color:#070b14;border:none;font-family:'VT323',monospace;font-size:12px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,.3)}.label-compare{color:#8fd6ff;font-size:11px;font-weight:bold}</style></head><body><h3>Standard vs. Neumorphic Inset</h3><div class='demo'><div><span class='label-compare'>← Standard JRPG Border (no inset)</span><div class='card-set'><div class='card static'>Quest</div><div class='card static'>Event</div></div></div><div><span class='label-compare'>Neumorphic Inset (signals affordance) →</span><div class='card-set'><div class='card neumorphic'>Quest</div><div class='card neumorphic'>Event</div></div></div><div style='margin-top:8px'><span class='label-compare'>Input Field with Inset Depth</span><div class='input-row'><input class='input-field' value='Quick add...'><button class='btn'>▶ ADD</button></div></div></div></body></html>",
-      "status": "awaiting_rating",
+      "status": "discarded",
       "revisionCount": 1,
-      "lastRating": 3,
-      "lastRatingLabel": "Almost there",
+      "lastRating": 1,
+      "lastRatingLabel": "Not even close",
       "lastComment": "",
       "createdDate": "2026-10-01",
-      "updatedDate": "2026-10-02",
+      "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-01-design-research-daily",
       "openTopic": false,
       "mc_relevance": ""
