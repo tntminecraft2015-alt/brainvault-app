@@ -1023,3 +1023,10 @@ Calendar events synced
 **Pages created:** [[2026-10-04-design-research-revisions-1791152093526]]
 
 Design research: Revisions: "Inset Shadows for Interactive Affordance", "Device-Local Offline Simulation: F… (2 findings)
+
+## [2026-10-05] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-10-05-design-research-daily]]
+
+Design research: General Improvements: Depth Affordance, Smart Gamification Boundaries & Content-Driven Card Sizing (3 findings)
