@@ -428,6 +428,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-05-design-research-daily",
+      "date": "2026-10-05",
+      "topic": "",
+      "title": "General Improvements: Depth Affordance, Smart Gamification Boundaries & Content-Driven Card Sizing",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-04-design-research-revisions-1791152093526",
       "date": "2026-10-04",
       "topic": "",
@@ -656,7 +666,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-04",
+  "lastDesignResearchAutoRun": "2026-10-05",
   "changeRequests": [
     {
       "id": "2026-10-04-show-current-day-events-on-home-screen",
@@ -2294,6 +2304,57 @@
       "createdDate": "2026-10-04",
       "updatedDate": "2026-10-04",
       "originResearchId": "2026-10-04-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791228337825-0-inverted-inset-shadows-for-dark-retro-st": {
+      "id": "thread-1791228337825-0-inverted-inset-shadows-for-dark-retro-st",
+      "title": "Inverted Inset Shadows for Dark Retro: State Clarity on High-Contrast Action Buttons",
+      "description": "In dark mode, Mission Control uses inverted skeuomorphism with subtle inner-stroke edge-lighting to mimic plastic objects in dim rooms. Instead of relying on soft shadows that fail accessibility audits, add a subtle secondary indicator like a 2px high-contrast underline or color change on hover to confirm interactivity to low-vision users. Applies perfectly to rank badges and quest checkboxes — where the \"pressed\" state needs to feel physically inset without losing the JRPG aesthetic.",
+      "source_title": "Timothy Graf: Glassmorphism vs. Neumorphism — High-End UI Guide (2026)",
+      "source_url": "https://timgraf.com/ui/glassmorphism-vs-neumorphism-high-end-ui-guide-2026/",
+      "mockup_html": "<style>\n  body { background: #0a1929; font-family: VT323, monospace; padding: 20px; }\n  .rank-badge {\n    width: 80px; height: 80px; border-radius: 8px;\n    background: #12253c; display: flex; align-items: center; justify-content: center;\n    font-size: 24px; font-weight: bold; cursor: pointer;\n    box-shadow: inset 0 0 0 1px #66c8ff, inset 0 1px 3px rgba(223,238,255,.1);\n    transition: all 120ms;\n    position: relative;\n  }\n  .rank-badge:active {\n    box-shadow: inset 0 0 0 1px #66c8ff, inset 0 -2px 4px rgba(0,0,0,.4), inset 0 2px 0 rgba(102,200,255,.3);\n    transform: translateY(1px);\n  }\n  .rank-badge.s-rank { color: #e85d3a; }\n  .rank-badge.s-rank:after {\n    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;\n    background: #e85d3a; opacity: 0; transition: opacity 120ms;\n  }\n  .rank-badge.s-rank:active:after { opacity: 1; }\n  .label { color: #dfeeff; font-size: 11px; margin-top: 8px; text-align: center; }\n</style>\n<div style=\"display: flex; gap: 16px; align-items: flex-start;\">\n  <div>\n    <div class=\"rank-badge s-rank\">S</div>\n    <div class=\"label\">Unpressed</div>\n  </div>\n  <div>\n    <div class=\"rank-badge s-rank\" style=\"box-shadow: inset 0 0 0 1px #66c8ff, inset 0 -2px 4px rgba(0,0,0,.4), inset 0 2px 0 rgba(102,200,255,.3); transform: translateY(1px);\"><span style=\"opacity: 0.7;\">S</span></div>\n    <div class=\"label\">Pressed</div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-05",
+      "updatedDate": "2026-10-05",
+      "originResearchId": "2026-10-05-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791228337825-1-gamification-graduation-auto-switch-from": {
+      "id": "thread-1791228337825-1-gamification-graduation-auto-switch-from",
+      "title": "Gamification Graduation: Auto-Switch from Points to Streaks After 90 Days",
+      "description": "When protecting a streak becomes another task, gamification adds friction rather than removing it. Autonomous motivation, not external reward, predicts habit persistence — switching to timed structure instead of points keeps the underlying habit while dropping the game management overhead. Mission Control can detect user tenure and automatically soften point popups after 90 days, letting the existing day-streak card carry the motivation load. Prevents burnout while respecting that early adopters need quick wins.",
+      "source_title": "Routine & Habit Tracker: Best Gamified Habit & Productivity Apps (2026)",
+      "source_url": "https://www.routinery.app/blog/best-gamified-habit-productivity-apps",
+      "mockup_html": "<style>\n  body { background: #0a1929; font-family: VT323, monospace; padding: 20px; }\n  .cards { display: flex; gap: 12px; flex-direction: column; max-width: 280px; }\n  .card { background: #12253c; border-radius: 10px; padding: 12px; box-shadow: inset 0 0 0 2px #1a2533; }\n  .label { color: #8fd6ff; font-size: 10px; text-transform: uppercase; margin-bottom: 6px; }\n  .stat { color: #dfeeff; font-size: 20px; font-weight: bold; margin-bottom: 4px; }\n  .xp-pop { color: #7fffb0; font-size: 12px; animation: float-fade 1.5s ease-out; }\n  @keyframes float-fade { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-20px); } }\n  .streak-quiet { color: #ff8a63; font-size: 16px; margin-top: 4px; }\n  .phase-label { font-size: 9px; color: #8fd6ff; margin-top: 8px; opacity: 0.7; }\n</style>\n<div class=\"cards\">\n  <div class=\"card\"><div class=\"label\">🎮 Early Phase (&lt;90d)</div><div class=\"stat\">142 XP</div><div class=\"xp-pop\">+50 XP</div><div class=\"phase-label\">Points active, streak forming</div></div>\n  <div class=\"card\"><div class=\"label\">📊 Mature Phase (&gt;90d)</div><div class=\"stat\">73 Day Streak</div><div class=\"streak-quiet\">↑ Motivation now autonomous</div><div class=\"phase-label\">Points muted, structure visible</div></div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-05",
+      "updatedDate": "2026-10-05",
+      "originResearchId": "2026-10-05-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791228337825-2-content-earned-cell-sizing-scale-card-he": {
+      "id": "thread-1791228337825-2-content-earned-cell-sizing-scale-card-he",
+      "title": "Content-Earned Cell Sizing: Scale Card Height to Fit Content, Not Canvas",
+      "description": "The biggest mistake is sizing cells to fill the canvas instead of to fit what they hold. A cell with a single number does not need the same size as one with a screenshot and three sentences — forcing them equal leaves one empty and one cramped. Mission Control's quest card can shrink when it holds 1–2 items and expand when holding 4+, collapsing responsively from desktop (full asymmetry) to tablet (two columns) to mobile (single full-width stack in priority order).",
+      "source_title": "Brainy.ink: Bento Grid Design Guide (2026)",
+      "source_url": "https://brainy.ink/paper/bento-grid-design-guide",
+      "mockup_html": "<style>\n  body { background: #0a1929; font-family: VT323, monospace; padding: 20px; }\n  .quest-card { background: #12253c; border-radius: 10px; padding: 12px; box-shadow: inset 0 0 0 2px #1a2533; width: 240px; }\n  .card-title { color: #8fd6ff; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; }\n  .quest-item { color: #dfeeff; font-size: 13px; padding: 6px 0; border-bottom: 1px solid rgba(26,37,51,.6); }\n  .quest-item:last-child { border: none; }\n  .rank { float: right; font-weight: bold; }\n  .short { }\n  .tall { }\n  .label-sm { font-size: 9px; color: #8fd6ff; margin-top: 6px; }\n</style>\n<div style=\"display: flex; gap: 12px;\">\n  <div class=\"quest-card short\"><div class=\"card-title\">TODAY'S QUESTS</div><div class=\"quest-item\">Morning run <span class=\"rank\">S</span></div><div class=\"label-sm\">1 item → compact card</div></div>\n  <div class=\"quest-card tall\"><div class=\"card-title\">TODAY'S QUESTS</div><div class=\"quest-item\">Morning run <span class=\"rank\">S</span></div><div class=\"quest-item\">Code review <span class=\"rank\">B</span></div><div class=\"quest-item\">Call mom <span class=\"rank\">B</span></div><div class=\"quest-item\">Evening walk <span class=\"rank\">B</span></div><div class=\"label-sm\">4 items → expands naturally</div></div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-05",
+      "updatedDate": "2026-10-05",
+      "originResearchId": "2026-10-05-design-research-daily",
       "openTopic": false
     }
   },
