@@ -123,6 +123,17 @@
         "notifyLeadMin": null,
         "linkedTaskId": 1790874404082
       }
+    ],
+    "2026-10-12": [
+      {
+        "id": "ev-1791228391344",
+        "title": "History test",
+        "time": "15:00",
+        "location": "",
+        "kind": "focus",
+        "notify": false,
+        "notifyLeadMin": null
+      }
     ]
   },
   "tasks": [
