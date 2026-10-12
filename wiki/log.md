@@ -1037,3 +1037,10 @@ Design research: General Improvements: Depth Affordance, Smart Gamification Boun
 **Pages created:** [[chat-2026-10-05]]
 
 Chat session on 2026-10-05
+
+## [2026-10-12] note | Mission Control Sync
+
+**Operation:** note
+**Pages created:** [[2026-10-12-design-research-daily]]
+
+Design research: General Improvements: Progressive Disclosure, Micro-Interaction Polish & Inset-Depth Affordance (3 findings)
