@@ -1,8 +1,8 @@
 ---
 type: analysis
 title: "Calendar Events"
-last_updated: "2026-10-05"
-synced_at: "10/5/2026, 7:26:31 PM"
+last_updated: "2026-10-12"
+synced_at: "10/12/2026, 2:06:08 PM"
 tags: [calendar, events]
 ---
 
@@ -24,6 +24,10 @@ tags: [calendar, events]
 | 2026-10-08 | — | Psych Exam | focus |  |
 | 2026-10-08 | — | Chapter Assignments Due | focus |  |
 | 2026-10-12 | 15:00 | History test | focus |  |
+| 2026-10-13 | 17:00 | Work | routine | MyShift |
+| 2026-10-15 | 16:00 | Work | routine | MyShift |
+| 2026-10-17 | 11:00 | Work | routine | MyShift |
+| 2026-10-17 | 17:00 | Work | routine | MyShift |
 
 ## Recurring Events
 
@@ -36,4 +40,4 @@ tags: [calendar, events]
 | Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
 
-_Last synced: 10/5/2026, 7:26:31 PM_
+_Last synced: 10/12/2026, 2:06:08 PM_
