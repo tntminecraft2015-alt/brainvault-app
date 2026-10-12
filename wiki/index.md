@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[chat-2026-10-12]] — Claude conversation log for 2026-10-12
 - [[2026-10-12-design-research-daily]] — Recent dashboard trends emphasize data storytelling through progressive disclosure, visual hierarchy that guides attention without cognitive
 - [[chat-2026-10-05]] — Claude conversation log for 2026-10-05
 - [[2026-10-05-design-research-daily]] — Found three patterns: retro-dark UI with inset shadows for tactile button states (proven on gaming interfaces but requiring contrast fallbac
