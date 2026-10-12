@@ -439,6 +439,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-12-design-research-daily",
+      "date": "2026-10-12",
+      "topic": "",
+      "title": "General Improvements: Progressive Disclosure, Micro-Interaction Polish & Inset-Depth Affordance",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-05-design-research-daily",
       "date": "2026-10-05",
       "topic": "",
@@ -677,7 +687,7 @@
       "viewed": true
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-05",
+  "lastDesignResearchAutoRun": "2026-10-12",
   "changeRequests": [
     {
       "id": "2026-10-04-show-current-day-events-on-home-screen",
@@ -2366,6 +2376,57 @@
       "createdDate": "2026-10-05",
       "updatedDate": "2026-10-05",
       "originResearchId": "2026-10-05-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791813940165-0-progressive-disclosure-collapse-secondar": {
+      "id": "thread-1791813940165-0-progressive-disclosure-collapse-secondar",
+      "title": "Progressive Disclosure: Collapse Secondary Details, Surface Critical Metrics",
+      "description": "Show only the most actionable data first—today's quests, current week stats—with clear 'View More' toggles to drill into history or details. Modern dashboards reduce cognitive load by staging information: high-level overview → expandable cards → full details on demand. Applied to Mission Control: the HOME card collapses past weeks into a hidden timeline; the CAL tab shows only this month grid first, with an expand for yearly view; GIL wallet hides income/expense history under a collapsible section. Keeps the screen scannable at a glance without sacrificing depth.",
+      "source_title": "Modern Dashboard UI: 2026 Design Trends and Layouts",
+      "source_url": "https://artofstyleframe.com/blog/dashboard-design-patterns-web-apps/",
+      "mockup_html": "<div style=\"background: #0a1929; padding: 20px; font-family: VT323, monospace; color: #dfeeff;\">\n  <div style=\"background: #12253c; border-radius: 10px; padding: 16px; margin-bottom: 12px; border: 2px solid #1a2533;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;\">\n      <span style=\"font-size: 12px; font-weight: bold; color: #8fd6ff;\">🎯 TODAY'S QUESTS</span>\n      <span style=\"cursor: pointer; color: #66c8ff; font-size: 10px;\">▼ EXPAND</span>\n    </div>\n    <div style=\"background: #0c1422; padding: 8px; border-radius: 6px; font-size: 11px; margin-bottom: 8px;\">\n      S-rank: Morning routine · 6:00 AM\n    </div>\n    <div style=\"background: #0c1422; padding: 8px; border-radius: 6px; font-size: 11px;\">\n      B-rank: Coding session · No time set\n    </div>\n  </div>\n  <div style=\"background: #12253c; border-radius: 10px; padding: 16px; border: 2px solid #1a2533;\">\n    <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n      <span style=\"font-size: 12px; font-weight: bold; color: #8fd6ff;\">📊 THIS WEEK</span>\n      <span style=\"cursor: pointer; color: #ff8a63; font-size: 10px;\">▼ +150 XP</span>\n    </div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-12",
+      "updatedDate": "2026-10-12",
+      "originResearchId": "2026-10-12-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791813940165-1-non-shadow-affordance-for-depth-pair-ins": {
+      "id": "thread-1791813940165-1-non-shadow-affordance-for-depth-pair-ins",
+      "title": "Non-Shadow Affordance for Depth: Pair Inset Shadows with Color/Icon Signals",
+      "description": "Mission Control's inset-shadow JRPG aesthetic is accessible and unique—but only when paired with a secondary signal (accent color, icon, or status chip) that communicates 'clickable' or 'active' beyond the shadow alone. Research shows neumorphic/inset-shadow UIs fail accessibility when shadows are the only depth cue. Solution: rank badges stay inset-shadowed, but gain a subtle accent-color bar on the left (S=red, A=orange, B=blue, C=gray), or the quest text itself shifts to a brighter foreground color on hover. Desktop quest checkboxes already have this (the XP pop animation is the secondary signal); mobile quest items need the same clarity.",
+      "source_title": "Neumorphism in user interfaces",
+      "source_url": "https://hype4.academy/articles/design/neumorphism-in-user-interfaces",
+      "mockup_html": "<div style=\"background: #0a1929; padding: 20px; font-family: VT323, monospace; color: #dfeeff;\">\n  <div style=\"display: flex; gap: 8px; margin-bottom: 12px;\">\n    <div style=\"background: #12253c; border-radius: 6px; padding: 8px 12px; font-size: 10px; border-left: 3px solid #ff8080; box-shadow: inset 0 0 0 2px #ff8080; cursor: pointer; transition: all 0.15s;\">\n      S-rank · Morning\n    </div>\n    <div style=\"background: #12253c; border-radius: 6px; padding: 8px 12px; font-size: 10px; border-left: 3px solid #4a90d9; box-shadow: inset 0 0 0 2px #4a90d9; cursor: pointer;\">\n      B-rank · Today\n    </div>\n  </div>\n  <div style=\"font-size: 9px; color: #8fd6ff; margin-top: 16px; padding: 8px; background: #0c1422; border-radius: 6px;\">\n    ✓ Inset shadow = depth<br/>✓ Left border = rank rank<br/>✓ Focus ring on :focus-visible\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-12",
+      "updatedDate": "2026-10-12",
+      "originResearchId": "2026-10-12-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1791813940165-2-single-mechanic-streak-visualization-cal": {
+      "id": "thread-1791813940165-2-single-mechanic-streak-visualization-cal",
+      "title": "Single-Mechanic Streak Visualization: Calendar Heat-Map Mini-Card on Home",
+      "description": "Gamification effectiveness is not proportional to complexity; a single well-chosen mechanic applied with design precision outperforms elaborate systems. Add a small 'This Week' heat-map card to the HOME bento grid (7 tiny squares, one per day, colored by quest completion: full green, half-yellow, empty gray). No numbers, no XP pop—just a visual chain that shows the streak at a glance. Streaks motivate without creating pressure; if a streak breaks, progress history remains valuable. This replaces the removed LEVEL counter with something more forgiving and habit-science-backed.",
+      "source_title": "Best Gamified Habit Trackers (2026) — Points, Rewards, and Streaks",
+      "source_url": "https://www.pointwisesystem.com/blog/best-gamified-habit-trackers",
+      "mockup_html": "<div style=\"background: #0a1929; padding: 20px; font-family: VT323, monospace; color: #dfeeff;\">\n  <div style=\"background: #12253c; border-radius: 10px; padding: 12px; border: 2px solid #1a2533;\">\n    <div style=\"font-size: 10px; font-weight: bold; color: #8fd6ff; margin-bottom: 10px;\">📅 THIS WEEK</div>\n    <div style=\"display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;\">\n      <div style=\"width: 24px; height: 24px; background: #7fffb0; border-radius: 4px; cursor: help;\" title=\"Mon: 2/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #7fffb0; border-radius: 4px; cursor: help;\" title=\"Tue: 2/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #ffd700; border-radius: 4px; cursor: help;\" title=\"Wed: 1/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #7a8a78; border-radius: 4px; cursor: help;\" title=\"Thu: 0/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #7fffb0; border-radius: 4px; cursor: help;\" title=\"Fri: 2/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #7fffb0; border-radius: 4px; cursor: help;\" title=\"Sat: 2/2\"></div>\n      <div style=\"width: 24px; height: 24px; background: #7a8a78; border-radius: 4px; cursor: help;\" title=\"Sun: Not yet\"></div>\n    </div>\n  </div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-12",
+      "updatedDate": "2026-10-12",
+      "originResearchId": "2026-10-12-design-research-daily",
       "openTopic": false
     }
   },
