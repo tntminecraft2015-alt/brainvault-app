@@ -1065,3 +1065,10 @@ Calendar events synced
 **Pages created:** [[2026-10-20-design-research-daily]]
 
 Design research: General Improvements: Adaptive Layouts, Subtle Depth Clarity & Sustainable Engagement (3 findings)
+
+## [2026-10-20] query | Mission Control Sync
+
+**Operation:** query
+**Pages created:** [[chat-2026-10-20]]
+
+Chat session on 2026-10-20
