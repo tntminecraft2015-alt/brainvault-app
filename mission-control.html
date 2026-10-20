@@ -1464,13 +1464,13 @@
 
       <div class="buddy-card" id="buddyCard"></div>
 
-      <div class="home-card">
+      <div class="home-card" onclick="if(!event.target.closest('button'))goToMobTab('cal')">
         <div class="home-card-hd">
-          <span class="home-card-t">Today's quests</span>
-          <span class="home-count" id="mobHomeQuestCount">0/0</span>
-          <button type="button" class="home-add" onclick="openAddSheetAs('quest')">+ Add</button>
+          <span class="home-card-t">Today</span>
+          <span class="home-count" id="mobHomeTodayCount">0</span>
+          <button type="button" class="home-add" onclick="event.stopPropagation();openAddSheet(TODAY())">+ Add</button>
         </div>
-        <div class="tl-list home-tl" id="mobHomeQuestList"></div>
+        <div class="tl-list home-tl" id="mobHomeTodayList"></div>
       </div>
 
       <div class="home-card" onclick="if(!event.target.closest('button'))goToMobTab('gil')">
@@ -1479,15 +1479,6 @@
           <span class="home-gil" id="mobHomeGilAmt">$0</span>
         </div>
         <div class="quickgil-row" id="mobQuickGilRow"></div>
-      </div>
-
-      <div class="home-card" onclick="if(!event.target.closest('button'))goToMobTab('cal')">
-        <div class="home-card-hd">
-          <span class="home-card-t">Today's events</span>
-          <span class="home-count" id="mobHomeEventsCount">0</span>
-          <button type="button" class="home-add" onclick="event.stopPropagation();openAddSheetAs('event')">+ Add</button>
-        </div>
-        <div class="tl-list home-tl" id="mobHomeEventsList"></div>
       </div>
 
       <div class="home-row2">
@@ -2619,24 +2610,24 @@ function goToMobTab(tab){
   switchMobTab(tab, btn);
 }
 
-function renderMobHomeQuests(){
+function renderMobHomeToday(){
   const key=TODAY(), d=new Date(key+'T00:00:00');
   const hd=document.getElementById('homeDay'); if(hd) hd.textContent=d.toLocaleDateString('en-US',{weekday:'long'});
   const hdt=document.getElementById('homeDate'); if(hdt) hdt.textContent=d.toLocaleDateString('en-US',{month:'long',day:'numeric'});
-  const tasks=getTasksForDate(key);
-  const ce=document.getElementById('mobHomeQuestCount'); if(ce)ce.textContent=`${tasks.filter(t=>t.done).length}/${tasks.length}`;
-  renderQuestTimeline(document.getElementById('mobHomeQuestList'), key);
+  const ce=document.getElementById('mobHomeTodayCount'); if(ce)ce.textContent=calItemsForDate(key).length;
+  renderTodayTimeline(document.getElementById('mobHomeTodayList'), key);
   if(typeof renderBuddy==='function') renderBuddy();
 }
-// Today's quests on Home, drawn with the calendar's timeline pieces
-function renderQuestTimeline(el, key){
+// Today's full day timeline on Home (events + quests together) — same pieces as the
+// Calendar tab's Day view, just rendered into the home card instead of #tlList.
+function renderTodayTimeline(el, key){
   if(!el) return;
-  const items=calItemsForDate(key).filter(x=>x.task).map(x=>({...x,e:null}));
-  if(!items.length){ el.innerHTML=`<div class="home-empty">No quests yet today. <button type="button" onclick="openAddSheetAs('quest')">Add one</button></div>`; return; }
+  const items=calItemsForDate(key);
+  if(!items.length){ el.innerHTML=`<div class="home-empty">Clear day. <button type="button" onclick="openAddSheet(TODAY())">Add one</button></div>`; return; }
   const now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), isToday=key===TODAY();
   const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
   let html='';
-  if(untimed.length) html+=`<div class="tl-anytime">`+untimed.map(it=>`<div class="tl-row${it.task.done?' done':''}">
+  if(untimed.length) html+=`<div class="tl-anytime">`+untimed.map(it=>`<div class="tl-row${it.task&&it.task.done?' done':''}">
       <div class="tl-rail">${tlPill(it)}</div>
       <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
       ${tlCheck(it)}</div>`).join('')+`</div>`;
@@ -2644,11 +2635,11 @@ function renderQuestTimeline(el, key){
   const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
   let rows='';
   timed.forEach(it=>{
-    const start=tlMins(it.time);
+    const start=tlMins(it.time), dur=it.e?TL_EVENT_MIN:TL_QUEST_MIN;
     if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
-    const past=isToday && start+TL_QUEST_MIN<=nowMin;
+    const past=isToday && start+dur<=nowMin;
     const [hm,ap]=fmtTime(it.time).split(' ');
-    rows+=`<div class="tl-row${it.task.done?' done':''}${past?' past':''}">
+    rows+=`<div class="tl-row${it.task&&it.task.done?' done':''}${past?' past':''}">
       <div class="tl-time">${hm}<small>${ap}</small></div>
       <div class="tl-rail">${tlPill(it)}</div>
       <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
@@ -2701,43 +2692,8 @@ function renderMobHomeDex(){
   el.innerHTML=ids.length?ids.slice(0,4).map(id=>`<img src="${homeArt(id,caught[String(id)].shiny)}" alt="" loading="lazy">`).join(''):'<span class="home-mini-s">Catch your first one!</span>';
 }
 
-// Today's events on Home, drawn with the same calendar timeline pieces as the quests card
-function renderMobHomeEvents(){
-  const key=TODAY();
-  const ce=document.getElementById('mobHomeEventsCount'); if(ce)ce.textContent=eventsForDate(key).length;
-  renderEventsTimeline(document.getElementById('mobHomeEventsList'), key);
-}
-function renderEventsTimeline(el, key){
-  if(!el) return;
-  const items=calItemsForDate(key).filter(x=>x.e);
-  if(!items.length){ el.innerHTML=`<div class="home-empty">Clear day. <button type="button" onclick="openAddSheetAs('event')">Add an event</button></div>`; return; }
-  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), isToday=key===TODAY();
-  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
-  let html='';
-  if(untimed.length) html+=`<div class="tl-anytime">`+untimed.map(it=>`<div class="tl-row${it.task&&it.task.done?' done':''}">
-      <div class="tl-rail">${tlPill(it)}</div>
-      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
-      ${tlCheck(it)}</div>`).join('')+`</div>`;
-  let nowPlaced=!isToday;
-  const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
-  let rows='';
-  timed.forEach(it=>{
-    const start=tlMins(it.time);
-    if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
-    const past=isToday && start+TL_EVENT_MIN<=nowMin;
-    const [hm,ap]=fmtTime(it.time).split(' ');
-    rows+=`<div class="tl-row${it.task&&it.task.done?' done':''}${past?' past':''}">
-      <div class="tl-time">${hm}<small>${ap}</small></div>
-      <div class="tl-rail">${tlPill(it)}</div>
-      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
-      ${tlCheck(it)}</div>`;
-  });
-  if(!nowPlaced && timed.length) rows+=nowRow();
-  el.innerHTML=html+(timed.length?`<div class="tl-sched">${rows}</div>`:'');
-}
-
 function renderMobHomeTeasers(){
-  renderMobHomeQuests(); renderMobHomeGil(); renderMobQuickGil(); renderMobHomeDex(); renderMobHomeEvents();
+  renderMobHomeToday(); renderMobHomeGil(); renderMobQuickGil(); renderMobHomeDex();
 }
 
 function renderAll(){
@@ -3634,7 +3590,7 @@ function renderTasksInto(el, tasks, isMob){
   }).join('');
 }
 
-function renderMobTasks(){ renderMobHomeQuests(); renderMobCalQuests(); if(typeof renderCalViews==='function') renderCalViews(); }
+function renderMobTasks(){ renderMobHomeToday(); renderMobCalQuests(); if(typeof renderCalViews==='function') renderCalViews(); }
 
 // Quests and calendar events auto-link on creation (a new task gets a matching
 // calendar event and vice versa) so the daily quest list and the month grid
@@ -4553,7 +4509,7 @@ function showCompletePoke(rank){
 }
 
 function showXpPop(amount,color){
-  ['questScroll','mobHomeQuestList','mobCalQuestList'].forEach(id=>{
+  ['questScroll','mobHomeTodayList','mobCalQuestList'].forEach(id=>{
     const el=document.getElementById(id); if(!el)return;
     const p=document.createElement('div'); p.className='xp-pop'; p.textContent=`+${amount} XP`; p.style.color=color;
     el.style.position='relative'; el.appendChild(p); setTimeout(()=>p.remove(),900);

@@ -1091,43 +1091,56 @@ async function getCaldavClient(appleId) {
   _caldavClient = client; _caldavClientKey = key;
   return client;
 }
-async function syncCaldavCalendar(data) {
+// Serializes overlapping calls (connect's initial sync, the /api/data hook, a manual
+// Sync Now, the daily interval can all fire close together) — without this, two passes
+// both read the same stale pushedEvents map and both try to create the same object,
+// which iCloud answers with 412 Precondition Failed on whichever one loses the race.
+let _caldavSyncChain = Promise.resolve();
+function syncCaldavCalendar(data) {
+  const run = _caldavSyncChain.then(() => syncCaldavCalendarNow(data));
+  _caldavSyncChain = run.catch(() => {});
+  return run;
+}
+async function syncCaldavCalendarNow(data) {
   const cal = data.caldav;
   if (!cal || !cal.enabled || !cal.connected || !cal.appleId || !cal.calendarUrl) return;
   if (!CALDAV_APP_PASSWORD) { cal.lastError = 'CALDAV_APP_PASSWORD not set'; saveAppData(data); return; }
-  try {
-    const client  = await getCaldavClient(cal.appleId);
-    const calendar = { url: cal.calendarUrl };
-    const desired   = upcomingEventsForSync(data);
-    const desiredByUid = new Map(desired.map(e => [e.uid, e]));
-    const pushed = cal.pushedEvents || {};
-    for (const [uid, rec] of Object.entries(pushed)) {
-      if (!desiredByUid.has(uid)) {
-        try { await client.deleteCalendarObject({ calendarObject: { url: rec.href } }); } catch (e) { console.error('CalDAV delete failed:', e.message); }
-        delete pushed[uid];
-      }
+  const client  = await getCaldavClient(cal.appleId);
+  const calendar = { url: cal.calendarUrl };
+  const desired   = upcomingEventsForSync(data);
+  const desiredByUid = new Map(desired.map(e => [e.uid, e]));
+  const pushed = cal.pushedEvents || {};
+  const errors = [];
+  for (const [uid, rec] of Object.entries(pushed)) {
+    if (!desiredByUid.has(uid)) {
+      try { await client.deleteCalendarObject({ calendarObject: { url: rec.href } }); } catch (e) { console.error('CalDAV delete failed:', e.message); }
+      delete pushed[uid];
     }
-    for (const ev of desired) {
+  }
+  for (const ev of desired) {
+    try {
       const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time);
       const existing = pushed[ev.uid];
       if (existing && existing.ics === ics) continue;
+      const filename = `${ev.uid}.ics`;
+      const href = calendar.url.replace(/\/?$/, '/') + filename;
       if (existing) {
         try { await client.deleteCalendarObject({ calendarObject: { url: existing.href } }); } catch (e) { console.error('CalDAV delete-before-update failed:', e.message); }
       }
-      const filename = `${ev.uid}.ics`;
       const resp = await client.createCalendarObject({ calendar, iCalString: ics, filename });
-      if (!resp.ok) throw new Error(`CalDAV create failed (${resp.status}) for "${ev.title}"`);
-      pushed[ev.uid] = { href: calendar.url.replace(/\/?$/, '/') + filename, ics };
+      // 412 means iCloud already has an object at this filename (e.g. an overlapping sync
+      // pass won the race) — the event is already there, so treat it as success, not a failure.
+      if (!resp.ok && resp.status !== 412) throw new Error(`CalDAV create failed (${resp.status}) for "${ev.title}"`);
+      pushed[ev.uid] = { href, ics };
+    } catch (err) {
+      console.error('CalDAV push failed for', ev.title, ':', err.message);
+      errors.push(`"${ev.title}": ${err.message}`);
     }
-    cal.pushedEvents  = pushed;
-    cal.lastSyncTime  = new Date().toISOString();
-    cal.lastError     = null;
-    saveAppData(data);
-  } catch (err) {
-    console.error('CalDAV sync failed:', err.message);
-    cal.lastError = err.message;
-    saveAppData(data);
   }
+  cal.pushedEvents  = pushed;
+  cal.lastSyncTime  = new Date().toISOString();
+  cal.lastError     = errors.length ? errors.slice(0, 3).join('; ') : null;
+  saveAppData(data);
 }
 
 // Finds events (one-off and recurring occurrences) matching a title substring, optionally
