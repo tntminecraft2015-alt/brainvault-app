@@ -238,6 +238,15 @@
         "kind": "routine",
         "notify": false,
         "notifyLeadMin": null
+      },
+      {
+        "id": "ev-1792521873052",
+        "title": "Trey's short film recording",
+        "time": "20:00",
+        "location": "",
+        "kind": "social",
+        "notify": false,
+        "notifyLeadMin": null
       }
     ],
     "2026-10-27": [
@@ -264,6 +273,17 @@
     "2026-10-26": [
       {
         "id": "ev-1792521796700",
+        "title": "Trey's short film recording",
+        "time": "20:00",
+        "location": "",
+        "kind": "social",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-25": [
+      {
+        "id": "ev-1792521873055",
         "title": "Trey's short film recording",
         "time": "20:00",
         "location": "",
