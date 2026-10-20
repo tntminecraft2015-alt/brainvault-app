@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Personal Dashboard Evolution: Motion, Micro-Interactions &amp; Smart Personalization</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>Personal Dashboard Evolution: Motion, Micro-Interactions &amp; Smart Personalization</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Current 2026 trends emphasize playful micro-interactions that reward user actions, intelligent dashboards that surface contextual insights, and motion-first layouts that make navigation feel alive. Mission Control can lean into its JRPG identity while adopting these patterns to make daily tracking feel less like a chore and more like an immersive experience.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Contextual Micro-Interactions on Quest Completion</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Playful micro-interactions reward clicks and interactions with visible reactions, like a tiny 'woo' when archiving something. Mission Control already has XP pop animations, but adding targeted feedback for quest completions—screen shake, glow pulse, quick jingle snippet—turns checking off a task into a satisfying moment. The JRPG battle-menu aesthetic is perfect for this: a completed S-rank quest could trigger a brief flash or border highlight before the card melts away.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://medium.com/@ryan.almeida86/10-ui-trends-to-watch-out-for-in-2026-0905e527a582" target="_blank" rel="noopener" style="color:#ff8a63;">10 UI Trends to Watch Out for in 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px;min-height:300px}.quest-row{background:#12253c;border:1px solid #ff8a63;border-radius:2px;padding:16px;margin:12px 0;display:flex;align-items:center;gap:12px;position:relative}.quest-row.complete{animation:popFlash 0.6s ease-out}.rank-badge{font-size:10px;font-weight:bold;text-transform:uppercase;padding:4px 8px;border-radius:1px}.rank-s{background:#e85d3a;color:#0a1929}.quest-text{flex:1;font-size:14px}.checkbox{width:20px;height:20px;border:2px solid #ff8a63;cursor:pointer;display:flex;align-items:center;justify-content:center}.checkbox:hover{background:rgba(255,138,99,0.2)}@keyframes popFlash{0%{box-shadow:0 0 0 0 #ff8a63;opacity:1}50%{box-shadow:0 0 20px 10px rgba(255,138,99,0.4)}100%{box-shadow:0 0 0 0 rgba(255,138,99,0);opacity:1}}.label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;color:#ff8a63}&lt;/style&gt;&lt;div class=&quot;mockup&quot;&gt;&lt;div class=&quot;label&quot;&gt;TODAY'S QUESTS&lt;/div&gt;&lt;div class=&quot;quest-row&quot;&gt;&lt;div class=&quot;rank-badge rank-s&quot;&gt;S&lt;/div&gt;&lt;div class=&quot;quest-text&quot;&gt;Morning Routine Review&lt;/div&gt;&lt;div class=&quot;checkbox&quot;&gt;✓&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;quest-row complete&quot; style=&quot;animation-delay:0.1s&quot;&gt;&lt;div class=&quot;rank-badge rank-s&quot;&gt;S&lt;/div&gt;&lt;div class=&quot;quest-text&quot;&gt;Design Mockup (Completed)&lt;/div&gt;&lt;div class=&quot;checkbox&quot; style=&quot;background:#4a90d9;border-color:#4a90d9&quot;&gt;✓&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;quest-row&quot;&gt;&lt;div class=&quot;rank-badge&quot; style=&quot;background:#4a90d9&quot;&gt;B&lt;/div&gt;&lt;div class=&quot;quest-text&quot;&gt;Review Vault Changes&lt;/div&gt;&lt;div class=&quot;checkbox&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Streak Momentum Grid with Visual Consistency Heatmap</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Habit tracker apps use bento grids of tappable tiles with oversized streak numerals and GitHub-style momentum grids that turn progress into a glowing mosaic. Mission Control already shows a day streak counter but could surface a year-long heatmap in the Home card or a dedicated Streaks modal—color-coded by completion rate (full week = bright accent, partial = medium tint, empty = darker). This visualizes consistency over time without requiring new data, only a visual reframe of what the app already tracks.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://sleek.design/templates/habit-tracker-app" target="_blank" rel="noopener" style="color:#ff8a63;">Streakly — Habit Tracker App UI</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px}.streak-header{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;color:#ff8a63}.current-streak{background:#1e3a5f;border:2px solid #ff8a63;padding:16px;border-radius:2px;margin-bottom:20px;text-align:center}.streak-num{font-size:28px;font-weight:bold;color:#ff8a63;display:block}.streak-label{font-size:10px;color:#dfeeff;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px}.cell{width:24px;height:24px;border-radius:1px;border:1px solid rgba(255,138,99,0.3);transition:all 0.2s}.cell.empty{background:#12253c}.cell.partial{background:rgba(255,138,99,0.4)}.cell.full{background:#ff8a63;border-color:#ff8a63}.row-label{font-size:8px;color:#ff8a63;text-transform:uppercase;margin-bottom:4px}.week{margin-bottom:8px}&lt;/style&gt;&lt;div class=&quot;mockup&quot;&gt;&lt;div class=&quot;streak-header&quot;&gt;WEEK CONSISTENCY&lt;/div&gt;&lt;div class=&quot;current-streak&quot;&gt;&lt;span class=&quot;streak-num&quot;&gt;12&lt;/span&gt;&lt;span class=&quot;streak-label&quot;&gt;days active&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;week&quot;&gt;&lt;div class=&quot;row-label&quot;&gt;OCT '26&lt;/div&gt;&lt;div class=&quot;grid&quot;&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell partial&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell empty&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;week&quot;&gt;&lt;div class=&quot;row-label&quot;&gt;SEP '26&lt;/div&gt;&lt;div class=&quot;grid&quot;&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell empty&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell partial&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell full&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cell empty&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Contextual Insight Cards: Quick Suggestions Based on Patterns</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Dashboards will become personalized life coaches, showing suggestions like 'Hey, you usually get stuck here, want to address it first?' using behavioral data, preferences, and mood indicators. Mission Control could add a small insight banner on the Home card ("You completed 4 S-ranks this week—5 in a row unlocks a new badge!" or "Most active time: 6–8pm"). This requires minimal backend work—just flagging patterns in the existing data—but transforms the dashboard from passive tracker to active coach.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://medium.com/@ryan.almeida86/10-ui-trends-to-watch-out-for-in-2026-0905e527a582" target="_blank" rel="noopener" style="color:#ff8a63;">10 UI Trends to Watch Out for in 2026</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px;min-height:300px}.insight-card{background:linear-gradient(135deg,rgba(30,58,95,0.8),rgba(18,35,60,0.8));border:2px inset #ff8a63;border-radius:1px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}.insight-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,138,99,0.1),transparent);animation:shimmer 2s infinite}.insight-icon{font-size:18px;margin-bottom:8px}@keyframes shimmer{0%{left:-100%}100%{left:100%}}.insight-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ff8a63;margin-bottom:6px}.insight-text{font-size:12px;line-height:1.4;color:#dfeeff}.insight-progress{width:100%;height:6px;background:#12253c;margin-top:10px;border:1px solid rgba(255,138,99,0.2)}.insight-progress-fill{height:100%;background:#ff8a63;width:80%}&lt;/style&gt;&lt;div class=&quot;mockup&quot;&gt;&lt;div class=&quot;insight-card&quot;&gt;&lt;div class=&quot;insight-icon&quot;&gt;⭐&lt;/div&gt;&lt;div class=&quot;insight-title&quot;&gt;Close to Milestone!&lt;/div&gt;&lt;div class=&quot;insight-text&quot;&gt;You've completed 4 S-ranks this week. One more gets you a new badge!&lt;/div&gt;&lt;div class=&quot;insight-progress&quot;&gt;&lt;div class=&quot;insight-progress-fill&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;insight-card&quot;&gt;&lt;div class=&quot;insight-icon&quot;&gt;🕐&lt;/div&gt;&lt;div class=&quot;insight-title&quot;&gt;Your Peak Hours&lt;/div&gt;&lt;div class=&quot;insight-text&quot;&gt;Most quests completed 6–8pm. Consider scheduling harder tasks then.&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">‹ Back</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">Next ›</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-10-20-design-research-daily-2";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Contextual Micro-Interactions on Quest Completion","description":"Playful micro-interactions reward clicks and interactions with visible reactions, like a tiny 'woo' when archiving something. Mission Control already has XP pop animations, but adding targeted feedback for quest completions—screen shake, glow pulse, quick jingle snippet—turns checking off a task into a satisfying moment. The JRPG battle-menu aesthetic is perfect for this: a completed S-rank quest could trigger a brief flash or border highlight before the card melts away.","source_title":"10 UI Trends to Watch Out for in 2026","source_url":"https://medium.com/@ryan.almeida86/10-ui-trends-to-watch-out-for-in-2026-0905e527a582","mockup_html":"\u003cstyle>*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px;min-height:300px}.quest-row{background:#12253c;border:1px solid #ff8a63;border-radius:2px;padding:16px;margin:12px 0;display:flex;align-items:center;gap:12px;position:relative}.quest-row.complete{animation:popFlash 0.6s ease-out}.rank-badge{font-size:10px;font-weight:bold;text-transform:uppercase;padding:4px 8px;border-radius:1px}.rank-s{background:#e85d3a;color:#0a1929}.quest-text{flex:1;font-size:14px}.checkbox{width:20px;height:20px;border:2px solid #ff8a63;cursor:pointer;display:flex;align-items:center;justify-content:center}.checkbox:hover{background:rgba(255,138,99,0.2)}@keyframes popFlash{0%{box-shadow:0 0 0 0 #ff8a63;opacity:1}50%{box-shadow:0 0 20px 10px rgba(255,138,99,0.4)}100%{box-shadow:0 0 0 0 rgba(255,138,99,0);opacity:1}}.label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;color:#ff8a63}\u003c/style>\u003cdiv class=\"mockup\">\u003cdiv class=\"label\">TODAY'S QUESTS\u003c/div>\u003cdiv class=\"quest-row\">\u003cdiv class=\"rank-badge rank-s\">S\u003c/div>\u003cdiv class=\"quest-text\">Morning Routine Review\u003c/div>\u003cdiv class=\"checkbox\">✓\u003c/div>\u003c/div>\u003cdiv class=\"quest-row complete\" style=\"animation-delay:0.1s\">\u003cdiv class=\"rank-badge rank-s\">S\u003c/div>\u003cdiv class=\"quest-text\">Design Mockup (Completed)\u003c/div>\u003cdiv class=\"checkbox\" style=\"background:#4a90d9;border-color:#4a90d9\">✓\u003c/div>\u003c/div>\u003cdiv class=\"quest-row\">\u003cdiv class=\"rank-badge\" style=\"background:#4a90d9\">B\u003c/div>\u003cdiv class=\"quest-text\">Review Vault Changes\u003c/div>\u003cdiv class=\"checkbox\">\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1792527554176-0-contextual-micro-interactions-on-quest-c"},{"title":"Streak Momentum Grid with Visual Consistency Heatmap","description":"Habit tracker apps use bento grids of tappable tiles with oversized streak numerals and GitHub-style momentum grids that turn progress into a glowing mosaic. Mission Control already shows a day streak counter but could surface a year-long heatmap in the Home card or a dedicated Streaks modal—color-coded by completion rate (full week = bright accent, partial = medium tint, empty = darker). This visualizes consistency over time without requiring new data, only a visual reframe of what the app already tracks.","source_title":"Streakly — Habit Tracker App UI","source_url":"https://sleek.design/templates/habit-tracker-app","mockup_html":"\u003cstyle>*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px}.streak-header{font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px;color:#ff8a63}.current-streak{background:#1e3a5f;border:2px solid #ff8a63;padding:16px;border-radius:2px;margin-bottom:20px;text-align:center}.streak-num{font-size:28px;font-weight:bold;color:#ff8a63;display:block}.streak-label{font-size:10px;color:#dfeeff;margin-top:4px}.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px}.cell{width:24px;height:24px;border-radius:1px;border:1px solid rgba(255,138,99,0.3);transition:all 0.2s}.cell.empty{background:#12253c}.cell.partial{background:rgba(255,138,99,0.4)}.cell.full{background:#ff8a63;border-color:#ff8a63}.row-label{font-size:8px;color:#ff8a63;text-transform:uppercase;margin-bottom:4px}.week{margin-bottom:8px}\u003c/style>\u003cdiv class=\"mockup\">\u003cdiv class=\"streak-header\">WEEK CONSISTENCY\u003c/div>\u003cdiv class=\"current-streak\">\u003cspan class=\"streak-num\">12\u003c/span>\u003cspan class=\"streak-label\">days active\u003c/span>\u003c/div>\u003cdiv class=\"week\">\u003cdiv class=\"row-label\">OCT '26\u003c/div>\u003cdiv class=\"grid\">\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell partial\">\u003c/div>\u003cdiv class=\"cell empty\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003c/div>\u003c/div>\u003cdiv class=\"week\">\u003cdiv class=\"row-label\">SEP '26\u003c/div>\u003cdiv class=\"grid\">\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell empty\">\u003c/div>\u003cdiv class=\"cell partial\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell full\">\u003c/div>\u003cdiv class=\"cell empty\">\u003c/div>\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1792527554176-1-streak-momentum-grid-with-visual-consist"},{"title":"Contextual Insight Cards: Quick Suggestions Based on Patterns","description":"Dashboards will become personalized life coaches, showing suggestions like 'Hey, you usually get stuck here, want to address it first?' using behavioral data, preferences, and mood indicators. Mission Control could add a small insight banner on the Home card (\"You completed 4 S-ranks this week—5 in a row unlocks a new badge!\" or \"Most active time: 6–8pm\"). This requires minimal backend work—just flagging patterns in the existing data—but transforms the dashboard from passive tracker to active coach.","source_title":"10 UI Trends to Watch Out for in 2026","source_url":"https://medium.com/@ryan.almeida86/10-ui-trends-to-watch-out-for-in-2026-0905e527a582","mockup_html":"\u003cstyle>*{margin:0;padding:0;box-sizing:border-box}.mockup{background:#0a1929;color:#dfeeff;font-family:VT323,monospace;padding:40px;min-height:300px}.insight-card{background:linear-gradient(135deg,rgba(30,58,95,0.8),rgba(18,35,60,0.8));border:2px inset #ff8a63;border-radius:1px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden}.insight-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,138,99,0.1),transparent);animation:shimmer 2s infinite}.insight-icon{font-size:18px;margin-bottom:8px}@keyframes shimmer{0%{left:-100%}100%{left:100%}}.insight-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#ff8a63;margin-bottom:6px}.insight-text{font-size:12px;line-height:1.4;color:#dfeeff}.insight-progress{width:100%;height:6px;background:#12253c;margin-top:10px;border:1px solid rgba(255,138,99,0.2)}.insight-progress-fill{height:100%;background:#ff8a63;width:80%}\u003c/style>\u003cdiv class=\"mockup\">\u003cdiv class=\"insight-card\">\u003cdiv class=\"insight-icon\">⭐\u003c/div>\u003cdiv class=\"insight-title\">Close to Milestone!\u003c/div>\u003cdiv class=\"insight-text\">You've completed 4 S-ranks this week. One more gets you a new badge!\u003c/div>\u003cdiv class=\"insight-progress\">\u003cdiv class=\"insight-progress-fill\">\u003c/div>\u003c/div>\u003c/div>\u003cdiv class=\"insight-card\">\u003cdiv class=\"insight-icon\">🕐\u003c/div>\u003cdiv class=\"insight-title\">Your Peak Hours\u003c/div>\u003cdiv class=\"insight-text\">Most quests completed 6–8pm. Consider scheduling harder tasks then.\u003c/div>\u003c/div>\u003c/div>","threadId":"thread-1792527554176-2-contextual-insight-cards-quick-suggestio"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'Done ✓' : 'Next ›';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
