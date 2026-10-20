@@ -186,6 +186,16 @@
         "kind": "routine",
         "notify": false,
         "notifyLeadMin": null
+      },
+      {
+        "id": 1792521066220,
+        "title": "Gym",
+        "time": "12:00",
+        "location": "",
+        "kind": "training",
+        "notify": false,
+        "notifyLeadMin": null,
+        "linkedTaskId": 1792521065633
       }
     ],
     "2026-10-22": [
@@ -258,6 +268,15 @@
       "date": "2026-10-02",
       "time": "13:00",
       "linkedEventId": 1790874451672
+    },
+    {
+      "id": 1792521065633,
+      "text": "Gym",
+      "done": false,
+      "rank": "B",
+      "date": "2026-10-21",
+      "time": "12:00",
+      "linkedEventId": 1792521066220
     }
   ],
   "streakDays": [],
