@@ -3104,6 +3104,24 @@
       "startDate": "2026-10-30",
       "endDate": "2026-11-01",
       "exceptions": {}
+    },
+    {
+      "id": "rec-1792521281448",
+      "title": "Therapy",
+      "time": "14:00",
+      "location": "",
+      "kind": "meeting",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        2
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-11-17",
+      "endDate": "2026-11-30",
+      "exceptions": {}
     }
   ],
   "redAssignments": [
