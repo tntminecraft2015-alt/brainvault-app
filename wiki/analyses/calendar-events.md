@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-10-20"
-synced_at: "10/20/2026, 6:44:34 PM"
+synced_at: "10/20/2026, 6:45:24 PM"
 tags: [calendar, events]
 ---
 
@@ -34,8 +34,8 @@ tags: [calendar, events]
 | 2026-10-23 | 11:00 | Work @ MyShift | routine |  |
 | 2026-10-24 | 11:00 | Work @ MyShift | routine |  |
 | 2026-10-24 | 17:00 | Work @ MyShift | routine |  |
-| 2026-10-24 | 20:00 | Trey's short film recording | social |  |
-| 2026-10-25 | 20:00 | Trey's short film recording | social |  |
+| 2026-10-24 | 20:00 | Trey's short film recording | meeting |  |
+| 2026-10-25 | 20:00 | Trey's short film recording | meeting |  |
 | 2026-10-27 | 14:00 | Therapy | meeting |  |
 
 ## Recurring Events
@@ -53,4 +53,4 @@ tags: [calendar, events]
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
 | Therapy | every Tue at 14:00, from 2026-11-17 until 2026-11-30 | meeting |  |
 
-_Last synced: 10/20/2026, 6:44:34 PM_
+_Last synced: 10/20/2026, 6:45:24 PM_
