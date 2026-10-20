@@ -3021,6 +3021,24 @@
           "skip": true
         }
       }
+    },
+    {
+      "id": "rec-1792520734688",
+      "title": "Look over schedule",
+      "time": "10:00",
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        0
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
     }
   ],
   "redAssignments": [
