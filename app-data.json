@@ -3165,6 +3165,78 @@
       "startDate": "2026-10-20",
       "endDate": null,
       "exceptions": {}
+    },
+    {
+      "id": "rec-1792522641273",
+      "title": "Work @ MyShift",
+      "time": "16:00",
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        2
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1792522641276",
+      "title": "Work @ MyShift",
+      "time": "16:00",
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        4
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1792522641279",
+      "title": "Work @ MyShift",
+      "time": "15:00",
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        5
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
+    },
+    {
+      "id": "rec-1792522641282",
+      "title": "Work @ MyShift",
+      "time": null,
+      "location": "",
+      "kind": "routine",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        6
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
     }
   ],
   "redAssignments": [
