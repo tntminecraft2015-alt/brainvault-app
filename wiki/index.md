@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[daily-tasks-2026-10-20]] — Quest log for 2026-10-20
 - [[chat-2026-10-20]] — Claude conversation log for 2026-10-20
 - [[2026-10-20-design-research-daily]] — Current 2026 dashboard trends emphasize personalized adaptive layouts, clean hierarchy with purposeful micro-interactions, and neumorphic de
 - [[chat-2026-10-12]] — Claude conversation log for 2026-10-12
