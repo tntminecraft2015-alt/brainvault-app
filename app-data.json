@@ -239,6 +239,18 @@
         "notify": false,
         "notifyLeadMin": null
       }
+    ],
+    "2026-10-27": [
+      {
+        "id": 1792521160402,
+        "title": "Therapy",
+        "time": "14:00",
+        "location": "",
+        "kind": "meeting",
+        "notify": false,
+        "notifyLeadMin": null,
+        "linkedTaskId": 1792521160182
+      }
     ]
   },
   "tasks": [
@@ -277,6 +289,15 @@
       "date": "2026-10-21",
       "time": "12:00",
       "linkedEventId": 1792521066220
+    },
+    {
+      "id": 1792521160182,
+      "text": "Therapy",
+      "done": false,
+      "rank": "B",
+      "date": "2026-10-27",
+      "time": "14:00",
+      "linkedEventId": 1792521160402
     }
   ],
   "streakDays": [],
