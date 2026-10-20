@@ -176,6 +176,59 @@
         "notify": false,
         "notifyLeadMin": null
       }
+    ],
+    "2026-10-21": [
+      {
+        "id": "ev-1792520706041",
+        "title": "Work @ MyShift",
+        "time": "17:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-22": [
+      {
+        "id": "ev-1792520706048",
+        "title": "Work @ MyShift",
+        "time": "17:30",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-23": [
+      {
+        "id": "ev-1792520706053",
+        "title": "Work @ MyShift",
+        "time": "11:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-24": [
+      {
+        "id": "ev-1792520706101",
+        "title": "Work @ MyShift",
+        "time": "11:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      },
+      {
+        "id": "ev-1792520706104",
+        "title": "Work @ MyShift",
+        "time": "17:00",
+        "location": "",
+        "kind": "routine",
+        "notify": false,
+        "notifyLeadMin": null
+      }
     ]
   },
   "tasks": [
