@@ -3468,5 +3468,15 @@
     },
     "letterRead": "2026-10-05"
   },
-  "notifiedEvents": {}
+  "notifiedEvents": {},
+  "caldav": {
+    "appleId": "tntminecraft2015@gmail.com",
+    "calendarUrl": "https://caldav.icloud.com/8173918847/calendars/home/",
+    "calendarName": "Home",
+    "connected": true,
+    "enabled": true,
+    "lastSyncTime": null,
+    "lastError": null,
+    "pushedEvents": {}
+  }
 }
