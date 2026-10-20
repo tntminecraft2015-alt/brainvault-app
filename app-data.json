@@ -250,6 +250,26 @@
         "notify": false,
         "notifyLeadMin": null,
         "linkedTaskId": 1792521160182
+      },
+      {
+        "id": "ev-1792521796703",
+        "title": "Trey's short film recording",
+        "time": "20:00",
+        "location": "",
+        "kind": "social",
+        "notify": false,
+        "notifyLeadMin": null
+      }
+    ],
+    "2026-10-26": [
+      {
+        "id": "ev-1792521796700",
+        "title": "Trey's short film recording",
+        "time": "20:00",
+        "location": "",
+        "kind": "social",
+        "notify": false,
+        "notifyLeadMin": null
       }
     ]
   },
