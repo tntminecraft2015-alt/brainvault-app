@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-10-20"
-synced_at: "10/20/2026, 6:57:21 PM"
+synced_at: "10/20/2026, 6:58:29 PM"
 tags: [calendar, events]
 ---
 
@@ -28,7 +28,7 @@ tags: [calendar, events]
 | 2026-10-15 | 16:00 | Work | routine | MyShift |
 | 2026-10-17 | 11:00 | Work | routine | MyShift |
 | 2026-10-17 | 17:00 | Work | routine | MyShift |
-| 2026-10-21 | 17:00 | Work @ MyShift | routine |  |
+| 2026-10-21 | 17:00 | Work | routine |  |
 | 2026-10-21 | 12:00 | Gym | training |  |
 | 2026-10-22 | 17:30 | Work @ MyShift | routine |  |
 | 2026-10-23 | 11:00 | Work @ MyShift | routine |  |
@@ -57,4 +57,4 @@ tags: [calendar, events]
 | Work @ MyShift | every Fri at 15:00, from 2026-10-20 | routine |  |
 | Work @ MyShift | every Sat, from 2026-10-20 | routine |  |
 
-_Last synced: 10/20/2026, 6:57:21 PM_
+_Last synced: 10/20/2026, 6:58:29 PM_
