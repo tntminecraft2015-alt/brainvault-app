@@ -1072,3 +1072,9 @@ Design research: General Improvements: Adaptive Layouts, Subtle Depth Clarity & 
 **Pages created:** [[chat-2026-10-20]]
 
 Chat session on 2026-10-20
+
+## [2026-10-20] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Google Calendar Sync Integration
