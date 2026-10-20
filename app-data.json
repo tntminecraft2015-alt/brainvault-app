@@ -3048,6 +3048,22 @@
       "startDate": "2026-10-20",
       "endDate": null,
       "exceptions": {}
+    },
+    {
+      "id": "rec-1792520970695",
+      "title": "Halloween at Kent State",
+      "time": null,
+      "location": "",
+      "kind": "social",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "daily",
+      "daysOfWeek": null,
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-30",
+      "endDate": "2026-11-01",
+      "exceptions": {}
     }
   ],
   "redAssignments": [
