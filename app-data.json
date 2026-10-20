@@ -3475,8 +3475,713 @@
     "calendarName": "Home",
     "connected": true,
     "enabled": true,
-    "lastSyncTime": null,
-    "lastError": "CalDAV create failed (412) for \"Work\"",
-    "pushedEvents": {}
+    "lastSyncTime": "2026-10-20T20:12:29.473Z",
+    "lastError": null,
+    "pushedEvents": {
+      "mc-ev-1792520706041": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706041.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792520706041@brainvault.local\r\nDTSTAMP:20261020T201113Z\r\nDTSTART:20261021T210000Z\r\nDTEND:20261021T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-1792521066220": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-1792521066220.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-1792521066220@brainvault.local\r\nDTSTAMP:20261020T201113Z\r\nDTSTART:20261021T160000Z\r\nDTEND:20261021T170000Z\r\nSUMMARY:Gym\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792520706048": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706048.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792520706048@brainvault.local\r\nDTSTAMP:20261020T201114Z\r\nDTSTART:20261022T213000Z\r\nDTEND:20261022T223000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792520706053": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706053.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792520706053@brainvault.local\r\nDTSTAMP:20261020T201114Z\r\nDTSTART:20261023T150000Z\r\nDTEND:20261023T160000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792520706101": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706101.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792520706101@brainvault.local\r\nDTSTAMP:20261020T201114Z\r\nDTSTART:20261024T150000Z\r\nDTEND:20261024T160000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792520706104": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706104.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792520706104@brainvault.local\r\nDTSTAMP:20261020T201115Z\r\nDTSTART:20261024T210000Z\r\nDTEND:20261024T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792521873052": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792521873052.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792521873052@brainvault.local\r\nDTSTAMP:20261020T201115Z\r\nDTSTART:20261025T000000Z\r\nDTEND:20261025T010000Z\r\nSUMMARY:Trey's short film recording\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-1792521160402": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-1792521160402.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-1792521160402@brainvault.local\r\nDTSTAMP:20261020T201116Z\r\nDTSTART:20261027T180000Z\r\nDTEND:20261027T190000Z\r\nSUMMARY:Therapy\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-ev-1792521873055": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792521873055.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-ev-1792521873055@brainvault.local\r\nDTSTAMP:20261020T201116Z\r\nDTSTART:20261026T000000Z\r\nDTEND:20261026T010000Z\r\nSUMMARY:Trey's short film recording\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-19@brainvault.local\r\nDTSTAMP:20261020T201116Z\r\nDTSTART:20261019T140000Z\r\nDTEND:20261019T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-21": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-21.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-21@brainvault.local\r\nDTSTAMP:20261020T201117Z\r\nDTSTART:20261021T140000Z\r\nDTEND:20261021T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-23": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-23.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-23@brainvault.local\r\nDTSTAMP:20261020T201117Z\r\nDTSTART:20261023T140000Z\r\nDTEND:20261023T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-26@brainvault.local\r\nDTSTAMP:20261020T201118Z\r\nDTSTART:20261026T140000Z\r\nDTEND:20261026T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-28": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-28.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-28@brainvault.local\r\nDTSTAMP:20261020T201119Z\r\nDTSTART:20261028T140000Z\r\nDTEND:20261028T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-10-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-10-30@brainvault.local\r\nDTSTAMP:20261020T201119Z\r\nDTSTART:20261030T140000Z\r\nDTEND:20261030T150000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-02": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-02.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-02@brainvault.local\r\nDTSTAMP:20261020T201120Z\r\nDTSTART:20261102T150000Z\r\nDTEND:20261102T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-04": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-04.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-04@brainvault.local\r\nDTSTAMP:20261020T201120Z\r\nDTSTART:20261104T150000Z\r\nDTEND:20261104T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-06": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-06.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-06@brainvault.local\r\nDTSTAMP:20261020T201121Z\r\nDTSTART:20261106T150000Z\r\nDTEND:20261106T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-09": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-09.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-09@brainvault.local\r\nDTSTAMP:20261020T201121Z\r\nDTSTART:20261109T150000Z\r\nDTEND:20261109T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-11": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-11.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-11@brainvault.local\r\nDTSTAMP:20261020T201122Z\r\nDTSTART:20261111T150000Z\r\nDTEND:20261111T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-13": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-13.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-13@brainvault.local\r\nDTSTAMP:20261020T201122Z\r\nDTSTART:20261113T150000Z\r\nDTEND:20261113T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-16": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-16.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-16@brainvault.local\r\nDTSTAMP:20261020T201123Z\r\nDTSTART:20261116T150000Z\r\nDTEND:20261116T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-18": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-18.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-18@brainvault.local\r\nDTSTAMP:20261020T201123Z\r\nDTSTART:20261118T150000Z\r\nDTEND:20261118T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-20@brainvault.local\r\nDTSTAMP:20261020T201124Z\r\nDTSTART:20261120T150000Z\r\nDTEND:20261120T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-23": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-23.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-23@brainvault.local\r\nDTSTAMP:20261020T201124Z\r\nDTSTART:20261123T150000Z\r\nDTEND:20261123T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-25": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-25.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-25@brainvault.local\r\nDTSTAMP:20261020T201125Z\r\nDTSTART:20261125T150000Z\r\nDTEND:20261125T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-27@brainvault.local\r\nDTSTAMP:20261020T201125Z\r\nDTSTART:20261127T150000Z\r\nDTEND:20261127T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-11-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-11-30@brainvault.local\r\nDTSTAMP:20261020T201125Z\r\nDTSTART:20261130T150000Z\r\nDTEND:20261130T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-02": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-02.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-02@brainvault.local\r\nDTSTAMP:20261020T201126Z\r\nDTSTART:20261202T150000Z\r\nDTEND:20261202T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-04": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-04.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-04@brainvault.local\r\nDTSTAMP:20261020T201126Z\r\nDTSTART:20261204T150000Z\r\nDTEND:20261204T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-07": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-07.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-07@brainvault.local\r\nDTSTAMP:20261020T201127Z\r\nDTSTART:20261207T150000Z\r\nDTEND:20261207T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-09": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-09.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-09@brainvault.local\r\nDTSTAMP:20261020T201127Z\r\nDTSTART:20261209T150000Z\r\nDTEND:20261209T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-11": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-11.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-11@brainvault.local\r\nDTSTAMP:20261020T201127Z\r\nDTSTART:20261211T150000Z\r\nDTEND:20261211T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-14": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-14.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-14@brainvault.local\r\nDTSTAMP:20261020T201128Z\r\nDTSTART:20261214T150000Z\r\nDTEND:20261214T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-16": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-16.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-16@brainvault.local\r\nDTSTAMP:20261020T201128Z\r\nDTSTART:20261216T150000Z\r\nDTEND:20261216T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694374-2026-12-18": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-18.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694374-2026-12-18@brainvault.local\r\nDTSTAMP:20261020T201129Z\r\nDTSTART:20261218T150000Z\r\nDTEND:20261218T160000Z\r\nSUMMARY:Math\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-10-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-10-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-10-19@brainvault.local\r\nDTSTAMP:20261020T201129Z\r\nDTSTART:20261019T160000Z\r\nDTEND:20261019T170000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-10-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-10-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-10-26@brainvault.local\r\nDTSTAMP:20261020T201130Z\r\nDTSTART:20261026T160000Z\r\nDTEND:20261026T170000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-11-02": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-02.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-11-02@brainvault.local\r\nDTSTAMP:20261020T201130Z\r\nDTSTART:20261102T170000Z\r\nDTEND:20261102T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-11-09": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-09.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-11-09@brainvault.local\r\nDTSTAMP:20261020T201130Z\r\nDTSTART:20261109T170000Z\r\nDTEND:20261109T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-11-16": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-16.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-11-16@brainvault.local\r\nDTSTAMP:20261020T201131Z\r\nDTSTART:20261116T170000Z\r\nDTEND:20261116T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-11-23": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-23.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-11-23@brainvault.local\r\nDTSTAMP:20261020T201131Z\r\nDTSTART:20261123T170000Z\r\nDTEND:20261123T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-11-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-11-30@brainvault.local\r\nDTSTAMP:20261020T201132Z\r\nDTSTART:20261130T170000Z\r\nDTEND:20261130T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-12-07": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-12-07.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-12-07@brainvault.local\r\nDTSTAMP:20261020T201132Z\r\nDTSTART:20261207T170000Z\r\nDTEND:20261207T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694376-2026-12-14": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-12-14.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694376-2026-12-14@brainvault.local\r\nDTSTAMP:20261020T201133Z\r\nDTSTART:20261214T170000Z\r\nDTEND:20261214T180000Z\r\nSUMMARY:Film\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-10-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-10-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-10-19@brainvault.local\r\nDTSTAMP:20261020T201133Z\r\nDTSTART:20261019T190000Z\r\nDTEND:20261019T200000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-10-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-10-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-10-26@brainvault.local\r\nDTSTAMP:20261020T201133Z\r\nDTSTART:20261026T190000Z\r\nDTEND:20261026T200000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-11-02": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-02.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-11-02@brainvault.local\r\nDTSTAMP:20261020T201134Z\r\nDTSTART:20261102T200000Z\r\nDTEND:20261102T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-11-09": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-09.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-11-09@brainvault.local\r\nDTSTAMP:20261020T201134Z\r\nDTSTART:20261109T200000Z\r\nDTEND:20261109T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-11-16": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-16.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-11-16@brainvault.local\r\nDTSTAMP:20261020T201135Z\r\nDTSTART:20261116T200000Z\r\nDTEND:20261116T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-11-23": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-23.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-11-23@brainvault.local\r\nDTSTAMP:20261020T201135Z\r\nDTSTART:20261123T200000Z\r\nDTEND:20261123T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-11-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-11-30@brainvault.local\r\nDTSTAMP:20261020T201136Z\r\nDTSTART:20261130T200000Z\r\nDTEND:20261130T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-12-07": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-12-07.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-12-07@brainvault.local\r\nDTSTAMP:20261020T201136Z\r\nDTSTART:20261207T200000Z\r\nDTEND:20261207T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694378-2026-12-14": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-12-14.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694378-2026-12-14@brainvault.local\r\nDTSTAMP:20261020T201136Z\r\nDTSTART:20261214T200000Z\r\nDTEND:20261214T210000Z\r\nSUMMARY:History\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-10-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-10-20@brainvault.local\r\nDTSTAMP:20261020T201137Z\r\nDTSTART:20261020T143000Z\r\nDTEND:20261020T153000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-10-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-10-22@brainvault.local\r\nDTSTAMP:20261020T201137Z\r\nDTSTART:20261022T143000Z\r\nDTEND:20261022T153000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-10-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-10-27@brainvault.local\r\nDTSTAMP:20261020T201138Z\r\nDTSTART:20261027T143000Z\r\nDTEND:20261027T153000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-10-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-10-29@brainvault.local\r\nDTSTAMP:20261020T201138Z\r\nDTSTART:20261029T143000Z\r\nDTEND:20261029T153000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-03@brainvault.local\r\nDTSTAMP:20261020T201139Z\r\nDTSTART:20261103T153000Z\r\nDTEND:20261103T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-05": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-05.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-05@brainvault.local\r\nDTSTAMP:20261020T201139Z\r\nDTSTART:20261105T153000Z\r\nDTEND:20261105T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-10@brainvault.local\r\nDTSTAMP:20261020T201139Z\r\nDTSTART:20261110T153000Z\r\nDTEND:20261110T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-12": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-12.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-12@brainvault.local\r\nDTSTAMP:20261020T201140Z\r\nDTSTART:20261112T153000Z\r\nDTEND:20261112T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-17@brainvault.local\r\nDTSTAMP:20261020T201140Z\r\nDTSTART:20261117T153000Z\r\nDTEND:20261117T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-19@brainvault.local\r\nDTSTAMP:20261020T201141Z\r\nDTSTART:20261119T153000Z\r\nDTEND:20261119T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-24@brainvault.local\r\nDTSTAMP:20261020T201141Z\r\nDTSTART:20261124T153000Z\r\nDTEND:20261124T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-11-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-11-26@brainvault.local\r\nDTSTAMP:20261020T201142Z\r\nDTSTART:20261126T153000Z\r\nDTEND:20261126T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-01@brainvault.local\r\nDTSTAMP:20261020T201142Z\r\nDTSTART:20261201T153000Z\r\nDTEND:20261201T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-03@brainvault.local\r\nDTSTAMP:20261020T201142Z\r\nDTSTART:20261203T153000Z\r\nDTEND:20261203T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-08@brainvault.local\r\nDTSTAMP:20261020T201143Z\r\nDTSTART:20261208T153000Z\r\nDTEND:20261208T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-10@brainvault.local\r\nDTSTAMP:20261020T201143Z\r\nDTSTART:20261210T153000Z\r\nDTEND:20261210T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-15@brainvault.local\r\nDTSTAMP:20261020T201144Z\r\nDTSTART:20261215T153000Z\r\nDTEND:20261215T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790806694379-2026-12-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790806694379-2026-12-17@brainvault.local\r\nDTSTAMP:20261020T201144Z\r\nDTSTART:20261217T153000Z\r\nDTEND:20261217T163000Z\r\nSUMMARY:Psych\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790807951527-2026-11-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2026-11-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790807951527-2026-11-01@brainvault.local\r\nDTSTAMP:20261020T201145Z\r\nDTSTART;VALUE=DATE:20261101\r\nDTEND;VALUE=DATE:20261102\r\nSUMMARY:Pay rent\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790807951527-2026-12-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2026-12-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790807951527-2026-12-01@brainvault.local\r\nDTSTAMP:20261020T201145Z\r\nDTSTART;VALUE=DATE:20261201\r\nDTEND;VALUE=DATE:20261202\r\nSUMMARY:Pay rent\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790807951527-2027-01-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2027-01-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790807951527-2027-01-01@brainvault.local\r\nDTSTAMP:20261020T201146Z\r\nDTSTART;VALUE=DATE:20270101\r\nDTEND;VALUE=DATE:20270102\r\nSUMMARY:Pay rent\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-10-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-10-20@brainvault.local\r\nDTSTAMP:20261020T201146Z\r\nDTSTART:20261020T160000Z\r\nDTEND:20261020T170000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-10-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-10-22@brainvault.local\r\nDTSTAMP:20261020T201147Z\r\nDTSTART:20261022T160000Z\r\nDTEND:20261022T170000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-10-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-10-27@brainvault.local\r\nDTSTAMP:20261020T201147Z\r\nDTSTART:20261027T160000Z\r\nDTEND:20261027T170000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-10-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-10-29@brainvault.local\r\nDTSTAMP:20261020T201147Z\r\nDTSTART:20261029T160000Z\r\nDTEND:20261029T170000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-03@brainvault.local\r\nDTSTAMP:20261020T201148Z\r\nDTSTART:20261103T170000Z\r\nDTEND:20261103T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-05": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-05.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-05@brainvault.local\r\nDTSTAMP:20261020T201148Z\r\nDTSTART:20261105T170000Z\r\nDTEND:20261105T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-10@brainvault.local\r\nDTSTAMP:20261020T201149Z\r\nDTSTART:20261110T170000Z\r\nDTEND:20261110T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-12": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-12.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-12@brainvault.local\r\nDTSTAMP:20261020T201149Z\r\nDTSTART:20261112T170000Z\r\nDTEND:20261112T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-17@brainvault.local\r\nDTSTAMP:20261020T201150Z\r\nDTSTART:20261117T170000Z\r\nDTEND:20261117T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-19@brainvault.local\r\nDTSTAMP:20261020T201150Z\r\nDTSTART:20261119T170000Z\r\nDTEND:20261119T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-24@brainvault.local\r\nDTSTAMP:20261020T201150Z\r\nDTSTART:20261124T170000Z\r\nDTEND:20261124T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-11-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-11-26@brainvault.local\r\nDTSTAMP:20261020T201151Z\r\nDTSTART:20261126T170000Z\r\nDTEND:20261126T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-01@brainvault.local\r\nDTSTAMP:20261020T201151Z\r\nDTSTART:20261201T170000Z\r\nDTEND:20261201T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-03@brainvault.local\r\nDTSTAMP:20261020T201152Z\r\nDTSTART:20261203T170000Z\r\nDTEND:20261203T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-08@brainvault.local\r\nDTSTAMP:20261020T201152Z\r\nDTSTART:20261208T170000Z\r\nDTEND:20261208T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-10@brainvault.local\r\nDTSTAMP:20261020T201153Z\r\nDTSTART:20261210T170000Z\r\nDTEND:20261210T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-15@brainvault.local\r\nDTSTAMP:20261020T201153Z\r\nDTSTART:20261215T170000Z\r\nDTEND:20261215T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1790865328016-2026-12-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1790865328016-2026-12-17@brainvault.local\r\nDTSTAMP:20261020T201153Z\r\nDTSTART:20261217T170000Z\r\nDTEND:20261217T180000Z\r\nSUMMARY:English\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-10-25": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-10-25.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-10-25@brainvault.local\r\nDTSTAMP:20261020T201154Z\r\nDTSTART:20261025T140000Z\r\nDTEND:20261025T150000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-11-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-11-01@brainvault.local\r\nDTSTAMP:20261020T201154Z\r\nDTSTART:20261101T150000Z\r\nDTEND:20261101T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-11-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-11-08@brainvault.local\r\nDTSTAMP:20261020T201155Z\r\nDTSTART:20261108T150000Z\r\nDTEND:20261108T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-11-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-11-15@brainvault.local\r\nDTSTAMP:20261020T201155Z\r\nDTSTART:20261115T150000Z\r\nDTEND:20261115T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-11-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-11-22@brainvault.local\r\nDTSTAMP:20261020T201156Z\r\nDTSTART:20261122T150000Z\r\nDTEND:20261122T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-11-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-11-29@brainvault.local\r\nDTSTAMP:20261020T201156Z\r\nDTSTART:20261129T150000Z\r\nDTEND:20261129T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-12-06": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-06.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-12-06@brainvault.local\r\nDTSTAMP:20261020T201156Z\r\nDTSTART:20261206T150000Z\r\nDTEND:20261206T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-12-13": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-13.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-12-13@brainvault.local\r\nDTSTAMP:20261020T201157Z\r\nDTSTART:20261213T150000Z\r\nDTEND:20261213T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-12-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-12-20@brainvault.local\r\nDTSTAMP:20261020T201157Z\r\nDTSTART:20261220T150000Z\r\nDTEND:20261220T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2026-12-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2026-12-27@brainvault.local\r\nDTSTAMP:20261020T201158Z\r\nDTSTART:20261227T150000Z\r\nDTEND:20261227T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2027-01-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2027-01-03@brainvault.local\r\nDTSTAMP:20261020T201158Z\r\nDTSTART:20270103T150000Z\r\nDTEND:20270103T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2027-01-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2027-01-10@brainvault.local\r\nDTSTAMP:20261020T201159Z\r\nDTSTART:20270110T150000Z\r\nDTEND:20270110T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520734688-2027-01-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520734688-2027-01-17@brainvault.local\r\nDTSTAMP:20261020T201159Z\r\nDTSTART:20270117T150000Z\r\nDTEND:20270117T160000Z\r\nSUMMARY:Look over schedule\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520970695-2026-10-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-10-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520970695-2026-10-30@brainvault.local\r\nDTSTAMP:20261020T201159Z\r\nDTSTART;VALUE=DATE:20261030\r\nDTEND;VALUE=DATE:20261031\r\nSUMMARY:Halloween at Kent State\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520970695-2026-10-31": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-10-31.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520970695-2026-10-31@brainvault.local\r\nDTSTAMP:20261020T201200Z\r\nDTSTART;VALUE=DATE:20261031\r\nDTEND;VALUE=DATE:20261101\r\nSUMMARY:Halloween at Kent State\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792520970695-2026-11-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-11-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792520970695-2026-11-01@brainvault.local\r\nDTSTAMP:20261020T201200Z\r\nDTSTART;VALUE=DATE:20261101\r\nDTEND;VALUE=DATE:20261102\r\nSUMMARY:Halloween at Kent State\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521281448-2026-11-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521281448-2026-11-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521281448-2026-11-17@brainvault.local\r\nDTSTAMP:20261020T201201Z\r\nDTSTART:20261117T190000Z\r\nDTEND:20261117T200000Z\r\nSUMMARY:Therapy\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521281448-2026-11-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521281448-2026-11-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521281448-2026-11-24@brainvault.local\r\nDTSTAMP:20261020T201201Z\r\nDTSTART:20261124T190000Z\r\nDTEND:20261124T200000Z\r\nSUMMARY:Therapy\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-10-25": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-10-25.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-10-25@brainvault.local\r\nDTSTAMP:20261020T201202Z\r\nDTSTART;VALUE=DATE:20261025\r\nDTEND;VALUE=DATE:20261026\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-11-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-11-01@brainvault.local\r\nDTSTAMP:20261020T201202Z\r\nDTSTART;VALUE=DATE:20261101\r\nDTEND;VALUE=DATE:20261102\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-11-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-11-08@brainvault.local\r\nDTSTAMP:20261020T201202Z\r\nDTSTART;VALUE=DATE:20261108\r\nDTEND;VALUE=DATE:20261109\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-11-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-11-15@brainvault.local\r\nDTSTAMP:20261020T201203Z\r\nDTSTART;VALUE=DATE:20261115\r\nDTEND;VALUE=DATE:20261116\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-11-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-11-22@brainvault.local\r\nDTSTAMP:20261020T201203Z\r\nDTSTART;VALUE=DATE:20261122\r\nDTEND;VALUE=DATE:20261123\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-11-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-11-29@brainvault.local\r\nDTSTAMP:20261020T201204Z\r\nDTSTART;VALUE=DATE:20261129\r\nDTEND;VALUE=DATE:20261130\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-12-06": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-06.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-12-06@brainvault.local\r\nDTSTAMP:20261020T201204Z\r\nDTSTART;VALUE=DATE:20261206\r\nDTEND;VALUE=DATE:20261207\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-12-13": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-13.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-12-13@brainvault.local\r\nDTSTAMP:20261020T201205Z\r\nDTSTART;VALUE=DATE:20261213\r\nDTEND;VALUE=DATE:20261214\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-12-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-12-20@brainvault.local\r\nDTSTAMP:20261020T201205Z\r\nDTSTART;VALUE=DATE:20261220\r\nDTEND;VALUE=DATE:20261221\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2026-12-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2026-12-27@brainvault.local\r\nDTSTAMP:20261020T201205Z\r\nDTSTART;VALUE=DATE:20261227\r\nDTEND;VALUE=DATE:20261228\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2027-01-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2027-01-03@brainvault.local\r\nDTSTAMP:20261020T201206Z\r\nDTSTART;VALUE=DATE:20270103\r\nDTEND;VALUE=DATE:20270104\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2027-01-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2027-01-10@brainvault.local\r\nDTSTAMP:20261020T201206Z\r\nDTSTART;VALUE=DATE:20270110\r\nDTEND;VALUE=DATE:20270111\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792521720533-2027-01-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792521720533-2027-01-17@brainvault.local\r\nDTSTAMP:20261020T201207Z\r\nDTSTART;VALUE=DATE:20270117\r\nDTEND;VALUE=DATE:20270118\r\nSUMMARY:Homework\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-10-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-10-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-10-20@brainvault.local\r\nDTSTAMP:20261020T201207Z\r\nDTSTART:20261020T200000Z\r\nDTEND:20261020T210000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-10-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-10-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-10-27@brainvault.local\r\nDTSTAMP:20261020T201208Z\r\nDTSTART:20261027T200000Z\r\nDTEND:20261027T210000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-11-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-11-03@brainvault.local\r\nDTSTAMP:20261020T201208Z\r\nDTSTART:20261103T210000Z\r\nDTEND:20261103T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-11-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-11-10@brainvault.local\r\nDTSTAMP:20261020T201208Z\r\nDTSTART:20261110T210000Z\r\nDTEND:20261110T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-11-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-11-17@brainvault.local\r\nDTSTAMP:20261020T201209Z\r\nDTSTART:20261117T210000Z\r\nDTEND:20261117T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-11-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-11-24@brainvault.local\r\nDTSTAMP:20261020T201209Z\r\nDTSTART:20261124T210000Z\r\nDTEND:20261124T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-12-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-12-01@brainvault.local\r\nDTSTAMP:20261020T201210Z\r\nDTSTART:20261201T210000Z\r\nDTEND:20261201T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-12-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-12-08@brainvault.local\r\nDTSTAMP:20261020T201210Z\r\nDTSTART:20261208T210000Z\r\nDTEND:20261208T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-12-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-12-15@brainvault.local\r\nDTSTAMP:20261020T201210Z\r\nDTSTART:20261215T210000Z\r\nDTEND:20261215T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-12-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-12-22@brainvault.local\r\nDTSTAMP:20261020T201211Z\r\nDTSTART:20261222T210000Z\r\nDTEND:20261222T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2026-12-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2026-12-29@brainvault.local\r\nDTSTAMP:20261020T201211Z\r\nDTSTART:20261229T210000Z\r\nDTEND:20261229T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2027-01-05": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2027-01-05.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2027-01-05@brainvault.local\r\nDTSTAMP:20261020T201212Z\r\nDTSTART:20270105T210000Z\r\nDTEND:20270105T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641273-2027-01-12": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2027-01-12.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641273-2027-01-12@brainvault.local\r\nDTSTAMP:20261020T201212Z\r\nDTSTART:20270112T210000Z\r\nDTEND:20270112T220000Z\r\nSUMMARY:Work\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-10-22": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-10-22.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-10-22@brainvault.local\r\nDTSTAMP:20261020T201212Z\r\nDTSTART:20261022T200000Z\r\nDTEND:20261022T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-10-29": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-10-29.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-10-29@brainvault.local\r\nDTSTAMP:20261020T201213Z\r\nDTSTART:20261029T200000Z\r\nDTEND:20261029T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-11-05": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-05.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-11-05@brainvault.local\r\nDTSTAMP:20261020T201213Z\r\nDTSTART:20261105T210000Z\r\nDTEND:20261105T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-11-12": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-12.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-11-12@brainvault.local\r\nDTSTAMP:20261020T201214Z\r\nDTSTART:20261112T210000Z\r\nDTEND:20261112T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-11-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-11-19@brainvault.local\r\nDTSTAMP:20261020T201214Z\r\nDTSTART:20261119T210000Z\r\nDTEND:20261119T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-11-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-11-26@brainvault.local\r\nDTSTAMP:20261020T201215Z\r\nDTSTART:20261126T210000Z\r\nDTEND:20261126T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-12-03": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-03.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-12-03@brainvault.local\r\nDTSTAMP:20261020T201215Z\r\nDTSTART:20261203T210000Z\r\nDTEND:20261203T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-12-10": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-10.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-12-10@brainvault.local\r\nDTSTAMP:20261020T201215Z\r\nDTSTART:20261210T210000Z\r\nDTEND:20261210T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-12-17": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-17.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-12-17@brainvault.local\r\nDTSTAMP:20261020T201216Z\r\nDTSTART:20261217T210000Z\r\nDTEND:20261217T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-12-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-12-24@brainvault.local\r\nDTSTAMP:20261020T201216Z\r\nDTSTART:20261224T210000Z\r\nDTEND:20261224T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2026-12-31": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-31.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2026-12-31@brainvault.local\r\nDTSTAMP:20261020T201217Z\r\nDTSTART:20261231T210000Z\r\nDTEND:20261231T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2027-01-07": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2027-01-07.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2027-01-07@brainvault.local\r\nDTSTAMP:20261020T201217Z\r\nDTSTART:20270107T210000Z\r\nDTEND:20270107T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641276-2027-01-14": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2027-01-14.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641276-2027-01-14@brainvault.local\r\nDTSTAMP:20261020T201218Z\r\nDTSTART:20270114T210000Z\r\nDTEND:20270114T220000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-10-23": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-10-23.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-10-23@brainvault.local\r\nDTSTAMP:20261020T201218Z\r\nDTSTART:20261023T190000Z\r\nDTEND:20261023T200000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-10-30": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-10-30.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-10-30@brainvault.local\r\nDTSTAMP:20261020T201219Z\r\nDTSTART:20261030T190000Z\r\nDTEND:20261030T200000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-11-06": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-06.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-11-06@brainvault.local\r\nDTSTAMP:20261020T201219Z\r\nDTSTART:20261106T200000Z\r\nDTEND:20261106T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-11-13": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-13.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-11-13@brainvault.local\r\nDTSTAMP:20261020T201220Z\r\nDTSTART:20261113T200000Z\r\nDTEND:20261113T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-11-20": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-20.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-11-20@brainvault.local\r\nDTSTAMP:20261020T201220Z\r\nDTSTART:20261120T200000Z\r\nDTEND:20261120T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-11-27": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-27.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-11-27@brainvault.local\r\nDTSTAMP:20261020T201220Z\r\nDTSTART:20261127T200000Z\r\nDTEND:20261127T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-12-04": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-04.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-12-04@brainvault.local\r\nDTSTAMP:20261020T201221Z\r\nDTSTART:20261204T200000Z\r\nDTEND:20261204T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-12-11": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-11.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-12-11@brainvault.local\r\nDTSTAMP:20261020T201221Z\r\nDTSTART:20261211T200000Z\r\nDTEND:20261211T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-12-18": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-18.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-12-18@brainvault.local\r\nDTSTAMP:20261020T201222Z\r\nDTSTART:20261218T200000Z\r\nDTEND:20261218T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2026-12-25": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-25.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2026-12-25@brainvault.local\r\nDTSTAMP:20261020T201222Z\r\nDTSTART:20261225T200000Z\r\nDTEND:20261225T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2027-01-01": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-01.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2027-01-01@brainvault.local\r\nDTSTAMP:20261020T201223Z\r\nDTSTART:20270101T200000Z\r\nDTEND:20270101T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2027-01-08": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-08.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2027-01-08@brainvault.local\r\nDTSTAMP:20261020T201223Z\r\nDTSTART:20270108T200000Z\r\nDTEND:20270108T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641279-2027-01-15": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-15.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641279-2027-01-15@brainvault.local\r\nDTSTAMP:20261020T201223Z\r\nDTSTART:20270115T200000Z\r\nDTEND:20270115T210000Z\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-10-24": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-10-24.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-10-24@brainvault.local\r\nDTSTAMP:20261020T201224Z\r\nDTSTART;VALUE=DATE:20261024\r\nDTEND;VALUE=DATE:20261025\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-10-31": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-10-31.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-10-31@brainvault.local\r\nDTSTAMP:20261020T201224Z\r\nDTSTART;VALUE=DATE:20261031\r\nDTEND;VALUE=DATE:20261101\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-11-07": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-07.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-11-07@brainvault.local\r\nDTSTAMP:20261020T201225Z\r\nDTSTART;VALUE=DATE:20261107\r\nDTEND;VALUE=DATE:20261108\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-11-14": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-14.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-11-14@brainvault.local\r\nDTSTAMP:20261020T201225Z\r\nDTSTART;VALUE=DATE:20261114\r\nDTEND;VALUE=DATE:20261115\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-11-21": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-21.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-11-21@brainvault.local\r\nDTSTAMP:20261020T201225Z\r\nDTSTART;VALUE=DATE:20261121\r\nDTEND;VALUE=DATE:20261122\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-11-28": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-28.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-11-28@brainvault.local\r\nDTSTAMP:20261020T201226Z\r\nDTSTART;VALUE=DATE:20261128\r\nDTEND;VALUE=DATE:20261129\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-12-05": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-05.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-12-05@brainvault.local\r\nDTSTAMP:20261020T201226Z\r\nDTSTART;VALUE=DATE:20261205\r\nDTEND;VALUE=DATE:20261206\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-12-12": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-12.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-12-12@brainvault.local\r\nDTSTAMP:20261020T201227Z\r\nDTSTART;VALUE=DATE:20261212\r\nDTEND;VALUE=DATE:20261213\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-12-19": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-19.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-12-19@brainvault.local\r\nDTSTAMP:20261020T201227Z\r\nDTSTART;VALUE=DATE:20261219\r\nDTEND;VALUE=DATE:20261220\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2026-12-26": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-26.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2026-12-26@brainvault.local\r\nDTSTAMP:20261020T201227Z\r\nDTSTART;VALUE=DATE:20261226\r\nDTEND;VALUE=DATE:20261227\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2027-01-02": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-02.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2027-01-02@brainvault.local\r\nDTSTAMP:20261020T201228Z\r\nDTSTART;VALUE=DATE:20270102\r\nDTEND;VALUE=DATE:20270103\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2027-01-09": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-09.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2027-01-09@brainvault.local\r\nDTSTAMP:20261020T201228Z\r\nDTSTART;VALUE=DATE:20270109\r\nDTEND;VALUE=DATE:20270110\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      },
+      "mc-rec-rec-1792522641282-2027-01-16": {
+        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-16.ics",
+        "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//BrainVault//Mission Control//EN\r\nBEGIN:VEVENT\r\nUID:mc-rec-rec-1792522641282-2027-01-16@brainvault.local\r\nDTSTAMP:20261020T201229Z\r\nDTSTART;VALUE=DATE:20270116\r\nDTEND;VALUE=DATE:20270117\r\nSUMMARY:Work @ MyShift\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+      }
+    }
   }
 }
