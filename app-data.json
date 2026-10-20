@@ -3127,6 +3127,24 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-30",
       "exceptions": {}
+    },
+    {
+      "id": "rec-1792521720533",
+      "title": "Homework",
+      "time": null,
+      "location": "",
+      "kind": "focus",
+      "notify": false,
+      "notifyLeadMin": null,
+      "freq": "weekly",
+      "daysOfWeek": [
+        0
+      ],
+      "dayOfMonth": null,
+      "interval": 1,
+      "startDate": "2026-10-20",
+      "endDate": null,
+      "exceptions": {}
     }
   ],
   "redAssignments": [
