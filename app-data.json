@@ -796,6 +796,15 @@
   "lastDesignResearchAutoRun": "2026-10-20",
   "changeRequests": [
     {
+      "id": "2026-10-20-google-calendar-sync-integration",
+      "date": "2026-10-20",
+      "title": "Google Calendar Sync Integration",
+      "status": "pending",
+      "source": "ED chat",
+      "description": "User wants Mission Control calendar events to sync bidirectionally with Google Calendar so that updates in one automatically reflect in the other. Currently all calendar data is stored locally in localStorage with no cloud sync capability.",
+      "details": "Add Google Calendar OAuth integration to Mission Control. Required changes:\n\n**Backend (server.js):**\n- Implement Google OAuth 2.0 flow (authorization code grant)\n- Store user's Google Calendar credentials securely\n- Periodic sync job to push Mission Control events to Google Calendar and pull Google Calendar events back\n- Handle conflict resolution (e.g., if same event edited in both places)\n- Endpoints for: `/auth/google`, `/auth/google/callback`, `/sync/google-calendar`\n\n**Frontend (mission-control.html):**\n- Add \"Connect Google Calendar\" button in settings modal\n- Show sync status (last synced, connected/disconnected)\n- Toggle to enable/disable sync\n- Handle OAuth redirect back to app after user authorizes\n\n**Data:**\n- Store Google Calendar credentials in app-data.json alongside existing calendar events\n- Track sync metadata (lastSyncTime, googleCalendarId, etc.)\n\nStart with one-way sync (Mission Control → Google Calendar) if bidirectional is complex. Preserve existing localStorage calendar behavior as fallback if sync fails."
+    },
+    {
       "id": "2026-10-04-show-current-day-events-on-home-screen",
       "date": "2026-10-04",
       "title": "Show Current Day Events on Home Screen",
