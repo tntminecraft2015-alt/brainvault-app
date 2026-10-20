@@ -1481,6 +1481,15 @@
         <div class="quickgil-row" id="mobQuickGilRow"></div>
       </div>
 
+      <div class="home-card" onclick="if(!event.target.closest('button'))goToMobTab('cal')">
+        <div class="home-card-hd">
+          <span class="home-card-t">Today's events</span>
+          <span class="home-count" id="mobHomeEventsCount">0</span>
+          <button type="button" class="home-add" onclick="event.stopPropagation();openAddSheetAs('event')">+ Add</button>
+        </div>
+        <div class="tl-list home-tl" id="mobHomeEventsList"></div>
+      </div>
+
       <div class="home-row2">
         <button type="button" class="home-mini" onclick="openPokedexModal()">
           <span class="home-mini-hd"><span class="ed-pill-ic"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12a10 10 0 0 1 20 0z" fill="#ff5a4e"/><path d="M2 12h20" stroke="#10141c" stroke-width="2"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#10141c" stroke-width="2"/></svg></span><span>Pokédex</span><span class="home-mini-count" id="mobHomeDexCount">0/0</span></span>
@@ -1991,7 +2000,9 @@
       <button type="button" class="as-x" onclick="closeModal('dlSlideshowModal')" aria-label="Close">✕</button>
     </div>
     <div id="dlRevisionBanner" class="dl-revision-banner" style="display:none;"></div>
-    <iframe id="dlSlideshowFrame" style="flex:1;border:none;width:100%;transition:opacity .22s;border-radius:16px;background:var(--bg);"></iframe>
+    <div id="dlSlideshowFrameWrap" style="flex:1;position:relative;overflow:hidden;border-radius:16px;background:var(--bg);">
+      <iframe id="dlSlideshowFrame" style="position:absolute;inset:0;border:none;width:100%;height:100%;opacity:1;transition:opacity .15s ease-in-out;"></iframe>
+    </div>
   </div>
 </div>
 
@@ -2058,6 +2069,29 @@
       <div class="m-label" style="margin-bottom:6px;">EVENT NOTIFICATIONS</div>
       <button class="modal-btn sm ok" id="pushToggleBtn" onclick="togglePushSubscription()" style="width:100%;">🔔 Turn on notifications</button>
       <div id="pushStatus" style="font-family:'Inter',sans-serif;font-size:15px;opacity:.6;margin-top:6px;line-height:1.4;;font-weight:600"></div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(223,238,255,.1);">
+      <div class="m-label" style="margin-bottom:6px;">APPLE CALENDAR SYNC</div>
+      <div id="caldavDisconnected">
+        <div style="font-family:'Inter',sans-serif;font-size:12px;opacity:.65;margin-bottom:8px;line-height:1.5;">One-way: Mission Control events push to an iCloud calendar. Needs an app-specific password set as <b>CALDAV_APP_PASSWORD</b> on Render first (generate one at appleid.apple.com).</div>
+        <div style="display:flex;gap:6px;">
+          <input id="caldavAppleIdInp" class="m-inp" type="email" placeholder="you@icloud.com" style="flex:1;">
+          <button class="modal-btn sm ok" onclick="connectCaldav()">Connect</button>
+        </div>
+      </div>
+      <div id="caldavConnected" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <span style="font-family:'Inter',sans-serif;font-size:13px;" id="caldavConnectedLabel"></span>
+          <label style="display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:11px;opacity:.8;flex-shrink:0;">
+            <input type="checkbox" id="caldavEnabledChk" onchange="toggleCaldavEnabled()"> sync on
+          </label>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="modal-btn sm" onclick="syncCaldavNow()" style="flex:1;">Sync now</button>
+          <button class="modal-btn sm" onclick="disconnectCaldav()" style="flex:1;">Disconnect</button>
+        </div>
+      </div>
+      <div id="caldavStatus" style="font-family:'Inter',sans-serif;font-size:9.5px;opacity:.5;margin-top:6px;"></div>
     </div>
     <div class="modal-btns" style="margin-top:14px;">
       <button class="modal-btn ok" onclick="saveTheme()">Apply theme</button>
@@ -2667,8 +2701,43 @@ function renderMobHomeDex(){
   el.innerHTML=ids.length?ids.slice(0,4).map(id=>`<img src="${homeArt(id,caught[String(id)].shiny)}" alt="" loading="lazy">`).join(''):'<span class="home-mini-s">Catch your first one!</span>';
 }
 
+// Today's events on Home, drawn with the same calendar timeline pieces as the quests card
+function renderMobHomeEvents(){
+  const key=TODAY();
+  const ce=document.getElementById('mobHomeEventsCount'); if(ce)ce.textContent=eventsForDate(key).length;
+  renderEventsTimeline(document.getElementById('mobHomeEventsList'), key);
+}
+function renderEventsTimeline(el, key){
+  if(!el) return;
+  const items=calItemsForDate(key).filter(x=>x.e);
+  if(!items.length){ el.innerHTML=`<div class="home-empty">Clear day. <button type="button" onclick="openAddSheetAs('event')">Add an event</button></div>`; return; }
+  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes(), isToday=key===TODAY();
+  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
+  let html='';
+  if(untimed.length) html+=`<div class="tl-anytime">`+untimed.map(it=>`<div class="tl-row${it.task&&it.task.done?' done':''}">
+      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+      ${tlCheck(it)}</div>`).join('')+`</div>`;
+  let nowPlaced=!isToday;
+  const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
+  let rows='';
+  timed.forEach(it=>{
+    const start=tlMins(it.time);
+    if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
+    const past=isToday && start+TL_EVENT_MIN<=nowMin;
+    const [hm,ap]=fmtTime(it.time).split(' ');
+    rows+=`<div class="tl-row${it.task&&it.task.done?' done':''}${past?' past':''}">
+      <div class="tl-time">${hm}<small>${ap}</small></div>
+      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
+      ${tlCheck(it)}</div>`;
+  });
+  if(!nowPlaced && timed.length) rows+=nowRow();
+  el.innerHTML=html+(timed.length?`<div class="tl-sched">${rows}</div>`:'');
+}
+
 function renderMobHomeTeasers(){
-  renderMobHomeQuests(); renderMobHomeGil(); renderMobQuickGil(); renderMobHomeDex();
+  renderMobHomeQuests(); renderMobHomeGil(); renderMobQuickGil(); renderMobHomeDex(); renderMobHomeEvents();
 }
 
 function renderAll(){
@@ -4918,13 +4987,21 @@ function hideRevisionBanner(){
 }
 function swapToRevision(id){
   clearTimeout(_slideshowSwapTimer);
-  const frame=document.getElementById('dlSlideshowFrame');
-  if(frame){
-    frame.style.opacity='0';
-    setTimeout(()=>{
-      frame.src=`${SERVER}/api/design-research/${id}`;
-      frame.onload=()=>{ frame.style.opacity='1'; };
-    },220);
+  const wrap=document.getElementById('dlSlideshowFrameWrap');
+  const oldFrame=document.getElementById('dlSlideshowFrame');
+  if(wrap && oldFrame){
+    const newFrame=document.createElement('iframe');
+    newFrame.style.cssText=oldFrame.style.cssText;
+    newFrame.style.opacity='0';
+    newFrame.src=`${SERVER}/api/design-research/${id}`;
+    newFrame.onload=()=>{
+      requestAnimationFrame(()=>{
+        oldFrame.style.opacity='0';
+        newFrame.style.opacity='1';
+      });
+      setTimeout(()=>{ oldFrame.remove(); newFrame.id='dlSlideshowFrame'; },150);
+    };
+    wrap.appendChild(newFrame);
   }
   _slideshowKnownIds.add(id);
   hideRevisionBanner();
@@ -5107,6 +5184,60 @@ function openSettingsModal(){
   if(localEl) localEl.style.display = isCloud ? 'none' : '';
   if(cloudEl) cloudEl.style.display = isCloud ? '' : 'none';
   openModal('settingsModal');
+  refreshCaldavStatus();
+}
+
+// ── APPLE CALENDAR SYNC (settings panel) ──
+async function refreshCaldavStatus(){
+  const disc=document.getElementById('caldavDisconnected'), conn=document.getElementById('caldavConnected');
+  const statusEl=document.getElementById('caldavStatus');
+  if(!disc||!conn)return;
+  try{
+    const r=await fetch(`${SERVER}/api/caldav/status`,{signal:AbortSignal.timeout(5000)});
+    const d=await r.json();
+    if(d.connected){
+      disc.style.display='none'; conn.style.display='';
+      document.getElementById('caldavConnectedLabel').textContent=`◆ ${d.appleId} → ${d.calendarName||'Calendar'}`;
+      document.getElementById('caldavEnabledChk').checked=!!d.enabled;
+      statusEl.textContent=d.lastError?`⚠ ${d.lastError}`:(d.lastSyncTime?`Last synced ${new Date(d.lastSyncTime).toLocaleString()}`:'Not synced yet');
+    } else {
+      disc.style.display=''; conn.style.display='none';
+      statusEl.textContent=d.configured?'':'⚠ CALDAV_APP_PASSWORD not set on the server yet.';
+    }
+  }catch(e){ statusEl.textContent='⚠ Could not reach server.'; }
+}
+async function connectCaldav(){
+  const appleId=document.getElementById('caldavAppleIdInp').value.trim();
+  if(!appleId){ showToast('Enter your Apple ID email'); return; }
+  showToast('Connecting to iCloud…');
+  try{
+    const r=await fetch(`${SERVER}/api/caldav/connect`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({appleId}),signal:AbortSignal.timeout(20000)});
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||'failed');
+    showToast(`Connected to "${d.calendarName}" ◆`);
+    refreshCaldavStatus();
+  }catch(e){ showToast('Connect failed: '+(e.message||'server offline')); }
+}
+async function disconnectCaldav(){
+  try{ await fetch(`${SERVER}/api/caldav/disconnect`,{method:'POST'}); }catch(e){}
+  showToast('Apple Calendar sync disconnected');
+  refreshCaldavStatus();
+}
+async function toggleCaldavEnabled(){
+  const enabled=document.getElementById('caldavEnabledChk').checked;
+  try{ await fetch(`${SERVER}/api/caldav/toggle`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({enabled})}); }catch(e){}
+  showToast(enabled?'Sync enabled':'Sync paused');
+  refreshCaldavStatus();
+}
+async function syncCaldavNow(){
+  showToast('Syncing…');
+  try{
+    const r=await fetch(`${SERVER}/api/caldav/sync`,{method:'POST',signal:AbortSignal.timeout(20000)});
+    const d=await r.json();
+    if(!r.ok||!d.ok) throw new Error(d.error||'failed');
+    showToast(d.lastError?`⚠ ${d.lastError}`:'Synced ◆');
+    refreshCaldavStatus();
+  }catch(e){ showToast('Sync failed: '+(e.message||'server offline')); }
 }
 
 function selectPreset(name, btn){

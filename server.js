@@ -5,6 +5,7 @@ const fs        = require('fs');
 const os        = require('os');
 const Anthropic = require('@anthropic-ai/sdk');
 const webpush   = require('web-push');
+const { createDAVClient } = require('tsdav');
 
 const app       = express();
 const PORT      = process.env.PORT || 3000;
@@ -397,6 +398,12 @@ function addDays(dateStr, n) {
   return d.toISOString().split('T')[0];
 }
 
+// The one real secret in the Apple Calendar sync below — an iCloud app-specific
+// password — lives only in this env var, never in app-data.json (which is
+// committed straight to the vault repo).
+const CALDAV_APP_PASSWORD    = process.env.CALDAV_APP_PASSWORD || '';
+const CALDAV_SYNC_WINDOW_DAYS = 90;
+
 function today()   { return dateInTz(); }
 function nowStamp() {
   return new Intl.DateTimeFormat('en-GB', {
@@ -561,10 +568,82 @@ app.post('/api/data', (req, res) => {
     saveAppData(data);
     if (patch.tasks && Array.isArray(patch.tasks)) syncTasks(patch.tasks, date);
     if (patch.events !== undefined || patch.recurringEvents !== undefined) syncEvents(data);
+    if (patch.events !== undefined || patch.recurringEvents !== undefined) syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     if (patch.schedule !== undefined) syncSchedule(data.schedule);
     res.json({ ok: true, currentStreak: data.currentStreak, streakDays: data.streakDays });
   } catch (err) {
     console.error('Data patch error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/caldav/status', (req, res) => {
+  const cal = getAppData().caldav || {};
+  res.json({
+    ok: true,
+    configured: !!CALDAV_APP_PASSWORD,
+    connected: !!cal.connected,
+    enabled: cal.enabled !== false,
+    appleId: cal.appleId || null,
+    calendarName: cal.calendarName || null,
+    lastSyncTime: cal.lastSyncTime || null,
+    lastError: cal.lastError || null,
+  });
+});
+
+app.post('/api/caldav/connect', async (req, res) => {
+  try {
+    const appleId = String(req.body.appleId || '').trim();
+    if (!appleId) return res.status(400).json({ error: 'Apple ID email required' });
+    if (!CALDAV_APP_PASSWORD)
+      return res.status(400).json({ error: 'Set CALDAV_APP_PASSWORD as a Render environment variable first (an app-specific password generated at appleid.apple.com — your normal Apple ID password will not work here).' });
+    const client = await getCaldavClient(appleId);
+    const calendars = await client.fetchCalendars();
+    const target = calendars.find(c => (c.components || []).includes('VEVENT'));
+    if (!target) return res.status(400).json({ error: 'No event-capable calendar found on this iCloud account.' });
+    const data = getAppData();
+    data.caldav = {
+      appleId,
+      calendarUrl: target.url,
+      calendarName: typeof target.displayName === 'string' ? target.displayName : 'Calendar',
+      connected: true,
+      enabled: true,
+      lastSyncTime: null,
+      lastError: null,
+      pushedEvents: (data.caldav && data.caldav.pushedEvents) || {},
+    };
+    saveAppData(data);
+    syncCaldavCalendar(data).catch(e => console.error('Initial CalDAV sync failed:', e.message));
+    res.json({ ok: true, calendarName: data.caldav.calendarName });
+  } catch (err) {
+    console.error('CalDAV connect failed:', err.message);
+    res.status(500).json({ error: 'Could not connect — check the Apple ID and app-specific password: ' + err.message });
+  }
+});
+
+app.post('/api/caldav/disconnect', (req, res) => {
+  const data = getAppData();
+  data.caldav = { ...(data.caldav || {}), connected: false, enabled: false };
+  saveAppData(data);
+  res.json({ ok: true });
+});
+
+app.post('/api/caldav/toggle', (req, res) => {
+  const data = getAppData();
+  if (!data.caldav || !data.caldav.connected) return res.status(400).json({ error: 'Not connected' });
+  data.caldav.enabled = !!req.body.enabled;
+  saveAppData(data);
+  if (data.caldav.enabled) syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
+  res.json({ ok: true, enabled: data.caldav.enabled });
+});
+
+app.post('/api/caldav/sync', async (req, res) => {
+  const data = getAppData();
+  if (!data.caldav || !data.caldav.connected) return res.status(400).json({ error: 'Not connected' });
+  try {
+    await syncCaldavCalendar(data);
+    res.json({ ok: true, lastSyncTime: getAppData().caldav.lastSyncTime, lastError: getAppData().caldav.lastError });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -931,6 +1010,124 @@ function occurrenceForDate(rec, dateStr) {
     recurring: true,
     recurringId: rec.id,
   };
+}
+
+// ── APPLE CALENDAR SYNC (one-way: Mission Control → iCloud via CalDAV) ───────
+// Push-only — Mission Control stays the source of truth. Idempotent via a uid→
+// {href,ics} map kept in data.caldav.pushedEvents: unchanged events are skipped,
+// changed ones are deleted+recreated (simpler than tracking etags for a personal
+// calendar this size), and anything no longer desired gets deleted.
+function icsEscape(str) {
+  return String(str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+}
+function icsStamp(date) {
+  return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+function tzOffsetMinutes(utcGuess, tz) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+  }).formatToParts(utcGuess).reduce((a, p) => { a[p.type] = p.value; return a; }, {});
+  const asIfUtc = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+  return (asIfUtc - utcGuess.getTime()) / 60000;
+}
+function zonedTimeToUtc(dateKey, timeStr, tz) {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const [hh, mm]  = (timeStr || '00:00').split(':').map(Number);
+  const guess = new Date(Date.UTC(y, m - 1, d, hh, mm));
+  return new Date(guess.getTime() - tzOffsetMinutes(guess, tz) * 60000);
+}
+function buildEventICS(uid, title, dateKey, time, durationMin = 60) {
+  const now = icsStamp(new Date());
+  let dtLines;
+  if (time) {
+    const start = zonedTimeToUtc(dateKey, time, APP_TZ);
+    const end   = new Date(start.getTime() + durationMin * 60000);
+    dtLines = `DTSTART:${icsStamp(start)}\r\nDTEND:${icsStamp(end)}`;
+  } else {
+    const d = dateKey.replace(/-/g, '');
+    const next = new Date(dateKey + 'T00:00:00'); next.setDate(next.getDate() + 1);
+    const nextD = `${next.getFullYear()}${String(next.getMonth() + 1).padStart(2, '0')}${String(next.getDate()).padStart(2, '0')}`;
+    dtLines = `DTSTART;VALUE=DATE:${d}\r\nDTEND;VALUE=DATE:${nextD}`;
+  }
+  return [
+    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BrainVault//Mission Control//EN', 'BEGIN:VEVENT',
+    `UID:${uid}@brainvault.local`, `DTSTAMP:${now}`, dtLines, `SUMMARY:${icsEscape(title)}`,
+    'END:VEVENT', 'END:VCALENDAR', '',
+  ].join('\r\n');
+}
+// Flattens one-off events (today forward) + expanded recurring occurrences (today ..
+// +CALDAV_SYNC_WINDOW_DAYS) into the flat shape buildEventICS expects. Past events
+// aren't pushed — no value syncing history to a one-way destination calendar.
+function upcomingEventsForSync(data) {
+  const start = today();
+  const endDate = new Date(start + 'T00:00:00'); endDate.setDate(endDate.getDate() + CALDAV_SYNC_WINDOW_DAYS);
+  const out = [];
+  for (const [dateKey, evs] of Object.entries(data.events || {})) {
+    if (dateKey < start) continue;
+    (Array.isArray(evs) ? evs : []).forEach(e => out.push({ uid: `mc-${e.id}`, title: e.title, dateKey, time: e.time || null }));
+  }
+  for (const rec of (data.recurringEvents || [])) {
+    for (let d = new Date(start + 'T00:00:00'); d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateKey = dateInTz(d);
+      if (occursOn(rec, dateKey)) {
+        const occ = occurrenceForDate(rec, dateKey);
+        out.push({ uid: `mc-${occ.id}`, title: occ.title, dateKey, time: occ.time || null });
+      }
+    }
+  }
+  return out;
+}
+let _caldavClient = null, _caldavClientKey = '';
+async function getCaldavClient(appleId) {
+  const key = `${appleId}::${CALDAV_APP_PASSWORD}`;
+  if (_caldavClient && _caldavClientKey === key) return _caldavClient;
+  const client = await createDAVClient({
+    serverUrl: 'https://caldav.icloud.com',
+    credentials: { username: appleId, password: CALDAV_APP_PASSWORD },
+    authMethod: 'Basic',
+    defaultAccountType: 'caldav',
+  });
+  _caldavClient = client; _caldavClientKey = key;
+  return client;
+}
+async function syncCaldavCalendar(data) {
+  const cal = data.caldav;
+  if (!cal || !cal.enabled || !cal.connected || !cal.appleId || !cal.calendarUrl) return;
+  if (!CALDAV_APP_PASSWORD) { cal.lastError = 'CALDAV_APP_PASSWORD not set'; saveAppData(data); return; }
+  try {
+    const client  = await getCaldavClient(cal.appleId);
+    const calendar = { url: cal.calendarUrl };
+    const desired   = upcomingEventsForSync(data);
+    const desiredByUid = new Map(desired.map(e => [e.uid, e]));
+    const pushed = cal.pushedEvents || {};
+    for (const [uid, rec] of Object.entries(pushed)) {
+      if (!desiredByUid.has(uid)) {
+        try { await client.deleteCalendarObject({ calendarObject: { url: rec.href } }); } catch (e) { console.error('CalDAV delete failed:', e.message); }
+        delete pushed[uid];
+      }
+    }
+    for (const ev of desired) {
+      const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time);
+      const existing = pushed[ev.uid];
+      if (existing && existing.ics === ics) continue;
+      if (existing) {
+        try { await client.deleteCalendarObject({ calendarObject: { url: existing.href } }); } catch (e) { console.error('CalDAV delete-before-update failed:', e.message); }
+      }
+      const filename = `${ev.uid}.ics`;
+      const resp = await client.createCalendarObject({ calendar, iCalString: ics, filename });
+      if (!resp.ok) throw new Error(`CalDAV create failed (${resp.status}) for "${ev.title}"`);
+      pushed[ev.uid] = { href: calendar.url.replace(/\/?$/, '/') + filename, ics };
+    }
+    cal.pushedEvents  = pushed;
+    cal.lastSyncTime  = new Date().toISOString();
+    cal.lastError     = null;
+    saveAppData(data);
+  } catch (err) {
+    console.error('CalDAV sync failed:', err.message);
+    cal.lastError = err.message;
+    saveAppData(data);
+  }
 }
 
 // Finds events (one-off and recurring occurrences) matching a title substring, optionally
@@ -2664,6 +2861,9 @@ async function main() {
 
   pruneOldEvents().catch(console.error);
   setInterval(() => pruneOldEvents().catch(console.error), 24 * 60 * 60 * 1000);
+
+  syncCaldavCalendar(getAppData()).catch(console.error);
+  setInterval(() => syncCaldavCalendar(getAppData()).catch(console.error), 24 * 60 * 60 * 1000);
 }
 
 main().catch(console.error);
