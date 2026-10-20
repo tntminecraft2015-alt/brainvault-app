@@ -2,7 +2,7 @@
 type: analysis
 title: "Calendar Events"
 last_updated: "2026-10-20"
-synced_at: "10/20/2026, 6:32:40 PM"
+synced_at: "10/20/2026, 6:34:41 PM"
 tags: [calendar, events]
 ---
 
@@ -48,5 +48,6 @@ tags: [calendar, events]
 | Math | every Mon & Wed & Fri at 10:00, from 2026-09-30 until 2026-12-20 | focus |  |
 | Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
+| Therapy | every Tue at 14:00, from 2026-11-17 until 2026-11-30 | meeting |  |
 
-_Last synced: 10/20/2026, 6:32:40 PM_
+_Last synced: 10/20/2026, 6:34:41 PM_
