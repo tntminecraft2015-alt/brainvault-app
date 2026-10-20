@@ -3476,7 +3476,7 @@
     "connected": true,
     "enabled": true,
     "lastSyncTime": null,
-    "lastError": null,
+    "lastError": "CalDAV create failed (412) for \"Work\"",
     "pushedEvents": {}
   }
 }
