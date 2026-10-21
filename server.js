@@ -208,6 +208,13 @@ async function loadDir(dir) {
   }
 }
 
+// Set once initStore has verified, via a direct GitHub metadata lookup, that
+// app-data.json genuinely does not exist yet (a brand-new vault). Stays false on
+// any other failure to load it, so getAppData's fallback below gets flagged
+// unsafe-to-save instead of silently standing in for real data that just failed
+// to load this one time (rate limit, network blip, etc.).
+let appDataConfirmedMissing = false;
+
 async function initStore() {
   if (!USE_GITHUB) return;
   console.log('  Loading vault from GitHub…');
@@ -215,6 +222,11 @@ async function initStore() {
   console.log(`  Loaded ${Object.keys(fileStore).length} files from ${GH_OWNER}/${GH_REPO}`);
   const readFailures = Object.entries(syncStatus).filter(([, s]) => s.lastReadOk === false).length;
   if (readFailures) console.log(`  ${readFailures} read failure(s) during load — see /api/status for details`);
+  if (!fileStore['app-data.json']) {
+    const meta = await ghGetMeta('app-data.json');
+    appDataConfirmedMissing = meta === 404;
+    if (!appDataConfirmedMissing) console.error('  WARNING: app-data.json failed to load from GitHub and is not confirmed missing — saves will be refused until a restart successfully reloads it.');
+  }
 }
 
 // Debounced write: updates memory immediately, persists to GitHub after 600ms idle
@@ -325,10 +337,20 @@ function getAppData() {
     ? fileStore['app-data.json']
     : (() => { try { return fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : null; } catch { return null; } })();
   if (raw) { try { return JSON.parse(raw); } catch {} }
-  return { schedule: DEFAULT_SCHEDULE, events: {}, recurringEvents: [], tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [], redMemory: [] };
+  const fallback = { schedule: DEFAULT_SCHEDULE, events: {}, recurringEvents: [], tasks: {}, streakDays: [], timelineChecks: {}, pushSubscriptions: [], notifiedEvents: {}, designResearch: [], lastDesignResearchAutoRun: null, changeRequests: [], designFeedback: [], designThreads: {}, edMemory: [], redMemory: [] };
+  if (USE_GITHUB && !appDataConfirmedMissing) {
+    // A GitHub read failure, not a genuinely empty vault — mark it so saveAppData
+    // refuses to persist it. Non-enumerable so it never leaks into JSON responses.
+    Object.defineProperty(fallback, '__unsafeToSave', { value: true, enumerable: false });
+  }
+  return fallback;
 }
 
 function saveAppData(data) {
+  if (data && data.__unsafeToSave) {
+    console.error('saveAppData BLOCKED: app-data.json could not be confirmed loaded from GitHub — refusing to overwrite real data with an empty fallback. Restart the server once GitHub is reachable again.');
+    return;
+  }
   const content = JSON.stringify(data, null, 2);
   if (USE_GITHUB) {
     ghWrite('app-data.json', content);
@@ -1037,7 +1059,7 @@ function zonedTimeToUtc(dateKey, timeStr, tz) {
   const guess = new Date(Date.UTC(y, m - 1, d, hh, mm));
   return new Date(guess.getTime() - tzOffsetMinutes(guess, tz) * 60000);
 }
-function buildEventICS(uid, title, dateKey, time, durationMin = 60) {
+function buildEventICS(uid, title, dateKey, time, notifyLeadMin, durationMin = 60) {
   const now = icsStamp(new Date());
   let dtLines;
   if (time) {
@@ -1050,9 +1072,15 @@ function buildEventICS(uid, title, dateKey, time, durationMin = 60) {
     const nextD = `${next.getFullYear()}${String(next.getMonth() + 1).padStart(2, '0')}${String(next.getDate()).padStart(2, '0')}`;
     dtLines = `DTSTART;VALUE=DATE:${d}\r\nDTEND;VALUE=DATE:${nextD}`;
   }
+  // Only a timed event with a real lead time gets a native alert — Mission Control's own
+  // push notification is separate from this and keeps working either way.
+  const valarm = (time && Number.isFinite(notifyLeadMin) && notifyLeadMin > 0)
+    ? ['BEGIN:VALARM', `TRIGGER:-PT${Math.round(notifyLeadMin)}M`, 'ACTION:DISPLAY', `DESCRIPTION:${icsEscape(title)}`, 'END:VALARM']
+    : [];
   return [
     'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//BrainVault//Mission Control//EN', 'BEGIN:VEVENT',
     `UID:${uid}@brainvault.local`, `DTSTAMP:${now}`, dtLines, `SUMMARY:${icsEscape(title)}`,
+    ...valarm,
     'END:VEVENT', 'END:VCALENDAR', '',
   ].join('\r\n');
 }
@@ -1065,14 +1093,14 @@ function upcomingEventsForSync(data) {
   const out = [];
   for (const [dateKey, evs] of Object.entries(data.events || {})) {
     if (dateKey < start) continue;
-    (Array.isArray(evs) ? evs : []).forEach(e => out.push({ uid: `mc-${e.id}`, title: e.title, dateKey, time: e.time || null }));
+    (Array.isArray(evs) ? evs : []).forEach(e => out.push({ uid: `mc-${e.id}`, title: e.title, dateKey, time: e.time || null, notifyLeadMin: e.notify ? e.notifyLeadMin : null }));
   }
   for (const rec of (data.recurringEvents || [])) {
     for (let d = new Date(start + 'T00:00:00'); d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateKey = dateInTz(d);
       if (occursOn(rec, dateKey)) {
         const occ = occurrenceForDate(rec, dateKey);
-        out.push({ uid: `mc-${occ.id}`, title: occ.title, dateKey, time: occ.time || null });
+        out.push({ uid: `mc-${occ.id}`, title: occ.title, dateKey, time: occ.time || null, notifyLeadMin: occ.notify ? occ.notifyLeadMin : null });
       }
     }
   }
@@ -1119,7 +1147,7 @@ async function syncCaldavCalendarNow(data) {
   }
   for (const ev of desired) {
     try {
-      const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time);
+      const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time, ev.notifyLeadMin);
       const existing = pushed[ev.uid];
       if (existing && existing.ics === ics) continue;
       const filename = `${ev.uid}.ics`;
@@ -1225,6 +1253,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
     data.recurringEvents.push(rec);
     saveAppData(data);
     syncEvents(data);
+    syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     return { ok: true, recurring: true, rec };
   }
 
@@ -1236,6 +1265,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
   data.events[d].push(ev);
   saveAppData(data);
   syncEvents(data);
+  syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
   return { ok: true, recurring: false, date: d, ev };
 }
 
@@ -1281,6 +1311,7 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
     }
     saveAppData(data);
     syncEvents(data);
+    syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     return { ok: true, message: `Updated "${m.ev.title}".` };
   }
 
@@ -1291,11 +1322,13 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
     m.rec.exceptions[m.date] = { ...m.rec.exceptions[m.date], ...fields };
     saveAppData(data);
     syncEvents(data);
+    syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     return { ok: true, message: `Updated the ${m.date} occurrence of "${m.rec.title}".` };
   }
   Object.assign(m.rec, fields);
   saveAppData(data);
   syncEvents(data);
+  syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
   return { ok: true, message: `Updated the whole "${m.rec.title}" series.` };
 }
 
@@ -1325,6 +1358,7 @@ function deleteEdCalendarEvent({ title_search, date, scope }) {
     if (!data.events[m.date].length) delete data.events[m.date];
     saveAppData(data);
     syncEvents(data);
+    syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     return { ok: true, message: `Deleted "${m.ev.title}" on ${m.date}.` };
   }
 
@@ -1334,11 +1368,13 @@ function deleteEdCalendarEvent({ title_search, date, scope }) {
     m.rec.exceptions[m.date] = { skip: true };
     saveAppData(data);
     syncEvents(data);
+    syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
     return { ok: true, message: `Deleted the ${m.date} occurrence of "${m.rec.title}".` };
   }
   data.recurringEvents = (data.recurringEvents || []).filter(r => r.id !== m.rec.id);
   saveAppData(data);
   syncEvents(data);
+  syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
   return { ok: true, message: `Deleted the whole "${m.rec.title}" series.` };
 }
 
