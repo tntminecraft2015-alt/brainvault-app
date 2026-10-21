@@ -5,6 +5,7 @@ const fs        = require('fs');
 const os        = require('os');
 const Anthropic = require('@anthropic-ai/sdk');
 const webpush   = require('web-push');
+const crypto    = require('crypto');
 const { createDAVClient } = require('tsdav');
 
 const app       = express();
@@ -198,7 +199,11 @@ async function loadDir(dir) {
   for (const item of items) {
     if (item.type === 'dir') {
       await loadDir(item.path);
-    } else if (item.type === 'file' && item.size < 300_000) {
+    // app-data.json is core app state, not a skippable media/wiki asset — it must always
+    // load regardless of size (silently skipping it here is exactly what produced the
+    // empty-fallback-then-overwrite data loss this cap once caused). GitHub's contents
+    // API itself handles files well past this size; the cap only exists for everything else.
+    } else if (item.type === 'file' && (item.path === 'app-data.json' || item.size < 300_000)) {
       const f = await ghGet(item.path);
       if (f?.content) {
         fileStore[item.path] = Buffer.from(f.content, 'base64').toString('utf8');
@@ -1148,8 +1153,13 @@ async function syncCaldavCalendarNow(data) {
   for (const ev of desired) {
     try {
       const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time, ev.notifyLeadMin);
+      // Store a short hash instead of the full ICS text for change-detection — with the
+      // rolling sync window holding hundreds of occurrences, the full text per entry was
+      // the single biggest driver of app-data.json's growth (the exact thing that tripped
+      // the loadDir size cap and caused the data-loss incident this sync engine survived).
+      const hash = crypto.createHash('sha1').update(ics).digest('hex');
       const existing = pushed[ev.uid];
-      if (existing && existing.ics === ics) continue;
+      if (existing && existing.hash === hash) continue;
       const filename = `${ev.uid}.ics`;
       const href = calendar.url.replace(/\/?$/, '/') + filename;
       if (existing) {
@@ -1159,7 +1169,7 @@ async function syncCaldavCalendarNow(data) {
       // 412 means iCloud already has an object at this filename (e.g. an overlapping sync
       // pass won the race) — the event is already there, so treat it as success, not a failure.
       if (!resp.ok && resp.status !== 412) throw new Error(`CalDAV create failed (${resp.status}) for "${ev.title}"`);
-      pushed[ev.uid] = { href, ics };
+      pushed[ev.uid] = { href, hash };
     } catch (err) {
       console.error('CalDAV push failed for', ev.title, ':', err.message);
       errors.push(`"${ev.title}": ${err.message}`);
