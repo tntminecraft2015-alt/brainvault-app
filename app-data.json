@@ -3338,6 +3338,11 @@
         "t": "Charmander left today’s letter in the mailbox"
       },
       {
+        "ic": "mail",
+        "col": "#ff8a63",
+        "t": "Charmander left today’s letter in the mailbox"
+      },
+      {
         "ic": "gift",
         "col": "#ffe27a",
         "t": "Welcome to your farm! Here are 5 berries to start."
@@ -3347,7 +3352,7 @@
       "4": {
         "pts": 24,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
@@ -3386,14 +3391,14 @@
       "132": {
         "pts": 0,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
       "133": {
         "pts": 4,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
@@ -3436,14 +3441,14 @@
       "282": {
         "pts": 12,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
       "359": {
         "pts": 4,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
@@ -3454,7 +3459,7 @@
       "448": {
         "pts": 20,
         "joined": "2026-10-01",
-        "day": "2026-10-20",
+        "day": "2026-10-22",
         "pets": 0,
         "feeds": 0
       },
@@ -3503,7 +3508,7 @@
       448,
       359
     ],
-    "rolled": "2026-10-20",
+    "rolled": "2026-10-22",
     "custom": {
       "name": "",
       "map": "meadow",
