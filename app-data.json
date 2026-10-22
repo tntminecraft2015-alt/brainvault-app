@@ -595,6 +595,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-22-design-research-daily",
+      "date": "2026-10-22",
+      "topic": "",
+      "title": "General Improvements: Micro-Confirmation Feedback, Grace-Based Streak Recovery & AI-Driven Contextual Reminders",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-20-design-research-daily",
       "date": "2026-10-20",
       "topic": "",
@@ -863,7 +873,7 @@
       "openTopic": false
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-20",
+  "lastDesignResearchAutoRun": "2026-10-22",
   "changeRequests": [
     {
       "id": "2026-10-20-google-calendar-sync-integration",
@@ -2664,6 +2674,57 @@
       "updatedDate": "2026-10-20",
       "originResearchId": "2026-10-20-design-research-daily",
       "openTopic": false
+    },
+    "thread-1792647781648-0-quest-completion-burst-satisfying-micro-": {
+      "id": "thread-1792647781648-0-quest-completion-burst-satisfying-micro-",
+      "title": "Quest Completion Burst: Satisfying Micro-Feedback on Check",
+      "description": "When users check off a quest, surface a small, celebratory micro-interaction—a brief scale-pop on the rank badge, a subtle color-pulse on the card, or a quiet 'streak +1' indicator. Thoughtful micro-interactions increase retention by up to 30% because they create emotional responses that make users feel more connected. This is especially powerful on mobile where quest completion is the fastest user action; mobile-first habit tracking drives retention through daily feedback loops and frictionless logging, and users can capture behaviors in seconds and receive immediate progress signals. Unlike expensive animations, a single frame-pop and brief highlight take milliseconds and fit Mission Control's retro JRPG character.",
+      "source_title": "UI/UX Design Trends That Actually Improve User Retention",
+      "source_url": "https://workspacein.com/blog/web-design/ux-design-trends",
+      "mockup_html": "<div style=\"background:#0a1929;padding:24px;border-radius:8px;font-family:'VT323',monospace;color:#dfeeff;text-align:center;box-shadow:inset 0 0 0 3px #ff8a63,inset 0 0 0 5px #0a1929,inset 0 0 0 7px #ff8a63\"><div style=\"margin-bottom:16px;font-size:12px;font-family:'Press Start 2P',monospace;letter-spacing:1px;color:#ff8a63\">S-RANK QUEST</div><div style=\"background:#12253c;padding:16px;border-radius:4px;margin-bottom:12px;border:1px solid #1e3a5f\"><div style=\"font-size:14px;margin-bottom:8px\">Morning Focus Session</div><div style=\"display:flex;gap:8px;align-items:center;justify-content:center\"><input type='checkbox' checked style=\"cursor:pointer;transform:scale(1.5)\"><span style=\"color:#ff8a63;font-size:16px;font-weight:bold;animation:float-up 0.6s ease-out forwards\">+50 XP</span></div></div><div style=\"font-size:11px;color:#12253c;background:#ff8a63;padding:4px 8px;border-radius:3px;display:inline-block\">Streak: 7 days 🔥</div><style>@keyframes float-up { 0% { opacity:1;transform:translateY(0); } 100% { opacity:0;transform:translateY(-20px); } }</style></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-22",
+      "updatedDate": "2026-10-22",
+      "originResearchId": "2026-10-22-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1792647781648-1-streak-grace-window-miss-yesterday-recov": {
+      "id": "thread-1792647781648-1-streak-grace-window-miss-yesterday-recov",
+      "title": "Streak Grace Window: 'Miss Yesterday?' Recovery Prompt",
+      "description": "Streaks need grace windows; punishing one missed day is the single most common self-inflicted churn wound in habit trackers. When a user opens Mission Control after missing a day, show a subtle prompt offer: 'Missed yesterday? Add it now to keep your streak alive.' This surfaces data showing the longer the streak lost, the more likely a user returns, with return rates rising from roughly a third to three-quarters depending on streak length. Implement as a non-modal inline card on the Home screen (not a guilt-trip popup), disappearing after one completion or after 24 hours. Keeps the grace-window mechanic hidden until needed, reducing friction.",
+      "source_title": "How to Build a Habit Tracker or Productivity App in 2026",
+      "source_url": "https://www.chopdawg.com/how-to-build-a-habit-tracker-or-productivity-app-in-2026/",
+      "mockup_html": "<div style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace\"><div style=\"background:#12253c;border:1px solid #1e3a5f;border-radius:6px;padding:16px;margin-bottom:16px;box-shadow:inset 0 0 0 2px #ff8a63\"><div style=\"font-size:11px;font-family:'Press Start 2P',monospace;color:#ff8a63;margin-bottom:8px;letter-spacing:0.5px\">STREAK RECOVERY</div><div style=\"color:#dfeeff;font-size:13px;line-height:1.4;margin-bottom:12px\">Missed yesterday? Add a quest to keep your 12-day streak alive.</div><div style=\"display:flex;gap:8px\"><button style=\"background:#ff8a63;color:#0a1929;border:none;padding:6px 12px;border-radius:3px;cursor:pointer;font-family:'VT323',monospace;font-size:12px;font-weight:bold\">Add Quest</button><button style=\"background:transparent;color:#dfeeff;border:1px solid #1e3a5f;padding:6px 12px;border-radius:3px;cursor:pointer;font-family:'VT323',monospace;font-size:12px\">Later</button></div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-22",
+      "updatedDate": "2026-10-22",
+      "originResearchId": "2026-10-22-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1792647781648-2-context-aware-reminder-timing-quest-hint": {
+      "id": "thread-1792647781648-2-context-aware-reminder-timing-quest-hint",
+      "title": "Context-Aware Reminder Timing: Quest Hints by Calendar Slot",
+      "description": "Apps that activate users within three minutes of opening see nearly 2x higher retention rates, and users who receive even a single push notification in the first 90 days are three times more likely to stay. Mission Control already has rich calendar + quest data (scheduled times, event kinds). Surface a soft nudge 5–15 minutes before an S-rank quest's scheduled time, or send a morning briefing listing that day's B-rank quests. AI-driven personalization—adaptive reminders, context-aware nudges, and flexible streak recovery—represents the most promising path to solving the 52% 30-day drop-off rate in habit trackers. No new data model needed; just smarter scheduling of existing push/in-app notifications tied to quest times.",
+      "source_title": "The State of Habit Tracking in 2026: Trends and Data",
+      "source_url": "https://habit-streak.com/en/blog/habit-tracking/state-of-habit-tracking-2026",
+      "mockup_html": "<div style=\"background:#0a1929;padding:24px;font-family:'VT323',monospace;border-radius:8px;color:#dfeeff\"><div style=\"background:#1e3a5f;border:1px solid #ff8a63;border-radius:6px;padding:12px;margin-bottom:12px\"><div style=\"font-size:10px;font-family:'Press Start 2P',monospace;color:#ff8a63;letter-spacing:0.5px;margin-bottom:6px\">ACTIVE REMINDER</div><div style=\"font-size:13px;margin-bottom:8px\">📅 Today, 2:30 PM</div><div style=\"background:#12253c;padding:10px;border-radius:3px;margin-bottom:8px;border-left:3px solid #ff8a63\"><div style=\"font-size:12px;color:#dfeeff\">Daily Focus Block</div><div style=\"font-size:11px;color:#12253c;margin-top:3px\">S-Rank · 50 XP</div></div><div style=\"font-size:10px;color:#12253c;opacity:0.7\">in 8 minutes</div></div></div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-22",
+      "updatedDate": "2026-10-22",
+      "originResearchId": "2026-10-22-design-research-daily",
+      "openTopic": false
     }
   },
   "designArchive": [
@@ -3177,24 +3238,6 @@
       "exceptions": {}
     },
     {
-      "id": "rec-1792522641273",
-      "title": "Work",
-      "time": "16:00",
-      "location": "",
-      "kind": "routine",
-      "notify": false,
-      "notifyLeadMin": null,
-      "freq": "weekly",
-      "daysOfWeek": [
-        2
-      ],
-      "dayOfMonth": null,
-      "interval": 1,
-      "startDate": "2026-10-20",
-      "endDate": null,
-      "exceptions": {}
-    },
-    {
       "id": "rec-1792522641276",
       "title": "Work @ MyShift",
       "time": "16:00",
@@ -3485,684 +3528,632 @@
     "calendarName": "Home",
     "connected": true,
     "enabled": true,
-    "lastSyncTime": "2026-10-22T05:44:52.267Z",
+    "lastSyncTime": "2026-10-22T05:47:01.104Z",
     "lastError": null,
     "pushedEvents": {
       "mc-ev-1792520706048": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706048.ics",
-        "hash": "3a6e4caf7a1a18701c6c18291b8c9fd5e67260f4"
+        "hash": "536dfb6dc0052c2bf29db0e26a16fb8fc0e892df"
       },
       "mc-ev-1792520706053": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706053.ics",
-        "hash": "9023ee8e2d7b1d391c4adf4af5c2e54568054bc5"
+        "hash": "17bb21c9e8d55fa2a116259919959fbbed7b0104"
       },
       "mc-ev-1792520706101": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706101.ics",
-        "hash": "f3f76d85c95cc56d75f696856f849632893e0ba1"
+        "hash": "d745d88d35498e41ce27de8f5518f172e44876e8"
       },
       "mc-ev-1792520706104": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792520706104.ics",
-        "hash": "8fa254538f09bf2a6733a4b823389561e316276c"
+        "hash": "10b7375beee59565d5a31b4d9b7ef3b21d778e16"
       },
       "mc-ev-1792521873052": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792521873052.ics",
-        "hash": "bf3e2564124814c3de6f325b8f7c033b83f1c8ce"
+        "hash": "e5cbd5e9956ff74e2e636e75b26df7604628ce24"
       },
       "mc-1792521160402": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-1792521160402.ics",
-        "hash": "33d4e1c5b04dc8712f9248408d386af37f2f64b5"
+        "hash": "fa8b057f8702b1cedbbd112143b475631bdbf65a"
       },
       "mc-ev-1792521873055": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-ev-1792521873055.ics",
-        "hash": "6eb15db9c44502bce057efc1b299cb6ba41eaae5"
+        "hash": "8bbc367b1b9c3f925ef3772514e8a94575d0ff94"
       },
       "mc-rec-rec-1790806694374-2026-10-21": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-21.ics",
-        "hash": "8ad39d15839f262faac394e84c6d3731faa8c326"
+        "hash": "0d0eb40cb743b8f88ddf58517462078dfd8ae115"
       },
       "mc-rec-rec-1790806694374-2026-10-23": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-23.ics",
-        "hash": "8e738dbed0acf29efb9622c4d01b164b59e0ce22"
+        "hash": "a343e7cc1fe64853332a63dd1e5ca3f11d8fb2a7"
       },
       "mc-rec-rec-1790806694374-2026-10-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-26.ics",
-        "hash": "3ed3a325eaa12adce5443a95f803ac0fb717d4ca"
+        "hash": "53b98fad8116d2b920dc17dcd14336802b817f85"
       },
       "mc-rec-rec-1790806694374-2026-10-28": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-28.ics",
-        "hash": "2b36fc07b70bfecc90278319b566b962320aa517"
+        "hash": "c741c17572b3ddf5a7a3e90e0146c2f9deadfc1a"
       },
       "mc-rec-rec-1790806694374-2026-10-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-10-30.ics",
-        "hash": "6b9a665aabd83df112561b6a9417551f9df18270"
+        "hash": "e18704608c68b1b8066ef2e0698668b1690ab4c3"
       },
       "mc-rec-rec-1790806694374-2026-11-02": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-02.ics",
-        "hash": "4335a307fec8d754bb387cdf6eb198759f849705"
+        "hash": "f9ec50aa03ea8f2e9aa3bb7f8cf44e35c462d803"
       },
       "mc-rec-rec-1790806694374-2026-11-04": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-04.ics",
-        "hash": "1a785bd67fda14d5cd2d55a506275a4f8ab47676"
+        "hash": "31a5e5fa5bdb73197388881058630e54fc7f0e94"
       },
       "mc-rec-rec-1790806694374-2026-11-06": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-06.ics",
-        "hash": "cfa3a27687be8252dec2c2a54c8b1970c25462b8"
+        "hash": "7a7552163dc576a3d71a4ccd2f23039fa8abe65b"
       },
       "mc-rec-rec-1790806694374-2026-11-09": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-09.ics",
-        "hash": "5107cdea247bf6121e79defb683e39224af8d7b4"
+        "hash": "7c170c46361df36bb2e572f337c549f812f1aa8f"
       },
       "mc-rec-rec-1790806694374-2026-11-11": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-11.ics",
-        "hash": "70cff564aaaddf7346e30f002fdba3ab6a9a16a0"
+        "hash": "c872a53014124c51bf1454656898b68480e8046c"
       },
       "mc-rec-rec-1790806694374-2026-11-13": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-13.ics",
-        "hash": "50bdd8a3e224b60f54de738a03804a224b1a137f"
+        "hash": "ed186f9747300299d16c035946d021a42577269f"
       },
       "mc-rec-rec-1790806694374-2026-11-16": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-16.ics",
-        "hash": "8fa3146906816b31d5f86e728b8c88e35c116236"
+        "hash": "00872fdbf8c5c6d43e0d6715fe3815905d08c2e9"
       },
       "mc-rec-rec-1790806694374-2026-11-18": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-18.ics",
-        "hash": "7650bffd0530161ac1cc7be2069961e5bdb430f4"
+        "hash": "c7052f3ad0127f026869d1569de9f2bac9e1b81a"
       },
       "mc-rec-rec-1790806694374-2026-11-20": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-20.ics",
-        "hash": "c9950fb8b993f8d540d282602acf8338feb30b80"
+        "hash": "1c1d9c1a4a89b5656f051889940b753d49f48a2c"
       },
       "mc-rec-rec-1790806694374-2026-11-23": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-23.ics",
-        "hash": "692aa802aa98d0e2984acd2c94cc2aedd19d71f1"
+        "hash": "b0cb21bc45d2e4da9134bd76f647b9aef37331eb"
       },
       "mc-rec-rec-1790806694374-2026-11-25": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-25.ics",
-        "hash": "c90c31b42f84b4ec79a60bb79363598ddc5f1817"
+        "hash": "65445266eec0c86ca0fe00414adfdd0e37705363"
       },
       "mc-rec-rec-1790806694374-2026-11-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-27.ics",
-        "hash": "b84b7148d5a6d5508f436029872441516a785d53"
+        "hash": "06a32c32d85592c12f0f7c2a5a47d0b3fac71215"
       },
       "mc-rec-rec-1790806694374-2026-11-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-11-30.ics",
-        "hash": "392f54fa6f190ac156c1712cae3e59735d0dd487"
+        "hash": "dd280559f7d4dc26e362ba9d2be5cf356f0d0d0a"
       },
       "mc-rec-rec-1790806694374-2026-12-02": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-02.ics",
-        "hash": "7909c08050951b2a4fca3ebfc687933e9ea97390"
+        "hash": "1a73eb109fb55d6c3e1c657338c85a8dae11de53"
       },
       "mc-rec-rec-1790806694374-2026-12-04": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-04.ics",
-        "hash": "f8c43c6a974d684d849191a0f7eb8afab312106e"
+        "hash": "79e116c0f70eadeb289a491fdcdf95dc6a3de5e8"
       },
       "mc-rec-rec-1790806694374-2026-12-07": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-07.ics",
-        "hash": "df02bc0384d4fd08e82588cc62c7d60e2873e379"
+        "hash": "840839779b837d00066f786e405ffe39e585293b"
       },
       "mc-rec-rec-1790806694374-2026-12-09": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-09.ics",
-        "hash": "fc24423ce5fb5222052f34287cfba76e9038a682"
+        "hash": "0e0462ea6306fb55aa804b40abe46377f577bcc4"
       },
       "mc-rec-rec-1790806694374-2026-12-11": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-11.ics",
-        "hash": "2844931f83e4823a11923126a8d6c3bbd2d97c7b"
+        "hash": "3cc420ebd42f7189fdfdc1dfde50684c8d188199"
       },
       "mc-rec-rec-1790806694374-2026-12-14": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-14.ics",
-        "hash": "d5aa27d2e6bac0a63772aea11c41d096cfd7cd88"
+        "hash": "d3c811fbe6b5e2a07c1327c7da7e1ad8347c1e4a"
       },
       "mc-rec-rec-1790806694374-2026-12-16": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-16.ics",
-        "hash": "2e90b9d87b755be3c9849b19444400bb8c6d04eb"
+        "hash": "2c1a95c83ef9e3081ca6549c39c9293205232002"
       },
       "mc-rec-rec-1790806694374-2026-12-18": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694374-2026-12-18.ics",
-        "hash": "4f29d5f84a120dafd09fb661fe10fdb6be348bb1"
+        "hash": "1f82bb6b00c8eac3b527b056e8aa7fe3d5d26de3"
       },
       "mc-rec-rec-1790806694376-2026-10-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-10-26.ics",
-        "hash": "23143d2de08dbd950e9d31413119c613283b89cc"
+        "hash": "41c5e81159dbf3b4c339240f28f6475e2282e97b"
       },
       "mc-rec-rec-1790806694376-2026-11-02": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-02.ics",
-        "hash": "f9fe7d166ebad3cfce871c92d742d87c47227920"
+        "hash": "c5802c3ca139c05a71a1ef4cd362e9f1dcb18859"
       },
       "mc-rec-rec-1790806694376-2026-11-09": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-09.ics",
-        "hash": "7f25111a4a391d5a1374cc684fd2620710dbdd4e"
+        "hash": "d0ea787c83872c5ae9db2204c22d8a583e92af95"
       },
       "mc-rec-rec-1790806694376-2026-11-16": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-16.ics",
-        "hash": "bedd67c5c821ad4bbd424a9a96c663f88bafb291"
+        "hash": "50a67179e1b0794b2bc32d1ae3c80468ecf8f148"
       },
       "mc-rec-rec-1790806694376-2026-11-23": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-23.ics",
-        "hash": "4dd5c0c8b242b07663d11308c2c006cacc536cf4"
+        "hash": "4a9c8e78cfe7567d909dd7651380af5ed74d3e25"
       },
       "mc-rec-rec-1790806694376-2026-11-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-11-30.ics",
-        "hash": "72e2b564d276bb1eb07c8202c0f0275fff2d8446"
+        "hash": "7269ee8effedb1e640273fe886f7a730a8f95867"
       },
       "mc-rec-rec-1790806694376-2026-12-07": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-12-07.ics",
-        "hash": "8d9332f2d5d16732ba2554ddb6b0efde200e2ffa"
+        "hash": "63d73a52fd67c1100286ab095a80b28a5ec41964"
       },
       "mc-rec-rec-1790806694376-2026-12-14": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694376-2026-12-14.ics",
-        "hash": "f1af20f33749d3580fcb795a441c8b93e0a00510"
+        "hash": "4d6150a5e5dec1eab3175e90a95b57f988fa1a8b"
       },
       "mc-rec-rec-1790806694378-2026-10-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-10-26.ics",
-        "hash": "1197e919bef119941ca5d436b7934fa3815829c0"
+        "hash": "1c8dfd4d7dbac5ef0da62b0ee85c15fb2822a37c"
       },
       "mc-rec-rec-1790806694378-2026-11-02": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-02.ics",
-        "hash": "33505bafe95eaa403aa4c21552587ff052dc7560"
+        "hash": "ba47f0095c1451485c0e566359041bb1861ab295"
       },
       "mc-rec-rec-1790806694378-2026-11-09": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-09.ics",
-        "hash": "9d6b6da6bd5ca1e704c8a069d1fffdac4817684e"
+        "hash": "2a15ba9b23bebed1072037b9f322363cc008f494"
       },
       "mc-rec-rec-1790806694378-2026-11-16": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-16.ics",
-        "hash": "085a21784d1e5c49092c3498b1982614f2e14483"
+        "hash": "3326432af81e3397dc5936f156c0ec226d1652e3"
       },
       "mc-rec-rec-1790806694378-2026-11-23": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-23.ics",
-        "hash": "1439ca025f76d5f9cdeddc74c70d1f0c4d71d8be"
+        "hash": "ea34b926c3a74c22c4f4580e4773f63cee70e0a8"
       },
       "mc-rec-rec-1790806694378-2026-11-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-11-30.ics",
-        "hash": "31bb68107f10ee788ec21d0e20ada4da938f9989"
+        "hash": "1e036c0904237171a5ec2b70eab76fccf1244fea"
       },
       "mc-rec-rec-1790806694378-2026-12-07": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-12-07.ics",
-        "hash": "624ce3ba1708202bb8f799b8a7d6a27ece1bcf50"
+        "hash": "0f23567f6259e3679bd61744c4946428a6155d81"
       },
       "mc-rec-rec-1790806694378-2026-12-14": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694378-2026-12-14.ics",
-        "hash": "98dfd06aacaba51b7cbc16a67238fc40cf61d4e2"
+        "hash": "80dbdfba89aef5b6ac822b45edb153136c08c8d2"
       },
       "mc-rec-rec-1790806694379-2026-10-22": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-22.ics",
-        "hash": "96e8d7c00606deec1179cfc94cc3049fb494f19c"
+        "hash": "bfc0404d24a986dedf60b007eafa498930f79587"
       },
       "mc-rec-rec-1790806694379-2026-10-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-27.ics",
-        "hash": "cfe13c9c522261a66cff3219876eb00de9e659fb"
+        "hash": "35c9d03b7ec9d1c5b3ec845ea5cf1050b121edb2"
       },
       "mc-rec-rec-1790806694379-2026-10-29": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-10-29.ics",
-        "hash": "55a1dfe789c738d3c78987702dddbf6a46384adc"
+        "hash": "2c0fcaf9e898de0f97887050337fbb97eeaa0d2e"
       },
       "mc-rec-rec-1790806694379-2026-11-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-03.ics",
-        "hash": "94bdc40428ef86f125ad8b4ff715baaf7669b00f"
+        "hash": "502117a595a129c2c30b9ab3d98ff8764fd327cc"
       },
       "mc-rec-rec-1790806694379-2026-11-05": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-05.ics",
-        "hash": "545601a27dc63f1da8275392354c74101a807f60"
+        "hash": "18b125f6a065e62c0bd643511f1d8a2c465a4634"
       },
       "mc-rec-rec-1790806694379-2026-11-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-10.ics",
-        "hash": "cf90071996606952ed581545155a27b368292446"
+        "hash": "816aa0c096d144f6b354771c9a8b6a186e01bda5"
       },
       "mc-rec-rec-1790806694379-2026-11-12": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-12.ics",
-        "hash": "ddfaf78fed264d7a4f3eea552179fa3fe368fd2b"
+        "hash": "9a81c251268baa81c3323b684441630c89889603"
       },
       "mc-rec-rec-1790806694379-2026-11-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-17.ics",
-        "hash": "ff6d622683a0cd5c209513689b6c15d78de6ee4b"
+        "hash": "e3646e909b7976006ed7465a46f388b229924df0"
       },
       "mc-rec-rec-1790806694379-2026-11-19": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-19.ics",
-        "hash": "96df4e0e8dd6ed7e3503d0a59d45e0cf3098a1dc"
+        "hash": "f74a4dd768336eb54d583713b0ce8df6b04c892d"
       },
       "mc-rec-rec-1790806694379-2026-11-24": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-24.ics",
-        "hash": "b2f7c2c210a44affb49f230bbb0d85c409ea2369"
+        "hash": "e7442ef3942ea6447c083273567faff7bd6f0dfc"
       },
       "mc-rec-rec-1790806694379-2026-11-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-11-26.ics",
-        "hash": "1cd8d98710a51ca4a1b4cdb40fc9178b4bbc4167"
+        "hash": "e8289fefae51f4bd7d4a002df0fb913f127856dc"
       },
       "mc-rec-rec-1790806694379-2026-12-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-01.ics",
-        "hash": "cfdc733f6755c97dad3a5f3d1764ae1a15e044b6"
+        "hash": "d8de588ef50b9a44771d071c971fd96be600b77d"
       },
       "mc-rec-rec-1790806694379-2026-12-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-03.ics",
-        "hash": "c6fced1822285b176901e8917f6167c14c72fe49"
+        "hash": "13afc58aa2a69f49c6257b71f375723a4e41701e"
       },
       "mc-rec-rec-1790806694379-2026-12-08": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-08.ics",
-        "hash": "dddf836569518878e8ccd333fe5e67acac9ba208"
+        "hash": "49d07b05baf966ab162185da52a452fff25f5647"
       },
       "mc-rec-rec-1790806694379-2026-12-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-10.ics",
-        "hash": "deff6ee2cb19ce172a10dc813ea70fcb8a655e20"
+        "hash": "0b2196b45354c8bd42760fe3c8ed74a6ba820837"
       },
       "mc-rec-rec-1790806694379-2026-12-15": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-15.ics",
-        "hash": "69b8960849714f7965495e762b71e58c923db019"
+        "hash": "a98173b2b75e9800bb95fd07d3a76d1507e70850"
       },
       "mc-rec-rec-1790806694379-2026-12-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790806694379-2026-12-17.ics",
-        "hash": "98dc66ce2fd88f1ca0ba3dc48ad3b184d8982407"
+        "hash": "9d6ef7f76af2128bbd5cc0f44523564b8aa74efa"
       },
       "mc-rec-rec-1790807951527-2026-11-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2026-11-01.ics",
-        "hash": "db0537a7e86a3a446fdc4e4467619559e5490dea"
+        "hash": "18ff31e016236f2a92087699064c5f2153875e9e"
       },
       "mc-rec-rec-1790807951527-2026-12-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2026-12-01.ics",
-        "hash": "3a50e524ff504ae0e1ca0ce5680372e7fd1f91ef"
+        "hash": "b39e693f66438ec49de7ecfd505b35404d5eca4b"
       },
       "mc-rec-rec-1790807951527-2027-01-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790807951527-2027-01-01.ics",
-        "hash": "e213aa9c280df067ebc30aed6524de5bcf34b5ec"
+        "hash": "fa2007df68074edcf875ae1e1dfcaea4fcfdc05c"
       },
       "mc-rec-rec-1790865328016-2026-10-22": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-22.ics",
-        "hash": "7949aad5be8e26f8e24cd3d131293091622e0b1d"
+        "hash": "c755a3b9404c84f8dc555c94e304a9b1936fe8cf"
       },
       "mc-rec-rec-1790865328016-2026-10-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-27.ics",
-        "hash": "b8fdac67aecc3e6ffaa101e1fc5a62d144530dc8"
+        "hash": "8cecef6457243da98d7e7ffc309b9e93a4799766"
       },
       "mc-rec-rec-1790865328016-2026-10-29": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-10-29.ics",
-        "hash": "33e62199671b80f7aa929b918b921050b05f38e2"
+        "hash": "a70fddc91717a48773dfd2f70674136c59e8f2bc"
       },
       "mc-rec-rec-1790865328016-2026-11-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-03.ics",
-        "hash": "c2e2750929aedcad01e004e3c1a360d7bececd7c"
+        "hash": "28eebffc82e1a900d6a157280cf8ee96f0843875"
       },
       "mc-rec-rec-1790865328016-2026-11-05": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-05.ics",
-        "hash": "a780604dd086dbb5c3cff6bf9a4f93ddb181fcf4"
+        "hash": "a3326ef7f14b80731c7653f825fca0cfcb029bf9"
       },
       "mc-rec-rec-1790865328016-2026-11-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-10.ics",
-        "hash": "486c4909f65b6f4c8827133bc1d4ef1e4d2eee8c"
+        "hash": "e5a05b625c83149d2bca5461c069144879a75817"
       },
       "mc-rec-rec-1790865328016-2026-11-12": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-12.ics",
-        "hash": "54b7ea6b4473edd3efa86cbaae77a31dd3ac227d"
+        "hash": "ba79b3f61ad2b4ec07953ec4796dab3f35e8ef00"
       },
       "mc-rec-rec-1790865328016-2026-11-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-17.ics",
-        "hash": "b7b2c2ca858fff5ffe14468074bb2f7bd6a3ad11"
+        "hash": "eeeb390cfad76d118acc24690ef90dfb5f30e9d6"
       },
       "mc-rec-rec-1790865328016-2026-11-19": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-19.ics",
-        "hash": "1c1c4b22f5e2c228ee38e58296b3515d5490c5de"
+        "hash": "a1bda2e126fc13fcf13a69eb8945348b538be82b"
       },
       "mc-rec-rec-1790865328016-2026-11-24": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-24.ics",
-        "hash": "18f311c1a9358eaf260217feb0947d4e945d49fd"
+        "hash": "4a84c0c22d25d775c25698b448c2b2bf8d276500"
       },
       "mc-rec-rec-1790865328016-2026-11-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-11-26.ics",
-        "hash": "b91bc1980ae1e26c9fb3a8afc47928d77a7a1661"
+        "hash": "2a000fc06e019e9a5b6342658ea587ee8fc1e625"
       },
       "mc-rec-rec-1790865328016-2026-12-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-01.ics",
-        "hash": "2c00aa8c4690a7f46ade0ee79c1936a3cb719bbd"
+        "hash": "e59d211625f7cb48c70274b6f6f4a0074e3a081c"
       },
       "mc-rec-rec-1790865328016-2026-12-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-03.ics",
-        "hash": "618a94bd95a903f2354254b9ce6e78732910c525"
+        "hash": "40aaa6b16b74dff4be889461f7d7951c6386bb11"
       },
       "mc-rec-rec-1790865328016-2026-12-08": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-08.ics",
-        "hash": "71202b58cb88962c1e39d6dd4fc58b80ade43849"
+        "hash": "422230d4df0d8f61f12e16541d5edab3a6c89f2c"
       },
       "mc-rec-rec-1790865328016-2026-12-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-10.ics",
-        "hash": "e739759958bb17c88e57b5dadd442afcc8230e20"
+        "hash": "b5048785cf6b8d57b46175312b0f8bf6a2eff291"
       },
       "mc-rec-rec-1790865328016-2026-12-15": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-15.ics",
-        "hash": "0153eab46b3b18ff2e1ad743a9d791881fa6f8cc"
+        "hash": "5416e1f743758a02674de5505b12458d7e036f89"
       },
       "mc-rec-rec-1790865328016-2026-12-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1790865328016-2026-12-17.ics",
-        "hash": "02bb70cce6e15da91dfb92570cb451631f8b956a"
+        "hash": "1664f9d1df88eda0d9e39ef4db0f8d294f28dcc0"
       },
       "mc-rec-rec-1792520734688-2026-10-25": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-10-25.ics",
-        "hash": "1b1622a35bd970ac93e5d9e971419969fe26ffd3"
+        "hash": "03610b78efabcbe278a4df5d6f5603a980038a91"
       },
       "mc-rec-rec-1792520734688-2026-11-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-01.ics",
-        "hash": "0b4e189595797d0f01ab3db23e887b1357382a5c"
+        "hash": "4073986e4590086541f12c83b5b8ece0fff44381"
       },
       "mc-rec-rec-1792520734688-2026-11-08": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-08.ics",
-        "hash": "caf5623b1c1b5fc73196c85b657978c894862c6e"
+        "hash": "b625b34044f3eb5405d648e8ce7e828194c082c5"
       },
       "mc-rec-rec-1792520734688-2026-11-15": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-15.ics",
-        "hash": "927f5f127af9150e82ffb0c8006146d145d9713b"
+        "hash": "d0d75988c66d424ade3422ffdb19c7ad1f7742c2"
       },
       "mc-rec-rec-1792520734688-2026-11-22": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-22.ics",
-        "hash": "95a3e401e291f141991eac33b34684bbaecfe061"
+        "hash": "96927e248adab741c49eb30f3a4779e5affef6b6"
       },
       "mc-rec-rec-1792520734688-2026-11-29": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-11-29.ics",
-        "hash": "4728f938b5a4545891499d59c7965a0d63078c25"
+        "hash": "23d9bf8c2c3e7a648400db31b122b783220ef2a2"
       },
       "mc-rec-rec-1792520734688-2026-12-06": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-06.ics",
-        "hash": "3d78f7d89fb5a692a87f4d1008ccf50b42f01684"
+        "hash": "ecbc93a010c753c3c58deabe29f8e347a0bcd70f"
       },
       "mc-rec-rec-1792520734688-2026-12-13": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-13.ics",
-        "hash": "ef9ccbbfc877fdf4fb289a3cfeb4af82544a6165"
+        "hash": "857f8b1df0b4964df89c34c8bbe3d850d7cd76b4"
       },
       "mc-rec-rec-1792520734688-2026-12-20": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-20.ics",
-        "hash": "bf9d025726763e02bdfa812c11db4682eb4ac319"
+        "hash": "6dc54fde52462723710b4a1d8b2c630700b59633"
       },
       "mc-rec-rec-1792520734688-2026-12-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2026-12-27.ics",
-        "hash": "e3f800cb2deb409a526934fdfd4886d188b247e5"
+        "hash": "696b308de1af7da5fd8f4a23c0f6d6b125361c46"
       },
       "mc-rec-rec-1792520734688-2027-01-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-03.ics",
-        "hash": "7afd49938c133395e65d716b3c91094f7641b268"
+        "hash": "2b298b7b4d048fbed9eb0f58217915bb881f6a95"
       },
       "mc-rec-rec-1792520734688-2027-01-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-10.ics",
-        "hash": "03dc05855a4335caa902ff3ad8c443ae0bb68e38"
+        "hash": "1c63307783be86ea833a43817c806368bf689573"
       },
       "mc-rec-rec-1792520734688-2027-01-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520734688-2027-01-17.ics",
-        "hash": "bc008a747ebed72b3c31b837d2c061a360048f20"
+        "hash": "47a45f191b58e6f1b0522158f2612d7ded5889eb"
       },
       "mc-rec-rec-1792520970695-2026-10-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-10-30.ics",
-        "hash": "a0fa21c0578a5ef5f3766241bf3ec66f6550708e"
+        "hash": "40a825d8226544ce10d3e79e932382152a7f2546"
       },
       "mc-rec-rec-1792520970695-2026-10-31": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-10-31.ics",
-        "hash": "ad2c00c188e95eb1df1206ef6e63611a275b1db2"
+        "hash": "fbcf6a3025f460737e9f4e8e997d4bc1ed62eaea"
       },
       "mc-rec-rec-1792520970695-2026-11-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792520970695-2026-11-01.ics",
-        "hash": "80262bb0fd783582fdc5d19e7e2377e09d8e884b"
+        "hash": "f5cc27dc926ae732cc9a987f63040511d18c31e8"
       },
       "mc-rec-rec-1792521281448-2026-11-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521281448-2026-11-17.ics",
-        "hash": "212ef54de40f2b2c241017606248d35c2d837fc0"
+        "hash": "e521a78dbaf1ab1c4fef185f499b14d64b347154"
       },
       "mc-rec-rec-1792521281448-2026-11-24": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521281448-2026-11-24.ics",
-        "hash": "8c6fe9d7e2068e3d34f82acee81b6a0e79d3f084"
+        "hash": "bc17ffad6399b0bdcfe003dd9e0906a773752fef"
       },
       "mc-rec-rec-1792521720533-2026-10-25": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-10-25.ics",
-        "hash": "9e376887262d7d3a52d264e228c40670b9b95bb9"
+        "hash": "b0d5a381dee36337353454d2a06e6c1041d67c61"
       },
       "mc-rec-rec-1792521720533-2026-11-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-01.ics",
-        "hash": "e2d7a1e1c350c09fb907eab9c5db1a8094194f93"
+        "hash": "6e23047496f1dfbc3e4d8769ee641eb238eeff74"
       },
       "mc-rec-rec-1792521720533-2026-11-08": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-08.ics",
-        "hash": "5815750de4c0c44de58202f6554c96d3dd33216e"
+        "hash": "371274fae2a8c1a85b7e95a7a39636aa4518663c"
       },
       "mc-rec-rec-1792521720533-2026-11-15": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-15.ics",
-        "hash": "74dfded3114e480770dcaca392fbb07b58bc4b82"
+        "hash": "3200f8a58371074991a8ea0137307534df04919f"
       },
       "mc-rec-rec-1792521720533-2026-11-22": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-22.ics",
-        "hash": "f26d433aa313d78f40c98cb92979bcee2dee5eb0"
+        "hash": "74c3748757103eec93a156de3c3670e30431e351"
       },
       "mc-rec-rec-1792521720533-2026-11-29": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-11-29.ics",
-        "hash": "e3cf58afe963dbcec041eacae19c337e259cbad4"
+        "hash": "4e13bd0ea701f617427b62ab4731957d5a2394fe"
       },
       "mc-rec-rec-1792521720533-2026-12-06": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-06.ics",
-        "hash": "067d2ffb1984d6fefe4ef931a077a0c89abb9f0d"
+        "hash": "85ebb96864118a13ab74d4f7c8c0e4b2217a774e"
       },
       "mc-rec-rec-1792521720533-2026-12-13": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-13.ics",
-        "hash": "7f216deaa35bca9f21eb4d0ef38cea291348314b"
+        "hash": "ec1f53af753f1eff3af9dd455324d795c23f1a5e"
       },
       "mc-rec-rec-1792521720533-2026-12-20": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-20.ics",
-        "hash": "491a1607bade513d48fbc73a84041e1f86fc590d"
+        "hash": "60c8f4b7df68e1c8e5567ab48d1f722448cdd788"
       },
       "mc-rec-rec-1792521720533-2026-12-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2026-12-27.ics",
-        "hash": "374a4793ccbbfe5aa5c8efc32dac93e3eadb45d8"
+        "hash": "7c5a556afaf3a206e5f5a82550f51be5962af945"
       },
       "mc-rec-rec-1792521720533-2027-01-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-03.ics",
-        "hash": "b42bdd5595b79657d9c939ab74cc67c02a82b473"
+        "hash": "dad37fafe7ccee75ee756ff5de837705474d7891"
       },
       "mc-rec-rec-1792521720533-2027-01-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-10.ics",
-        "hash": "efb0da230081c21a7e6470fd11bda7031f853709"
+        "hash": "a87b0820fe83c6d4093677ae21852fda4fd29309"
       },
       "mc-rec-rec-1792521720533-2027-01-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792521720533-2027-01-17.ics",
-        "hash": "76639f0bd12075f607db686856167841a192d0c4"
-      },
-      "mc-rec-rec-1792522641273-2026-10-27": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-10-27.ics",
-        "hash": "02735740befa3b9b27efb000564cfd1eb513ccd9"
-      },
-      "mc-rec-rec-1792522641273-2026-11-03": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-03.ics",
-        "hash": "64a4c0a19b039d5d4013e2413b9d87d76acb7397"
-      },
-      "mc-rec-rec-1792522641273-2026-11-10": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-10.ics",
-        "hash": "38ff30a7f7941eeeac49dd23fc99d87513e3fcda"
-      },
-      "mc-rec-rec-1792522641273-2026-11-17": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-17.ics",
-        "hash": "fa65fee3882d762e7634ee9cc501d86fe3a5cc3c"
-      },
-      "mc-rec-rec-1792522641273-2026-11-24": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-11-24.ics",
-        "hash": "2582454543b426f07b8447720672a5b65835cc9a"
-      },
-      "mc-rec-rec-1792522641273-2026-12-01": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-01.ics",
-        "hash": "b44e4e815a17d6a16b7039d091b73593ee96ce85"
-      },
-      "mc-rec-rec-1792522641273-2026-12-08": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-08.ics",
-        "hash": "d0be45fefdffbb23ca3aced424e4e99ffe7a871e"
-      },
-      "mc-rec-rec-1792522641273-2026-12-15": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-15.ics",
-        "hash": "73155a2c9ca8b77554d34a15d44ea871b5ca57ea"
-      },
-      "mc-rec-rec-1792522641273-2026-12-22": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-22.ics",
-        "hash": "b27e41300291278bb8607395d8fee18d2f54ad33"
-      },
-      "mc-rec-rec-1792522641273-2026-12-29": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2026-12-29.ics",
-        "hash": "05fbeb14e31a145e788ed40e54cbf54ec1d928eb"
-      },
-      "mc-rec-rec-1792522641273-2027-01-05": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2027-01-05.ics",
-        "hash": "86e18771536504c50cbd325087566aeb5725beaa"
-      },
-      "mc-rec-rec-1792522641273-2027-01-12": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2027-01-12.ics",
-        "hash": "a2ff179dff0ad9ca2fefe98eab0e8552288187bc"
+        "hash": "30bf4e3054e3c7061a43462d8255bc9bf79861f8"
       },
       "mc-rec-rec-1792522641276-2026-10-22": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-10-22.ics",
-        "hash": "ee0952662a0c2f3c80c659423e9572f23ff0b39e"
+        "hash": "34e5fb974c94e057f0a19de6b52d6f442c1d6a27"
       },
       "mc-rec-rec-1792522641276-2026-10-29": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-10-29.ics",
-        "hash": "663e0d2ff8c26e15e1c5e2398890ac9124330f72"
+        "hash": "09e290f54dfdaedb81347b953ad0bc1ceb2f7ab8"
       },
       "mc-rec-rec-1792522641276-2026-11-05": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-05.ics",
-        "hash": "277736bf585e3a0caf7d74225b7320e7ae572bad"
+        "hash": "c6847d840973db171618d3a900747daf5c43c1e5"
       },
       "mc-rec-rec-1792522641276-2026-11-12": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-12.ics",
-        "hash": "16acdfd0b2a6dee5e8c5e231c330d0b087a54b44"
+        "hash": "6896b4c10cbe1343a880297ef6aa4f8ee6efabe1"
       },
       "mc-rec-rec-1792522641276-2026-11-19": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-19.ics",
-        "hash": "bc7c3eb4ec8257c5fa7f317352ec433bebc733e7"
+        "hash": "e8c08b369b1c7c08b94110e72286c06a99b5981e"
       },
       "mc-rec-rec-1792522641276-2026-11-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-11-26.ics",
-        "hash": "1cd6ef4f2ff0a6fc73d2497d06d1d670502aff98"
+        "hash": "9b3b8ca79f615f865eb0ab016006fdd34df45165"
       },
       "mc-rec-rec-1792522641276-2026-12-03": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-03.ics",
-        "hash": "025cfade0c640b59b339167bf6cd7be35f78d4e2"
+        "hash": "3b77b29d87d827d960f5f2cdf3c4e15317d9502e"
       },
       "mc-rec-rec-1792522641276-2026-12-10": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-10.ics",
-        "hash": "3569095565b4aac1185580f50f4cfbf7cca8f619"
+        "hash": "613dd29960c9c6b3ee03a66ac047fcfa453ff8e1"
       },
       "mc-rec-rec-1792522641276-2026-12-17": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-17.ics",
-        "hash": "1e27439c7500ad27e357aeadee6cffaf7bbb1477"
+        "hash": "95bdfdfb5633d83e7c6b5195f2b3445d03c71e46"
       },
       "mc-rec-rec-1792522641276-2026-12-24": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-24.ics",
-        "hash": "fea27f440d65e82832c1c6c6cde23345e7d8a7d6"
+        "hash": "d360352086b14d70d717ea469fcdf97e3ece2e65"
       },
       "mc-rec-rec-1792522641276-2026-12-31": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2026-12-31.ics",
-        "hash": "8e1e095d02c66f46679336f30d75968cb88a0e1a"
+        "hash": "4d48926ef1a8535b1d9c804c891731327fffe1d8"
       },
       "mc-rec-rec-1792522641276-2027-01-07": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2027-01-07.ics",
-        "hash": "db337d2a267b67fd505af94cadce88c43e32d09d"
+        "hash": "5c2a8bdc1213b88c73a170a0bc0e7eebf895432f"
       },
       "mc-rec-rec-1792522641276-2027-01-14": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641276-2027-01-14.ics",
-        "hash": "5dc725af2af45e656eb43dbc5539519812561c66"
+        "hash": "89f8832ebb092b243c3067eef9512d508bb46888"
       },
       "mc-rec-rec-1792522641279-2026-10-23": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-10-23.ics",
-        "hash": "f0bc237c4e5269901d9c1c429260485f26cc3599"
+        "hash": "7b82a72014eb20796e176f1563acb7330210a230"
       },
       "mc-rec-rec-1792522641279-2026-10-30": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-10-30.ics",
-        "hash": "f08cdbf94c843c539873cf91854d080e8df40e34"
+        "hash": "1e10be6704e1be26f6e15ad4ac241f056691aa31"
       },
       "mc-rec-rec-1792522641279-2026-11-06": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-06.ics",
-        "hash": "26050a43620177739233f2b65014598f1e671d46"
+        "hash": "aa83b479992da28724413fca0ca3ce93da44a0a4"
       },
       "mc-rec-rec-1792522641279-2026-11-13": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-13.ics",
-        "hash": "907bfe41a9de749e9a9fc0a2adc753a858d827cb"
+        "hash": "0bb5faddf0df22d0416cf7c55963779f409dab30"
       },
       "mc-rec-rec-1792522641279-2026-11-20": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-20.ics",
-        "hash": "0593348b49d5acaf304df0f7881ac5bae83a5caa"
+        "hash": "c02b4f2cf1c896db0cf686d2c365ebc314f8b6d1"
       },
       "mc-rec-rec-1792522641279-2026-11-27": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-11-27.ics",
-        "hash": "daee2488f2f356ec6ad7ba726f48bd8800dc03a8"
+        "hash": "bfb5f69660f48f7c28d64fe24bd7c199fed190a1"
       },
       "mc-rec-rec-1792522641279-2026-12-04": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-04.ics",
-        "hash": "9f4daea21b9575856a24014d5f4c96afeb5a3e0b"
+        "hash": "6828e91e3f85496d8bcc1197a8937bd7b8245500"
       },
       "mc-rec-rec-1792522641279-2026-12-11": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-11.ics",
-        "hash": "06992aa2e3a7667e495708ab6fb02ec8d8afc2e7"
+        "hash": "327f0b26b0fc54c907115d724ec5937270da1a91"
       },
       "mc-rec-rec-1792522641279-2026-12-18": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-18.ics",
-        "hash": "aac2943ef992e1b4e1e954f0c32fa04583e7059a"
+        "hash": "618e4246c946ae34fc24b626b7f978afd0554c23"
       },
       "mc-rec-rec-1792522641279-2026-12-25": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2026-12-25.ics",
-        "hash": "ce2b405e32c3cf570013429b170b59e9b040ff26"
+        "hash": "ae5016e7e58c50c788e0e0add13e9dc2645ccb06"
       },
       "mc-rec-rec-1792522641279-2027-01-01": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-01.ics",
-        "hash": "4c4ce48db4555b845fd5db783dec522cf3dfee0c"
+        "hash": "6e3e086a9a30c61da273419cd2e53c10070142bd"
       },
       "mc-rec-rec-1792522641279-2027-01-08": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-08.ics",
-        "hash": "0ed5fede8e8490eff1788e165096b6cc66df0088"
+        "hash": "d5f1d3674f71a52730bb8f70e696158d8293aacc"
       },
       "mc-rec-rec-1792522641279-2027-01-15": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641279-2027-01-15.ics",
-        "hash": "efbcf4fb151930f50f0386b732a87fcfbd019142"
+        "hash": "5341544730e8ed5f60e467dc1e84cc247a116479"
       },
       "mc-rec-rec-1792522641282-2026-10-24": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-10-24.ics",
-        "hash": "62a83a3f82429e500eb883ebfd88168d2dacc405"
+        "hash": "041bfa2a78563d235f90c802a7c3362fbafcbfbb"
       },
       "mc-rec-rec-1792522641282-2026-10-31": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-10-31.ics",
-        "hash": "ed53cb2b5c87add70e24a6a5839de2f1c1e1c64a"
+        "hash": "eac9565668455bff65592f138ba490692b54d9d5"
       },
       "mc-rec-rec-1792522641282-2026-11-07": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-07.ics",
-        "hash": "ecf19222d319834604da64eb3e922afc21d8188f"
+        "hash": "578eb04a668a370e7d2f5bbfedb806c279fbe334"
       },
       "mc-rec-rec-1792522641282-2026-11-14": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-14.ics",
-        "hash": "f7d1fe3c8817d56c51e8d037f44ae19997f8f3de"
+        "hash": "fa99a300b9730eb9c298b11bac9848c5cc6cf36f"
       },
       "mc-rec-rec-1792522641282-2026-11-21": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-21.ics",
-        "hash": "9991d317fbe0ba9ca121f52fe04663afe890fc9c"
+        "hash": "fe088ebab70f93ca984d1f1a772163ab5027734a"
       },
       "mc-rec-rec-1792522641282-2026-11-28": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-11-28.ics",
-        "hash": "0813fe005ab30c9393979771c902c73c03e363d9"
+        "hash": "dfc834ce446c81e7765ab9e1dc9de1d4ac5c6034"
       },
       "mc-rec-rec-1792522641282-2026-12-05": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-05.ics",
-        "hash": "7f04a14edd81d27e55013ed28e49130f6e8da159"
+        "hash": "b9c2480b81183c063e8f61d513299a88c6a21d38"
       },
       "mc-rec-rec-1792522641282-2026-12-12": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-12.ics",
-        "hash": "40579e2b124c20a4089c990ec71116c1053ac437"
+        "hash": "5dc845926d12c422e87e422f1ac7027f2da73e5d"
       },
       "mc-rec-rec-1792522641282-2026-12-19": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-19.ics",
-        "hash": "63c41119c10b36842d3cbd7e8bccec61004c4880"
+        "hash": "46baa155f3a534769e128933f19b0f50a1736b91"
       },
       "mc-rec-rec-1792522641282-2026-12-26": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2026-12-26.ics",
-        "hash": "5e941aec6148a322862dd0ff179e2b92bf1fbc67"
+        "hash": "d374de28c906f0fb0d27ea6d059bf79350d9843e"
       },
       "mc-rec-rec-1792522641282-2027-01-02": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-02.ics",
-        "hash": "8b8e79e2e7ecf026965da374b27124e8e04219ca"
+        "hash": "67b8ff0a75b0dfb4df19134e6a1f01ff501157b5"
       },
       "mc-rec-rec-1792522641282-2027-01-09": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-09.ics",
-        "hash": "9672f3413e5c826a444c9761219751ac593dea41"
+        "hash": "228e8838d91e2a63adabf1b5453d0315dd090d91"
       },
       "mc-rec-rec-1792522641282-2027-01-16": {
         "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641282-2027-01-16.ics",
-        "hash": "f3882f8701728e2868a9ddbfa4e53b39f48d9d9d"
-      },
-      "mc-rec-rec-1792522641273-2027-01-19": {
-        "href": "https://caldav.icloud.com/8173918847/calendars/home/mc-rec-rec-1792522641273-2027-01-19.ics",
-        "hash": "4458fccaabbec90187d95d99408b28fdbf6bb629"
+        "hash": "fa7cdb05d6795dc1f2342595b6ea7f2da4b06e7e"
       }
     }
   }
