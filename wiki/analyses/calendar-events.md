@@ -1,8 +1,8 @@
 ---
 type: analysis
 title: "Calendar Events"
-last_updated: "2026-10-20"
-synced_at: "10/20/2026, 6:58:33 PM"
+last_updated: "2026-10-22"
+synced_at: "10/22/2026, 5:43:20 AM"
 tags: [calendar, events]
 ---
 
@@ -52,9 +52,8 @@ tags: [calendar, events]
 | Pay rent | day 1 of every month, from 2026-10-01 | routine |  |
 | Psych | every Tue & Thu at 10:30, from 2026-09-30 until 2026-12-20 _(1 exception)_ | focus |  |
 | Therapy | every Tue at 14:00, from 2026-11-17 until 2026-11-30 | meeting |  |
-| Work | every Tue at 16:00, from 2026-10-20 | routine |  |
 | Work @ MyShift | every Thu at 16:00, from 2026-10-20 | routine |  |
 | Work @ MyShift | every Fri at 15:00, from 2026-10-20 | routine |  |
 | Work @ MyShift | every Sat, from 2026-10-20 | routine |  |
 
-_Last synced: 10/20/2026, 6:58:33 PM_
+_Last synced: 10/22/2026, 5:43:20 AM_
