@@ -39,6 +39,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-10-22-design-research-daily]] — Recent research shows that micro-interactions boost engagement by 30–61% in habit apps, streak recovery windows reduce churn by up to 300%, 
 - [[2026-10-20-design-research-daily-3]] — 2026 dashboard trends emphasize emotional depth over spectacle—calm interfaces, grace-based gamification (streaks with forgiveness), and coh
 - [[2026-10-20-design-research-daily-2]] — Current 2026 trends emphasize playful micro-interactions that reward user actions, intelligent dashboards that surface contextual insights, 
 - [[daily-tasks-2026-10-20]] — Quest log for 2026-10-20
