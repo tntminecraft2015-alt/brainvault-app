@@ -1127,3 +1127,9 @@ Design research: General Improvements: Micro-Confirmation Feedback, Grace-Based 
 **Pages created:** [[chat-2026-10-22]]
 
 Chat session on 2026-10-22
+
+## [2026-10-22] note | Mission Control Sync
+
+**Operation:** note
+
+Mission Control change requested via ED chat: Fix calendar event deletion and add end time support
