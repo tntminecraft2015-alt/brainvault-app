@@ -462,14 +462,17 @@ function liveCalendar(data, from, days) {
 }
 
 function buildLiveCalendarContext(data) {
+  if (ensureEventIds(data)) saveAppData(data);
   const t = today();
   const fmt12 = hm => { if (!hm) return 'anytime'; const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
-  const line = e => `${fmt12(e.time)}${e.time && e.endTime ? '–' + fmt12(e.endTime) : ''} — ${e.title}${e.location ? ` @ ${e.location}` : ''} (${e.kind || 'focus'}${e.recurring ? ', repeating' : ''})`;
+  const line = e => `${fmt12(e.time)}${e.time && e.endTime ? '–' + fmt12(e.endTime) : ''} — ${e.title}${e.location ? ` @ ${e.location}` : ''} (${e.kind || 'focus'}${e.recurring ? ', repeating' : ''}${e.notify && e.notifyLeadMin ? `, notify ${e.notifyLeadMin}m before` : ''}) [id ${e.recurring ? e.recurringId : e.id}]`;
+  const dupes = findPossibleDuplicates(data, t, 21)
+    .map(({ date, a, b }) => `- ${date}: ${line(a)}  ⟷  ${line(b)}`).join('\n');
   const agenda = liveCalendar(data, addDays(t, -3), 3 + 21).map(d => {
     const tag = d.date === t ? ' ← TODAY' : '';
     return `${d.weekday} ${d.date}${tag}: ${d.events.length ? d.events.map(line).join('; ') : 'nothing scheduled'}`;
   }).join('\n');
-  const rules = (data.recurringEvents || []).map(rec => `- id: ${rec.id} | "${rec.title}" — ${describeRecurrence(rec)}${rec.location ? ` @ ${rec.location}` : ''}`).join('\n') || '(none)';
+  const rules = (data.recurringEvents || []).map(rec => `- id: ${rec.id} | "${rec.title}" ${fmt12(rec.time)}${rec.time && rec.endTime ? '–' + fmt12(rec.endTime) : ''} — ${describeRecurrence(rec)} (starts ${rec.startDate}${rec.endDate ? `, ends ${rec.endDate}` : ', no end date'})${rec.location ? ` @ ${rec.location}` : ''}`).join('\n') || '(none)';
   const later = Object.keys(data.events || {}).filter(d => d > addDays(t, 20)).sort()
     .flatMap(d => (data.events[d] || []).map(e => `- ${d} ${line({ ...e, recurring: false })}`)).slice(0, 15).join('\n');
   return [
@@ -477,6 +480,7 @@ function buildLiveCalendarContext(data) {
     `## Day-by-day (3 days ago → 3 weeks ahead; repeating events already expanded)\n${agenda}`,
     `## Repeating event rules\n${rules}`,
     later ? `## Further-out one-off events\n${later}` : '',
+    dupes ? `## Possible duplicates (same day, same title or overlapping times — next 3 weeks)\nNot proof: two real shifts on one day also show here. Mention these when the calendar comes up and offer to clean them up; delete only what the user confirms.\n${dupes}` : '',
   ].filter(Boolean).join('\n\n');
 }
 
@@ -526,6 +530,14 @@ For job (3): you cannot edit code yourself. When the user clearly asks for a cha
 If the user asks to cancel, remove, undo, or discard a queued request, use the remove_queued_change tool with the exact id from the PENDING CHANGE QUEUE below — never claim you removed something without calling the tool. If nothing in the queue matches what they described, say so plainly and ask them to clarify which one they mean rather than guessing or picking one arbitrarily.
 
 For job (4): when the user clearly asks you to add/log/remember a to-do or an expense right now (e.g. "add 'call the vet' to my tasks", "log $12 for lunch"), call add_task or log_expense instead of just acknowledging in prose — a personal assistant that only talks and never acts isn't useful. Don't call these speculatively or infer them from unrelated chat. The same goes for calendar events: when the user asks to add/schedule/cancel/move something (e.g. "add a meeting Tuesday at 2pm", "gym every Monday at 6am", "move dentist to Friday", "cancel my haircut"), use add_calendar_event / edit_calendar_event / delete_calendar_event. Resolve relative dates ("Tuesday", "next week", "tomorrow") yourself against the CURRENT DATE below before calling the tool — always pass a real YYYY-MM-DD, never the relative phrase. If editing or deleting a recurring event and the user didn't say whether they mean just one occurrence or the whole series, ask before calling the tool rather than guessing.
+
+You can do everything to the calendar the user can do in the app: add (with start + optional end time, location, kind, notification lead time, and repeat rule), edit any field including end time, notification, and a series' whole repeat schedule (days, frequency, interval, start/end date via new_recurrence), move one-off events to new dates, and delete single events, single occurrences, whole series, or several at once (event_ids). Every event in the CALENDAR context carries an [id ...] tag — always target by event_id when more than one event shares a title, instead of failing on "multiple events match" or asking the user to clean it up by hand.
+
+Calendar lessons learned (from a real mistake — follow them):
+- Never create a recurring series from a one-time schedule (a shift schedule, a week of classes someone pasted, a screenshot). Work shifts change week to week: add each shift as its own one-off event with time + end_time. Only make a series when the user says it repeats ("every Monday", "weekly").
+- Before adding anything, check that day in the CALENDAR context; if the same title is already there (one-off or repeating), don't add a second copy — tell the user it's already on.
+- If the "Possible duplicates" section lists anything, point it out when the calendar comes up and offer to clean it up. List exactly what you'd delete (date, time, title) and delete by event_id only after the user confirms. A repeating series that duplicates one-off events usually means the series was the mistake — offer to delete the series, not the real one-offs.
+- If a delete or edit fails, say so plainly with the reason; never claim it worked.
 
 You also have persistent memory across every conversation, not just this one — the WHAT ED REMEMBERS section below is durable notes you've saved about the user over time (preferences, ongoing projects, recurring context, things they've corrected you on). Actually use it: let it shape how you answer instead of just restating it back. When you learn something durable and reusable in this conversation — a preference, a standing fact about their life/projects, a correction to how you should behave — call save_memory to write it down in your own words, concisely. Don't save one-off ephemeral chat content (e.g. "user asked what time it is"), don't save duplicates of what's already in the list below, and don't narrate that you're saving something unless it's naturally relevant. If a memory turns out to be wrong or the user tells you to forget something, call forget_memory with its exact id from the list below.`;
 
@@ -1191,6 +1203,53 @@ async function syncCaldavCalendarNow(data) {
 
 // Finds events (one-off and recurring occurrences) matching a title substring, optionally
 // narrowed to one date. Shared by edit/delete so both give the same "which one?" behavior.
+// Older one-off events were saved without an id; give them one so ED can target them exactly.
+function ensureEventIds(data) {
+  let changed = false;
+  for (const evs of Object.values(data.events || {})) {
+    (Array.isArray(evs) ? evs : []).forEach(ev => {
+      if (ev && ev.id == null) { ev.id = `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`; changed = true; }
+    });
+  }
+  return changed;
+}
+
+// Exact lookup by id: a one-off event id, or a recurring series id (optionally one occurrence via dateFilter).
+function findCalendarById(data, eventId, dateFilter) {
+  const id = String(eventId || '').trim();
+  for (const [date, evs] of Object.entries(data.events || {})) {
+    const idx = (evs || []).findIndex(e => String(e.id) === id);
+    if (idx > -1) return [{ kind: 'oneoff', date, idx, ev: evs[idx] }];
+  }
+  const rec = (data.recurringEvents || []).find(r => r.id === id || `rec-${r.id}` === id.replace(/-\d{4}-\d{2}-\d{2}$/, ''));
+  if (rec) {
+    const occDate = dateFilter || (id.match(/(\d{4}-\d{2}-\d{2})$/) || [])[1] || null;
+    if (occDate && !occursOn(rec, occDate)) return [];
+    return [{ kind: 'recurring', date: occDate, rec }];
+  }
+  return [];
+}
+
+function findCalendarTargets(data, { event_id, title_search, date }) {
+  if (event_id) return findCalendarById(data, event_id, date);
+  return findCalendarMatches(data, title_search, date);
+}
+
+// Same day + same title or overlapping times. Mirrors evsClash in mission-control.html.
+function findPossibleDuplicates(data, from, days) {
+  const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const span = e => { if (!e.time) return null; const [h, m] = e.time.split(':').map(Number); const s = h * 60 + (m || 0); return [s, s + eventDurationMin(e.time, e.endTime)]; };
+  const out = [];
+  for (let i = 0; i < days; i++) {
+    const date = addDays(from, i), evs = eventsOnDate(data, date);
+    for (let a = 0; a < evs.length; a++) for (let b = a + 1; b < evs.length; b++) {
+      const sa = span(evs[a]), sb = span(evs[b]);
+      if (norm(evs[a].title) === norm(evs[b].title) || (sa && sb && sa[0] < sb[1] && sb[0] < sa[1])) out.push({ date, a: evs[a], b: evs[b] });
+    }
+  }
+  return out;
+}
+
 function findCalendarMatches(data, titleSearch, dateFilter) {
   const q = String(titleSearch || '').toLowerCase().trim();
   const matches = [];
@@ -1227,6 +1286,7 @@ const ADD_CALENDAR_EVENT_TOOL = {
       time:     { type: 'string', description: '24h HH:MM, e.g. "18:00". Omit if no specific time.' },
       end_time: { type: 'string', description: '24h HH:MM end time, e.g. "17:30". Optional; only with `time`. An end earlier than the start means it ends the next day (overnight shift).' },
       location: { type: 'string', description: 'Optional location.' },
+      notify_lead_min: { type: 'integer', minimum: 1, maximum: 1440, description: 'Optional: push-notify the user this many minutes before the start (e.g. 15, 30, 60). Only with `time`. Omit for no notification.' },
       kind:     { type: 'string', enum: EVENT_KIND_KEYS, description: 'Category for calendar color-coding. Default "focus" if unclear.' },
       recurrence: {
         type: 'object',
@@ -1247,10 +1307,11 @@ const ADD_CALENDAR_EVENT_TOOL = {
 
 const HHMM_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-function addEdCalendarEvent({ title, date, time, end_time, location, kind, recurrence }) {
+function addEdCalendarEvent({ title, date, time, end_time, location, kind, recurrence, notify_lead_min }) {
   const cleanTitle = String(title || '').trim().slice(0, 120);
   if (!cleanTitle) return { ok: false, error: 'Empty title' };
   const endTime = time && HHMM_RE.test(end_time || '') ? end_time : null;
+  const lead = time && Number.isInteger(notify_lead_min) && notify_lead_min > 0 ? notify_lead_min : null;
   const evKind = EVENT_KIND_KEYS.includes(kind) ? kind : 'focus';
   const data = getAppData();
 
@@ -1263,7 +1324,7 @@ function addEdCalendarEvent({ title, date, time, end_time, location, kind, recur
       endTime,
       location: String(location || '').trim().slice(0, 120),
       kind: evKind,
-      notify: false, notifyLeadMin: null,
+      notify: !!lead, notifyLeadMin: lead,
       freq: recurrence.freq,
       daysOfWeek: recurrence.freq === 'weekly' ? (Array.isArray(recurrence.daysOfWeek) && recurrence.daysOfWeek.length ? recurrence.daysOfWeek : [new Date((date || today()) + 'T00:00:00').getDay()]) : null,
       dayOfMonth: recurrence.freq === 'monthly' ? (recurrence.dayOfMonth || new Date((date || today()) + 'T00:00:00').getDate()) : null,
@@ -1284,7 +1345,7 @@ function addEdCalendarEvent({ title, date, time, end_time, location, kind, recur
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return { ok: false, error: 'Invalid date, expected YYYY-MM-DD' };
   if (!data.events) data.events = {};
   if (!data.events[d]) data.events[d] = [];
-  const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, endTime, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: false, notifyLeadMin: null };
+  const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, endTime, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: !!lead, notifyLeadMin: lead };
   data.events[d].push(ev);
   saveAppData(data);
   syncEvents(data);
@@ -1294,29 +1355,43 @@ function addEdCalendarEvent({ title, date, time, end_time, location, kind, recur
 
 const EDIT_CALENDAR_EVENT_TOOL = {
   name: 'edit_calendar_event',
-  description: 'Change the title/time/location/kind (or, for a one-off event, the date) of an existing calendar event that is still happening. Do NOT use this to cancel/skip/delete an event — use delete_calendar_event for that, even for one occurrence of a series; pushing the time to some "out of the way" value is not a cancellation and leaves a real, wrong event on the calendar. Find the event by title_search (matched against existing titles) and optionally a date to narrow it down. If it turns out to be part of a recurring series and the user didn\'t specify a date/occasion, ask them in your reply whether they mean just one occurrence or the whole series, then call this again with scope and date set — don\'t guess.',
+  description: 'Change the title/time/end time/location/kind/notification (or, for a one-off event, the date; for a whole series, its repeat schedule via new_recurrence) of an existing calendar event that is still happening. Do NOT use this to cancel/skip/delete an event — use delete_calendar_event for that, even for one occurrence of a series; pushing the time to some "out of the way" value is not a cancellation and leaves a real, wrong event on the calendar. Find the event by event_id (exact, from the [id ...] tag in the calendar context) or by title_search plus optionally a date. If it turns out to be part of a recurring series and the user didn\'t specify a date/occasion, ask them in your reply whether they mean just one occurrence or the whole series, then call this again with scope and date set — don\'t guess.',
   input_schema: {
     type: 'object',
     properties: {
-      title_search: { type: 'string', description: 'Text to match against the event\'s current title.' },
+      event_id:     { type: 'string', description: 'Exact id from the [id ...] tag in the CALENDAR context — preferred whenever several events share a title. For a repeating event this is the series id; add `date` + scope "occurrence" to change just one day.' },
+      title_search: { type: 'string', description: 'Text to match against the event\'s current title (used when no event_id is given).' },
       date:         { type: 'string', description: 'YYYY-MM-DD. Narrows to one event/occurrence; required when scope is "occurrence" on a recurring series.' },
       scope:        { type: 'string', enum: ['occurrence', 'series'], description: 'For recurring events only: change just the one occurrence on `date`, or the whole series. Default "series".' },
+      new_notify_lead_min: { type: 'integer', minimum: 0, maximum: 1440, description: 'Push-notify this many minutes before the start; 0 turns the notification off.' },
+      new_recurrence: {
+        type: 'object',
+        description: 'Whole-series only: change the repeat schedule. Only the fields given are changed. Set endDate to stop a series from a date onward (keeps past occurrences); "" removes the end date.',
+        properties: {
+          freq:       { type: 'string', enum: ['daily', 'weekly', 'monthly'] },
+          daysOfWeek: { type: 'array', items: { type: 'integer', minimum: 0, maximum: 6 }, description: 'Weekly only. 0=Sunday...6=Saturday.' },
+          dayOfMonth: { type: 'integer', minimum: 1, maximum: 31 },
+          interval:   { type: 'integer', minimum: 1 },
+          startDate:  { type: 'string', description: 'YYYY-MM-DD.' },
+          endDate:    { type: 'string', description: 'YYYY-MM-DD, or "" for no end.' },
+        },
+      },
       new_title:    { type: 'string' },
-      new_date:     { type: 'string', description: 'YYYY-MM-DD. Only valid for a one-off event (moves it to a new day) — a recurring series\' schedule cannot be moved this way, only its time/title/location/kind.' },
+      new_date:     { type: 'string', description: 'YYYY-MM-DD. Only valid for a one-off event (moves it to a new day) — to change a recurring series\' days/frequency/dates use new_recurrence instead.' },
       new_time:     { type: 'string', description: '24h HH:MM.' },
       new_end_time: { type: 'string', description: '24h HH:MM end time, or "" to remove the end time.' },
       new_location: { type: 'string' },
       new_kind:     { type: 'string', enum: EVENT_KIND_KEYS },
     },
-    required: ['title_search'],
   },
 };
 
-function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, new_time, new_end_time, new_location, new_kind }) {
+function editEdCalendarEvent({ event_id, title_search, date, scope, new_title, new_date, new_time, new_end_time, new_location, new_kind, new_notify_lead_min, new_recurrence }) {
+  if (!event_id && !title_search) return { ok: false, error: 'Give event_id or title_search.' };
   const data = getAppData();
-  const matches = findCalendarMatches(data, title_search, date);
+  const matches = findCalendarTargets(data, { event_id, title_search, date });
   if (!matches.length) return { ok: false, error: 'No matching event found' };
-  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Ask the user which one, or narrow with a date.` };
+  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Use the exact event_id from the calendar context, narrow with a date, or ask the user which one.` };
 
   const m = matches[0];
   const fields = {};
@@ -1325,6 +1400,12 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
   if (new_end_time !== undefined) fields.endTime = HHMM_RE.test(new_end_time) ? new_end_time : null;
   if (new_location !== undefined) fields.location = String(new_location).trim().slice(0, 120);
   if (new_kind !== undefined && EVENT_KIND_KEYS.includes(new_kind)) fields.kind = new_kind;
+  if (new_notify_lead_min !== undefined) {
+    const lead = Number.isInteger(new_notify_lead_min) && new_notify_lead_min > 0 ? new_notify_lead_min : null;
+    fields.notify = !!lead; fields.notifyLeadMin = lead;
+  }
+  if (new_recurrence && (m.kind !== 'recurring' || scope === 'occurrence')) return { ok: false, error: 'new_recurrence only applies to a whole recurring series (scope "series").' };
+  if (new_recurrence && new_recurrence.freq !== undefined && !['daily', 'weekly', 'monthly'].includes(new_recurrence.freq)) return { ok: false, error: 'Invalid recurrence.freq' };
 
   if (m.kind === 'oneoff') {
     Object.assign(m.ev, fields);
@@ -1351,10 +1432,22 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
     return { ok: true, message: `Updated the ${m.date} occurrence of "${m.rec.title}".` };
   }
   Object.assign(m.rec, fields);
+  if (new_recurrence) {
+    const r = new_recurrence, isDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s);
+    if (r.freq !== undefined) m.rec.freq = r.freq;
+    if (Array.isArray(r.daysOfWeek) && r.daysOfWeek.length) m.rec.daysOfWeek = [...new Set(r.daysOfWeek.filter(d => Number.isInteger(d) && d >= 0 && d <= 6))].sort();
+    if (Number.isInteger(r.dayOfMonth) && r.dayOfMonth >= 1 && r.dayOfMonth <= 31) m.rec.dayOfMonth = r.dayOfMonth;
+    if (Number.isInteger(r.interval) && r.interval >= 1) m.rec.interval = r.interval;
+    if (r.startDate !== undefined && isDate(r.startDate)) m.rec.startDate = r.startDate;
+    if (r.endDate !== undefined) m.rec.endDate = isDate(r.endDate) ? r.endDate : null;
+    // Switching freq leaves the other freq's field unset — fill it from the start date like add does.
+    if (m.rec.freq === 'weekly' && !(m.rec.daysOfWeek || []).length) m.rec.daysOfWeek = [new Date(m.rec.startDate + 'T00:00:00').getDay()];
+    if (m.rec.freq === 'monthly' && !m.rec.dayOfMonth) m.rec.dayOfMonth = new Date(m.rec.startDate + 'T00:00:00').getDate();
+  }
   saveAppData(data);
   syncEvents(data);
   syncCaldavCalendar(data).catch(e => console.error('CalDAV sync failed:', e.message));
-  return { ok: true, message: `Updated the whole "${m.rec.title}" series.` };
+  return { ok: true, message: `Updated the whole "${m.rec.title}" series${new_recurrence ? ` — now ${describeRecurrence(m.rec)}` : ''}.` };
 }
 
 const DELETE_CALENDAR_EVENT_TOOL = {
@@ -1363,19 +1456,31 @@ const DELETE_CALENDAR_EVENT_TOOL = {
   input_schema: {
     type: 'object',
     properties: {
-      title_search: { type: 'string', description: 'Text to match against the event\'s title.' },
+      event_id:     { type: 'string', description: 'Exact id from the [id ...] tag in the CALENDAR context — preferred whenever several events share a title. For a repeating event this is the series id; add `date` + scope "occurrence" to delete just one day.' },
+      event_ids:    { type: 'array', items: { type: 'string' }, description: 'Bulk cleanup: several exact ids to delete in one call (one-off ids delete that event, series ids delete the whole series). Use only after the user confirmed which ones.' },
+      title_search: { type: 'string', description: 'Text to match against the event\'s title (used when no id is given).' },
       date:         { type: 'string', description: 'YYYY-MM-DD. Narrows to one event/occurrence; required when scope is "occurrence".' },
       scope:        { type: 'string', enum: ['occurrence', 'series'], description: 'For recurring events only. Default "series".' },
     },
-    required: ['title_search'],
   },
 };
 
-function deleteEdCalendarEvent({ title_search, date, scope }) {
+function deleteEdCalendarEvent({ event_id, event_ids, title_search, date, scope }) {
+  if (Array.isArray(event_ids) && event_ids.length) {
+    const done = [], missing = [];
+    for (const id of event_ids) {
+      const r = deleteEdCalendarEvent({ event_id: id, scope: 'series' });
+      (r.ok ? done : missing).push(r.ok ? r.message : `${id} (${r.error})`);
+    }
+    return done.length
+      ? { ok: true, message: `${done.join(' ')}${missing.length ? ` Not found: ${missing.join(', ')}.` : ''}` }
+      : { ok: false, error: `None deleted. Not found: ${missing.join(', ')}` };
+  }
+  if (!event_id && !title_search) return { ok: false, error: 'Give event_id, event_ids or title_search.' };
   const data = getAppData();
-  const matches = findCalendarMatches(data, title_search, date);
+  const matches = findCalendarTargets(data, { event_id, title_search, date });
   if (!matches.length) return { ok: false, error: 'No matching event found' };
-  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Ask the user which one, or narrow with a date.` };
+  if (matches.length > 1) return { ok: false, error: `Multiple events match: ${matches.map(describeMatch).join('; ')}. Use the exact event_id from the calendar context, narrow with a date, or ask the user which one.` };
 
   const m = matches[0];
   if (m.kind === 'oneoff') {

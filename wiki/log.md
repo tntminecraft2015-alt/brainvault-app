@@ -1155,3 +1155,9 @@ Calendar events synced
 **Operation:** note
 
 Implemented queued request "Fix calendar event deletion and add end time support" (ED chat, 2026-10-22). Root cause of the "undeletable duplicates": three recurring "Work @ MyShift" series (Thu/Fri/Sat from 10/20), made from a one-time shift schedule, sat on top of the real one-off shifts, and ED's delete tool refused because the title matched several events. Removed those 3 series from live data (approved by user). Added: Settings → Manage calendar events (every series and one-off with raw data, ⚠ possible-duplicate flags, two-tap delete); optional event end times across data model, ED add/edit tools, add/edit forms, timeline, week view, and Apple Calendar sync; shift-screenshot imports now store start/end as fields and are always one-offs, never recurring.
+
+## [2026-10-26] note | ED calendar parity + lessons learned
+
+**Operation:** note
+
+Gave ED the same calendar powers as the app UI: exact targeting by event id (ids now shown in ED's calendar context; legacy id-less events get ids), bulk delete (event_ids), notification lead time on add/edit, end time on add/edit, and changing a series' repeat schedule (new_recurrence: days, freq, interval, start/end date). ED's context now has a "Possible duplicates" section, and its instructions carry the lessons from the Work-series incident: never turn a one-time schedule into a recurring series, check for an existing copy before adding, offer duplicate cleanup and delete by id only after confirmation.
