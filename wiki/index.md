@@ -42,6 +42,7 @@
 - [[2028-summit-st]] — 1BR on Iuka Ravine; $800/mo; considering; balcony, AC, pet friendly, a little dirty
 
 ## Analyses
+- [[2026-10-26-design-research-daily]] — Modern dashboards prioritize immediate micro-feedback on task completion and progressive disclosure to reduce cognitive load. Habit trackers
 - [[chat-2026-10-22]] — Claude conversation log for 2026-10-22
 - [[2026-10-22-design-research-daily]] — Recent research shows that micro-interactions boost engagement by 30–61% in habit apps, streak recovery windows reduce churn by up to 300%, 
 - [[2026-10-20-design-research-daily-3]] — 2026 dashboard trends emphasize emotional depth over spectacle—calm interfaces, grace-based gamification (streaks with forgiveness), and coh
