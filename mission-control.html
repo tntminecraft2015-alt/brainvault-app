@@ -1745,9 +1745,10 @@
           <div class="ev-more-wrap" id="evMoreWrap">
             <input id="devTitle" class="m-inp" type="text" placeholder="Event name...">
             <div class="m-2col">
-              <input id="devTime" class="m-inp" type="time">
-              <input id="devLoc" class="m-inp" type="text" placeholder="Location">
+              <input id="devTime" class="m-inp" type="time" aria-label="Start time">
+              <input id="devEndTime" class="m-inp" type="time" aria-label="End time (optional)" title="End time (optional)">
             </div>
+            <input id="devLoc" class="m-inp" type="text" placeholder="Location">
             <select id="devKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
             <div class="notify-row">
               <label class="notify-toggle">
@@ -1887,9 +1888,10 @@
     </div>
     <div class="m-field"><div class="m-label">Title</div><input id="editEvTitle" class="m-inp" type="text"></div>
     <div class="m-2col m-field">
-      <div><div class="m-label">Time</div><input id="editEvTime" class="m-inp" type="time"></div>
-      <div><div class="m-label">Location</div><input id="editEvLoc" class="m-inp" type="text"></div>
+      <div><div class="m-label">Start</div><input id="editEvTime" class="m-inp" type="time"></div>
+      <div><div class="m-label">End (optional)</div><input id="editEvEndTime" class="m-inp" type="time"></div>
     </div>
+    <div class="m-field"><div class="m-label">Location</div><input id="editEvLoc" class="m-inp" type="text"></div>
     <div class="m-field"><div class="m-label">Type</div>
       <select id="editEvKind" class="m-sel"><option value="focus">Focus</option><option value="meeting">Meeting</option><option value="training">Training</option><option value="social">Social</option><option value="errand">Errand</option><option value="routine">Routine</option></select>
     </div>
@@ -2083,6 +2085,12 @@
         </div>
       </div>
       <div id="caldavStatus" style="font-family:'Inter',sans-serif;font-size:9.5px;opacity:.5;margin-top:6px;"></div>
+    </div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(223,238,255,.1);">
+      <div class="m-label" style="margin-bottom:6px;">MANAGE CALENDAR EVENTS</div>
+      <div style="font-family:'Inter',sans-serif;font-size:12px;opacity:.65;margin-bottom:8px;line-height:1.5;">Every stored event. ⚠ = same title or overlapping time as another event that day. Use it to clear out duplicates or events ED can't pin down by name.</div>
+      <button class="modal-btn sm" id="calMgrToggle" onclick="toggleCalManager()" style="width:100%;">Show events</button>
+      <div id="calMgr" hidden></div>
     </div>
     <div class="modal-btns" style="margin-top:14px;">
       <button class="modal-btn ok" onclick="saveTheme()">Apply theme</button>
@@ -2635,7 +2643,7 @@ function renderTodayTimeline(el, key){
   const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
   let rows='';
   timed.forEach(it=>{
-    const start=tlMins(it.time), dur=it.e?TL_EVENT_MIN:TL_QUEST_MIN;
+    const start=tlMins(it.time), dur=tlItemDur(it);
     if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
     const past=isToday && start+dur<=nowMin;
     const [hm,ap]=fmtTime(it.time).split(' ');
@@ -2979,9 +2987,18 @@ function saveAddSheet(){
 
 // ── STRUCTURED-STYLE TIMELINE ─────────────────────────────────────────────────
 // Day view is the primary calendar: one vertical timeline merging events and quests
-// (a quest linked to an event shows once, with a checkbox). Events only store a start
-// time, so free-time gaps assume 60 min per event / 30 min per quest.
+// (a quest linked to an event shows once, with a checkbox). Events with an endTime use
+// their real length; otherwise free-time gaps assume 60 min per event / 30 min per quest.
 const TL_EVENT_MIN=60, TL_QUEST_MIN=30, TL_GAP_MIN=30;
+// Minutes from start to end; an end at or before the start is overnight (ends next day).
+// Mirrors eventDurationMin in server.js.
+function evDurMin(time,endTime){
+  if(!time||!endTime) return null;
+  const d=tlMins(endTime)-tlMins(time);
+  return d>0?d:d+1440;
+}
+function tlItemDur(it){ return (it.e && evDurMin(it.time,it.e.endTime)) || (it.e?TL_EVENT_MIN:TL_QUEST_MIN); }
+function fmtTimeRange(time,endTime){ return time ? fmtTime(time)+(endTime?'–'+fmtTime(endTime):'') : ''; }
 let calView='day';
 try{ const v=localStorage.getItem('mc.calView'); if(['day','week','month'].includes(v)) calView=v; }catch{}
 
@@ -3040,7 +3057,7 @@ function tlCheck(it){
 }
 function tlSub(it){
   const parts=[];
-  if(it.time) parts.push(fmtTime(it.time));
+  if(it.time) parts.push(it.e&&it.e.endTime ? `${fmtTimeRange(it.time,it.e.endTime)} (${tlDur(tlItemDur(it))})` : fmtTime(it.time));
   if(it.e && it.e.location) parts.push(esc(it.e.location));
   if(it.e && it.e.recurring) parts.push('🔁 repeats');
   if(!it.e) parts.push('Quest');
@@ -3080,7 +3097,7 @@ function renderCalDay(){
   let rows='', nowPlaced=!isToday;
   const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
   timed.forEach((it,idx)=>{
-    const start=tlMins(it.time), dur=it.e?TL_EVENT_MIN:TL_QUEST_MIN;
+    const start=tlMins(it.time), dur=tlItemDur(it);
     if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
     const past=isToday && start+dur<=nowMin;
     const [hm,ap]=fmtTime(it.time).split(' ');
@@ -3114,7 +3131,7 @@ function renderCalWeek(){
     if(isToday) inWeek=true;
     total+=items.length;
     const rows=items.map(it=>`<div class="wk-row${it.task&&it.task.done?' done':''}">
-        <span class="wk-t">${it.time?fmtTime(it.time):'Anytime'}</span>
+        <span class="wk-t">${it.time?fmtTimeRange(it.time,it.e&&it.e.endTime):'Anytime'}</span>
         <span class="wk-dot" style="background:${it.e?(KIND_COLORS[it.kind]||'#666'):(RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B)};"></span>
         <span class="wk-title" onclick="${tlItemClick(key,it)}" style="cursor:pointer;">${esc(it.title)}</span>
         ${it.task?tlCheck(it):'<span></span>'}
@@ -3173,7 +3190,7 @@ function renderDaySummaryInto(key,el,isMob){
   }
 }
 
-function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
+function openDayModal(key,date){ dayModalDate=key; document.getElementById('dayModalTitle').textContent=`${MONTHS_S[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`; ['devQuick','devTitle','devTime','devEndTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devKind').value='focus'; renderDevList(key); openModal('dayModal'); setTimeout(()=>document.getElementById('devTitle').focus(),60); }
 function renderDevList(key){
   const oneoff=((APP.events||{})[key]||[]).map((e,i)=>({e,oneoffIdx:i}));
   const recurring=(APP.recurringEvents||[]).filter(rec=>occursOn(rec,key)).map(rec=>({e:occurrenceForDate(rec,key),oneoffIdx:null}));
@@ -3192,7 +3209,7 @@ function renderDevList(key){
     const recBadge=oneoffIdx==null?`<span title="Recurring" style="opacity:.6;font-size:13px;">🔁</span>`:'';
     return`<div class="dev-item">
       <div class="dev-dot" style="background:${kc};width:8px;height:8px;flex-shrink:0;"></div>
-      <span class="dev-time">${e.time?fmtTime(e.time):'—'}</span>
+      <span class="dev-time">${e.time?fmtTimeRange(e.time,e.endTime):'—'}</span>
       ${recBadge}
       <span style="flex:1;font-size:16px;color:var(--fg);font-family:'Inter',sans-serif;;font-weight:600">${esc(e.title)}</span>
       <span style="font-family:'Inter',sans-serif;font-size:10.5px;background:${kc};color:#fff;padding:2px 4px;flex-shrink:0;">${pt.icon} ${(e.kind||'').toUpperCase()}</span>
@@ -3280,6 +3297,7 @@ function occurrenceForDate(rec,dateStr){
     id:`rec-${rec.id}-${dateStr}`,
     title:exc.title||rec.title,
     time:exc.time!==undefined?exc.time:rec.time,
+    endTime:exc.endTime!==undefined?exc.endTime:(rec.endTime||null),
     location:exc.location!==undefined?exc.location:rec.location,
     kind:exc.kind||rec.kind||'focus',
     notify:exc.notify!==undefined?exc.notify:rec.notify,
@@ -3312,7 +3330,7 @@ function addDayEvent(){
   if(!APP.events[dayModalDate])APP.events[dayModalDate]=[];
   const notify=document.getElementById('devNotify').checked;
   const time=document.getElementById('devTime').value;
-  const ev={id:genLinkId(),title,time,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('devNotifyLead').value,10):null};
+  const ev={id:genLinkId(),title,time,endTime:(time&&document.getElementById('devEndTime').value)||null,location:document.getElementById('devLoc').value.trim(),kind:document.getElementById('devKind').value,notify,notifyLeadMin:notify?parseInt(document.getElementById('devNotifyLead').value,10):null};
   APP.events[dayModalDate].push(ev);
   if(!Array.isArray(APP.tasks)) APP.tasks=[];
   const task={id:genLinkId(),text:title,done:false,rank:'B',date:dayModalDate,time:time||null,linkedEventId:ev.id};
@@ -3320,8 +3338,103 @@ function addDayEvent(){
   ev.linkedTaskId=task.id;
   patchData({events:APP.events, tasks:APP.tasks});
   renderDevList(dayModalDate); renderMobMonthGrid(); renderMobTasks();
-  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; document.getElementById('evMoreWrap').classList.remove('open'); document.getElementById('evMoreToggle').textContent='+ More options (time, location, notify)'; showToast('Event added ◆'); document.getElementById('devQuick').focus();
+  ['devQuick','devTitle','devTime','devEndTime','devLoc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('devNotify').checked=false; document.getElementById('devNotifyLead').style.display='none'; document.getElementById('devNotifyLead').value='30'; document.getElementById('evMoreWrap').classList.remove('open'); document.getElementById('evMoreToggle').textContent='+ More options (time, location, notify)'; showToast('Event added ◆'); document.getElementById('devQuick').focus();
 }
+// ── CALENDAR MANAGER (Settings) ──
+// Lists every stored one-off event and recurring series with its raw data and a delete
+// button, so duplicates/corrupt events can be cleared even when ED can't single them out
+// by title. Overlaps are flagged by comparing each day's events (recurring ones expanded).
+let calMgrShowPast=false;
+const CAL_MGR_AHEAD_DAYS=60;
+function toggleCalManager(){
+  const el=document.getElementById('calMgr'), open=el.hidden;
+  el.hidden=!open;
+  document.getElementById('calMgrToggle').textContent=open?'Hide events':'Show events';
+  if(open) renderCalManager();
+}
+function evSpan(e){ const s=tlMins(e.time); return s==null?null:[s, s+(evDurMin(e.time,e.endTime)||TL_EVENT_MIN)]; }
+// Same day and either overlapping times or the same title (e.g. a recurring "Work" series
+// on top of a one-off "Work" shift at a different hour) — a hint, not proof, of a duplicate.
+function evsClash(a,b){
+  const norm=t=>String(t||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(norm(a.title)===norm(b.title)) return true;
+  const sa=evSpan(a), sb=evSpan(b);
+  return !!(sa && sb && sa[0]<sb[1] && sb[0]<sa[1]);
+}
+// Returns { oneoff: Map(event object → clash count), rec: Map(recurringId → clash count) }.
+// One-offs are keyed by object, not id — some older events were saved without an id.
+function calMgrClashes(){
+  const oneoff=new Map(), rec=new Map(), bump=(m,k)=>m.set(k,(m.get(k)||0)+1);
+  const t=TODAY(), from=new Date(t+'T00:00:00'); from.setDate(from.getDate()-30);
+  const keys=new Set(Object.keys(APP.events||{}));
+  for(let i=0;i<30+CAL_MGR_AHEAD_DAYS;i++){ const d=new Date(from); d.setDate(from.getDate()+i); keys.add(dateKey(d)); }
+  keys.forEach(key=>{
+    const evs=eventsForDate(key);
+    for(let i=0;i<evs.length;i++) for(let j=i+1;j<evs.length;j++){
+      if(!evsClash(evs[i],evs[j])) continue;
+      [evs[i],evs[j]].forEach(e=>e.recurring?bump(rec,e.recurringId):bump(oneoff,e));
+    }
+  });
+  return { oneoff, rec };
+}
+function calMgrDescribeRec(r){
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], every=(r.interval||1)>1?`Every ${r.interval} `:'';
+  let s=r.freq==='weekly'?`${every||'Weekly '}${every?'weeks ':''}on ${(r.daysOfWeek||[]).map(d=>DOW[d]).join(', ')}`
+       :r.freq==='monthly'?`${every||'Monthly '}${every?'months ':''}on day ${r.dayOfMonth}`
+       :`${every||'Daily'}${every?'days':''}`;
+  s+=` · from ${r.startDate}${r.endDate?' to '+r.endDate:''}`;
+  const exc=Object.keys(r.exceptions||{}).length; if(exc) s+=` · ${exc} exception${exc>1?'s':''}`;
+  return s;
+}
+// Delete buttons need two taps (first tap arms "Confirm?" for 3s) instead of a confirm() dialog.
+function calMgrArm(btn,fn){
+  if(btn.dataset.armed){ fn(); return; }
+  btn.dataset.armed='1'; const orig=btn.textContent; btn.textContent='Confirm?'; btn.style.color='#ff6b6b';
+  setTimeout(()=>{ if(btn.isConnected){ delete btn.dataset.armed; btn.textContent=orig; btn.style.color=''; } },3000);
+}
+function calMgrDeleteOneoff(key,idx){
+  if(!((APP.events||{})[key]||[])[idx]) return;
+  deleteDayEv(key,idx); renderCalManager(); showToast('Event deleted ◆');
+}
+function calMgrDeleteSeries(id){
+  APP.recurringEvents=(APP.recurringEvents||[]).filter(r=>r.id!==id);
+  patchData({recurringEvents:APP.recurringEvents});
+  renderMobMonthGrid(); renderMobTasks(); renderCalManager(); showToast('Series deleted ◆');
+}
+function renderCalManager(){
+  const el=document.getElementById('calMgr'); if(!el) return;
+  const { oneoff:clashO, rec:clashR }=calMgrClashes(), t=TODAY();
+  const row=(main,sub,warn,btn)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(223,238,255,.07);font-family:'Inter',sans-serif;">
+      <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;color:var(--fg);overflow-wrap:anywhere;">${warn?'<span title="Same title or overlapping time as another event that day">⚠ </span>':''}${main}</div>
+      <div style="font-size:11px;opacity:.6;overflow-wrap:anywhere;">${sub}</div></div>${btn}</div>`;
+  const delBtn=onclick=>`<button type="button" class="modal-btn sm" style="flex-shrink:0;" onclick="calMgrArm(this,()=>${onclick})">Delete</button>`;
+
+  const recs=(APP.recurringEvents||[]).slice().sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  let html=`<div class="m-label" style="margin:12px 0 2px;">REPEATING (${recs.length})</div>`;
+  html+=recs.length?recs.map(r=>{
+    const n=clashR.get(r.id)||0;
+    return row(`${esc(r.title||'Untitled')} · ${r.time?fmtTimeRange(r.time,r.endTime):'Anytime'}`,
+      `${esc(calMgrDescribeRec(r))}${n?` · <b style="color:#ffb347;">possible duplicate ×${n}</b>`:''} · id ${esc(r.id)}`,
+      n>0, delBtn(`calMgrDeleteSeries('${esc(r.id)}')`));
+  }).join(''):'<div style="font-size:12px;opacity:.55;padding:6px 0;">None</div>';
+
+  const dates=Object.keys(APP.events||{}).filter(k=>(APP.events[k]||[]).length).sort();
+  const shown=dates.filter(k=>calMgrShowPast||k>=t), pastCount=dates.filter(k=>k<t).reduce((n,k)=>n+APP.events[k].length,0);
+  const total=dates.reduce((n,k)=>n+APP.events[k].length,0);
+  html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin:14px 0 2px;">
+      <div class="m-label">ONE-TIME (${total})</div>
+      ${pastCount?`<button type="button" class="modal-btn sm" onclick="calMgrShowPast=!calMgrShowPast;renderCalManager();">${calMgrShowPast?'Hide past':'Show past ('+pastCount+')'}</button>`:''}
+    </div>`;
+  const oneoffRows=shown.flatMap(k=>APP.events[k].slice().sort((a,b)=>(a.time||'99').localeCompare(b.time||'99')).map(e=>{
+    const n=clashO.get(e)||0, d=new Date(k+'T00:00:00'), idx=APP.events[k].indexOf(e);
+    return row(`${esc(e.title||'Untitled')} · ${e.time?fmtTimeRange(e.time,e.endTime):'Anytime'}`,
+      `${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}${e.location?' · '+esc(e.location):''}${n?` · <b style="color:#ffb347;">possible duplicate ×${n}</b>`:''}${k<t?' · past':''}`,
+      n>0, delBtn(`calMgrDeleteOneoff('${k}',${idx})`));
+  }));
+  html+=oneoffRows.length?oneoffRows.join(''):`<div style="font-size:12px;opacity:.55;padding:6px 0;">${total?'No upcoming one-time events':'None'}</div>`;
+  el.innerHTML=`<div style="max-height:46vh;overflow-y:auto;margin-top:6px;">${html}</div>`;
+}
+
 function deleteDayEv(key,idx){
   if(!APP.events[key])return;
   const ev=APP.events[key][idx];
@@ -3455,6 +3568,7 @@ function openEditEvent(key,idx){
   document.getElementById('editEvScopeRow').style.display='none';
   document.getElementById('editEvTitle').value=ev.title||'';
   document.getElementById('editEvTime').value=ev.time||'';
+  document.getElementById('editEvEndTime').value=ev.endTime||'';
   document.getElementById('editEvLoc').value=ev.location||'';
   document.getElementById('editEvKind').value=ev.kind||'focus';
   document.getElementById('editEvNotify').checked=!!ev.notify;
@@ -3473,6 +3587,7 @@ function editRecurringOccurrence(date,recurringId){
   document.querySelectorAll('input[name="editEvScope"]').forEach(r=>r.checked=(r.value==='occurrence'));
   document.getElementById('editEvTitle').value=occ.title||'';
   document.getElementById('editEvTime').value=occ.time||'';
+  document.getElementById('editEvEndTime').value=occ.endTime||'';
   document.getElementById('editEvLoc').value=occ.location||'';
   document.getElementById('editEvKind').value=occ.kind||'focus';
   document.getElementById('editEvNotify').checked=!!occ.notify;
@@ -3498,6 +3613,7 @@ function saveEditEvent(){
   if(!title){showToast('Enter event title');return;}
   const notify=document.getElementById('editEvNotify').checked;
   const time=document.getElementById('editEvTime').value;
+  const endTime=(time&&document.getElementById('editEvEndTime').value)||null;
   const location=document.getElementById('editEvLoc').value.trim();
   const kind=document.getElementById('editEvKind').value;
   const notifyLeadMin=notify?parseInt(document.getElementById('editEvNotifyLead').value,10):null;
@@ -3505,7 +3621,7 @@ function saveEditEvent(){
   if(editEvMode==='recurring'){
     const rec=(APP.recurringEvents||[]).find(r=>r.id===editEvRecurringId); if(!rec)return;
     const scope=document.querySelector('input[name="editEvScope"]:checked')?.value||'occurrence';
-    const fields={title,time,location,kind,notify,notifyLeadMin};
+    const fields={title,time,endTime,location,kind,notify,notifyLeadMin};
     if(scope==='series'){
       Object.assign(rec,fields);
     } else {
@@ -3519,7 +3635,7 @@ function saveEditEvent(){
   }
 
   const prev=APP.events[editEvKey][editEvIdx];
-  const ev={id:prev?.id||genLinkId(),title,time,location,kind,notify,notifyLeadMin,linkedTaskId:prev?.linkedTaskId};
+  const ev={id:prev?.id||genLinkId(),title,time,endTime,location,kind,notify,notifyLeadMin,linkedTaskId:prev?.linkedTaskId};
   APP.events[editEvKey][editEvIdx]=ev;
   patchData({events:APP.events});
   if(ev.linkedTaskId && Array.isArray(APP.tasks)){
@@ -5140,6 +5256,7 @@ function openSettingsModal(){
   if(localEl) localEl.style.display = isCloud ? 'none' : '';
   if(cloudEl) cloudEl.style.display = isCloud ? '' : 'none';
   openModal('settingsModal');
+  if(!document.getElementById('calMgr').hidden) renderCalManager();
   refreshCaldavStatus();
 }
 
@@ -5242,7 +5359,7 @@ function openDayModal(key,date){
   const mon=MONTHS_S[date.getMonth()]; const d=date.getDate(); const yr=date.getFullYear();
   document.getElementById('dayModalTitle').textContent=date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   document.getElementById('pdxDateLabel').textContent=`${mon} ${String(d).padStart(2,'0')} ${yr}`;
-  ['devQuick','devTitle','devTime','devLoc'].forEach(id=>document.getElementById(id).value='');
+  ['devQuick','devTitle','devTime','devEndTime','devLoc'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('devKind').value='focus';
   document.getElementById('devNotify').checked=false;
   document.getElementById('devNotifyLead').style.display='none';

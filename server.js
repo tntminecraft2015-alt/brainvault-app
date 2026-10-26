@@ -464,7 +464,7 @@ function liveCalendar(data, from, days) {
 function buildLiveCalendarContext(data) {
   const t = today();
   const fmt12 = hm => { if (!hm) return 'anytime'; const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
-  const line = e => `${fmt12(e.time)} — ${e.title}${e.location ? ` @ ${e.location}` : ''} (${e.kind || 'focus'}${e.recurring ? ', repeating' : ''})`;
+  const line = e => `${fmt12(e.time)}${e.time && e.endTime ? '–' + fmt12(e.endTime) : ''} — ${e.title}${e.location ? ` @ ${e.location}` : ''} (${e.kind || 'focus'}${e.recurring ? ', repeating' : ''})`;
   const agenda = liveCalendar(data, addDays(t, -3), 3 + 21).map(d => {
     const tag = d.date === t ? ' ← TODAY' : '';
     return `${d.weekday} ${d.date}${tag}: ${d.events.length ? d.events.map(line).join('; ') : 'nothing scheduled'}`;
@@ -1030,6 +1030,7 @@ function occurrenceForDate(rec, dateStr) {
     id: `rec-${rec.id}-${dateStr}`,
     title: exc.title || rec.title,
     time: exc.time !== undefined ? exc.time : rec.time,
+    endTime: exc.endTime !== undefined ? exc.endTime : (rec.endTime || null),
     location: exc.location !== undefined ? exc.location : rec.location,
     kind: exc.kind || rec.kind || 'focus',
     notify: exc.notify !== undefined ? exc.notify : rec.notify,
@@ -1063,6 +1064,13 @@ function zonedTimeToUtc(dateKey, timeStr, tz) {
   const [hh, mm]  = (timeStr || '00:00').split(':').map(Number);
   const guess = new Date(Date.UTC(y, m - 1, d, hh, mm));
   return new Date(guess.getTime() - tzOffsetMinutes(guess, tz) * 60000);
+}
+// Minutes from start to end; an end at or before the start is an overnight shift ending the next day.
+function eventDurationMin(time, endTime) {
+  if (!time || !endTime) return 60;
+  const toMin = hm => { const [h, m] = hm.split(':').map(Number); return h * 60 + (m || 0); };
+  const diff = toMin(endTime) - toMin(time);
+  return diff > 0 ? diff : diff + 1440;
 }
 function buildEventICS(uid, title, dateKey, time, notifyLeadMin, durationMin = 60) {
   const now = icsStamp(new Date());
@@ -1098,14 +1106,14 @@ function upcomingEventsForSync(data) {
   const out = [];
   for (const [dateKey, evs] of Object.entries(data.events || {})) {
     if (dateKey < start) continue;
-    (Array.isArray(evs) ? evs : []).forEach(e => out.push({ uid: `mc-${e.id}`, title: e.title, dateKey, time: e.time || null, notifyLeadMin: e.notify ? e.notifyLeadMin : null }));
+    (Array.isArray(evs) ? evs : []).forEach(e => out.push({ uid: `mc-${e.id}`, title: e.title, dateKey, time: e.time || null, endTime: e.endTime || null, notifyLeadMin: e.notify ? e.notifyLeadMin : null }));
   }
   for (const rec of (data.recurringEvents || [])) {
     for (let d = new Date(start + 'T00:00:00'); d <= endDate; d.setDate(d.getDate() + 1)) {
       const dateKey = dateInTz(d);
       if (occursOn(rec, dateKey)) {
         const occ = occurrenceForDate(rec, dateKey);
-        out.push({ uid: `mc-${occ.id}`, title: occ.title, dateKey, time: occ.time || null, notifyLeadMin: occ.notify ? occ.notifyLeadMin : null });
+        out.push({ uid: `mc-${occ.id}`, title: occ.title, dateKey, time: occ.time || null, endTime: occ.endTime || null, notifyLeadMin: occ.notify ? occ.notifyLeadMin : null });
       }
     }
   }
@@ -1152,7 +1160,7 @@ async function syncCaldavCalendarNow(data) {
   }
   for (const ev of desired) {
     try {
-      const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time, ev.notifyLeadMin);
+      const ics = buildEventICS(ev.uid, ev.title, ev.dateKey, ev.time, ev.notifyLeadMin, eventDurationMin(ev.time, ev.endTime));
       // Store a short hash instead of the full ICS text for change-detection — with the
       // rolling sync window holding hundreds of occurrences, the full text per entry was
       // the single biggest driver of app-data.json's growth (the exact thing that tripped
@@ -1217,6 +1225,7 @@ const ADD_CALENDAR_EVENT_TOOL = {
       title:    { type: 'string', description: 'Event title, e.g. "Gym" or "Dentist appointment".' },
       date:     { type: 'string', description: 'YYYY-MM-DD. For a one-time event, the day it happens. For a recurring event, the day the recurrence starts from (default: today).' },
       time:     { type: 'string', description: '24h HH:MM, e.g. "18:00". Omit if no specific time.' },
+      end_time: { type: 'string', description: '24h HH:MM end time, e.g. "17:30". Optional; only with `time`. An end earlier than the start means it ends the next day (overnight shift).' },
       location: { type: 'string', description: 'Optional location.' },
       kind:     { type: 'string', enum: EVENT_KIND_KEYS, description: 'Category for calendar color-coding. Default "focus" if unclear.' },
       recurrence: {
@@ -1236,9 +1245,12 @@ const ADD_CALENDAR_EVENT_TOOL = {
   },
 };
 
-function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
+const HHMM_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function addEdCalendarEvent({ title, date, time, end_time, location, kind, recurrence }) {
   const cleanTitle = String(title || '').trim().slice(0, 120);
   if (!cleanTitle) return { ok: false, error: 'Empty title' };
+  const endTime = time && HHMM_RE.test(end_time || '') ? end_time : null;
   const evKind = EVENT_KIND_KEYS.includes(kind) ? kind : 'focus';
   const data = getAppData();
 
@@ -1248,6 +1260,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
       id: `rec-${Date.now()}`,
       title: cleanTitle,
       time: time || null,
+      endTime,
       location: String(location || '').trim().slice(0, 120),
       kind: evKind,
       notify: false, notifyLeadMin: null,
@@ -1271,7 +1284,7 @@ function addEdCalendarEvent({ title, date, time, location, kind, recurrence }) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return { ok: false, error: 'Invalid date, expected YYYY-MM-DD' };
   if (!data.events) data.events = {};
   if (!data.events[d]) data.events[d] = [];
-  const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: false, notifyLeadMin: null };
+  const ev = { id: `ev-${Date.now()}`, title: cleanTitle, time: time || null, endTime, location: String(location || '').trim().slice(0, 120), kind: evKind, notify: false, notifyLeadMin: null };
   data.events[d].push(ev);
   saveAppData(data);
   syncEvents(data);
@@ -1291,6 +1304,7 @@ const EDIT_CALENDAR_EVENT_TOOL = {
       new_title:    { type: 'string' },
       new_date:     { type: 'string', description: 'YYYY-MM-DD. Only valid for a one-off event (moves it to a new day) — a recurring series\' schedule cannot be moved this way, only its time/title/location/kind.' },
       new_time:     { type: 'string', description: '24h HH:MM.' },
+      new_end_time: { type: 'string', description: '24h HH:MM end time, or "" to remove the end time.' },
       new_location: { type: 'string' },
       new_kind:     { type: 'string', enum: EVENT_KIND_KEYS },
     },
@@ -1298,7 +1312,7 @@ const EDIT_CALENDAR_EVENT_TOOL = {
   },
 };
 
-function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, new_time, new_location, new_kind }) {
+function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, new_time, new_end_time, new_location, new_kind }) {
   const data = getAppData();
   const matches = findCalendarMatches(data, title_search, date);
   if (!matches.length) return { ok: false, error: 'No matching event found' };
@@ -1308,6 +1322,7 @@ function editEdCalendarEvent({ title_search, date, scope, new_title, new_date, n
   const fields = {};
   if (new_title !== undefined)    fields.title = String(new_title).trim().slice(0, 120);
   if (new_time !== undefined)     fields.time = new_time;
+  if (new_end_time !== undefined) fields.endTime = HHMM_RE.test(new_end_time) ? new_end_time : null;
   if (new_location !== undefined) fields.location = String(new_location).trim().slice(0, 120);
   if (new_kind !== undefined && EVENT_KIND_KEYS.includes(new_kind)) fields.kind = new_kind;
 
@@ -1577,7 +1592,7 @@ app.post('/api/chat', async (req, res) => {
     const system = buildSystemPrompt(message) + (images.length ? `\n\n# PHOTOS IN THIS MESSAGE
 The user attached ${images.length} photo${images.length > 1 ? 's' : ''} (often a screenshot or picture of a work schedule, class timetable, receipt, flyer or note). Read them carefully and literally — every row, date, day name and start/end time. Never guess or invent anything you can't actually read; say which parts were blurry or cut off.
 If it is a schedule: first list what you found in a short readable list (day + date, start–end time, role/location if shown), resolving dates against today's date (if no year is shown, use the upcoming occurrence). If the schedule shows several people, only pull out the user's shifts — ask which name is theirs if it isn't obvious.
-Only add things to the calendar when the user has asked you to (e.g. "add my shifts"); otherwise end by offering to. When adding a shift, call add_calendar_event once per shift with title "Work" plus the time range (e.g. "Work 9:00 AM–5:00 PM", or the role if shown, like "Barista 9:00 AM–5:00 PM"), time = the start time, location if shown, and kind "routine". Before adding, check the calendar context above and don't add a shift that's already there.
+Only add things to the calendar when the user has asked you to (e.g. "add my shifts"); otherwise end by offering to. When adding a shift, call add_calendar_event once per shift (a one-time event per date — never a recurring series, since shift schedules change week to week) with title "Work" (or the role if shown, like "Barista"), time = the start time, end_time = the end time, location if shown, and kind "routine". Don't put the time range in the title — the app shows start–end from those fields. Before adding, check the calendar context above and don't add a shift that's already there.
 If it's a receipt you may offer to log it with log_expense; for anything else, just help with what's in the picture.` : '');
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, system, tools, messages, ED_TOOL_HANDLERS, images.length ? 6 : 4, images.length ? 4096 : 2048);
     saveConversation(images.length ? `${message}${message ? ' ' : ''}[sent ${images.length} photo${images.length > 1 ? 's' : ''}]` : message, responseText);
@@ -1844,7 +1859,7 @@ function syncEvents(data) {
 
   const oneoffRows = Object.entries(events).sort(([a], [b]) => a.localeCompare(b))
     .flatMap(([date, evs]) => (Array.isArray(evs) ? evs : [])
-      .map(e => `| ${date} | ${e.time || '—'} | ${e.title} | ${e.kind || 'focus'} | ${e.location || ''} |`))
+      .map(e => `| ${date} | ${e.time ? e.time + (e.endTime ? '–' + e.endTime : '') : '—'} | ${e.title} | ${e.kind || 'focus'} | ${e.location || ''} |`))
     .join('\n');
 
   const recurRows = recurring.slice()

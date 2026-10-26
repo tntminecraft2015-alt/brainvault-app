@@ -1149,3 +1149,9 @@ First personal-finance source in the wiki. It is a sponsored advertorial (Chime 
 **Pages created:** [[calendar-events]]
 
 Calendar events synced
+
+## [2026-10-26] note | Mission Control queue run: calendar cleanup + end times
+
+**Operation:** note
+
+Implemented queued request "Fix calendar event deletion and add end time support" (ED chat, 2026-10-22). Root cause of the "undeletable duplicates": three recurring "Work @ MyShift" series (Thu/Fri/Sat from 10/20), made from a one-time shift schedule, sat on top of the real one-off shifts, and ED's delete tool refused because the title matched several events. Removed those 3 series from live data (approved by user). Added: Settings → Manage calendar events (every series and one-off with raw data, ⚠ possible-duplicate flags, two-tap delete); optional event end times across data model, ED add/edit tools, add/edit forms, timeline, week view, and Apple Calendar sync; shift-screenshot imports now store start/end as fields and are always one-offs, never recurring.
