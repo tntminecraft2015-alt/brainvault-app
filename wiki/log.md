@@ -1142,3 +1142,10 @@ Mission Control change requested via ED chat: Fix calendar event deletion and ad
 **Pages updated:** [[overview]], [[index]]
 
 First personal-finance source in the wiki. It is a sponsored advertorial (Chime paid placement on USA Today), captured through Chrome because usatoday.com blocked direct fetches. Chime-commissioned Talker Research survey (n=2,000): 63% think top rewards need high balances, 59% would drop a fee credit card for comparable checking rewards, 55% want a banking overhaul, 38% prefer direct-deposit-based rewards, ~1 in 3 didn't know no-fee rewards checking exists. Chime Prime: $3,000+/mo direct deposit unlocks 5% category cash back, 4.00% APY, and travel perks. Every page flags the source as marketing.
+
+## [2026-10-26] sync | Mission Control Sync
+
+**Operation:** sync
+**Pages created:** [[calendar-events]]
+
+Calendar events synced
