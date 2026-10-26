@@ -71,6 +71,12 @@ A third use of this vault: tracking music-career job leads around Columbus. Resu
 
 ---
 
+## Personal Finance
+
+A fourth thread, started 2026-10-26: notes on banking and rewards products. First source: [[chime-bank-rewards-everyday-habits]], a **sponsored** Chime piece on the [[rewards-checking-account]] trend (perks gated by direct deposit rather than balance). See [[chime]] for Chime Prime terms. All figures so far come from Chime-commissioned research, so independent sources are needed before trusting the framing.
+
+---
+
 ## How to Use This Wiki
 
 **To explore:** Start with [[index]] to see all pages. Use Obsidian's graph view to see the shape of the knowledge.

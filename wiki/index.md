@@ -15,12 +15,14 @@
 - [[karpathy-llm-wiki]] — Karpathy's gist describing the LLM Wiki pattern; the founding source for this vault
 - [[2040-iuka-ave-5b-listing]] — Apartment listing for 2040 Iuka Ave., 5B, Columbus; near OSU, scenic Iuka Ravine location, no in-unit W/D
 - [[2028-summit-st-listing]] — Apartment listing for 2028 Summit St., Columbus; $800/mo, balcony over Iuka Ravine, AC, pet friendly, reported dirty
+- [[chime-bank-rewards-everyday-habits]] — Sponsored Chime/USA Today piece (2026-10-14): bank rewards shifting from balance to direct deposit; Chime survey stats + Chime Prime terms
 
 ## Concepts
 
 - [[llm-wiki-pattern]] — LLM as wiki maintainer; knowledge compiled at ingest time and compounded over time; core architectural pattern
 - [[rag]] — Retrieval-Augmented Generation; query-time retrieval from raw docs; the dominant alternative to the LLM Wiki pattern
 - [[memex]] — Vannevar Bush's 1945 vision of a personal associative knowledge store; the conceptual precursor the LLM Wiki pattern realizes
+- [[rewards-checking-account]] — Checking account paying cash back/higher APY for use, gated by direct deposit not balance, no annual fee
 
 ## Entities
 
@@ -28,6 +30,7 @@
 - [[obsidian]] — Local markdown note app; the reading/browsing interface for this wiki
 - [[marp]] — Markdown slide format; output option for wiki content and query answers
 - [[qmd]] — Local markdown search engine (BM25 + vector + LLM re-ranking); optional at scale
+- [[chime]] — US fintech (not a bank); Chime Prime gives 5% category cash back + 4.00% APY at $3,000+/mo direct deposit
 
 ## Projects & Tools
 
