@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>General Improvements: Micro-Feedback Clarity, Data-Driven Progression Visibility &amp; Accessible Depth Affordance</title>
+<style>
+  :root{ --bg:#0a1929;--surface:#12253c;--darker:#1e3a5f;--fg:#dfeeff;--accent:#ff8a63; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--bg);color:var(--fg);font-family:Georgia,serif;display:flex;flex-direction:column;overflow:hidden;}
+  .slides{flex:1;position:relative;overflow:hidden;}
+  .slide{position:absolute;inset:0;padding:36px 48px;display:flex;flex-direction:column;justify-content:center;opacity:0;transform:translateX(24px);transition:opacity .25s,transform .25s;pointer-events:none;overflow-y:auto;}
+  .slide.active{opacity:1;transform:translateX(0);pointer-events:auto;}
+  .slide-kicker{font-size:11px;letter-spacing:3px;color:var(--accent);opacity:.85;margin-bottom:10px;font-family:monospace;}
+  .slide h1{margin:0 0 18px;font-size:28px;}
+  .slide-body{max-width:760px;}
+  .mockup-frame{border:1px solid rgba(223,238,255,.15);border-radius:10px;overflow:hidden;background:#fff;height:200px;}
+  .mockup-iframe{width:100%;height:100%;border:none;}
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid rgba(223,238,255,.1);background:var(--surface);flex-shrink:0;}
+  .nav button{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 16px;cursor:pointer;font-family:monospace;font-size:12px;}
+  .nav button:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .nav button:disabled{opacity:.3;cursor:default;}
+  .dots{display:flex;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;background:rgba(223,238,255,.2);}
+  .dot.active{background:var(--accent);}
+  .rate-row{margin-top:16px;}
+  .rate-label{font-size:11px;letter-spacing:2px;opacity:.5;font-family:monospace;margin-bottom:8px;}
+  .rate-btns{display:flex;flex-wrap:wrap;gap:6px;}
+  .rate-btn{background:var(--darker);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 12px;cursor:pointer;font-family:monospace;font-size:12px;transition:border-color .12s,color .12s,background .12s,opacity .12s;}
+  .rate-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .rate-btn.sel{border-color:var(--accent);color:var(--accent);background:rgba(255,138,99,.14);}
+  .rate-btn.got-it{background:var(--accent);color:#0a1929;border-color:var(--accent);font-weight:bold;}
+  .rate-btn.got-it:hover:not(:disabled){filter:brightness(1.08);}
+  .rate-btn:disabled{opacity:.35;cursor:default;}
+  .rate-btn.failed{background:rgba(255,64,64,.25);color:#ffb3b3;border-color:rgba(255,64,64,.4);}
+  .rate-tweak-box{display:none;flex-direction:column;gap:8px;margin-top:10px;}
+  .rate-tweak-box.show{display:flex;}
+  .rate-tweak-box textarea{background:var(--surface);color:var(--fg);border:1px solid rgba(223,238,255,.15);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;min-height:50px;}
+  .send-tweak-btn{align-self:flex-start;background:var(--accent);color:#0a1929;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-family:monospace;font-weight:bold;font-size:12px;}
+  .send-tweak-btn:disabled{opacity:.5;cursor:default;}
+  .rate-status{margin-top:8px;font-size:12px;font-family:monospace;color:var(--accent);opacity:0;transition:opacity .15s;}
+  .rate-status.show{opacity:1;}
+  @media (max-width:600px){
+    .slide{padding:20px 18px 16px;}
+    .slide h1{font-size:21px;margin-bottom:12px;}
+    .slide-kicker{font-size:10px;letter-spacing:2px;}
+    .slide-body{max-width:100%;font-size:15px;}
+    .slide-body p{font-size:15px !important;}
+    .mockup-frame{height:36vh;min-height:140px;}
+    .nav{padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));}
+    .nav button{padding:13px 20px;font-size:14px;min-width:84px;}
+    .rate-btn{padding:11px 13px;font-size:13px;flex:1 1 calc(50% - 6px);text-align:center;}
+  }
+</style></head>
+<body>
+  <div class="slides" id="slides">
+    <section class="slide active" data-i="0">
+      <div class="slide-kicker">DESIGN RESEARCH · BY RED</div>
+      <h1>General Improvements: Micro-Feedback Clarity, Data-Driven Progression Visibility &amp; Accessible Depth Affordance</h1>
+      <div class="slide-body"><p style="font-size:18px;line-height:1.6;">Modern dashboards prioritize immediate micro-feedback on task completion and progressive disclosure to reduce cognitive load. Habit trackers show that predictive trend forecasting and visible streaks work better than point inflation. Neumorphism in dark retro UI requires explicit button state feedback (not shadow alone) to stay accessible and readable.</p>
+               <p style="opacity:.55;font-size:13px;margin-top:22px;font-family:monospace;">3 findings</p></div>
+    </section>
+
+    <section class="slide" data-i="1">
+      <div class="slide-kicker">FINDING 1 / 3</div>
+      <h1>Immediate Micro-Confirmation: Visual Burst on Quest Complete</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Current rank-badge XP pops already hint at this, but the feedback stops there. Add a momentary visual burst (color shift + scale pulse on the card itself, not just a float) when a quest is checked—a quick 0.3s scale-up and shadow invert to confirm the action registered. Research shows micro-confirmation reduces user doubt and boosts perceived responsiveness. This keeps the JRPG feel (snappy, immediate) while making every interaction feel like a hit.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://rizevault.razorpay.com/p/gamification-in-product-design-when" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification in Product Design: Making Progress Visible at Every Micro Level</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;
+  .quest-card {
+    background: #12253c;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 8px 0;
+    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;
+    transition: all 0.15s ease;
+  }
+  .quest-card.completing {
+    animation: burst 0.3s ease-out;
+  }
+  @keyframes burst {
+    0% { transform: scale(1); box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63; }
+    50% { transform: scale(1.08); box-shadow: inset 0 0 0 3px #dfeeff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #dfeeff; }
+    100% { transform: scale(1); box-shadow: inset 0 0 0 3px #4a90d9, inset 0 0 0 5px #12253c, inset 0 0 0 7px #4a90d9; }
+  }
+&lt;/style&gt;
+&lt;div class=&quot;quest-card&quot;&gt;S-RANK QUEST&lt;/div&gt;
+&lt;div class=&quot;quest-card completing&quot;&gt;✓ QUEST COMPLETE&lt;/div&gt;
+&lt;p style=&quot;color: #dfeeff; font-size: 12px; margin-top: 16px; font-family: VT323;&quot;&gt;Click to see the burst—color and scale pulse in 0.3s&lt;/p&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow0">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(0,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(0,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(0,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(0,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(0,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox0">
+                   <textarea id="tweakText0" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(0)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus0"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="2">
+      <div class="slide-kicker">FINDING 2 / 3</div>
+      <h1>Streak Forecast Bar: Show Today's Progress Toward Tomorrow</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Instead of a flat streak counter, add a thin progress ring or bar under the streak stat showing "2 quests of 3 done today"—a predictive, real-time view of whether the user is on track to keep their streak alive. This mirrors production habit trackers (Habitify's AI forecast reduced churn by 17%) and gives users agency: they see *before* failure what they need to do. No alarm bells, just clarity. Keeps it minimalist (one thin line or ring, no bloat).</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results" target="_blank" rel="noopener" style="color:#ff8a63;">Gamification in Habit Tracking Apps: Predictive Trend Forecasting</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;
+  .streak-card {
+    background: #12253c;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;
+    font-family: 'Press Start 2P', monospace;
+    color: #dfeeff;
+  }
+  .streak-stat {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  .streak-bar {
+    height: 6px;
+    background: #1e3a5f;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .streak-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff8a63 0%, #4a90d9 100%);
+    width: 67%;
+  }
+  .streak-label {
+    font-size: 8px;
+    color: #dfeeff;
+    margin-top: 6px;
+    font-family: VT323;
+  }
+&lt;/style&gt;
+&lt;div class=&quot;streak-card&quot;&gt;
+  &lt;div class=&quot;streak-stat&quot;&gt;↗ 12 DAY STREAK&lt;/div&gt;
+  &lt;div class=&quot;streak-bar&quot;&gt;
+    &lt;div class=&quot;streak-bar-fill&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;streak-label&quot;&gt;2 of 3 quests done • ON TRACK&lt;/div&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow1">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(1,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(1,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(1,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(1,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(1,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox1">
+                   <textarea id="tweakText1" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(1)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus1"></div>
+               </div></div>
+    </section>
+
+    <section class="slide" data-i="3">
+      <div class="slide-kicker">FINDING 3 / 3</div>
+      <h1>Rank Badge State Clarity: Inset Shadows + Icon Signal for Pressed Affordance</h1>
+      <div class="slide-body">
+               <p style="font-size:15px;line-height:1.6;margin-bottom:14px;">Your JRPG interface already uses triple-inset shadows on modals, but rank badges (S/A/B/C) are flat color chips. Add a subtle icon (✓ for checked, ◯ for unchecked) *inside* the badge, and on check swap the inset shadow to concave (pressed in) to mirror physical button feedback. This solves a recurring feedback note: "inset shadow clarity." The icon makes interactivity obvious even if shadows fail (dark mode concern), and the concave press state gives tactile confidence. No animation bloat—just shadow + icon swap.</p>
+               <p style="font-size:12px;opacity:.6;margin-bottom:16px;">Source: <a href="https://timgraf.com/ui/glassmorphism-vs-neumorphism-high-end-ui-guide-2026/" target="_blank" rel="noopener" style="color:#ff8a63;">Neumorphism in Dark Mode: Inverted Affordance with Non-Shadow Signals</a></p>
+               <div class="mockup-frame"><iframe class="mockup-iframe" sandbox="allow-same-origin" srcdoc="&lt;style&gt;
+  .rank-badge {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    font-weight: bold;
+    color: #dfeeff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    position: relative;
+  }
+  .rank-badge.s-rank {
+    background: #e85d3a;
+    box-shadow: inset 0 0 0 3px #e85d3a, inset 0 0 0 5px #0a1929, inset 0 0 0 7px #e85d3a;
+  }
+  .rank-badge.s-rank.checked {
+    box-shadow: inset 0 0 0 3px #0a1929, inset 0 0 0 5px #e85d3a, inset 0 0 0 7px #0a1929;
+  }
+  .rank-icon {
+    font-size: 18px;
+  }
+&lt;/style&gt;
+&lt;div style=&quot;display: flex; gap: 12px; align-items: center;&quot;&gt;
+  &lt;div class=&quot;rank-badge s-rank&quot;&gt;&lt;span class=&quot;rank-icon&quot;&gt;◯&lt;/span&gt;&lt;/div&gt;
+  &lt;span style=&quot;color: #dfeeff; font-family: VT323; font-size: 12px;&quot;&gt;S-RANK QUEST&lt;/span&gt;
+&lt;/div&gt;
+&lt;div style=&quot;margin-top: 16px;&quot;&gt;
+  &lt;div class=&quot;rank-badge s-rank checked&quot;&gt;&lt;span class=&quot;rank-icon&quot;&gt;✓&lt;/span&gt;&lt;/div&gt;
+  &lt;span style=&quot;color: #dfeeff; font-family: VT323; font-size: 12px;&quot;&gt;Checked: inset inverts, icon confirms&lt;/span&gt;
+&lt;/div&gt;"></iframe></div>
+               <div class="rate-row" id="rateRow2">
+                 <div class="rate-label">RATE THIS IDEA</div>
+                 <div class="rate-btns">
+                   <button class="rate-btn" onclick="rateFinding(2,1,this)">Not even close</button>
+                   <button class="rate-btn" onclick="rateFinding(2,2,this)">Kind of</button>
+                   <button class="rate-btn" onclick="rateFinding(2,3,this)">Almost there</button>
+                   <button class="rate-btn" onclick="rateFinding(2,4,this)">Just one more tweak</button>
+                   <button class="rate-btn got-it" onclick="rateFinding(2,5,this)">Got it ✓</button>
+                 </div>
+                 <div class="rate-tweak-box" id="tweakBox2">
+                   <textarea id="tweakText2" placeholder="What needs tweaking?"></textarea>
+                   <button class="send-tweak-btn" onclick="submitTweak(2)">Send to Red</button>
+                 </div>
+                 <div class="rate-status" id="rateStatus2"></div>
+               </div></div>
+    </section></div>
+  <div class="nav">
+    <button id="prevBtn" onclick="go(-1)">‹ Back</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" onclick="next()">Next ›</button>
+  </div>
+<script>
+  const RESEARCH_ID = "2026-10-26-design-research-daily";
+  const RATING_LABELS = ["Not even close","Kind of","Almost there","Just one more tweak","Got it"];
+  const FINDINGS = [{"title":"Immediate Micro-Confirmation: Visual Burst on Quest Complete","description":"Current rank-badge XP pops already hint at this, but the feedback stops there. Add a momentary visual burst (color shift + scale pulse on the card itself, not just a float) when a quest is checked—a quick 0.3s scale-up and shadow invert to confirm the action registered. Research shows micro-confirmation reduces user doubt and boosts perceived responsiveness. This keeps the JRPG feel (snappy, immediate) while making every interaction feel like a hit.","source_title":"Gamification in Product Design: Making Progress Visible at Every Micro Level","source_url":"https://rizevault.razorpay.com/p/gamification-in-product-design-when","mockup_html":"\u003cstyle>\n  .quest-card {\n    background: #12253c;\n    border-radius: 6px;\n    padding: 12px;\n    margin: 8px 0;\n    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;\n    transition: all 0.15s ease;\n  }\n  .quest-card.completing {\n    animation: burst 0.3s ease-out;\n  }\n  @keyframes burst {\n    0% { transform: scale(1); box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63; }\n    50% { transform: scale(1.08); box-shadow: inset 0 0 0 3px #dfeeff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #dfeeff; }\n    100% { transform: scale(1); box-shadow: inset 0 0 0 3px #4a90d9, inset 0 0 0 5px #12253c, inset 0 0 0 7px #4a90d9; }\n  }\n\u003c/style>\n\u003cdiv class=\"quest-card\">S-RANK QUEST\u003c/div>\n\u003cdiv class=\"quest-card completing\">✓ QUEST COMPLETE\u003c/div>\n\u003cp style=\"color: #dfeeff; font-size: 12px; margin-top: 16px; font-family: VT323;\">Click to see the burst—color and scale pulse in 0.3s\u003c/p>","threadId":"thread-1792991647271-0-immediate-micro-confirmation-visual-burs"},{"title":"Streak Forecast Bar: Show Today's Progress Toward Tomorrow","description":"Instead of a flat streak counter, add a thin progress ring or bar under the streak stat showing \"2 quests of 3 done today\"—a predictive, real-time view of whether the user is on track to keep their streak alive. This mirrors production habit trackers (Habitify's AI forecast reduced churn by 17%) and gives users agency: they see *before* failure what they need to do. No alarm bells, just clarity. Keeps it minimalist (one thin line or ring, no bloat).","source_title":"Gamification in Habit Tracking Apps: Predictive Trend Forecasting","source_url":"https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results","mockup_html":"\u003cstyle>\n  .streak-card {\n    background: #12253c;\n    padding: 12px;\n    border-radius: 8px;\n    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;\n    font-family: 'Press Start 2P', monospace;\n    color: #dfeeff;\n  }\n  .streak-stat {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 8px;\n  }\n  .streak-bar {\n    height: 6px;\n    background: #1e3a5f;\n    border-radius: 3px;\n    overflow: hidden;\n    position: relative;\n  }\n  .streak-bar-fill {\n    height: 100%;\n    background: linear-gradient(90deg, #ff8a63 0%, #4a90d9 100%);\n    width: 67%;\n  }\n  .streak-label {\n    font-size: 8px;\n    color: #dfeeff;\n    margin-top: 6px;\n    font-family: VT323;\n  }\n\u003c/style>\n\u003cdiv class=\"streak-card\">\n  \u003cdiv class=\"streak-stat\">↗ 12 DAY STREAK\u003c/div>\n  \u003cdiv class=\"streak-bar\">\n    \u003cdiv class=\"streak-bar-fill\">\u003c/div>\n  \u003c/div>\n  \u003cdiv class=\"streak-label\">2 of 3 quests done • ON TRACK\u003c/div>\n\u003c/div>","threadId":"thread-1792991647271-1-streak-forecast-bar-show-today-s-progres"},{"title":"Rank Badge State Clarity: Inset Shadows + Icon Signal for Pressed Affordance","description":"Your JRPG interface already uses triple-inset shadows on modals, but rank badges (S/A/B/C) are flat color chips. Add a subtle icon (✓ for checked, ◯ for unchecked) *inside* the badge, and on check swap the inset shadow to concave (pressed in) to mirror physical button feedback. This solves a recurring feedback note: \"inset shadow clarity.\" The icon makes interactivity obvious even if shadows fail (dark mode concern), and the concave press state gives tactile confidence. No animation bloat—just shadow + icon swap.","source_title":"Neumorphism in Dark Mode: Inverted Affordance with Non-Shadow Signals","source_url":"https://timgraf.com/ui/glassmorphism-vs-neumorphism-high-end-ui-guide-2026/","mockup_html":"\u003cstyle>\n  .rank-badge {\n    display: inline-block;\n    width: 48px;\n    height: 48px;\n    border-radius: 6px;\n    font-family: 'Press Start 2P', monospace;\n    font-size: 12px;\n    font-weight: bold;\n    color: #dfeeff;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    transition: all 0.1s ease;\n    position: relative;\n  }\n  .rank-badge.s-rank {\n    background: #e85d3a;\n    box-shadow: inset 0 0 0 3px #e85d3a, inset 0 0 0 5px #0a1929, inset 0 0 0 7px #e85d3a;\n  }\n  .rank-badge.s-rank.checked {\n    box-shadow: inset 0 0 0 3px #0a1929, inset 0 0 0 5px #e85d3a, inset 0 0 0 7px #0a1929;\n  }\n  .rank-icon {\n    font-size: 18px;\n  }\n\u003c/style>\n\u003cdiv style=\"display: flex; gap: 12px; align-items: center;\">\n  \u003cdiv class=\"rank-badge s-rank\">\u003cspan class=\"rank-icon\">◯\u003c/span>\u003c/div>\n  \u003cspan style=\"color: #dfeeff; font-family: VT323; font-size: 12px;\">S-RANK QUEST\u003c/span>\n\u003c/div>\n\u003cdiv style=\"margin-top: 16px;\">\n  \u003cdiv class=\"rank-badge s-rank checked\">\u003cspan class=\"rank-icon\">✓\u003c/span>\u003c/div>\n  \u003cspan style=\"color: #dfeeff; font-family: VT323; font-size: 12px;\">Checked: inset inverts, icon confirms\u003c/span>\n\u003c/div>","threadId":"thread-1792991647271-2-rank-badge-state-clarity-inset-shadows-i"}];
+
+  function lockRateRow(i, statusText) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    document.getElementById('tweakBox'+i).classList.remove('show');
+    const status = document.getElementById('rateStatus'+i);
+    status.textContent = statusText;
+    status.classList.add('show');
+  }
+
+  async function sendRating(i, rating, comment, btn) {
+    const f = FINDINGS[i]; if (!f) return;
+    try {
+      const r = await fetch('/api/design-research/' + encodeURIComponent(RESEARCH_ID) + '/rate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          findingIndex: i, findingTitle: f.title, findingDescription: f.description, threadId: f.threadId, rating, comment,
+        }),
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.message || d.error || 'failed');
+      if (rating === 5) {
+        const qr = await fetch('/api/change-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: f.title, description: f.description, source_title: f.source_title, source_url: f.source_url, mockup_html: f.mockup_html }),
+        });
+        const qd = await qr.json();
+        if (!qr.ok || !qd.ok) throw new Error(qd.message || qd.error || 'queue failed');
+        lockRateRow(i, '✓ Got it! Queued for Claude Code');
+        if (window.parent !== window) window.parent.postMessage({ type: 'mc-queue-change', title: f.title }, window.location.origin);
+      } else if (rating === 1) {
+        lockRateRow(i, '✓ Scrapped — Red won\'t rework this one');
+      } else if (f.threadId) {
+        lockRateRow(i, '✓ Thanks — Red is working on a revision (you\'ll see it once a couple more are ready)');
+      } else {
+        lockRateRow(i, '✓ Thanks — feedback sent to Red');
+      }
+    } catch (e) {
+      const row = document.getElementById('rateRow'+i);
+      if (btn) btn.classList.add('failed');
+      const status = document.getElementById('rateStatus'+i);
+      status.textContent = rating === 4 ? '⚠ Failed to save — edit and tap Send to Red again' : '⚠ Failed to save — tap a rating to retry';
+      status.classList.add('show');
+      row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = false; });
+      const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+      if (sendBtn) sendBtn.disabled = false;
+    }
+  }
+
+  function rateFinding(i, rating, btn) {
+    const row = document.getElementById('rateRow'+i);
+    row.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('sel', 'failed'));
+    btn.classList.add('sel');
+    if (rating === 4) {
+      document.getElementById('tweakBox'+i).classList.add('show');
+      document.getElementById('tweakText'+i).focus();
+      return;
+    }
+    row.querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, rating, '', btn);
+  }
+
+  function submitTweak(i) {
+    const btn = document.getElementById('rateRow'+i).querySelector('.rate-btn.sel');
+    const sendBtn = document.getElementById('tweakBox'+i).querySelector('.send-tweak-btn');
+    const text = document.getElementById('tweakText'+i).value.trim();
+    sendBtn.disabled = true;
+    document.getElementById('rateRow'+i).querySelectorAll('.rate-btn').forEach(b => { b.disabled = true; });
+    sendRating(i, 4, text, btn);
+  }
+  const total = 4;
+  let cur = 0;
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < total; i++) { const d = document.createElement('div'); d.className = 'dot' + (i === 0 ? ' active' : ''); dotsEl.appendChild(d); }
+  function render() {
+    document.querySelectorAll('.slide').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.querySelectorAll('.dot').forEach((el, i) => el.classList.toggle('active', i === cur));
+    document.getElementById('prevBtn').disabled = cur === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.textContent = cur === total - 1 ? 'Done ✓' : 'Next ›';
+  }
+  function go(d) { cur = Math.max(0, Math.min(total - 1, cur + d)); render(); }
+  function next() {
+    if (cur === total - 1) {
+      if (window.parent !== window) window.parent.postMessage({ type: 'mc-slideshow-done' }, window.location.origin);
+      return;
+    }
+    go(1);
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(1); if (e.key === 'ArrowLeft') go(-1); });
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchX = null;
+  }, { passive: true });
+  render();
+</script>
+</body></html>
