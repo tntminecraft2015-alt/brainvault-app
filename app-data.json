@@ -595,6 +595,16 @@
   ],
   "designResearch": [
     {
+      "id": "2026-10-26-design-research-daily",
+      "date": "2026-10-26",
+      "topic": "",
+      "title": "General Improvements: Micro-Feedback Clarity, Data-Driven Progression Visibility & Accessible Depth Affordance",
+      "findingsCount": 3,
+      "auto": true,
+      "viewed": false,
+      "openTopic": false
+    },
+    {
       "id": "2026-10-22-design-research-daily",
       "date": "2026-10-22",
       "topic": "",
@@ -873,7 +883,7 @@
       "openTopic": false
     }
   ],
-  "lastDesignResearchAutoRun": "2026-10-22",
+  "lastDesignResearchAutoRun": "2026-10-26",
   "changeRequests": [
     {
       "id": "2026-10-22-fix-calendar-event-deletion-and-add-end-",
@@ -2733,6 +2743,57 @@
       "createdDate": "2026-10-22",
       "updatedDate": "2026-10-22",
       "originResearchId": "2026-10-22-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1792991647271-0-immediate-micro-confirmation-visual-burs": {
+      "id": "thread-1792991647271-0-immediate-micro-confirmation-visual-burs",
+      "title": "Immediate Micro-Confirmation: Visual Burst on Quest Complete",
+      "description": "Current rank-badge XP pops already hint at this, but the feedback stops there. Add a momentary visual burst (color shift + scale pulse on the card itself, not just a float) when a quest is checked—a quick 0.3s scale-up and shadow invert to confirm the action registered. Research shows micro-confirmation reduces user doubt and boosts perceived responsiveness. This keeps the JRPG feel (snappy, immediate) while making every interaction feel like a hit.",
+      "source_title": "Gamification in Product Design: Making Progress Visible at Every Micro Level",
+      "source_url": "https://rizevault.razorpay.com/p/gamification-in-product-design-when",
+      "mockup_html": "<style>\n  .quest-card {\n    background: #12253c;\n    border-radius: 6px;\n    padding: 12px;\n    margin: 8px 0;\n    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;\n    transition: all 0.15s ease;\n  }\n  .quest-card.completing {\n    animation: burst 0.3s ease-out;\n  }\n  @keyframes burst {\n    0% { transform: scale(1); box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63; }\n    50% { transform: scale(1.08); box-shadow: inset 0 0 0 3px #dfeeff, inset 0 0 0 5px #12253c, inset 0 0 0 7px #dfeeff; }\n    100% { transform: scale(1); box-shadow: inset 0 0 0 3px #4a90d9, inset 0 0 0 5px #12253c, inset 0 0 0 7px #4a90d9; }\n  }\n</style>\n<div class=\"quest-card\">S-RANK QUEST</div>\n<div class=\"quest-card completing\">✓ QUEST COMPLETE</div>\n<p style=\"color: #dfeeff; font-size: 12px; margin-top: 16px; font-family: VT323;\">Click to see the burst—color and scale pulse in 0.3s</p>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-26",
+      "updatedDate": "2026-10-26",
+      "originResearchId": "2026-10-26-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1792991647271-1-streak-forecast-bar-show-today-s-progres": {
+      "id": "thread-1792991647271-1-streak-forecast-bar-show-today-s-progres",
+      "title": "Streak Forecast Bar: Show Today's Progress Toward Tomorrow",
+      "description": "Instead of a flat streak counter, add a thin progress ring or bar under the streak stat showing \"2 quests of 3 done today\"—a predictive, real-time view of whether the user is on track to keep their streak alive. This mirrors production habit trackers (Habitify's AI forecast reduced churn by 17%) and gives users agency: they see *before* failure what they need to do. No alarm bells, just clarity. Keeps it minimalist (one thin line or ring, no bloat).",
+      "source_title": "Gamification in Habit Tracking Apps: Predictive Trend Forecasting",
+      "source_url": "https://guul.games/blog/gamification-in-habit-tracking-apps-examples-and-results",
+      "mockup_html": "<style>\n  .streak-card {\n    background: #12253c;\n    padding: 12px;\n    border-radius: 8px;\n    box-shadow: inset 0 0 0 3px #ff8a63, inset 0 0 0 5px #12253c, inset 0 0 0 7px #ff8a63;\n    font-family: 'Press Start 2P', monospace;\n    color: #dfeeff;\n  }\n  .streak-stat {\n    font-size: 20px;\n    font-weight: bold;\n    margin-bottom: 8px;\n  }\n  .streak-bar {\n    height: 6px;\n    background: #1e3a5f;\n    border-radius: 3px;\n    overflow: hidden;\n    position: relative;\n  }\n  .streak-bar-fill {\n    height: 100%;\n    background: linear-gradient(90deg, #ff8a63 0%, #4a90d9 100%);\n    width: 67%;\n  }\n  .streak-label {\n    font-size: 8px;\n    color: #dfeeff;\n    margin-top: 6px;\n    font-family: VT323;\n  }\n</style>\n<div class=\"streak-card\">\n  <div class=\"streak-stat\">↗ 12 DAY STREAK</div>\n  <div class=\"streak-bar\">\n    <div class=\"streak-bar-fill\"></div>\n  </div>\n  <div class=\"streak-label\">2 of 3 quests done • ON TRACK</div>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-26",
+      "updatedDate": "2026-10-26",
+      "originResearchId": "2026-10-26-design-research-daily",
+      "openTopic": false
+    },
+    "thread-1792991647271-2-rank-badge-state-clarity-inset-shadows-i": {
+      "id": "thread-1792991647271-2-rank-badge-state-clarity-inset-shadows-i",
+      "title": "Rank Badge State Clarity: Inset Shadows + Icon Signal for Pressed Affordance",
+      "description": "Your JRPG interface already uses triple-inset shadows on modals, but rank badges (S/A/B/C) are flat color chips. Add a subtle icon (✓ for checked, ◯ for unchecked) *inside* the badge, and on check swap the inset shadow to concave (pressed in) to mirror physical button feedback. This solves a recurring feedback note: \"inset shadow clarity.\" The icon makes interactivity obvious even if shadows fail (dark mode concern), and the concave press state gives tactile confidence. No animation bloat—just shadow + icon swap.",
+      "source_title": "Neumorphism in Dark Mode: Inverted Affordance with Non-Shadow Signals",
+      "source_url": "https://timgraf.com/ui/glassmorphism-vs-neumorphism-high-end-ui-guide-2026/",
+      "mockup_html": "<style>\n  .rank-badge {\n    display: inline-block;\n    width: 48px;\n    height: 48px;\n    border-radius: 6px;\n    font-family: 'Press Start 2P', monospace;\n    font-size: 12px;\n    font-weight: bold;\n    color: #dfeeff;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    transition: all 0.1s ease;\n    position: relative;\n  }\n  .rank-badge.s-rank {\n    background: #e85d3a;\n    box-shadow: inset 0 0 0 3px #e85d3a, inset 0 0 0 5px #0a1929, inset 0 0 0 7px #e85d3a;\n  }\n  .rank-badge.s-rank.checked {\n    box-shadow: inset 0 0 0 3px #0a1929, inset 0 0 0 5px #e85d3a, inset 0 0 0 7px #0a1929;\n  }\n  .rank-icon {\n    font-size: 18px;\n  }\n</style>\n<div style=\"display: flex; gap: 12px; align-items: center;\">\n  <div class=\"rank-badge s-rank\"><span class=\"rank-icon\">◯</span></div>\n  <span style=\"color: #dfeeff; font-family: VT323; font-size: 12px;\">S-RANK QUEST</span>\n</div>\n<div style=\"margin-top: 16px;\">\n  <div class=\"rank-badge s-rank checked\"><span class=\"rank-icon\">✓</span></div>\n  <span style=\"color: #dfeeff; font-family: VT323; font-size: 12px;\">Checked: inset inverts, icon confirms</span>\n</div>",
+      "status": "awaiting_rating",
+      "revisionCount": 0,
+      "lastRating": null,
+      "lastRatingLabel": null,
+      "lastComment": "",
+      "createdDate": "2026-10-26",
+      "updatedDate": "2026-10-26",
+      "originResearchId": "2026-10-26-design-research-daily",
       "openTopic": false
     }
   },
