@@ -7,6 +7,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const webpush   = require('web-push');
 const crypto    = require('crypto');
 const { createDAVClient } = require('tsdav');
+const appleCal = require('./apple-calendar');
 
 const app       = express();
 const PORT      = process.env.PORT || 3000;
@@ -533,6 +534,8 @@ For job (4): when the user clearly asks you to add/log/remember a to-do or an ex
 
 You can do everything to the calendar the user can do in the app: add (with start + optional end time, location, kind, notification lead time, and repeat rule), edit any field including end time, notification, and a series' whole repeat schedule (days, frequency, interval, start/end date via new_recurrence), move one-off events to new dates, and delete single events, single occurrences, whole series, or several at once (event_ids). Every event in the CALENDAR context carries an [id ...] tag — always target by event_id when more than one event shares a title, instead of failing on "multiple events match" or asking the user to clean it up by hand.
 
+Apple Calendar: the APPLE CALENDAR section lists events that live only in the user's Apple Calendar (made on their phone, from invites, etc.) — Mission Control's own events already sync to Apple automatically and are NOT listed there. To change or remove one of those Apple-only events, use edit_apple_event / delete_apple_event with the exact [apple ...] id; never use the Mission Control calendar tools on them, and never re-add one as a Mission Control event to "edit" it (that creates a duplicate on the phone). When the user asks what's on a day, include both sections. New events still go through add_calendar_event — they reach Apple Calendar on their own. For a repeating Apple event, ask whether they mean one occurrence or the whole series if they didn't say; a single occurrence can only be deleted, not edited, and a series can't be moved to a new start date — say so plainly and suggest changing it on the phone.
+
 Calendar lessons learned (from a real mistake — follow them):
 - Never create a recurring series from a one-time schedule (a shift schedule, a week of classes someone pasted, a screenshot). Work shifts change week to week: add each shift as its own one-off event with time + end_time. Only make a series when the user says it repeats ("every Monday", "weekly").
 - Before adding anything, check that day in the CALENDAR context; if the same title is already there (one-off or repeating), don't add a second copy — tell the user it's already on.
@@ -556,6 +559,8 @@ You also have persistent memory across every conversation, not just this one —
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
   parts.push('# CALENDAR (LIVE)\n' + buildLiveCalendarContext(appData));
+  const appleCtx = buildAppleCalendarContext(appData);
+  if (appleCtx) parts.push('# APPLE CALENDAR (events made outside Mission Control)\n' + appleCtx);
   if (extra.length) parts.push('# RELEVANT WIKI PAGES\n' + extra.slice(0,4).join('\n\n---\n\n'));
   return parts.join('\n\n═══════════════════════════════\n\n');
 }
@@ -1275,6 +1280,144 @@ function describeMatch(m) {
   return `"${m.rec.title}" (recurring, ${m.rec.freq}${m.date ? ', occurrence on ' + m.date : ''})`;
 }
 
+// ── APPLE CALENDAR (read + edit events made outside Mission Control) ───────────
+// Cached in memory only — never written to app-data.json (it's committed to the vault
+// repo and the push-sync map already made that file grow). Refreshed before each ED chat
+// turn when older than APPLE_CACHE_MS, and right after ED edits one.
+const APPLE_CACHE_MS = 2 * 60 * 1000;
+const APPLE_WINDOW_DAYS = 60;
+let appleCache = { events: [], fetchedAt: 0, error: null };
+let _appleRefresh = null;
+
+function appleReady(data) {
+  const cal = data.caldav;
+  return !!(cal && cal.connected && cal.appleId && cal.calendarUrl && CALDAV_APP_PASSWORD);
+}
+
+async function refreshAppleEvents(data, { force = false } = {}) {
+  if (!appleReady(data)) return appleCache;
+  if (!force && Date.now() - appleCache.fetchedAt < APPLE_CACHE_MS) return appleCache;
+  if (_appleRefresh) return _appleRefresh;
+  _appleRefresh = (async () => {
+    try {
+      const client = await getCaldavClient(data.caldav.appleId);
+      const from = addDays(today(), -3);
+      const events = await appleCal.fetchAppleEvents(client, data.caldav.calendarUrl, from, addDays(today(), APPLE_WINDOW_DAYS), APP_TZ);
+      appleCache = { events, fetchedAt: Date.now(), error: null };
+    } catch (e) {
+      console.error('Apple Calendar read failed:', e.message);
+      appleCache = { ...appleCache, fetchedAt: Date.now(), error: e.message };
+    } finally { _appleRefresh = null; }
+    return appleCache;
+  })();
+  return _appleRefresh;
+}
+
+// Waits at most `ms` for a refresh so a slow iCloud never stalls an ED reply.
+function refreshAppleEventsWithin(data, ms) {
+  return Promise.race([refreshAppleEvents(data), new Promise(r => setTimeout(r, ms))]);
+}
+
+function appleShortId(uid) { return crypto.createHash('sha1').update(uid).digest('hex').slice(0, 10); }
+function findAppleEvent(id) {
+  const key = String(id || '').replace(/^apple[- ]?/i, '').trim();
+  return appleCache.events.find(e => appleShortId(e.uid) === key || e.uid === key) || null;
+}
+
+function buildAppleCalendarContext(data) {
+  if (!appleReady(data)) return '';
+  if (!appleCache.fetchedAt) return 'Not loaded yet — tell the user you could not read their Apple Calendar this time and to try again in a moment.';
+  const t = today();
+  const fmt12 = hm => { if (!hm) return 'all day'; const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
+  const occ = appleCal.appleOccurrences(appleCache.events, addDays(t, -3), addDays(t, 21), APP_TZ);
+  const lines = occ.map(o => `- ${o.date}${o.date === t ? ' (TODAY)' : ''}: ${o.allDay ? 'all day' : fmt12(o.time) + (o.endTime ? '–' + fmt12(o.endTime) : '')} — ${o.title}${o.location ? ` @ ${o.location}` : ''}${o.recurring ? (o.moved ? ' (repeating, this one moved on the phone — read-only)' : ' (repeating)') : ''} [apple ${appleShortId(o.uid)}]`);
+  const stale = appleCache.error ? `\n(Last refresh failed: ${appleCache.error} — this list may be a few minutes old.)` : '';
+  return `Read from iCloud ${Math.round((Date.now() - appleCache.fetchedAt) / 60000)} min ago. 3 days ago → 3 weeks ahead.${stale}\n${lines.length ? lines.join('\n') : '(nothing — every event on their Apple Calendar in this window came from Mission Control)'}`;
+}
+
+const EDIT_APPLE_EVENT_TOOL = {
+  name: 'edit_apple_event',
+  description: 'Change an event that lives only in the user\'s Apple Calendar (listed in the APPLE CALENDAR section with an [apple ...] id). Edits it directly on iCloud, so it updates on their phone. Pass only the fields that change. For a repeating Apple event this edits the whole series (title, location, time of day); a single occurrence of an Apple series cannot be edited here, and a series cannot be moved to a new start date. Never use this for Mission Control events — use edit_calendar_event for those.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      apple_id: { type: 'string', description: 'Exact id from the [apple ...] tag, e.g. "3f9a0c12bd".' },
+      title:    { type: 'string', description: 'New title.' },
+      date:     { type: 'string', description: 'New date, YYYY-MM-DD (one-off events only).' },
+      time:     { type: 'string', description: 'New start time, 24h HH:MM. Setting a time on an all-day event makes it timed.' },
+      end_time: { type: 'string', description: 'New end time, 24h HH:MM. If omitted when moving, the original length is kept.' },
+      location: { type: 'string', description: 'New location; empty string removes it.' },
+      all_day:  { type: 'boolean', description: 'true to make it an all-day event.' },
+    },
+    required: ['apple_id'],
+  },
+};
+
+const DELETE_APPLE_EVENT_TOOL = {
+  name: 'delete_apple_event',
+  description: 'Delete/cancel an event that lives only in the user\'s Apple Calendar (listed in the APPLE CALENDAR section with an [apple ...] id) — removes it from iCloud and their phone. For a repeating Apple event, pass scope "occurrence" with the date to remove just that day, or scope "series" to delete every occurrence; if the user didn\'t say which, ask first. Never use this for Mission Control events — use delete_calendar_event for those.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      apple_id: { type: 'string', description: 'Exact id from the [apple ...] tag.' },
+      scope:    { type: 'string', enum: ['occurrence', 'series'], description: 'For repeating events only.' },
+      date:     { type: 'string', description: 'YYYY-MM-DD of the occurrence, when scope is "occurrence".' },
+    },
+    required: ['apple_id'],
+  },
+};
+
+const HM_RE = /^([01]\d|2[0-3]):[0-5]\d$/, DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+async function editAppleEventTool(input) {
+  const data = getAppData();
+  if (!appleReady(data)) return { ok: false, error: 'Apple Calendar is not connected.' };
+  const ev = findAppleEvent(input.apple_id);
+  if (!ev) return { ok: false, error: 'No Apple Calendar event with that id — it may have been changed or deleted on the phone. Re-check the APPLE CALENDAR list.' };
+  if (input.time && !HM_RE.test(input.time)) return { ok: false, error: 'time must be HH:MM (24h).' };
+  if (input.end_time && !HM_RE.test(input.end_time)) return { ok: false, error: 'end_time must be HH:MM (24h).' };
+  if (input.date && !DATE_RE.test(input.date)) return { ok: false, error: 'date must be YYYY-MM-DD.' };
+  const changes = {};
+  for (const k of ['title', 'date', 'time', 'end_time', 'location', 'all_day']) if (input[k] !== undefined) changes[k] = input[k];
+  if (!Object.keys(changes).length) return { ok: false, error: 'Nothing to change.' };
+  try {
+    const client = await getCaldavClient(data.caldav.appleId);
+    const updated = await appleCal.updateAppleEvent(client, data.caldav.calendarUrl, ev.url, changes, APP_TZ);
+    appendLog('note', `ED edited Apple Calendar event "${ev.title}"`, [], []);
+    await refreshAppleEvents(data, { force: true });
+    const when = updated.allDay ? `${updated.dateKey}, all day` : `${updated.dateKey} ${updated.time}${updated.endTime ? '–' + updated.endTime : ''}`;
+    return { ok: true, message: `Updated "${updated.title}" in Apple Calendar (${ev.rrule ? 'whole series, ' : ''}${when}).` };
+  } catch (e) {
+    console.error('Apple edit failed:', e.message);
+    return { ok: false, error: e.message };
+  }
+}
+
+async function deleteAppleEventTool(input) {
+  const data = getAppData();
+  if (!appleReady(data)) return { ok: false, error: 'Apple Calendar is not connected.' };
+  const ev = findAppleEvent(input.apple_id);
+  if (!ev) return { ok: false, error: 'No Apple Calendar event with that id — it may already be gone. Re-check the APPLE CALENDAR list.' };
+  let occurrenceDate = null;
+  if (ev.rrule) {
+    if (!input.scope) return { ok: false, error: `"${ev.title}" repeats — ask the user whether to delete just one occurrence (and which date) or the whole series, then call again with scope.` };
+    if (input.scope === 'occurrence') {
+      if (!input.date || !DATE_RE.test(input.date)) return { ok: false, error: 'scope "occurrence" needs date as YYYY-MM-DD.' };
+      occurrenceDate = input.date;
+    }
+  }
+  try {
+    const client = await getCaldavClient(data.caldav.appleId);
+    await appleCal.deleteAppleEvent(client, data.caldav.calendarUrl, ev.url, { occurrenceDate, appTz: APP_TZ });
+    appendLog('note', `ED deleted Apple Calendar event "${ev.title}"${occurrenceDate ? ` (${occurrenceDate} only)` : ''}`, [], []);
+    await refreshAppleEvents(data, { force: true });
+    return { ok: true, message: occurrenceDate ? `Removed "${ev.title}" on ${occurrenceDate} from Apple Calendar.` : `Deleted "${ev.title}" from Apple Calendar${ev.rrule ? ' (whole series)' : ''}.` };
+  } catch (e) {
+    console.error('Apple delete failed:', e.message);
+    return { ok: false, error: e.message };
+  }
+}
+
 const ADD_CALENDAR_EVENT_TOOL = {
   name: 'add_calendar_event',
   description: 'Create a calendar event — a one-time event on a specific date, or a recurring one (e.g. "gym every Monday at 6am", "rent due the 1st of every month"). Use ONLY when the user clearly asks to add/create/schedule something right now.',
@@ -1605,6 +1748,16 @@ const ED_TOOL_HANDLERS = {
     if (result.ok) toolActions.push({ type: 'calendar_event_deleted' });
     return result.ok ? { ok: true, message: result.message } : { ok: false, message: result.error };
   },
+  edit_apple_event: async (input, toolActions) => {
+    const result = await editAppleEventTool(input);
+    if (result.ok) toolActions.push({ type: 'calendar_event_edited' });
+    return result.ok ? { ok: true, message: result.message } : { ok: false, message: result.error };
+  },
+  delete_apple_event: async (input, toolActions) => {
+    const result = await deleteAppleEventTool(input);
+    if (result.ok) toolActions.push({ type: 'calendar_event_deleted' });
+    return result.ok ? { ok: true, message: result.message } : { ok: false, message: result.error };
+  },
 };
 
 // Red's tool dispatch — deliberately separate from ED_TOOL_HANDLERS, never merged. This is the
@@ -1692,8 +1845,11 @@ app.post('/api/chat', async (req, res) => {
       ADD_CALENDAR_EVENT_TOOL,
       EDIT_CALENDAR_EVENT_TOOL,
       DELETE_CALENDAR_EVENT_TOOL,
+      EDIT_APPLE_EVENT_TOOL,
+      DELETE_APPLE_EVENT_TOOL,
       ASSIGN_RED_RESEARCH_TOOL,
     ];
+    await refreshAppleEventsWithin(getAppData(), 8000);
     const system = buildSystemPrompt(message) + (images.length ? `\n\n# PHOTOS IN THIS MESSAGE
 The user attached ${images.length} photo${images.length > 1 ? 's' : ''} (often a screenshot or picture of a work schedule, class timetable, receipt, flyer or note). Read them carefully and literally — every row, date, day name and start/end time. Never guess or invent anything you can't actually read; say which parts were blurry or cut off.
 If it is a schedule: first list what you found in a short readable list (day + date, start–end time, role/location if shown), resolving dates against today's date (if no year is shown, use the upcoming occurrence). If the schedule shows several people, only pull out the user's shifts — ask which name is theirs if it isn't obvious.
