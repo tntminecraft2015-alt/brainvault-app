@@ -629,9 +629,19 @@
     .tl-rail::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; transform:translateX(-50%); background:var(--fg-faint); }
     .tl-row:first-of-type .tl-rail::before { top:50%; }
     .tl-list > .tl-row:last-child .tl-rail::before { bottom:50%; }
-    .tl-pill { position:relative; z-index:1; width:36px; height:44px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:17px; box-shadow:0 0 0 3px var(--bg); }
-    .tl-pill.quest { height:36px; font-size:13px; font-weight:800; color:#10141c; }
-    .tl-anytime .tl-pill { width:30px; height:30px; border-radius:15px; font-size:14px; box-shadow:none; }
+    /* Event pill: solid kind colour with a soft top-light gradient + line icon.
+       Quest pill: outlined ring with the rank letter, so to-dos read differently
+       from scheduled time at a glance. (--kc = kind/rank colour, set inline.) */
+    .tl-pill { position:relative; z-index:1; width:36px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; font-size:17px;
+      background:linear-gradient(165deg, color-mix(in srgb, var(--kc,#666) 78%, #fff) 0%, var(--kc,#666) 45%, color-mix(in srgb, var(--kc,#666) 80%, #000) 100%);
+      box-shadow:0 0 0 3px var(--bg), inset 0 1px 0 rgba(255,255,255,.28), 0 4px 12px -4px color-mix(in srgb, var(--kc,#666) 70%, transparent); }
+    .tl-pill .k-ic { display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.18)); }
+    .tl-pill.quest { width:32px; height:32px; border-radius:50%; font-size:13px; font-weight:800; background:var(--bg); color:var(--kc); box-shadow:0 0 0 3px var(--bg), inset 0 0 0 2.5px var(--kc); }
+    .tl-anytime .tl-pill { width:30px; height:30px; border-radius:10px; font-size:14px; box-shadow:inset 0 1px 0 rgba(255,255,255,.28); }
+    .tl-anytime .tl-pill.quest { border-radius:50%; box-shadow:inset 0 0 0 2.5px var(--kc); background:transparent; }
+    .tl-kind { font-weight:700; }
+    .tl-rep { display:inline-flex; align-items:center; gap:3px; }
+    .k-ic-inline { vertical-align:-1px; }
     .tl-body { min-width:0; cursor:pointer; padding:6px 0; }
     .tl-title { font-size:15px; font-weight:600; line-height:1.25; color:var(--fg); overflow-wrap:anywhere; }
     .tl-sub { font-size:12px; font-weight:500; color:var(--fg-dim); margin-top:2px; }
@@ -639,8 +649,18 @@
     .tl-check-spacer { width:28px; }
     .tl-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
     .tl-row.done .tl-title { text-decoration:line-through; opacity:.55; }
-    .tl-row.past .tl-pill, .tl-row.done .tl-pill { filter:saturate(.35) brightness(.6); }
+    .tl-row.past .tl-pill, .tl-row.done .tl-pill { filter:grayscale(.8) brightness(.62); box-shadow:0 0 0 3px var(--bg); }
     .tl-row.past .tl-title { opacity:.7; }
+    /* Day view: event bars proportional to duration (--bar-h set per row in JS).
+       Top-aligned so the start time and title sit at the top of the bar. */
+    .tl-list .tl-row.tl-prop { align-items:start; min-height:0; padding:4px 0; }
+    .tl-list .tl-row.tl-prop .tl-rail { align-items:flex-start; }
+    .tl-list .tl-row.tl-prop .tl-pill { height:var(--bar-h,44px); align-items:flex-start; padding-top:8px; box-sizing:border-box; }
+    .tl-list .tl-row.tl-prop .tl-time { padding-top:4px; }
+    .tl-list .tl-row.tl-prop .tl-body { padding:2px 0; }
+    .tl-list .tl-row.tl-prop .tl-check, .tl-list .tl-row.tl-prop .tl-check-spacer { margin-top:4px; }
+    /* short bars: icon centred, smaller */
+    .tl-list .tl-row.tl-prop .tl-pill.short { align-items:center; padding-top:0; font-size:13px; }
 
     .tl-gap { display:grid; grid-template-columns:52px 44px 1fr; column-gap:8px; min-height:34px; align-items:center; }
     .tl-gap .tl-rail::before { background:none; border-left:2px dotted rgba(223,238,255,.22); width:0; }
@@ -663,9 +683,11 @@
     .wk-day.today .wk-day-name { color:var(--accent); }
     .wk-day-count { font-size:11.5px; color:var(--fg-dim); font-weight:500; margin-left:auto; }
     .wk-rows { display:flex; flex-direction:column; gap:2px; margin-top:6px; }
-    .wk-row { display:grid; grid-template-columns:62px 10px 1fr auto; align-items:center; column-gap:8px; min-height:30px; }
-    .wk-row .wk-t { font-variant-numeric:tabular-nums; font-size:12px; font-weight:600; color:var(--fg-dim); }
-    .wk-row .wk-dot { width:8px; height:8px; border-radius:50%; }
+    .wk-row { display:grid; grid-template-columns:62px 20px 1fr auto; align-items:center; column-gap:8px; min-height:30px; }
+    .wk-row .wk-t { font-variant-numeric:tabular-nums; font-size:12px; font-weight:600; color:var(--fg-dim); line-height:1.15; }
+    .wk-row .wk-t small { display:block; font-size:10.5px; font-weight:500; opacity:.75; }
+    .wk-row .wk-dot { width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; background:var(--kc); box-shadow:inset 0 1px 0 rgba(255,255,255,.25); }
+    .wk-row .wk-dot.quest { background:none; border-radius:50%; box-shadow:inset 0 0 0 2px var(--kc); color:var(--kc); font-size:10px; font-weight:800; }
     .wk-row .wk-title { font-size:13.5px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .wk-row.done .wk-title { text-decoration:line-through; opacity:.5; }
     .wk-row .tl-check { width:22px; height:22px; font-size:11px; }
@@ -714,7 +736,7 @@
     .as-cal-grid button.today.sel { background:linear-gradient(160deg,#ffd6c7,var(--fg) 70%); color:#b3401c; box-shadow:inset 0 0 0 2px var(--accent); }
     .as-kinds { display:flex; flex-direction:column; gap:6px; }
     .as-kind { display:flex; align-items:center; gap:12px; width:100%; border:none; background:rgba(223,238,255,.045); border-radius:var(--r-md); padding:10px 12px; color:var(--fg); font-family:'Inter',sans-serif; font-size:14.5px; font-weight:600; cursor:pointer; text-align:left; min-height:48px; }
-    .as-kind .as-ic { width:30px; height:30px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:800; color:#10141c; }
+    .as-kind .as-ic { width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; font-weight:800; color:#10141c; }
     .as-kind .as-sub { font-size:12px; font-weight:500; color:var(--fg-dim); display:block; margin-top:1px; }
     .as-kind .as-tick { margin-left:auto; width:22px; height:22px; border-radius:50%; border:2px solid rgba(223,238,255,.3); flex-shrink:0; }
     .as-kind.on { background:rgba(223,238,255,.1); box-shadow:inset 0 0 0 1.5px rgba(223,238,255,.35); }
@@ -2117,6 +2139,29 @@ const KIND_POKE_TYPE = {
   errand:  { label:'GROUND',  icon:'⛰' },
   routine: { label:'NORMAL',  icon:'⭐' },
 };
+// Calendar icon set: clean line icons (24×24, stroke = currentColor) used for event
+// kinds in the Day timeline, Week agenda and add sheet — replaces the emoji, which
+// rendered inconsistently across devices and were hard to read at small sizes.
+const KIND_ICON_PATHS = {
+  training:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11"/>',
+  meeting: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.4-3.4 3-5.4 6-5.4s5.6 2 6 5.4"/><path d="M15.5 4.9a3.2 3.2 0 0 1 0 6.2M17.6 14.9c1.9.6 3.1 2.4 3.4 5.1"/>',
+  focus:   '<path d="M3 5.5h5.5A3.5 3.5 0 0 1 12 9v10.5a2.6 2.6 0 0 0-2.6-2.6H3z"/><path d="M21 5.5h-5.5A3.5 3.5 0 0 0 12 9v10.5a2.6 2.6 0 0 1 2.6-2.6H21z"/>',
+  social:  '<path d="M11 3.5l1.7 4.8 4.8 1.7-4.8 1.7L11 16.5l-1.7-4.8L4.5 10l4.8-1.7z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  errand:  '<path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/>',
+  routine: '<path d="M4.5 11.5a7.5 7.5 0 0 1 13-4.6L19.5 9"/><path d="M19.5 4v5h-5"/><path d="M19.5 12.5a7.5 7.5 0 0 1-13 4.6L4.5 15"/><path d="M4.5 20v-5h5"/>',
+};
+function kindIcon(kind,size){
+  const p=KIND_ICON_PATHS[kind]||KIND_ICON_PATHS.routine, s=size||18;
+  return `<svg class="k-ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+}
+// Small inline "repeats" glyph (replaces the 🔁 emoji in timeline subtitles)
+const ICON_REPEAT='<svg class="k-ic-inline" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+KIND_ICON_PATHS.routine+'</svg>';
+// Readable icon/text colour on a kind's swatch (dark on yellow, white elsewhere)
+function kindInk(hex){
+  const n=parseInt(String(hex).replace('#',''),16); if(isNaN(n)) return '#fff';
+  const r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  return (0.299*r+0.587*g+0.114*b)>170 ? '#1a1406' : '#fff';
+}
 const BUDGET_CATS = {
   food:      { icon:'🍖', label:'PROVISIONS', color:'#ff8a63' },
   rent:      { icon:'🏠', label:'SHELTER',    color:'#66c8ff' },
@@ -2929,7 +2974,7 @@ function renderAddSheet(){
 
   // kinds (vertical list) / ranks
   document.getElementById('asKinds').innerHTML=Object.keys(KIND_COLORS).map(k=>`<button type="button" class="as-kind${st.kind===k?' on':''}" onclick="asSetKind('${k}')">
-      <span class="as-ic" style="background:${KIND_COLORS[k]};">${KIND_POKE_TYPE[k].icon}</span>
+      <span class="as-ic" style="background:${KIND_COLORS[k]};color:${kindInk(KIND_COLORS[k])};">${kindIcon(k,16)}</span>
       <span>${k[0].toUpperCase()+k.slice(1)}<span class="as-sub">${AS_KIND_SUB[k]}</span></span><span class="as-tick"></span></button>`).join('');
   document.getElementById('asRanks').innerHTML=[['S','S-rank','Big, time-boxed — worth +'+(RANK_XP.S||'')+' XP'],['B','B-rank','Everyday to-do — +'+(RANK_XP.B||'')+' XP']].map(([r,l,sub])=>`<button type="button" class="as-kind${st.rank===r?' on':''}" onclick="asSetRank('${r}')">
       <span class="as-ic" style="background:${RANK_COLORS[r]};">${r}</span><span>${l}<span class="as-sub">${sub}</span></span><span class="as-tick"></span></button>`).join('');
@@ -2990,6 +3035,8 @@ function saveAddSheet(){
 // (a quest linked to an event shows once, with a checkbox). Events with an endTime use
 // their real length; otherwise free-time gaps assume 60 min per event / 30 min per quest.
 const TL_EVENT_MIN=60, TL_QUEST_MIN=30, TL_GAP_MIN=30;
+// Day-view event bar sizing: height = duration × px/min, clamped.
+const TL_PX_PER_MIN=1, TL_BAR_MIN_PX=26, TL_BAR_MAX_PX=300;
 // Minutes from start to end; an end at or before the start is overnight (ends next day).
 // Mirrors eventDurationMin in server.js.
 function evDurMin(time,endTime){
@@ -2998,7 +3045,12 @@ function evDurMin(time,endTime){
   return d>0?d:d+1440;
 }
 function tlItemDur(it){ return (it.e && evDurMin(it.time,it.e.endTime)) || (it.e?TL_EVENT_MIN:TL_QUEST_MIN); }
-function fmtTimeRange(time,endTime){ return time ? fmtTime(time)+(endTime?'–'+fmtTime(endTime):'') : ''; }
+function fmtTimeRange(time,endTime){
+  if(!time) return '';
+  if(!endTime) return fmtTime(time);
+  const a=fmtTime(time), b=fmtTime(endTime), [ah,ap]=a.split(' '), [,bp]=b.split(' ');
+  return ap&&ap===bp ? `${ah}–${b}` : `${a}–${b}`;
+}
 let calView='day';
 try{ const v=localStorage.getItem('mc.calView'); if(['day','week','month'].includes(v)) calView=v; }catch{}
 
@@ -3042,13 +3094,13 @@ function tlItemClick(key,it){
   if(it.e && it.e.recurring) return `editRecurringOccurrence('${key}','${esc(String(it.e.recurringId))}')`;
   return `openDayModalFor('${key}')`;
 }
-function tlPill(it){
+function tlPill(it,extraCls){
   if(it.e){
-    const col=KIND_COLORS[it.kind]||'#666', pt=KIND_POKE_TYPE[it.kind]||KIND_POKE_TYPE.routine;
-    return `<div class="tl-pill" style="background:${hexAlpha(col,.9)};">${pt.icon}</div>`;
+    const col=KIND_COLORS[it.kind]||'#666';
+    return `<div class="tl-pill${extraCls?' '+extraCls:''}" style="--kc:${col};color:${kindInk(col)};" title="${esc(it.kind||'')}">${kindIcon(it.kind,extraCls==='short'?15:18)}</div>`;
   }
-  const rank=it.task.rank||'B';
-  return `<div class="tl-pill quest" style="background:${RANK_COLORS[rank]||RANK_COLORS.B};">${rank}</div>`;
+  const rank=it.task.rank||'B', rc=RANK_COLORS[rank]||RANK_COLORS.B;
+  return `<div class="tl-pill quest" style="--kc:${rc};">${rank}</div>`;
 }
 function tlCheck(it){
   if(!it.task) return '<span class="tl-check-spacer"></span>';
@@ -3057,12 +3109,13 @@ function tlCheck(it){
 }
 function tlSub(it){
   const parts=[];
-  if(it.time) parts.push(it.e&&it.e.endTime ? `${fmtTimeRange(it.time,it.e.endTime)} (${tlDur(tlItemDur(it))})` : fmtTime(it.time));
+  if(it.e) parts.push(`<span class="tl-kind" style="color:${KIND_COLORS[it.kind]||'var(--fg-dim)'}">${esc((it.kind||'event')[0].toUpperCase()+(it.kind||'event').slice(1))}</span>`);
+  if(it.time) parts.push(it.e&&it.e.endTime ? `${fmtTimeRange(it.time,it.e.endTime)} · ${tlDur(tlItemDur(it))}` : fmtTime(it.time));
   if(it.e && it.e.location) parts.push(esc(it.e.location));
-  if(it.e && it.e.recurring) parts.push('🔁 repeats');
+  const rep = it.e && it.e.recurring ? ` <span class="tl-rep" title="Repeats" aria-label="Repeats">${ICON_REPEAT}</span>` : '';
   if(!it.e) parts.push('Quest');
   else if(it.task) parts.push('Quest · '+(it.task.rank||'B'));
-  return parts.join(' · ');
+  return parts.join(' · ')+rep;
 }
 
 function renderCalDay(){
@@ -3101,9 +3154,13 @@ function renderCalDay(){
     if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
     const past=isToday && start+dur<=nowMin;
     const [hm,ap]=fmtTime(it.time).split(' ');
-    rows+=`<div class="tl-row${it.task&&it.task.done?' done':''}${past?' past':''}">
+    // Event bars scale with duration (1px per minute, like Apple Calendar), so a 2h
+    // event is twice as tall as a 1h one. Clamped so tiny events stay tappable and
+    // all-night ones (e.g. sleep) don't take over the screen.
+    const propH = it.e ? Math.max(TL_BAR_MIN_PX, Math.min(TL_BAR_MAX_PX, Math.round(dur*TL_PX_PER_MIN))) : 0;
+    rows+=`<div class="tl-row${it.e?' tl-prop':''}${it.task&&it.task.done?' done':''}${past?' past':''}"${it.e?` style="--bar-h:${propH}px"`:''}>
       <div class="tl-time">${hm}<small>${ap}</small></div>
-      <div class="tl-rail">${tlPill(it)}</div>
+      <div class="tl-rail">${tlPill(it, it.e&&propH<40?'short':'')}</div>
       <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
       ${tlCheck(it)}
     </div>`;
@@ -3131,8 +3188,8 @@ function renderCalWeek(){
     if(isToday) inWeek=true;
     total+=items.length;
     const rows=items.map(it=>`<div class="wk-row${it.task&&it.task.done?' done':''}">
-        <span class="wk-t">${it.time?fmtTimeRange(it.time,it.e&&it.e.endTime):'Anytime'}</span>
-        <span class="wk-dot" style="background:${it.e?(KIND_COLORS[it.kind]||'#666'):(RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B)};"></span>
+        <span class="wk-t">${it.time?fmtTime(it.time):'Anytime'}${it.time&&it.e&&it.e.endTime?`<small>${tlDur(tlItemDur(it))}</small>`:''}</span>
+        ${it.e?`<span class="wk-dot" style="--kc:${KIND_COLORS[it.kind]||'#666'};color:${kindInk(KIND_COLORS[it.kind]||'#666')};">${kindIcon(it.kind,12)}</span>`:`<span class="wk-dot quest" style="--kc:${RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B};">${it.task.rank||'B'}</span>`}
         <span class="wk-title" onclick="${tlItemClick(key,it)}" style="cursor:pointer;">${esc(it.title)}</span>
         ${it.task?tlCheck(it):'<span></span>'}
       </div>`).join('');
