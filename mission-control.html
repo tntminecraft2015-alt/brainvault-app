@@ -5762,12 +5762,12 @@ async function farmLoadType(id){
 
 const FARM_JOBS = [
   {id:'letter',  name:'Morning Letter', ic:'mail',   col:'#ff8a63', fit:['psychic','fairy'],          fitTxt:'Psychic or Fairy', desc:'Writes you a note each morning with today’s events, quests and money.'},
+  {id:'coach',   name:'Coach',          ic:'football', col:'#ffb547', fit:['fighting','normal'],      fitTxt:'Fighting or Normal', desc:'Your NFL and fantasy football expert: live scores, headlines, a trade calculator with real market values, and start/sit advice on demand.'},
   {id:'remind',  name:'Reminders',      ic:'bell',   col:'#66c8ff', fit:['normal','electric'],        fitTxt:'Normal or Electric', desc:'Keeps an eye on your next event and nudges you 15 minutes before, while the app is open.'},
   {id:'garden',  name:'Savings Garden', ic:'sprout', col:'#6fd38a', fit:['grass','bug'],              fitTxt:'Grass or Bug', desc:'Grows your savings goal as a tree. Every deposit waters it.'},
   {id:'watch',   name:'Deadline Watch', ic:'eye',    col:'#b9a8ff', fit:['dark','ghost'],             fitTxt:'Dark or Ghost', desc:'Spots unfinished quests from earlier days and bills that are due.'},
   {id:'focus',   name:'Focus Flame',    ic:'flame',  col:'#ff8a4c', fit:['fire','dragon'],            fitTxt:'Fire or Dragon', desc:'Keeps a 25-minute focus timer burning. Finish one for +2 berries.'},
   {id:'scholar', name:'Wiki Scholar',   ic:'book',   col:'#5aa9ff', fit:['water','ice'],              fitTxt:'Water or Ice', desc:'Brings you one page from your wiki each day.'},
-  {id:'coach',   name:'Coach',          ic:'football', col:'#ffb547', fit:['fighting','normal'],      fitTxt:'Fighting or Normal', desc:'Your NFL and fantasy football expert: live scores, headlines, a trade calculator with real market values, and start/sit advice on demand.'},
   {id:'forager', name:'Forager',        ic:'basket', col:'#ff5a7a', fit:['ground','rock','fighting','steel'], fitTxt:'Ground, Rock, Fighting or Steel', desc:'Picks ripe berries while you’re away and finds an extra one each time.'}
 ];
 const FARM_HABITATS = [
@@ -6388,7 +6388,7 @@ function renderFarmJobs(el,mini){
       act=late.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('cal')">See quests</button>`:bills.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('gil')">See bills</button>`:''; }
     else if(J.id==='focus'){ const fo=f.focus; if(fo&&!fo.done){ const left=Math.max(0,fo.end-Date.now()); body=`<div class="farm-job-body"><span class="farm-timer" data-farm-timer>${farmFmt(left)}</span><br>The fire keeps going while you work.</div>`; act=`<button type="button" class="farm-btn sm" onclick="stopFarmFocus()">Stop</button>`; } else { body=`<div class="farm-job-body">${f.focusCount?.date===TODAY()?`${f.focusCount.n} focus session${f.focusCount.n>1?'s':''} today. `:''}Ready for 25 minutes of focus?</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="startFarmFocus()">Start focus</button>`; } }
     else if(J.id==='scholar'){ body=`<div class="farm-job-body" data-farm-wiki>${farmWikiPick?`Today’s page: <b>${esc(farmWikiPick.slug)}</b>${farmWikiPick.summary?`<br><span style="color:var(--fg-dim)">${esc(farmWikiPick.summary)}</span>`:''}`:'Looking through your wiki…'}</div>`; act=farmWikiPick?`<button type="button" class="farm-btn sm primary" onclick="openFarmWiki()">Read</button>`:''; if(!farmWikiPick) farmPickWiki(); }
-    else if(J.id==='coach'){ body=`<div class="farm-job-body" data-coach-mini>${coachMiniHTML()}</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="openCoach('ask')">Ask ${esc(pokeLabel(id))}</button><button type="button" class="farm-btn sm" onclick="openCoach('trade')">Trade calc</button><button type="button" class="farm-btn sm" onclick="openCoach('scores')">Scores</button>`; if(!coachBoard) coachLoadBoard().then(()=>document.querySelectorAll('[data-coach-mini]').forEach(e=>e.innerHTML=coachMiniHTML())); }
+    else if(J.id==='coach'){ body=`<div class="farm-job-body" data-coach-mini>${coachMiniHTML()}</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="openCoach('ask')">Ask ${esc(pokeLabel(id))}</button><button type="button" class="farm-btn sm" onclick="openCoach('trade')">Trade calc</button><button type="button" class="farm-btn sm" onclick="openCoach('scores')">Scores</button><button type="button" class="farm-btn sm" onclick="openCoach('injuries')">Injuries</button>`; if(!coachBoard) coachLoadBoard().then(()=>document.querySelectorAll('[data-coach-mini]').forEach(e=>e.innerHTML=coachMiniHTML())); }
     else if(J.id==='forager'){ const n=f.plots.filter(t=>t>Date.now()).length; body=`<div class="farm-job-body">Picks ripe berries on its own (+1 extra per plot). ${n} plot${n!==1?'s':''} growing.</div>`; }
     if(mini) return `<div class="farm-line" style="cursor:pointer" onclick="setFarmView('jobs')"><div class="fl-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div class="fl-t">${J.name}<div class="fl-s"${id?` id="farmMiniNm${J.id}"`:''}>${id?esc(pokeLabel(id)):'No helper yet'}</div></div></div>`;
     return `<div class="farm-job"><div class="farm-job-hd"><div class="farm-job-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div><div class="farm-job-t">${J.name}</div><div class="farm-job-s">${id&&farmFits(J.id,id)?'<span class="farm-fit">Great fit</span>':`Best: ${J.fitTxt}`}</div></div>${monBtn}</div>${body}${act?`<div class="farm-job-row">${act}</div>`:''}</div>`;
@@ -6715,6 +6715,17 @@ function meetFarmVisitor(){
   .cc-comp button:disabled { opacity:.4; }
   .cc-roster summary { font-size:12.5px; color:var(--fg-dim); cursor:pointer; font-weight:700; }
   .cc-roster textarea { width:100%; box-sizing:border-box; margin-top:6px; min-height:64px; border:none; outline:none; border-radius:12px; background:rgba(223,238,255,.06); color:var(--fg); font-family:inherit; font-size:14px; padding:9px 10px; resize:vertical; }
+  .ci { padding:10px 12px; border-radius:16px; background:rgba(223,238,255,.045); margin-bottom:6px; }
+  .ci.mine { box-shadow:inset 0 0 0 1.5px rgba(255,181,71,.55); }
+  .ci-hd { display:flex; align-items:center; gap:8px; }
+  .ci-nm { flex:1; min-width:0; font-size:14px; font-weight:700; }
+  .ci-nm small { display:block; font-size:11.5px; color:var(--fg-dim); font-weight:500; }
+  .ci-nm small b { color:#ffb547; }
+  .ci-st { flex-shrink:0; font-size:11.5px; font-weight:800; padding:4px 9px; border-radius:999px; }
+  .ci-nt { font-size:12.5px; color:var(--fg-dim); line-height:1.4; margin-top:6px; }
+  .ci-nt b { color:var(--fg); font-weight:700; }
+  .ci-rt { font-size:11.5px; color:var(--fg-dim); margin-top:3px; }
+  .coach-tabs button { font-size:13px; }
   .coach-src { font-size:11px; color:var(--fg-dim); text-align:center; padding:4px 0 2px; }
 </style>
 <script>
@@ -6724,6 +6735,7 @@ function meetFarmVisitor(){
 // waiver pulse (Sleeper trending), and a chat that uses all of them
 // plus web search. Trade math matches football.js exactly.
 // ══════════════════════════════════════════════════════════════
+let coachInj=null, coachInjKey='', coachInjFilter='mine', coachInjQ='';
 let coachBoard=null, coachNews=null, coachTrend=null, coachVals={}, coachTab='ask', coachBusy=false;
 const COACH_STAR=1.35;
 function coachState(){ const f=farmState(); f.coach=f.coach||{}; const c=f.coach;
@@ -6769,8 +6781,8 @@ function openCoach(tab){
   coachTab=tab||coachTab; const f=farmState(), c=coachState();
   farmSheet('coachOv',`
     <div class="coach-hd">${farmPortrait(id,52)}<div style="flex:1;min-width:0"><div class="ch-t" id="coachNm">${esc(pokeLabel(id))}</div><div class="ch-s">Coach · NFL &amp; fantasy football</div></div><button type="button" class="as-x" onclick="document.getElementById('coachOv').remove()" aria-label="Close">✕</button></div>
-    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['trade','Trade'],['scores','Scores']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
-    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div>`,true);
+    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['trade','Trade'],['scores','Scores'],['injuries','Injuries']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
+    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div><div class="coach-view" data-v="injuries"></div>`,true);
   if(!POKE_NAMES[id]) fillName(id,'coachNm');
   if(f.coachDay!==TODAY()){ f.coachDay=TODAY(); farmGive(id,1); farmSave(); }
   coachSetTab(coachTab);
@@ -6779,7 +6791,7 @@ function coachSetTab(t){
   coachTab=t; const ov=document.getElementById('coachOv'); if(!ov) return;
   ov.querySelectorAll('.coach-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   ov.querySelectorAll('.coach-view').forEach(v=>v.classList.toggle('on',v.dataset.v===t));
-  if(t==='ask') coachRenderAsk(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores();
+  if(t==='ask') coachRenderAsk(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores(); if(t==='injuries') coachRenderInjuries();
 }
 function coachView(t){ return document.querySelector(`#coachOv .coach-view[data-v="${t}"]`); }
 
@@ -6807,6 +6819,42 @@ async function coachRenderScores(){
   await Promise.all([coachLoadBoard(),coachNews?null:coachLoadNews(),coachTrend?null:coachLoadTrend()]);
   if(coachTab==='scores') draw();
 }
+
+// injuries tab — ESPN's league-wide report, joined to fantasy values so stars sort first;
+// players on your roster or in your trade get flagged so nothing sneaks up on you.
+const COACH_INJ_COL={out:'#ff6b6b','injured reserve':'#ff6b6b',ir:'#ff6b6b',doubtful:'#ff9f5a',questionable:'#ffd35a','day-to-day':'#ffd35a',suspension:'#c9c1ff','physically unable to perform':'#ff9f5a'};
+function coachInjColor(st){ const k=String(st||'').toLowerCase(); return COACH_INJ_COL[k]||Object.entries(COACH_INJ_COL).find(([n])=>k.includes(n))?.[1]||'#9fb3c8'; }
+function coachMyNames(){ const c=coachState(), all=coachVals[coachLeagueKey(c.league)]||[], n=s=>s.toLowerCase().replace(/[.'’,-]/g,'').replace(/\b(jr|sr|ii|iii|iv)\b/g,'').replace(/\s+/g,' ').trim();
+  const fromTrade=[...c.a,...c.b].map(i=>all.find(p=>p.id===i)?.name).filter(Boolean);
+  const fromRoster=c.roster.split(/[,\n;]+/).map(x=>x.trim()).filter(x=>x.length>2);
+  return {set:[...fromTrade,...fromRoster].map(n), n}; }
+async function coachLoadInj(){ const L=coachState().league, k=coachLeagueKey(L); if(coachInj&&coachInjKey===k) return;
+  try{ coachInj=(await coachGet(`/api/nfl/injuries?ppr=${L.ppr}&teams=${L.teams}&qbs=${L.qbs}&dynasty=${L.dynasty}`)).players||[]; coachInjKey=k; }catch{ coachInj=coachInj||null; } }
+function coachInjSet(f){ coachInjFilter=f; coachRenderInjuries(); }
+async function coachRenderInjuries(){
+  const el=coachView('injuries'); if(!el) return;
+  const draw=()=>{
+    const my=coachMyNames(), mine=p=>my.set.some(m=>{ const pn=my.n(p.name); return pn===m||pn.endsWith(' '+m)||(m.length>5&&pn.includes(m)); });
+    let rows=coachInj||[];
+    const nMine=rows.filter(mine).length;
+    if(coachInjFilter==='mine'&&!nMine&&rows.length) coachInjFilter='top';
+    if(coachInjFilter==='mine') rows=rows.filter(mine);
+    else if(coachInjFilter==='top') rows=rows.filter(p=>/out|reserve|doubtful|questionable|day/i.test(p.status)).slice(0,40);
+    if(coachInjQ){ const q=coachInjQ.toLowerCase(); rows=(coachInj||[]).filter(p=>p.name.toLowerCase().includes(q)||String(p.team).toLowerCase()===q); }
+    const chip=(k,l)=>`<button type="button" class="farm-chip${coachInjFilter===k&&!coachInjQ?' on':''}" onclick="coachInjQ='';coachInjSet('${k}')">${l}</button>`;
+    el.innerHTML=`<div class="ct-set">${chip('mine',`My players${nMine?` · ${nMine}`:''}`)}${chip('top','Biggest names')}${chip('all','Everyone')}</div>
+      <div class="ct-add"><input id="coachInjQ" placeholder="Search a player or team (e.g. KC)" value="${esc(coachInjQ)}" oninput="coachInjQ=this.value.trim();coachRenderInjuriesKeep()"></div>
+      ${!coachInj?'<div class="farm-empty">Loading the injury report…</div>'
+        :!rows.length?`<div class="farm-empty">${coachInjQ?'No one on the report matches that.':coachInjFilter==='mine'?'None of your players are on the injury report. Add your roster in the Ask tab (or players to the trade) and they’ll show up here.':'The injury report is empty right now.'}</div>`
+        :`<div>${rows.slice(0,80).map(p=>`<div class="ci${mine(p)?' mine':''}"><div class="ci-hd"><span class="pos ${esc(p.pos)}">${esc(p.pos||'—')}</span><span class="ci-nm">${esc(p.name)}<small>${esc(p.team)}${p.posRank?` · ${esc(p.pos)}${p.posRank}`:''}${mine(p)?' · <b>yours</b>':''}</small></span><span class="ci-st" style="color:${coachInjColor(p.status)};background:${coachInjColor(p.status)}22">${esc(p.status||'Listed')}</span></div>
+          ${p.injury||p.note?`<div class="ci-nt">${p.injury?`<b>${esc(p.injury)}</b>${p.note?' · ':''}`:''}${esc(p.note)}</div>`:''}${p.ret?`<div class="ci-rt">Expected back ${esc(new Date(p.ret).toLocaleDateString('en-US',{month:'short',day:'numeric'}))}</div>`:''}</div>`).join('')}</div>`}
+      <div class="farm-job-row"><button type="button" class="farm-btn" onclick="coachSetTab('ask');coachSend('Go through today’s injury report for my team. Who should I bench, and who should I pick up to cover?')">Ask ${esc(coachName())} what to do</button></div>
+      <div class="coach-src">Injury report: ESPN · refreshes every 20 min</div>`;
+  };
+  coachRenderInjuriesKeep=()=>{ const pos=document.getElementById('coachInjQ')?.selectionStart; draw(); const i=document.getElementById('coachInjQ'); if(i){ i.focus(); try{ i.setSelectionRange(pos,pos); }catch{} } };
+  draw(); await Promise.all([coachLoadInj(),coachLoadVals()]); if(coachTab==='injuries') draw();
+}
+let coachRenderInjuriesKeep=()=>{};
 
 // trade tab
 const COACH_SET=[['dynasty',[[false,'Redraft'],[true,'Dynasty']]],['ppr',[[1,'PPR'],[0.5,'Half'],[0,'Std']]],['qbs',[[1,'1QB'],[2,'Superflex']]],['teams',[[10,'10 tm'],[12,'12 tm'],[14,'14 tm']]]];

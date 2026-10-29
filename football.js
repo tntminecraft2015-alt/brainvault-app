@@ -70,6 +70,24 @@ async function getNews(limit = 10) {
   }));
 }
 
+// ── injuries (ESPN league-wide report) ──
+async function getInjuries() {
+  const d = await cachedJson(`${ESPN}/injuries`, 20 * 60 * 1000);
+  const out = [];
+  for (const t of (d.injuries || [])) {
+    const team = t.abbreviation || t.team?.abbreviation || (t.displayName || '').split(' ').pop();
+    for (const i of (t.injuries || [])) {
+      const a = i.athlete || {};
+      out.push({
+        name: a.displayName || '', pos: a.position?.abbreviation || '', team: a.team?.abbreviation || team || '', teamName: t.displayName || '',
+        status: i.status || i.type?.description || '', injury: i.details?.type || i.type?.abbreviation || '',
+        note: i.shortComment || '', ret: i.details?.returnDate || '', date: i.date || '',
+      });
+    }
+  }
+  return out.filter(x => x.name);
+}
+
 // ── values ──
 function leagueParams(q = {}) {
   const ppr = [0, 0.5, 1].includes(Number(q.ppr)) ? Number(q.ppr) : 1;
@@ -137,6 +155,18 @@ async function getTrending(kind = 'add', q) {
   }).filter(Boolean).slice(0, 10);
 }
 
+// injuries joined to fantasy values so the list is sorted by who matters
+async function fantasyInjuries(league, names) {
+  const inj = await getInjuries();
+  let players = [];
+  try { players = (await getValues(league)).players; } catch {}
+  const vByName = new Map(players.map(p => [norm(p.name), p]));
+  let rows = inj.map(x => { const v = vByName.get(norm(x.name)); return { ...x, value: v?.value || 0, posRank: v?.posRank || null }; });
+  if (names?.length) { const want = names.map(norm); rows = rows.filter(r => want.some(w => norm(r.name).includes(w))); }
+  else if (players.length) rows = rows.filter(r => r.value > 0);
+  return rows.sort((a, b) => b.value - a.value).slice(0, 150);
+}
+
 // ── coach chat ──
 const COACH_TOOLS = [
   { name: 'get_scoreboard', description: 'Live NFL scoreboard from ESPN: every game this week (or a given week) with score, quarter/clock, records, betting line and TV. Use for anything about scores, schedule, or who plays whom.',
@@ -146,6 +176,8 @@ const COACH_TOOLS = [
     input_schema: { type: 'object', properties: { players: { type: 'array', items: { type: 'string' } } }, required: ['players'] } },
   { name: 'evaluate_trade', description: "Score a fantasy trade with the same calculator the user sees. side_a is what the USER receives, side_b is what the user gives away. Returns raw and star-adjusted totals, verdict, edge % and players who would even it out.",
     input_schema: { type: 'object', properties: { side_a: { type: 'array', items: { type: 'string' } }, side_b: { type: 'array', items: { type: 'string' } } }, required: ['side_a', 'side_b'] } },
+  { name: 'get_injuries', description: "Today's league-wide NFL injury report from ESPN (status like Out/Questionable/IR, injury, short note, expected return), limited to fantasy-relevant players and sorted by fantasy value. Pass names to check specific players.",
+    input_schema: { type: 'object', properties: { players: { type: 'array', items: { type: 'string' } } } } },
   { name: 'get_trending', description: 'Most-added or most-dropped players across Sleeper leagues in the last 24 hours — the waiver wire pulse.',
     input_schema: { type: 'object', properties: { kind: { type: 'string', enum: ['add', 'drop'] } } } },
 ];
@@ -170,6 +202,7 @@ function coachHandlers(league) {
         return { league: leagueParams(league), user_receives: A, user_gives: B, result: res, not_found: missing };
       } catch (e) { return { ok: false, message: `Trade calculator unavailable (${e.message}).` }; }
     },
+    get_injuries: async i => { try { return { players: await fantasyInjuries(league, i.players) }; } catch (e) { return { ok: false, message: `Injury report unavailable (${e.message}) — use web search.` }; } },
     get_trending: async i => { try { return { kind: i.kind || 'add', players: await getTrending(i.kind, league) }; } catch (e) { return { ok: false, message: `Trending unavailable (${e.message}).` }; } },
   };
 }
@@ -184,7 +217,7 @@ function coachSystem({ name, league, board, roster, todayStr }) {
 
 Today is ${todayStr}. The NFL changes daily, so never answer from memory about injuries, depth charts, trades, signings, suspensions, coaching changes or anything "current" — use your tools and web_search first, and say how fresh the info is if it matters. Your training knowledge is older than this season.
 
-Tools: get_scoreboard (live ESPN scores), get_nfl_news, get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
+Tools: get_scoreboard (live ESPN scores), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
 
 Trades: always call evaluate_trade with the actual players before giving a verdict, quote the edge %, then add the context numbers miss — injuries, bye weeks, roster fit, playoff schedule, the user's positional needs. Stars are worth more than the sum of depth pieces. If it's close, say what to ask for to tip it.
 
@@ -199,6 +232,7 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
 
   app.get('/api/nfl/scoreboard', (req, res) => send(res, () => getScoreboard(req.query.week)));
   app.get('/api/nfl/news', (req, res) => send(res, async () => ({ articles: await getNews(10) })));
+  app.get('/api/nfl/injuries', (req, res) => send(res, async () => ({ players: req.query.all === '1' ? await getInjuries() : await fantasyInjuries(req.query) })));
   app.get('/api/fantasy/values', (req, res) => send(res, () => getValues(req.query)));
   app.get('/api/fantasy/trending', (req, res) => send(res, async () => ({ players: await getTrending(req.query.kind, req.query) })));
   app.post('/api/fantasy/trade', (req, res) => send(res, async () => {
