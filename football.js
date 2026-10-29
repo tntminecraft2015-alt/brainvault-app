@@ -13,6 +13,20 @@ const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
 const FC   = 'https://api.fantasycalc.com/values/current';
 const SLP  = 'https://api.sleeper.app/v1';
 const mine = require('./fantasy-leagues');
+const fs = require('fs');
+const path = require('path');
+
+// Researched season background (coach-season-2026.md) — re-read when the file changes so
+// refreshed notes go live without a restart.
+const SEASON_NOTES = path.join(__dirname, 'coach-season-2026.md');
+let seasonNotes = { mtime: 0, text: '' };
+function getSeasonNotes() {
+  try {
+    const m = fs.statSync(SEASON_NOTES).mtimeMs;
+    if (m !== seasonNotes.mtime) seasonNotes = { mtime: m, text: fs.readFileSync(SEASON_NOTES, 'utf8').slice(0, 40000) };
+  } catch { seasonNotes = { mtime: 0, text: '' }; }
+  return seasonNotes.text;
+}
 
 const cache = new Map();
 async function cachedJson(url, ttlMs) {
@@ -62,13 +76,115 @@ async function getScoreboard(week) {
   return { season: d.season?.year || null, week: d.week?.number || null, games };
 }
 
+// ── standings (ESPN, grouped by division) ──
+async function getStandings() {
+  const d = await cachedJson('https://site.api.espn.com/apis/v2/sports/football/nfl/standings?level=3', 30 * 60 * 1000);
+  const stat = (e, n) => (e.stats || []).find(s => s.name === n)?.displayValue ?? '';
+  const divisions = [];
+  for (const conf of (d.children || [])) for (const dv of (conf.children || [])) {
+    divisions.push({
+      conference: conf.abbreviation || '', division: dv.name || '',
+      teams: (dv.standings?.entries || []).map(e => ({
+        abbr: e.team?.abbreviation || '', name: e.team?.displayName || '', logo: e.team?.logos?.[0]?.href || '',
+        record: stat(e, 'overall'), seed: stat(e, 'playoffSeed'), div: stat(e, 'vs. Div.'), conf: stat(e, 'vs. Conf.'),
+        pf: stat(e, 'pointsFor'), pa: stat(e, 'pointsAgainst'), diff: stat(e, 'pointDifferential'), streak: stat(e, 'streak'),
+      })),
+    });
+  }
+  return { season: d.children?.[0]?.children?.[0]?.standings?.season || null, divisions };
+}
+
 // ── news ──
+const slimArticle = a => ({
+  headline: a.headline || '', description: a.description || '', published: a.published || '',
+  url: a.links?.web?.href || '', image: a.images?.[0]?.url || '',
+});
 async function getNews(limit = 10) {
   const d = await cachedJson(`${ESPN}/news?limit=${limit}`, 10 * 60 * 1000);
-  return (d.articles || []).slice(0, limit).map(a => ({
-    headline: a.headline || '', description: a.description || '', published: a.published || '',
-    url: a.links?.web?.href || '', image: a.images?.[0]?.url || '',
-  }));
+  return (d.articles || []).slice(0, limit).map(slimArticle);
+}
+
+// ── one team: record, next game, its news ──
+// ESPN's news endpoint ignores ?team=, so team news = the league feed filtered by the
+// article's team tags (falling back to the nickname in the headline/description).
+async function getTeam(abbr) {
+  const a = String(abbr || '').toLowerCase().replace(/[^a-z]/g, '').slice(0, 4);
+  if (!a) throw new Error('team required');
+  const d = await cachedJson(`${ESPN}/teams/${a}`, 10 * 60 * 1000);
+  const t = d.team || {};
+  const ev = t.nextEvent?.[0], comp = ev?.competitions?.[0];
+  const next = ev ? {
+    id: ev.id, date: ev.date, name: ev.shortName || ev.name || '',
+    state: comp?.status?.type?.state || ev.status?.type?.state || 'pre',
+    detail: comp?.status?.type?.shortDetail || '',
+    home: slimTeam((comp?.competitors || []).find(c => c.homeAway === 'home')),
+    away: slimTeam((comp?.competitors || []).find(c => c.homeAway === 'away')),
+    tv: (comp?.broadcasts || []).map(b => b.media?.shortName || (b.names || []).join(', ')).filter(Boolean).join(', '),
+  } : null;
+  const nick = t.name || '', id = String(t.id || '');
+  const feed = await cachedJson(`${ESPN}/news?limit=50`, 10 * 60 * 1000).catch(() => ({}));
+  const nickRe = nick ? new RegExp(`\\b${nick}\\b`, 'i') : null;
+  // articles that name the team come first; ones that merely tag it (e.g. "all 32 teams'
+  // odds") only fill in after
+  const arts = feed.articles || [];
+  const named = arts.filter(x => nickRe && nickRe.test(`${x.headline} ${x.description}`));
+  const tagged = arts.filter(x => !named.includes(x) && (x.categories || []).filter(c => c.type === 'team').length <= 2
+    && (x.categories || []).some(c => c.type === 'team' && String(c.teamId ?? c.team?.id ?? '') === id));
+  const news = [...named, ...tagged].slice(0, 6).map(slimArticle);
+  return {
+    abbr: t.abbreviation || a.toUpperCase(), name: t.displayName || '', short: nick,
+    logo: t.logos?.[0]?.href || '', color: t.color ? `#${t.color}` : '',
+    record: t.record?.items?.find(r => r.type === 'total')?.summary || t.record?.items?.[0]?.summary || '',
+    standing: t.standingSummary || '', next, news,
+  };
+}
+
+// ── one game: line score, team stats, leaders, every offensive player's line ──
+// Before kickoff ESPN only has season averages/leaders, so `kind` says which you got.
+const GAME_STATS = [['totalYards', 'Total yards'], ['netPassingYards', 'Passing'], ['rushingYards', 'Rushing'], ['firstDowns', 'First downs'], ['thirdDownEff', '3rd down'], ['turnovers', 'Turnovers'], ['possessionTime', 'Possession']];
+const SEASON_STATS = [['totalPointsPerGame', 'Points / game'], ['yardsPerGame', 'Yards / game'], ['passingYardsPerGame', 'Pass yds / game'], ['rushingYardsPerGame', 'Rush yds / game'], ['totalPointsPerGameAllowed', 'Pts allowed / game']];
+const LEADER_CATS = [['passingYards', 'PASS'], ['rushingYards', 'RUSH'], ['receivingYards', 'REC']];
+async function getGame(id) {
+  const gid = String(id || '').replace(/\D/g, '').slice(0, 12);
+  if (!gid) throw new Error('game id required');
+  const d = await cachedJson(`${ESPN}/summary?event=${gid}`, 30 * 1000);
+  const comp = d.header?.competitions?.[0] || {};
+  const st = comp.status?.type || {};
+  const side = ha => {
+    const c = (comp.competitors || []).find(x => x.homeAway === ha) || {};
+    return { ...slimTeam(c), logo: c.team?.logos?.[0]?.href || c.team?.logo || '', lines: (c.linescores || []).map(l => l.displayValue ?? l.value ?? '') };
+  };
+  const away = side('away'), home = side('home');
+  const kind = st.state === 'pre' ? 'season' : 'game';
+  const statsFor = abbr => (d.boxscore?.teams || []).find(t => t.team?.abbreviation === abbr)?.statistics || [];
+  const sa = statsFor(away.abbr), sh = statsFor(home.abbr), val = (s, n) => s.find(x => x.name === n)?.displayValue ?? '';
+  const stats = (kind === 'game' ? GAME_STATS : SEASON_STATS).map(([n, label]) => ({ label, away: val(sa, n), home: val(sh, n) })).filter(s => s.away !== '' || s.home !== '');
+  const leaders = [];
+  for (const t of (d.leaders || [])) for (const [n, cat] of LEADER_CATS) {
+    const l = (t.leaders || []).find(x => x.name === n)?.leaders?.[0];
+    if (l) leaders.push({ cat, team: t.team?.abbreviation || '', name: l.athlete?.displayName || '', line: l.displayValue || '' });
+  }
+  // per-player lines from the box score (game only) — used to flag the user's fantasy players
+  const players = new Map();
+  for (const p of (d.boxscore?.players || [])) for (const cat of (p.statistics || [])) {
+    if (!['passing', 'rushing', 'receiving'].includes(cat.name)) continue;
+    const lab = cat.labels || [];
+    for (const a of (cat.athletes || [])) {
+      const nm = a.athlete?.displayName; if (!nm) continue;
+      const s = Object.fromEntries(lab.map((l, i) => [l, a.stats?.[i]]));
+      const part = cat.name === 'passing' ? `${s['C/ATT'] || ''}, ${s.YDS || 0} yds${+s.TD ? `, ${s.TD} TD` : ''}${+s.INT ? `, ${s.INT} INT` : ''}`
+        : cat.name === 'rushing' ? `${s.CAR || 0} car, ${s.YDS || 0} yds${+s.TD ? `, ${s.TD} TD` : ''}`
+        : `${s.REC || 0} rec, ${s.YDS || 0} yds${+s.TD ? `, ${s.TD} TD` : ''}`;
+      const k = nm + '|' + (p.team?.abbreviation || '');
+      const prev = players.get(k);
+      players.set(k, { name: nm, team: p.team?.abbreviation || '', line: prev ? `${prev.line} · ${part}` : part });
+    }
+  }
+  return {
+    id: gid, state: st.state || 'pre', detail: st.shortDetail || st.detail || '', date: comp.date || '',
+    tv: (comp.broadcasts || []).map(b => b.media?.shortName).filter(Boolean).join(', '),
+    away, home, kind, stats, leaders, players: [...players.values()],
+  };
 }
 
 // ── injuries (ESPN league-wide report) ──
@@ -170,6 +286,8 @@ async function fantasyInjuries(league, names) {
 
 // ── coach chat ──
 const COACH_TOOLS = [
+  { name: 'get_standings', description: 'Live NFL standings from ESPN, by division: each team\'s record, playoff seed, division and conference record, points for/against, differential and streak. Use for playoff picture, division races, seeding and "how is team X doing".',
+    input_schema: { type: 'object', properties: {} } },
   { name: 'get_scoreboard', description: 'Live NFL scoreboard from ESPN: every game this week (or a given week) with score, quarter/clock, records, betting line and TV. Use for anything about scores, schedule, or who plays whom.',
     input_schema: { type: 'object', properties: { week: { type: 'integer', description: 'Regular-season week number. Omit for the current week.' } } } },
   { name: 'get_nfl_news', description: 'Latest NFL headlines from ESPN.', input_schema: { type: 'object', properties: {} } },
@@ -192,6 +310,7 @@ function coachHandlers(league, accounts) {
   };
   return {
     get_scoreboard: async i => { try { return await getScoreboard(i.week); } catch (e) { return { ok: false, message: `Scoreboard unavailable (${e.message}) — use web search.` }; } },
+    get_standings: async () => { try { return await getStandings(); } catch (e) { return { ok: false, message: `Standings unavailable (${e.message}) — use web search.` }; } },
     get_nfl_news: async () => { try { return { articles: await getNews(8) }; } catch (e) { return { ok: false, message: `News unavailable (${e.message}) — use web search.` }; } },
     get_trade_values: async i => { try { return { league: leagueParams(league), results: await lookup(i.players || []) }; } catch (e) { return { ok: false, message: `Values unavailable (${e.message}).` }; } },
     evaluate_trade: async (i, actions) => {
@@ -214,7 +333,7 @@ function coachHandlers(league, accounts) {
   };
 }
 
-function coachSystem({ name, league, board, roster, todayStr, teams }) {
+function coachSystem({ name, league, board, roster, todayStr, teams, notes }) {
   const L = leagueParams(league);
   const fmt = `${L.teams}-team ${L.ppr === 1 ? 'PPR' : L.ppr === 0.5 ? 'half-PPR' : 'standard'} ${L.qbs === 2 ? 'superflex' : '1QB'} ${L.dynasty ? 'dynasty' : 'redraft'}`;
   const games = board?.games?.length
@@ -224,7 +343,7 @@ function coachSystem({ name, league, board, roster, todayStr, teams }) {
 
 Today is ${todayStr}. The NFL changes daily, so never answer from memory about injuries, depth charts, trades, signings, suspensions, coaching changes or anything "current" — use your tools and web_search first, and say how fresh the info is if it matters. Your training knowledge is older than this season.
 
-Tools: get_scoreboard (live ESPN scores), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), get_my_teams (the user's own linked ESPN/Sleeper rosters and matchups), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
+Tools: get_scoreboard (live ESPN scores), get_standings (live division standings + seeds), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), get_my_teams (the user's own linked ESPN/Sleeper rosters and matchups), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
 
 Trades: always call evaluate_trade with the actual players before giving a verdict, quote the edge %, then add the context numbers miss — injuries, bye weeks, roster fit, playoff schedule, the user's positional needs. Stars are worth more than the sum of depth pieces. If it's close, say what to ask for to tip it.
 
@@ -235,13 +354,24 @@ When you value trades for one of these leagues, keep its own format in mind; the
 User's default calculator league: ${fmt}.${roster ? `\nUser's roster (as they typed it): ${roster}` : ''}
 
 Current scoreboard (Week ${board?.week ?? '?'}, ${board?.season ?? ''}):
-${games}`;
+${games}${notes ? `
+
+The user is a Buffalo Bills fan — bring Bills context in when it's relevant, and know the Bills section below cold.
+
+Below are your researched notes on the ${board?.season || 'current'} season: who's starting, who's hurt, trades, coaching changes, usage trends, rankings and the Bills. Use them as background so you reason like someone who has followed every week — name the injury replacements, bye-week crunches and role changes without being asked. They're a dated snapshot: live tool results and web_search beat them whenever they disagree, and verify anything a start/sit or trade call hinges on.
+
+<season_notes>
+${notes}
+</season_notes>` : ''}`;
 }
 
 module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTurn }) {
   const send = (res, fn) => fn().then(d => res.json(d)).catch(e => res.status(502).json({ error: 'SOURCE_DOWN', message: e.message }));
 
   app.get('/api/nfl/scoreboard', (req, res) => send(res, () => getScoreboard(req.query.week)));
+  app.get('/api/nfl/standings', (req, res) => send(res, () => getStandings()));
+  app.get('/api/nfl/team', (req, res) => send(res, () => getTeam(req.query.abbr)));
+  app.get('/api/nfl/game/:id', (req, res) => send(res, () => getGame(req.params.id)));
   app.get('/api/nfl/news', (req, res) => send(res, async () => ({ articles: await getNews(10) })));
   app.get('/api/nfl/injuries', (req, res) => send(res, async () => ({ players: req.query.all === '1' ? await getInjuries() : await fantasyInjuries(req.query) })));
   app.get('/api/fantasy/values', (req, res) => send(res, () => getValues(req.query)));
@@ -271,9 +401,9 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
           : null,
       ]);
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: process.env.APP_TZ || 'America/New_York' });
-      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr, teams });
+      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr, teams, notes: getSeasonNotes() });
       const messages = [...history.slice(-16).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') })), { role: 'user', content: message }];
-      const tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }, ...COACH_TOOLS];
+      const tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 6 }, ...COACH_TOOLS];
       const out = await runChatTurn(makeClient(key), system, tools, messages, coachHandlers(league, accounts), 6, 1600);
       res.json({ response: out.text, tokens: out.usage, toolActions: out.toolActions });
     } catch (err) {

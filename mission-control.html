@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="BrainVault">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <script type="module">
     // chrono-node@2 dropped its UMD/browser bundle (cjs+esm only), so a plain <script src>
     // throws "exports is not defined" — load it as a real ES module instead and expose it
@@ -42,6 +42,7 @@
       --r-md:       10px;
       --r-sm:       6px;
       --r-pill:     999px;
+      --font-display: 'Space Grotesk', 'Inter', sans-serif;   /* Calendar + Coach headings & numbers */
     }
 
     html, body { width:100%; height:100%; background:#000; color:var(--fg); overflow:hidden; image-rendering:pixelated; font-family:'Inter',sans-serif; }
@@ -555,19 +556,18 @@
        view (per the approved mockup); the toggle-behind month grid stays for full-
        month navigation, restyled flat to match. Quest add-row below reuses shared
        classes with the Home tab (site-wide Inter/flat styling now, layout unchanged). ── */
-    .mob-week-strip { display:flex; gap:6px; padding:0 2px 12px; font-family:'Inter',sans-serif; flex-shrink:0; }
-    .mob-wday { flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:9px 0 8px; border-radius:var(--r-md); cursor:pointer; background:rgba(223,238,255,.045); border:none; }
-    .mob-wday .mwd-name { font-size:9.5px; font-weight:600; color:var(--fg-dim); text-transform:uppercase; letter-spacing:.03em; }
-    .mob-wday .mwd-num  { font-family:'Inter',sans-serif; font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); }
-    .mob-wday .mwd-dot  { width:4px; height:4px; border-radius:50%; background:var(--accent2); margin-top:1px; opacity:0; }
-    .mob-wday.has-events .mwd-dot { opacity:1; }
-    .mob-wday.today { background:linear-gradient(170deg,rgba(255,138,99,.32),rgba(255,138,99,.1)); box-shadow:inset 0 0 0 2px var(--accent); }
-    .mob-wday.today .mwd-num, .mob-wday.today .mwd-name { color:var(--accent); }
-    .mob-wday.sel { background:var(--fg); }
-    .mob-wday.sel .mwd-num, .mob-wday.sel .mwd-name { color:var(--bg); }
-    .mob-wday.sel .mwd-dot { background:var(--bg); }
-    .mob-wday.today.sel { background:linear-gradient(170deg,#ffd6c7,var(--fg) 75%); box-shadow:inset 0 0 0 2px var(--accent); }
-    .mob-wday.today.sel .mwd-num, .mob-wday.today.sel .mwd-name { color:#b3401c; }
+    .mob-week-strip { display:flex; gap:6px; padding:0 0 4px; font-family:'Inter',sans-serif; flex-shrink:0; touch-action:pan-y; }
+    .mob-wday { flex:1; min-width:0; height:70px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; border-radius:16px; cursor:pointer; background:var(--surface); border:none; color:var(--fg); padding:0; }
+    .mob-wday .mwd-name { font-size:11px; font-weight:600; color:#9db3cc; letter-spacing:.04em; }
+    .mob-wday .mwd-num  { font-family:var(--font-display); font-variant-numeric:tabular-nums; font-size:20px; font-weight:700; line-height:1.05; }
+    .mob-wday .mwd-dots { display:flex; gap:3px; height:5px; }
+    .mob-wday .mwd-dots i { width:5px; height:5px; border-radius:50%; }
+    .mob-wday.today { box-shadow:inset 0 0 0 2px var(--accent); }
+    .mob-wday.today .mwd-num { color:var(--accent); }
+    .mob-wday.sel { background:var(--fg); color:var(--bg); }
+    .mob-wday.sel .mwd-name { color:#3b5878; }
+    .mob-wday.sel .mwd-num { color:var(--bg); }
+    .mob-wday.today.sel .mwd-num { color:#b3401c; }
 
     .mob-cal-toggle {
       display:flex; align-items:center; justify-content:space-between; width:100%;
@@ -602,7 +602,117 @@
     .cal-seg button.active { background:var(--fg); color:var(--bg); }
     .cal-view { display:none; flex-direction:column; flex-shrink:0; }
     .cal-view.active { display:flex; }
-    #mobTabCal.view-month .mob-week-strip { display:none; }
+
+    /* ── Calendar refresh (2026-10): Space Grotesk headings, bigger tiles & tap targets,
+       card-style timeline. Day-view classes are cd-* so the Home timeline (tl-*) is untouched. ── */
+    #mobTabCal { --cal-dim:#9db3cc; --cal-sf2:#1a3352; }
+    .cal-top { display:flex; align-items:center; padding:4px 2px 12px; flex-shrink:0; }
+    .cal-h1 { margin:0; font-family:var(--font-display); font-size:28px; font-weight:700; letter-spacing:-.02em; color:var(--fg); }
+    .cal-seg.cal-seg-main { padding:4px; background:var(--surface); margin-bottom:14px; flex-shrink:0; }
+    .cal-seg.cal-seg-main button { flex:1; min-height:40px; font-size:14px; color:var(--cal-dim); }
+    .cal-seg.cal-seg-main button.active { color:var(--bg); }
+    .cal-navrow { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+    .cal-navrow.center { margin-bottom:14px; }
+    .cal-navlbl { flex:1; font-family:var(--font-display); font-size:15px; font-weight:600; color:var(--cal-dim); }
+    .cal-navmid { flex:1; text-align:center; min-width:0; }
+    .cal-navttl { font-family:var(--font-display); font-size:20px; font-weight:700; color:var(--fg); }
+    .cal-ic { width:44px; height:44px; border-radius:50%; border:none; background:var(--surface); color:var(--fg); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+    .cal-ic:active, .cal-pill:active { transform:scale(.95); }
+    .cal-pill { height:44px; padding:0 18px; border:none; border-radius:var(--r-pill); background:var(--surface); color:var(--fg); font-family:'Inter',sans-serif; font-size:14px; font-weight:700; cursor:pointer; flex-shrink:0; }
+    .cal-pill[hidden] { display:none; }
+    .cal-pill.accent { background:var(--accent); color:#2a1208; }
+    .cal-pill-center { align-self:center; margin:-4px 0 12px; height:38px; }
+    .cal-lbl { font-size:12px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--cal-dim); margin:18px 2px 8px; }
+    .cal-swipe-hint { text-align:center; font-size:12px; font-weight:600; color:#6f89a6; padding:18px 0 6px; }
+    @media (hover:hover) and (pointer:fine) { .cal-swipe-hint { display:none; } }
+    .cd-meta { font-size:14px; color:var(--cal-dim); margin-top:3px; }
+    .cd-meta b { color:var(--accent); font-weight:700; }
+    /* Day */
+    .cd-head { display:flex; align-items:flex-end; gap:10px; margin:20px 2px 14px; }
+    .cd-head-txt { flex:1; min-width:0; }
+    .cd-name { font-family:var(--font-display); font-size:24px; font-weight:700; letter-spacing:-.01em; color:var(--fg); }
+    .cd-list { display:flex; flex-direction:column; gap:10px; }
+    .cd-row { display:grid; grid-template-columns:54px minmax(0,1fr); gap:10px; align-items:start; }
+    .cd-time { font-family:var(--font-display); font-variant-numeric:tabular-nums; font-size:14px; font-weight:700; color:var(--fg); text-align:right; padding-top:14px; line-height:1.1; }
+    .cd-time small { display:block; font-family:'Inter',sans-serif; font-size:11px; font-weight:600; color:var(--cal-dim); }
+    .cd-card { position:relative; display:flex; align-items:flex-start; gap:8px; background:var(--surface); border-radius:18px; padding:4px 12px 4px 4px; min-width:0; }
+    .cd-card.next { box-shadow:inset 0 0 0 1.5px rgba(255,138,99,.6); }
+    .cd-main { flex:1; min-width:0; display:flex; align-items:flex-start; gap:12px; border:none; background:none; color:var(--fg); font:inherit; text-align:left; padding:8px 0 8px 8px; cursor:pointer; border-radius:14px; }
+    .cd-tile { width:42px; height:42px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .cd-tile.quest { border-radius:50%; width:36px; height:36px; margin:3px; background:none; box-shadow:inset 0 0 0 2.5px var(--kc); color:var(--kc); font-weight:800; font-size:13px; }
+    .cd-txt { min-width:0; display:flex; flex-direction:column; justify-content:center; min-height:42px; }
+    .cd-title { font-size:16px; font-weight:600; line-height:1.25; overflow-wrap:anywhere; }
+    .cd-sub { font-size:13px; color:var(--cal-dim); margin-top:2px; line-height:1.35; }
+    .cd-badge { align-self:flex-start; margin-top:18px; flex-shrink:0; font-size:12px; font-weight:700; color:var(--accent); background:rgba(255,138,99,.14); padding:5px 9px; border-radius:var(--r-pill); }
+    .cd-card .tl-check { width:30px; height:30px; margin-top:14px; flex-shrink:0; border-color:#5d7896; }
+    .cd-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
+    .cd-row.done .cd-title { text-decoration:line-through; opacity:.55; }
+    .cd-row.past .cd-card { opacity:.55; }
+    .cd-row.past .cd-tile:not(.quest) { filter:grayscale(.7); }
+    .cd-gap { display:grid; grid-template-columns:54px 1fr; gap:10px; }
+    .cd-gap-txt { font-size:13px; color:var(--cal-dim); border-left:2px dotted #3d5a7a; padding:2px 0 2px 12px; margin-left:24px; }
+    .cd-now { display:grid; grid-template-columns:54px 1fr; gap:10px; align-items:center; }
+    .cd-now .cd-time { padding:0; font-size:12px; color:var(--accent); font-family:'Inter',sans-serif; }
+    .cd-now-line { display:flex; align-items:center; }
+    .cd-now-line i { width:10px; height:10px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+    .cd-now-line::after { content:''; flex:1; height:2px; background:var(--accent); }
+    .cd-empty { text-align:center; padding:30px 16px; background:var(--surface); border-radius:22px; display:flex; flex-direction:column; align-items:center; gap:6px; }
+    .cd-empty-t { font-family:var(--font-display); font-size:18px; font-weight:700; }
+    .cd-empty-s { font-size:14px; color:var(--cal-dim); margin-bottom:8px; }
+    /* Week */
+    .wd { background:var(--surface); border-radius:20px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
+    .wd.today { box-shadow:inset 0 0 0 2px var(--accent); }
+    .wd.free { padding:8px 14px; }
+    .wd-hd { display:flex; align-items:center; gap:12px; border:none; background:none; color:var(--fg); font:inherit; padding:0; cursor:pointer; text-align:left; width:100%; min-height:44px; }
+    .wd-num { width:42px; height:42px; border-radius:12px; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; flex-shrink:0; }
+    .wd-num small { font-size:9.5px; font-weight:700; color:var(--cal-dim); letter-spacing:.05em; }
+    .wd-num b { font-family:var(--font-display); font-size:17px; font-weight:700; margin-top:2px; }
+    .wd.today .wd-num { background:var(--accent); color:#2a1208; }
+    .wd.today .wd-num small { color:#5c2a16; }
+    .wd-name { flex:1; font-size:16px; font-weight:700; }
+    .wd.today .wd-name { color:var(--accent); }
+    .wd-cnt { font-size:13px; color:var(--cal-dim); font-weight:500; }
+    .wd-rows { display:flex; flex-direction:column; gap:2px; }
+    .wd-row { display:flex; align-items:center; gap:8px; }
+    .wd-main { flex:1; min-width:0; display:grid; grid-template-columns:68px 8px minmax(0,1fr); gap:10px; align-items:center; min-height:40px; border:none; background:none; color:var(--fg); font:inherit; text-align:left; padding:0; cursor:pointer; }
+    .wd-t { font-size:13px; font-weight:600; color:var(--cal-dim); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .wd-bar { width:8px; height:26px; border-radius:4px; background:var(--kc); }
+    .wd-bar.quest { background:none; box-shadow:inset 0 0 0 2px var(--kc); }
+    .wd-title { font-size:15px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .wd-row .tl-check { width:28px; height:28px; font-size:12px; flex-shrink:0; }
+    .wd-row.done .tl-check { background:var(--green); border-color:var(--green); color:#0a1929; }
+    .wd-row.done .wd-title { text-decoration:line-through; opacity:.5; }
+    /* Month */
+    #calViewMonth .mob-dow-row { font-size:12px; font-weight:700; opacity:1; color:var(--cal-dim); margin-bottom:6px; }
+    #calViewMonth .mob-month-grid { gap:4px; margin-top:0; }
+    #calViewMonth .mob-day-cell { height:50px; min-height:0; padding:0; border-radius:12px; background:var(--surface); justify-content:center; gap:4px; font-size:16px; }
+    #calViewMonth .mob-day-cell .dn { font-variant-numeric:tabular-nums; }
+    #calViewMonth .mob-day-dots { margin:0; height:5px; gap:3px; }
+    #calViewMonth .mob-dot-sq { width:5px; height:5px; border-radius:50%; }
+    #calViewMonth .mob-day-cell.today { box-shadow:inset 0 0 0 2px var(--accent); color:var(--accent); }
+    #calViewMonth .mob-day-cell.sel { background:var(--fg); color:var(--bg); font-weight:800; }
+    #calViewMonth .mob-day-cell.today.sel { background:var(--fg); color:#b3401c; }
+    .cm-dayhd { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin:20px 2px 10px; }
+    .cm-dayname { font-family:var(--font-display); font-size:19px; font-weight:700; }
+    .cm-events { display:flex; flex-direction:column; gap:10px; }
+    .cm-none { font-size:14px; color:var(--cal-dim); padding:4px 2px; }
+    .cm-none button { border:none; background:none; color:var(--accent); font:inherit; font-weight:700; cursor:pointer; padding:6px 4px; }
+    /* Event sheet (tap an event) */
+    .evs-hd { display:flex; align-items:flex-start; gap:14px; margin-bottom:16px; }
+    .evs-tile { width:56px; height:56px; border-radius:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .evs-ttl { flex:1; min-width:0; }
+    .evs-name { font-family:var(--font-display); font-size:26px; font-weight:700; line-height:1.15; overflow-wrap:anywhere; }
+    .evs-kind { font-size:14px; font-weight:600; margin-top:4px; }
+    .evs-info { display:flex; flex-direction:column; gap:14px; background:var(--bg); border-radius:20px; padding:16px; margin-bottom:16px; }
+    .evs-row { display:flex; align-items:center; gap:14px; font-size:16px; font-weight:500; }
+    .evs-row svg { color:#9db3cc; flex-shrink:0; }
+    .evs-row small { display:block; font-size:13px; color:#9db3cc; margin-top:1px; }
+    .evs-acts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+    .evs-act { min-height:72px; border:none; border-radius:18px; background:#1a3352; color:var(--fg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; font-family:'Inter',sans-serif; font-size:13.5px; font-weight:600; cursor:pointer; padding:6px; text-align:center; }
+    .evs-act.danger { color:#ff9a9a; }
+    .evs-act.armed { background:#5a1f26; color:#fff; }
+    .evs-edit { min-height:56px; border:none; border-radius:18px; background:var(--fg); color:var(--bg); font-family:'Inter',sans-serif; font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; }
+    .evs-act:active, .evs-edit:active { transform:scale(.97); }
 
     .tl-dayhead { display:flex; align-items:center; gap:6px; margin:2px 0 14px; }
     .tl-dayhead-txt { flex:1; min-width:0; }
@@ -751,8 +861,56 @@
     .as-remind input[type=checkbox] { width:20px; height:20px; accent-color:var(--accent); }
     .as-save { position:sticky; bottom:0; margin-top:20px; border:none; border-radius:var(--r-lg); background:var(--accent); color:#1a0e08; font-family:'Inter',sans-serif; font-size:16px; font-weight:800; min-height:52px; cursor:pointer; flex-shrink:0; box-shadow:0 -10px 16px 4px var(--surface); z-index:2; }
     .as-save:active { transform:scale(.98); }
-    .cal-fab { position:sticky; bottom:14px; align-self:flex-end; margin-top:auto; width:56px; height:56px; border-radius:50%; border:none; background:var(--accent); color:#1a0e08; font-size:30px; font-weight:600; line-height:1; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.45); flex-shrink:0; z-index:5; }
+    .cal-fab { position:sticky; bottom:14px; align-self:flex-end; margin-top:auto; width:62px; height:62px; border-radius:22px; border:none; background:var(--accent); color:#2a1208; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 10px 24px rgba(0,0,0,.45); flex-shrink:0; z-index:5; }
     .cal-fab:active { transform:scale(.94); }
+
+    /* Add / edit sheet refresh: bigger title, Start/End tiles + time wheel, icon option row */
+    .as2 { padding-left:18px; padding-right:18px; }
+    .as2 .as-top { margin-bottom:10px; }
+    .as2 .as-seg { background:var(--bg); padding:4px; }
+    .as2 .as-seg button { min-height:38px; padding:0 20px; font-size:14px; }
+    .as2 .as-x { width:44px; height:44px; background:#1a3352; display:flex; align-items:center; justify-content:center; }
+    .as-edit-hd { font-family:var(--font-display); font-size:20px; font-weight:700; }
+    .as-edit-hd[hidden], .as2 [hidden] { display:none !important; }
+    .as2 .as-label { font-size:12px; margin:14px 0 8px; }
+    .as2 .as-label-what { margin-top:4px; margin-bottom:2px; }
+    .as2 .as-title { font-family:var(--font-display); font-size:26px; padding:4px 0 10px; }
+    .as2 .as-hint { font-size:13px; }
+    .as2 .as-chip { font-size:15px; min-height:44px; padding:0 16px; background:#1a3352; }
+    .as2 .as-chip.on { background:var(--fg); color:var(--bg); }
+    .as-chip-ic { display:inline-flex; align-items:center; gap:4px; }
+    .as2 .as-chips.wrap { flex-wrap:wrap; overflow:visible; }
+    .as-times { display:flex; gap:10px; margin-top:14px; }
+    .as-tile { flex:1; border:none; background:var(--bg); border-radius:18px; padding:12px 14px; text-align:left; color:var(--fg); cursor:pointer; font-family:'Inter',sans-serif; }
+    .as-tile small { display:block; font-size:12px; font-weight:600; color:#9db3cc; }
+    .as-tile b { display:block; font-family:var(--font-display); font-size:22px; font-weight:700; margin-top:2px; }
+    .as-tile b.dim { color:#6f89a6; font-size:19px; }
+    .as-tile.on { box-shadow:inset 0 0 0 2px var(--accent); }
+    .as-wheel { position:relative; margin-top:10px; height:160px; background:var(--bg); border-radius:18px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); overflow:hidden; }
+    .as-wheel::before, .as-wheel::after { content:''; position:absolute; left:0; right:0; height:44px; z-index:2; pointer-events:none; }
+    .as-wheel::before { top:0; background:linear-gradient(var(--bg),transparent); }
+    .as-wheel::after { bottom:0; background:linear-gradient(transparent,var(--bg)); }
+    .asw-band { position:absolute; left:10px; right:10px; top:60px; height:40px; border-radius:12px; background:#1a3352; pointer-events:none; }
+    .asw-col { position:relative; height:160px; overflow-y:auto; scroll-snap-type:y mandatory; padding:60px 0; box-sizing:border-box; scrollbar-width:none; overscroll-behavior:contain; outline:none; }
+    .asw-col::-webkit-scrollbar { display:none; }
+    .asw-col:focus-visible { box-shadow:inset 0 0 0 2px rgba(223,238,255,.35); border-radius:12px; }
+    .asw-i { height:40px; display:flex; align-items:center; justify-content:center; scroll-snap-align:center; font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--fg); font-variant-numeric:tabular-nums; cursor:pointer; }
+    .as2 .as-durs { margin-top:10px; }
+    .as2 .as-durs .as-chip { min-height:40px; font-size:14px; }
+    .as2 .as-req { display:none; font-size:13px; margin-top:8px; }
+    .as2 .as-req.on { display:block; }
+    .as-opts { display:flex; align-items:center; gap:10px; margin-top:16px; }
+    .as-opt { width:52px; height:52px; border-radius:16px; border:none; background:#1a3352; color:#9db3cc; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+    .as-opt.set { color:var(--accent2); box-shadow:inset 0 0 0 2px var(--accent2); }
+    .as-opt.open { box-shadow:inset 0 0 0 2px var(--fg); color:var(--fg); }
+    .as-opt-sum { flex:1; min-width:0; font-size:13px; color:#9db3cc; line-height:1.35; }
+    .as-optpanel { margin-top:10px; background:var(--bg); border-radius:18px; padding:10px; }
+    .as-kgrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+    .as-kchip { display:flex; align-items:center; gap:10px; min-height:48px; border:none; border-radius:14px; background:#1a3352; color:var(--fg); font-family:'Inter',sans-serif; font-size:15px; font-weight:600; padding:6px 10px; cursor:pointer; text-align:left; }
+    .as-kchip.on { box-shadow:inset 0 0 0 2px var(--fg); }
+    .as-kchip .as-ic { width:30px; height:30px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .as2 .as-inp { font-size:16px; background:#1a3352; box-shadow:none; }
+    .as2 .as-save { min-height:56px; border-radius:18px; font-size:17px; color:#2a1208; }
 
     /* ══════════════════════════════════════
        ED + RED — same language as the calendar: soft cards, pills, sheets
@@ -1525,68 +1683,67 @@
       </div>
     </div>
 
-    <!-- CAL tab: Structured-style timeline (Day) is primary; Week agenda; Month = classic grid -->
+    <!-- CAL tab: Day = timeline (primary), Week = agenda, Month = grid + that day's agenda.
+         Swipe left/right on any view to move a day / week / month. -->
     <div class="mob-tab-pane" id="mobTabCal">
-      <div class="mob-tab-hd">
-        <span>📅 CALENDAR</span>
-        <div class="cal-seg" id="calSeg" role="tablist">
-          <button type="button" data-v="day" onclick="setCalView('day')">Day</button>
-          <button type="button" data-v="week" onclick="setCalView('week')">Week</button>
-          <button type="button" data-v="month" onclick="setCalView('month')">Month</button>
-        </div>
+      <div class="cal-top">
+        <h1 class="cal-h1">Calendar</h1>
+      </div>
+      <div class="cal-seg cal-seg-main" id="calSeg" role="tablist">
+        <button type="button" data-v="day" onclick="setCalView('day')">Day</button>
+        <button type="button" data-v="week" onclick="setCalView('week')">Week</button>
+        <button type="button" data-v="month" onclick="setCalView('month')">Month</button>
       </div>
 
-      <div class="mob-week-strip" id="mobWeekStrip"></div>
-
-      <!-- DAY: vertical timeline -->
+      <!-- DAY: week strip + vertical timeline -->
       <div class="cal-view" id="calViewDay">
-        <div class="tl-dayhead">
-          <button type="button" class="tl-nav" onclick="shiftCalDay(-1)" aria-label="Previous day">‹</button>
-          <div class="tl-dayhead-txt">
-            <div class="tl-dayname" id="tlDayName">—</div>
-            <div class="tl-daymeta" id="tlDayMeta"></div>
-          </div>
-          <button type="button" class="tl-nav" onclick="shiftCalDay(1)" aria-label="Next day">›</button>
-          <button type="button" class="tl-today" id="tlTodayBtn" onclick="jumpCalToday()">Today</button>
+        <div class="cal-navrow">
+          <div class="cal-navlbl" id="calStripLbl">—</div>
+          <button type="button" class="cal-ic" onclick="shiftCalDay(-7)" aria-label="Previous week"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <button type="button" class="cal-ic" onclick="shiftCalDay(7)" aria-label="Next week"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
-        <div class="tl-list" id="tlList"></div>
+        <div class="mob-week-strip" id="mobWeekStrip"></div>
+        <div class="cd-head">
+          <div class="cd-head-txt">
+            <div class="cd-name" id="tlDayName">—</div>
+            <div class="cd-meta" id="tlDayMeta"></div>
+          </div>
+          <button type="button" class="cal-pill" id="tlTodayBtn" onclick="jumpCalToday()">Today</button>
+        </div>
+        <div class="cd-list" id="tlList"></div>
+        <div class="cal-swipe-hint" aria-hidden="true">‹ swipe to change day ›</div>
       </div>
 
       <!-- WEEK: agenda of the selected week -->
       <div class="cal-view" id="calViewWeek">
-        <div class="tl-dayhead">
-          <button type="button" class="tl-nav" onclick="shiftCalDay(-7)" aria-label="Previous week">‹</button>
-          <div class="tl-dayhead-txt"><div class="tl-dayname" id="wkRange">—</div><div class="tl-daymeta" id="wkMeta"></div></div>
-          <button type="button" class="tl-nav" onclick="shiftCalDay(7)" aria-label="Next week">›</button>
-          <button type="button" class="tl-today" id="wkTodayBtn" onclick="jumpCalToday()">Today</button>
+        <div class="cal-navrow center">
+          <button type="button" class="cal-ic" onclick="shiftCalDay(-7)" aria-label="Previous week"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div class="cal-navmid"><div class="cal-navttl" id="wkRange">—</div><div class="cd-meta" id="wkMeta"></div></div>
+          <button type="button" class="cal-ic" onclick="shiftCalDay(7)" aria-label="Next week"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
+        <button type="button" class="cal-pill cal-pill-center" id="wkTodayBtn" onclick="jumpCalToday()">This week</button>
         <div class="wk-list" id="wkList"></div>
+        <div class="cal-swipe-hint" aria-hidden="true">‹ swipe to change week ›</div>
       </div>
 
-      <!-- MONTH: the classic grid, kept as-is -->
+      <!-- MONTH: grid, then the selected day's events + quests -->
       <div class="cal-view" id="calViewMonth">
-        <div class="mob-cal-grid-wrap open" id="mobCalGridWrap">
-          <div class="mob-cal-card">
-            <div class="mob-cal-nav">
-              <button class="cal-nav-btn" onclick="changeMobCalMonth(-1)">◀</button>
-              <span id="mobCalLabel" style="font-family:'Inter',sans-serif;font-size:11px;">—</span>
-              <button class="cal-nav-btn" onclick="changeMobCalMonth(1)">▶</button>
-            </div>
-            <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-            <div class="mob-month-grid" id="mobMonthGrid"></div>
-          </div>
+        <div class="cal-navrow center">
+          <button type="button" class="cal-ic" onclick="changeMobCalMonth(-1)" aria-label="Previous month"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+          <div class="cal-navmid"><div class="cal-navttl" id="mobCalLabel">—</div></div>
+          <button type="button" class="cal-ic" onclick="changeMobCalMonth(1)" aria-label="Next month"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
         </div>
+        <div class="mob-dow-row"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+        <div class="mob-month-grid" id="mobMonthGrid"></div>
 
-        <div class="mob-day-summary" id="mobDaySummary"></div>
-        <div class="mob-day-event-list" id="mobDayEventList"></div>
+        <div class="cm-dayhd"><div class="cm-dayname" id="mobDaySummary">—</div><div class="cd-meta" id="cmDayCount"></div></div>
+        <div class="cm-events" id="mobDayEventList"></div>
 
-        <div class="mob-tl-section-hd">
-          <span id="mobCalQuestHd">🎯 QUESTS</span>
-        </div>
+        <div class="cal-lbl" id="mobCalQuestHd">Quests</div>
         <div class="mob-quest-list" id="mobCalQuestList"></div>
       </div>
 
-      <button type="button" class="cal-fab" onclick="openAddSheet(selectedKey)" aria-label="Add event or quest">+</button>
+      <button type="button" class="cal-fab" onclick="openAddSheet(selectedKey)" aria-label="Add event or quest"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     </div>
 
     <!-- BUDGET tab -->
@@ -1800,43 +1957,44 @@
 
 <!-- ADD SHEET: one clean form for new events and quests -->
 <div class="overlay add-sheet-ov" id="addSheet" onclick="if(event.target===this)closeAddSheet()">
-  <div class="add-sheet" role="dialog" aria-labelledby="asTitleHd">
+  <div class="add-sheet as2" role="dialog" aria-labelledby="asTitleHd">
     <div class="as-grab"></div>
     <div class="as-top">
       <div class="cal-seg as-seg" id="asSeg">
         <button type="button" data-t="event" onclick="setAddType('event')">Event</button>
         <button type="button" data-t="quest" onclick="setAddType('quest')">Quest</button>
       </div>
-      <span id="asTitleHd" class="as-hd-sr">New item</span>
-      <button type="button" class="as-x" onclick="closeAddSheet()" aria-label="Close">✕</button>
+      <span id="asTitleHd" class="as-edit-hd" hidden>Edit event</span>
+      <button type="button" class="as-x" onclick="closeAddSheet()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
 
+    <label class="as-label as-label-what" for="asTitle">What</label>
     <input id="asTitle" class="as-title" type="text" autocomplete="off" placeholder="What's the plan?" oninput="asTitleChanged()" onkeydown="if(event.key==='Enter'){event.preventDefault();saveAddSheet();}">
     <div class="as-hint" id="asHint">Tip: type "gym tomorrow 6pm" and the date and time fill in.</div>
 
-    <div class="as-label">Date</div>
-    <div class="as-chips" id="asDateChips"></div>
-    <div class="as-cal" id="asCal">
-      <div class="as-cal-nav"><button type="button" onclick="asCalMove(-1)" aria-label="Previous month">‹</button><span id="asCalLbl">—</span><button type="button" onclick="asCalMove(1)" aria-label="Next month">›</button></div>
-      <div class="as-cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
-      <div class="as-cal-grid" id="asCalGrid"></div>
+    <div id="asScopeRow" hidden>
+      <div class="as-label">Change</div>
+      <div class="as-chips" id="asScope"></div>
     </div>
 
-    <div class="as-label">Time <span class="as-req" id="asTimeReq">required for S-rank</span></div>
-    <div class="as-chips" id="asTimeChips"></div>
+    <div id="asWhenRow">
+      <div class="as-label">When</div>
+      <div class="as-chips" id="asDateChips"></div>
+      <div class="as-cal" id="asCal">
+        <div class="as-cal-nav"><button type="button" onclick="asCalMove(-1)" aria-label="Previous month">‹</button><span id="asCalLbl">—</span><button type="button" onclick="asCalMove(1)" aria-label="Next month">›</button></div>
+        <div class="as-cal-dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+        <div class="as-cal-grid" id="asCalGrid"></div>
+      </div>
+    </div>
+
+    <div class="as-times" id="asTimes"></div>
+    <div class="as-wheel" id="asWheel" hidden></div>
+    <div class="as-chips as-durs" id="asDurs"></div>
+    <div class="as-req" id="asTimeReq">S-rank quests need a time</div>
 
     <div id="asEventOpts">
-      <div class="as-label">Type</div>
-      <div class="as-kinds" id="asKinds"></div>
-      <button type="button" class="as-more-btn" id="asMoreBtn" onclick="document.getElementById('asMore').classList.toggle('open');this.classList.toggle('open')">Location &amp; reminder <span>▾</span></button>
-      <div class="as-more" id="asMore">
-        <input id="asLoc" class="as-inp" type="text" placeholder="Location (optional)">
-        <label class="as-remind"><input type="checkbox" id="asNotify" onchange="document.getElementById('asLead').style.display=this.checked?'':'none'"> Remind me
-          <select id="asLead" class="as-inp" style="display:none;width:auto;">
-            <option value="5">5 min before</option><option value="15">15 min before</option><option value="30" selected>30 min before</option><option value="60">1 hour before</option><option value="1440">1 day before</option>
-          </select>
-        </label>
-      </div>
+      <div class="as-opts" id="asOpts"></div>
+      <div class="as-optpanel" id="asOptPanel" hidden></div>
     </div>
 
     <div id="asQuestOpts">
@@ -2710,7 +2868,7 @@ function openAddSheetAs(type){ asLastType=type; openAddSheet(TODAY()); }
 function renderMobCalQuests(){
   const key=selectedKey||TODAY();
   const d=new Date(key+'T00:00:00');
-  const hd=document.getElementById('mobCalQuestHd'); if(hd)hd.textContent=`🎯 QUESTS — ${MONTHS_S[d.getMonth()]} ${d.getDate()}`;
+  const hd=document.getElementById('mobCalQuestHd'); if(hd)hd.textContent=`Quests · ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
   const tasks=getTasksForDate(key);
   const ql=document.getElementById('mobCalQuestList');
   renderTasksInto(ql, tasks, true);
@@ -2851,7 +3009,7 @@ let mobCalYear=new Date().getFullYear(), mobCalMonth=new Date().getMonth();
 function changeMobCalMonth(d){ mobCalMonth+=d; if(mobCalMonth>11){mobCalMonth=0;mobCalYear++;}if(mobCalMonth<0){mobCalMonth=11;mobCalYear--;} renderMobMonthGrid(); }
 
 function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
-  if(labelEl) labelEl.textContent = MONTHS_S[month];
+  if(labelEl) labelEl.textContent = isMob ? `${MONTHS_FULL[month]} ${year}` : MONTHS_S[month];
   const todayK=TODAY();
   const firstDow=new Date(year,month,1).getDay();
   const lastDate=new Date(year,month+1,0).getDate();
@@ -2867,13 +3025,17 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
     const isToday=key===todayK, isSel=key===selKey;
     const btn=document.createElement('button');
     btn.className=(isMob?'mob-day-cell':'day-cell')+(isToday?' today':'')+(isSel?' sel':'');
-    const dots=evs.slice(0,4).map(e=>`<div class="${isMob?'mob-dot-sq':'dot-sq'}" style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'};"></div>`).join('');
+    const dots=evs.slice(0,isMob?3:4).map(e=>`<div class="${isMob?'mob-dot-sq':'dot-sq'}" style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'};"></div>`).join('');
     btn.innerHTML=`<span class="dn">${d}</span><div class="${isMob?'mob-day-dots':'day-dots'}">${dots}</div>`;
-    if(evs.length && !isSel && !isToday){
+    if(isToday) btn.setAttribute('aria-current','date');
+    if(!isMob && evs.length && !isSel && !isToday){
       const tint=KIND_COLORS[evs[0].kind||'focus']||'var(--fg)';
       btn.style.background=hexAlpha(tint, Math.min(.12+evs.length*.06, .4));
     }
-    btn.onclick=()=>{ selectedKey=key; renderMobMonthGrid(); renderMobDaySummary(); renderMobCalQuests(); openDayModal(key,dt); };
+    // Month view: a tap just selects the day — its events + quests list right below the grid
+    btn.onclick=isMob
+      ? ()=>{ selectedKey=key; renderMobMonthGrid(); renderMobCalQuests(); }
+      : ()=>{ selectedKey=key; renderMobMonthGrid(); renderMobDaySummary(); renderMobCalQuests(); openDayModal(key,dt); };
     gridEl.appendChild(btn);
   });
   renderDaySummaryInto(selKey, summaryEl, isMob);
@@ -2885,10 +3047,11 @@ function buildCalGrid(year, month, selKey, gridEl, summaryEl, labelEl, isMob){
 // day-cell tap keeps its existing "open day modal" behavior unchanged.
 function renderMobWeekStrip(){
   const el=document.getElementById('mobWeekStrip'); if(!el)return;
-  const DOW=['S','M','T','W','T','F','S'];
+  const DOW=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   const ref=new Date(selectedKey+'T00:00:00');
   const sun=new Date(ref); sun.setDate(ref.getDate()-ref.getDay());
   const todayK=TODAY();
+  const lbl=document.getElementById('calStripLbl'); if(lbl) lbl.textContent=`${MONTHS_FULL[ref.getMonth()]} ${ref.getFullYear()}`;
   el.innerHTML='';
   for(let i=0;i<7;i++){
     const d=new Date(sun); d.setDate(sun.getDate()+i);
@@ -2896,8 +3059,10 @@ function renderMobWeekStrip(){
     const evs=eventsForDate(key);
     const isToday=key===todayK, isSel=key===selectedKey;
     const btn=document.createElement('button');
-    btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'')+(evs.length?' has-events':'');
-    btn.innerHTML=`<span class="mwd-name">${isToday?'Today':DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dot"></span>`;
+    btn.type='button';
+    btn.className='mob-wday'+(isToday?' today':'')+(isSel?' sel':'');
+    btn.setAttribute('aria-label',d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+(evs.length?`, ${evs.length} event${evs.length===1?'':'s'}`:''));
+    btn.innerHTML=`<span class="mwd-name">${DOW[i]}</span><span class="mwd-num">${d.getDate()}</span><span class="mwd-dots">${evs.slice(0,3).map(e=>`<i style="background:${KIND_COLORS[e.kind||'focus']||'var(--fg)'}"></i>`).join('')}</span>`;
     if(isToday) btn.setAttribute('aria-current','date');
     btn.onclick=()=>{ selectedKey=key; mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth(); renderMobMonthGrid(); renderMobCalQuests(); };
     el.appendChild(btn);
@@ -2905,37 +3070,140 @@ function renderMobWeekStrip(){
 }
 function renderMobMonthGrid(){ const g=document.getElementById('mobMonthGrid');if(!g)return; buildCalGrid(mobCalYear,mobCalMonth,selectedKey,g,document.getElementById('mobDaySummary'),document.getElementById('mobCalLabel'),true); renderMobWeekStrip(); renderCalViews(); }
 
-// ── ADD SHEET ─────────────────────────────────────────────────────────────────
-// One form for both events and quests. Everything common is one tap: date chips
-// (Today / Tomorrow / weekday / Pick date → inline calendar), time chips, and a
-// vertical list of types. Natural language in the title still fills date/time.
-const AS_TIMES=[['','Anytime'],['09:00','9 AM'],['12:00','Noon'],['15:00','3 PM'],['18:00','6 PM'],['20:00','8 PM']];
-const AS_KIND_SUB={ focus:'Study, work, deep focus', meeting:'Calls, classes, 1:1s', training:'Gym, practice, games', social:'Friends, food, hangouts', errand:'Appointments, pickups', routine:'Everything else' };
+// ── ADD / EDIT SHEET ──────────────────────────────────────────────────────────
+// One sheet adds events and quests and edits existing events. Up front: title, date
+// chips (Today / Tomorrow / weekday / Pick date → inline calendar), Start/End tiles that
+// open a scroll-wheel time picker, and duration chips. Type, location, reminder and
+// repeat live in one row of icon buttons, each opening a small panel below it.
+// Natural language in the title still fills date/time ("gym tomorrow 6pm").
+const AS_DURS=[[30,'30 min'],[60,'1 hr'],[90,'1.5 hr'],[120,'2 hr']];
+const AS_LEADS=[[0,'Off'],[5,'5 min'],[15,'15 min'],[30,'30 min'],[60,'1 hr'],[1440,'1 day']];
+const AS_ICON={
+  pin:'<path d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  bell:'<path d="M6 16v-5a6 6 0 1112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  skip:'<path d="M5 5l14 14"/><circle cx="12" cy="12" r="9"/>',
+};
+function asIcon(p,s){ return `<svg width="${s||20}" height="${s||20}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`; }
+const kindName=k=>{ const s=k||'focus'; return s[0].toUpperCase()+s.slice(1); };
 let asLastType='event'; try{ const v=localStorage.getItem('mc.addType'); if(v==='event'||v==='quest') asLastType=v; }catch{}
-let asState={type:'event',date:null,time:'',kind:'focus',rank:'B',kindTouched:false,calY:0,calM:0,calOpen:false};
-
-function openAddSheet(key){
+let asState={};
+function asFresh(key){
   const d=key||TODAY(), dt=new Date(d+'T00:00:00');
-  asState={type:asLastType,date:d,time:'',kind:'focus',rank:'B',kindTouched:false,calY:dt.getFullYear(),calM:dt.getMonth(),calOpen:false};
-  document.getElementById('asTitle').value='';
-  document.getElementById('asLoc').value='';
-  document.getElementById('asNotify').checked=false;
-  document.getElementById('asLead').style.display='none';
-  document.getElementById('asMore').classList.remove('open');
-  document.getElementById('asMoreBtn').classList.remove('open');
-  const h=document.getElementById('asHint'); h.classList.remove('parsed'); h.textContent='Tip: type "gym tomorrow 6pm" and the date and time fill in.';
+  return {type:asLastType,date:d,time:'',end:'',kind:'focus',rank:'B',kindTouched:false,loc:'',lead:0,repeat:'none',
+          opt:null,wheel:null,calY:dt.getFullYear(),calM:dt.getMonth(),calOpen:false,edit:null,scope:'occurrence'};
+}
+function asResetFields(title){
+  document.getElementById('asTitle').value=title||'';
+  const h=document.getElementById('asHint'); h.classList.remove('parsed'); h.hidden=!!asState.edit;
+  h.textContent='Tip: type "gym tomorrow 6pm" and the date and time fill in.';
+}
+// preset (from Duplicate) prefills a new event with another event's details
+function openAddSheet(key,preset){
+  asState=asFresh(key);
+  if(preset){ Object.assign(asState,preset,{type:'event',kindTouched:true}); }
+  asResetFields(preset?.title);
   renderAddSheet();
   openModal('addSheet');
-  setTimeout(()=>document.getElementById('asTitle').focus(),80);
+  if(!preset) setTimeout(()=>document.getElementById('asTitle').focus(),80);
 }
-function closeAddSheet(){ closeModal('addSheet'); }
-function setAddType(t){ asState.type=t; asLastType=t; try{ localStorage.setItem('mc.addType',t); }catch{} renderAddSheet(); }
+// Edit an existing event: a one-off, or one day / every repeat of a repeating one
+function openEditSheet(key,ref){
+  const r=calEvFromRef(key,ref); if(!r) return;
+  const e=r.e;
+  asState={...asFresh(key),type:'event',time:e.time||'',end:(e.time&&e.endTime)||'',kind:e.kind||'focus',kindTouched:true,
+           loc:e.location||'',lead:e.notify?(e.notifyLeadMin||30):0,edit:{key,ref,idx:r.idx,rec:r.rec?r.rec.id:null}};
+  asResetFields(e.title);
+  renderAddSheet();
+  openModal('addSheet');
+}
+function closeAddSheet(){ asState.wheel=null; closeModal('addSheet'); }
+function setAddType(t){ asState.type=t; asLastType=t; if(t==='quest'){ asState.end=''; asState.opt=null; } try{ localStorage.setItem('mc.addType',t); }catch{} renderAddSheet(); }
 function asSetDate(k){ asState.date=k; const d=new Date(k+'T00:00:00'); asState.calY=d.getFullYear(); asState.calM=d.getMonth(); renderAddSheet(); }
 function asToggleCal(){ asState.calOpen=!asState.calOpen; renderAddSheet(); }
 function asCalMove(n){ asState.calM+=n; if(asState.calM>11){asState.calM=0;asState.calY++;} if(asState.calM<0){asState.calM=11;asState.calY--;} renderAddSheet(); }
-function asSetTime(t){ asState.time=t; renderAddSheet(); }
-function asSetKind(k){ asState.kind=k; asState.kindTouched=true; renderAddSheet(); }
+function asAddMin(t,m){ const x=((tlMins(t)+m)%1440+1440)%1440; return `${pad(Math.floor(x/60))}:${pad(x%60)}`; }
+// Moving the start keeps the event's length
+function asSetTime(t){ const st=asState; if(t&&st.time&&st.end) st.end=asAddMin(t,evDurMin(st.time,st.end)); st.time=t; if(!t){ st.end=''; st.wheel=null; } }
+function asDefaultTime(){ if(asState.date===TODAY()){ const h=new Date().getHours()+1; if(h<24) return `${pad(h)}:00`; } return '09:00'; }
+function asTapTile(which){
+  const st=asState;
+  if(!st.time) asSetTime(asDefaultTime());
+  if(which==='end'&&!st.end) st.end=asAddMin(st.time,60);
+  st.wheel=st.wheel===which?null:which;
+  renderAddSheet();
+}
+function asSetDur(m){ const st=asState; if(!m) asSetTime(''); else { if(!st.time) asSetTime(asDefaultTime()); st.end=asAddMin(st.time,m); } renderAddSheet(); }
+function asSetKind(k){ asState.kind=k; asState.kindTouched=true; asState.opt=null; renderAddSheet(); }
 function asSetRank(r){ asState.rank=r; renderAddSheet(); }
+function asSetLead(m){ asState.lead=m; asState.opt=null; renderAddSheet(); }
+function asSetRepeat(r){ asState.repeat=r; asState.opt=null; renderAddSheet(); }
+function asSetScope(s){ asState.scope=s; renderAddSheet(); }
+function asToggleOpt(k){ asState.opt=asState.opt===k?null:k; renderAddSheet(); if(asState.opt==='loc') setTimeout(()=>document.getElementById('asLoc')?.focus(),30); }
+
+// ── time wheel: hour / minute (5-min steps) / AM-PM columns with scroll-snap ──
+const ASW_H=40;
+let asWheelTimer=0, asWheelLockUntil=0;
+function asRenderWheel(){
+  const w=document.getElementById('asWheel'), st=asState, t=st.wheel==='start'?st.time:st.end;
+  if(!st.wheel||!t){ w.hidden=true; w.innerHTML=''; w.dataset.for=''; return; }
+  if(w.dataset.for!==st.wheel){
+    w.dataset.for=st.wheel; w.hidden=false;
+    const col=(c,label,vals)=>`<div class="asw-col" data-c="${c}" tabindex="0" role="listbox" aria-label="${label}" onkeydown="asWheelKey(event,this)">${vals.map(v=>`<div class="asw-i" onclick="asWheelPick(this)">${v}</div>`).join('')}</div>`;
+    w.innerHTML=`<div class="asw-band" aria-hidden="true"></div>${col('h','Hour',[1,2,3,4,5,6,7,8,9,10,11,12])}${col('m','Minute',['00','05','10','15','20','25','30','35','40','45','50','55'])}${col('a','AM or PM',['AM','PM'])}`;
+    w.querySelectorAll('.asw-col').forEach(c=>c.addEventListener('scroll',asWheelScrolled,{passive:true}));
+  }
+  asSyncWheel(t);
+}
+function asSyncWheel(t){
+  const w=document.getElementById('asWheel'), [h,m]=t.split(':').map(Number), set=(c,i)=>{ const el=w.querySelector(`[data-c="${c}"]`); if(el&&Math.round(el.scrollTop/ASW_H)!==i) el.scrollTop=i*ASW_H; };
+  asWheelLockUntil=Date.now()+180;     // ignore the scroll events our own positioning fires
+  set('h',(h%12||12)-1); set('m',Math.min(11,Math.round(m/5))); set('a',h>=12?1:0);
+}
+function asWheelScrolled(){ if(Date.now()<asWheelLockUntil) return; clearTimeout(asWheelTimer); asWheelTimer=setTimeout(asWheelRead,120); }
+function asWheelRead(){
+  const w=document.getElementById('asWheel'); if(!w||w.hidden||!asState.wheel) return;
+  const idx=(c,max)=>Math.max(0,Math.min(max,Math.round(w.querySelector(`[data-c="${c}"]`).scrollTop/ASW_H)));
+  const hr=idx('h',11)+1, mi=idx('m',11)*5, pm=idx('a',1)===1, t=`${pad((hr%12)+(pm?12:0))}:${pad(mi)}`;
+  if(asState.wheel==='start') asSetTime(t); else asState.end=t;
+  renderAddSheet(true);
+}
+function asWheelPick(item){ const col=item.parentElement; col.scrollTo({top:[...col.children].indexOf(item)*ASW_H,behavior:'smooth'}); }
+function asWheelKey(e,col){ if(e.key==='ArrowUp'||e.key==='ArrowDown'){ e.preventDefault(); col.scrollBy({top:e.key==='ArrowUp'?-ASW_H:ASW_H,behavior:'smooth'}); } }
+
+function asRepeatOpts(){
+  const d=new Date(asState.date+'T00:00:00');
+  return [['none','Never'],['daily','Every day'],['weekly',`Every ${d.toLocaleDateString('en-US',{weekday:'long'})}`],['weekdays','Weekdays'],['monthly',`Monthly on the ${d.getDate()}${ordSfx(d.getDate())}`]];
+}
+function ordSfx(n){ return ['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th'; }
+function asOptSummary(){
+  const st=asState, lead=AS_LEADS.find(([m])=>m===st.lead);
+  return [kindName(st.kind), st.loc.trim(), st.lead?`remind ${lead?lead[1]:st.lead+' min'} before`:'', st.repeat!=='none'?asRepeatOpts().find(([k])=>k===st.repeat)?.[1]:''].filter(Boolean).map(esc).join(' · ');
+}
+function asRenderOpts(){
+  const st=asState, col=KIND_COLORS[st.kind]||'#666';
+  const b=(k,inner,label,on,style)=>`<button type="button" class="as-opt${st.opt===k?' open':''}${on?' set':''}" onclick="asToggleOpt('${k}')" aria-label="${label}" aria-expanded="${st.opt===k}"${style?` style="${style}"`:''}>${inner}</button>`;
+  document.getElementById('asOpts').innerHTML=
+      b('kind',kindIcon(st.kind,22),`Type: ${kindName(st.kind)}`,false,`background:${col};color:${kindInk(col)}`)
+    + b('loc',asIcon(AS_ICON.pin,22),'Location',!!st.loc.trim())
+    + b('remind',asIcon(AS_ICON.bell,22),'Reminder',!!st.lead)
+    + (st.edit?'':b('repeat',asIcon(KIND_ICON_PATHS.routine,22),'Repeat',st.repeat!=='none'))
+    + `<div class="as-opt-sum">${asOptSummary()}</div>`;
+}
+function asRenderOptPanel(){
+  const st=asState, el=document.getElementById('asOptPanel'), chip=(on,click,label)=>`<button type="button" class="as-chip${on?' on':''}" onclick="${click}">${label}</button>`;
+  el.hidden=!st.opt;
+  if(st.opt==='kind') el.innerHTML=`<div class="as-kgrid">${Object.keys(KIND_COLORS).map(k=>`<button type="button" class="as-kchip${st.kind===k?' on':''}" onclick="asSetKind('${k}')"><span class="as-ic" style="background:${KIND_COLORS[k]};color:${kindInk(KIND_COLORS[k])};">${kindIcon(k,16)}</span>${kindName(k)}</button>`).join('')}</div>`;
+  else if(st.opt==='loc') el.innerHTML=`<input id="asLoc" class="as-inp" type="text" placeholder="Where? (optional)" value="${esc(st.loc)}" oninput="asState.loc=this.value;asRenderOpts()" onkeydown="if(event.key==='Enter'){event.preventDefault();asToggleOpt('loc');}">`;
+  else if(st.opt==='remind') el.innerHTML=`<div class="as-chips wrap">${AS_LEADS.map(([m,l])=>chip(st.lead===m,`asSetLead(${m})`,m?l+' before':l)).join('')}</div>`;
+  else if(st.opt==='repeat') el.innerHTML=`<div class="as-chips wrap">${asRepeatOpts().map(([k,l])=>chip(st.repeat===k,`asSetRepeat('${k}')`,l)).join('')}</div>`;
+  else el.innerHTML='';
+}
 
 function asDateLabel(k){
   const t=TODAY(); if(k===t) return 'Today';
@@ -2944,20 +3212,39 @@ function asDateLabel(k){
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
 
-function renderAddSheet(){
-  const st=asState, t=TODAY();
+function renderAddSheet(light){
+  const st=asState, t=TODAY(), isEv=st.type==='event', ed=st.edit;
+  document.getElementById('asSeg').hidden=!!ed;
+  const hd=document.getElementById('asTitleHd'); hd.hidden=!ed; hd.textContent=ed&&ed.rec?'Edit repeating event':'Edit event';
   document.querySelectorAll('#asSeg button').forEach(b=>b.classList.toggle('active',b.dataset.t===st.type));
-  document.getElementById('asEventOpts').style.display=st.type==='event'?'':'none';
-  document.getElementById('asQuestOpts').style.display=st.type==='quest'?'':'none';
-  document.getElementById('asTitle').placeholder=st.type==='event'?"What's happening?":'What do you need to do?';
-  document.getElementById('asTimeReq').classList.toggle('on',st.type==='quest'&&st.rank==='S');
+  document.getElementById('asEventOpts').style.display=isEv?'':'none';
+  document.getElementById('asQuestOpts').style.display=isEv?'none':'';
+  document.getElementById('asTitle').placeholder=isEv?"What's happening?":'What do you need to do?';
+  document.getElementById('asTimeReq').classList.toggle('on',!isEv&&st.rank==='S'&&!st.time);
+
+  // start / end tiles, duration chips, wheel
+  const tile=(k,label,val,dim)=>`<button type="button" class="as-tile${st.wheel===k?' on':''}" onclick="asTapTile('${k}')" aria-expanded="${st.wheel===k}"><small>${label}</small><b class="${dim?'dim':''}">${val}</b></button>`;
+  document.getElementById('asTimes').innerHTML=tile('start',isEv?'Starts':'Time',st.time?fmtTime(st.time):'Anytime',!st.time)
+    +(isEv?tile('end','Ends',st.end?fmtTime(st.end):'Add end',!st.end):'');
+  const dur=st.time&&st.end?evDurMin(st.time,st.end):null;
+  document.getElementById('asDurs').innerHTML=`<button type="button" class="as-chip${!st.time?' on':''}" onclick="asSetDur(0)">${isEv?'Anytime':'No set time'}</button>`
+    +(isEv?AS_DURS.map(([m,l])=>`<button type="button" class="as-chip${dur===m?' on':''}" onclick="asSetDur(${m})">${l}</button>`).join(''):'');
+  asRenderWheel();
+  document.getElementById('asSave').textContent=ed?'Save changes':`Add ${st.type} · ${asDateLabel(st.date)}${st.time?' '+fmtTime(st.time):''}`;
+  if(light) return;
+
+  // editing a repeat: pick this day vs. every repeat; the date itself stays put
+  document.getElementById('asScopeRow').hidden=!(ed&&ed.rec);
+  document.getElementById('asWhenRow').hidden=!!(ed&&ed.rec);
+  if(ed&&ed.rec) document.getElementById('asScope').innerHTML=[['occurrence','Just this day'],['series','Every repeat']].map(([k,l])=>`<button type="button" class="as-chip${st.scope===k?' on':''}" onclick="asSetScope('${k}')">${l}</button>`).join('');
+  if(isEv){ asRenderOpts(); asRenderOptPanel(); }
 
   // date chips: Today, Tomorrow, next 4 weekdays, Pick date
   const chips=[]; const base=new Date(t+'T00:00:00');
   for(let i=0;i<6;i++){ const d=new Date(base); d.setDate(base.getDate()+i); const k=dateKey(d);
     chips.push(`<button type="button" class="as-chip${st.date===k&&!st.calOpen?' on':''}" onclick="asState.calOpen=false;asSetDate('${k}')">${i===0?'Today':i===1?'Tomorrow':d.toLocaleDateString('en-US',{weekday:'short',day:'numeric'})}</button>`); }
   const inChips=[...Array(6).keys()].some(i=>{const d=new Date(base);d.setDate(base.getDate()+i);return dateKey(d)===st.date;});
-  chips.push(`<button type="button" class="as-chip${st.calOpen||!inChips?' on':''}" onclick="asToggleCal()">📅 ${!inChips?asDateLabel(st.date):'Pick date'}</button>`);
+  chips.push(`<button type="button" class="as-chip as-chip-ic${st.calOpen||!inChips?' on':''}" onclick="asToggleCal()" aria-label="Pick a date">${asIcon(AS_ICON.cal,18)}${!inChips?' '+asDateLabel(st.date):''}</button>`);
   document.getElementById('asDateChips').innerHTML=chips.join('');
 
   // inline calendar picker
@@ -2971,19 +3258,8 @@ function renderAddSheet(){
     document.getElementById('asCalGrid').innerHTML=g;
   }
 
-  // time chips + custom
-  const custom=st.time && !AS_TIMES.some(([v])=>v===st.time);
-  document.getElementById('asTimeChips').innerHTML=AS_TIMES.map(([v,l])=>`<button type="button" class="as-chip${st.time===v?' on':''}" onclick="asSetTime('${v}')">${l}</button>`).join('')
-    +`<label class="as-chip time-inp${custom?' on':''}"><input type="time" id="asTimeCustom" value="${custom?st.time:''}" onchange="asSetTime(this.value)" aria-label="Custom time"></label>`;
-
-  // kinds (vertical list) / ranks
-  document.getElementById('asKinds').innerHTML=Object.keys(KIND_COLORS).map(k=>`<button type="button" class="as-kind${st.kind===k?' on':''}" onclick="asSetKind('${k}')">
-      <span class="as-ic" style="background:${KIND_COLORS[k]};color:${kindInk(KIND_COLORS[k])};">${kindIcon(k,16)}</span>
-      <span>${k[0].toUpperCase()+k.slice(1)}<span class="as-sub">${AS_KIND_SUB[k]}</span></span><span class="as-tick"></span></button>`).join('');
   document.getElementById('asRanks').innerHTML=[['S','S-rank','Big, time-boxed — worth +'+(RANK_XP.S||'')+' XP'],['B','B-rank','Everyday to-do — +'+(RANK_XP.B||'')+' XP']].map(([r,l,sub])=>`<button type="button" class="as-kind${st.rank===r?' on':''}" onclick="asSetRank('${r}')">
       <span class="as-ic" style="background:${RANK_COLORS[r]};">${r}</span><span>${l}<span class="as-sub">${sub}</span></span><span class="as-tick"></span></button>`).join('');
-
-  document.getElementById('asSave').textContent=`Add ${st.type} · ${asDateLabel(st.date)}${st.time?' '+fmtTime(st.time):''}`;
 }
 
 // Natural language: "lunch tomorrow 1pm" → title "lunch", date, time, kind
@@ -2998,12 +3274,13 @@ function asParse(){
   return { title:title||raw, date:dateKey(dt), time:r.start.isCertain('hour')?`${pad(dt.getHours())}:${pad(dt.getMinutes())}`:null, matched:r.text };
 }
 function asTitleChanged(){
+  if(asState.edit) return;                       // editing: the title is just the title
   const raw=document.getElementById('asTitle').value;
   if(asState.type==='event' && !asState.kindTouched && raw.trim()) asState.kind=guessEventKind(raw);
   const p=asParse(), h=document.getElementById('asHint');
   if(p.matched){
     if(p.date) asState.date=p.date;
-    if(p.time) asState.time=p.time;
+    if(p.time) asSetTime(p.time);
     const d=new Date(asState.date+'T00:00:00'); asState.calY=d.getFullYear(); asState.calM=d.getMonth();
     h.classList.add('parsed'); h.textContent=`✓ Got it: "${p.title}" · ${asDateLabel(asState.date)}${p.time?' at '+fmtTime(p.time):''}`;
   } else { h.classList.remove('parsed'); h.textContent='Tip: type "gym tomorrow 6pm" and the date and time fill in.'; }
@@ -3012,16 +3289,26 @@ function asTitleChanged(){
 }
 
 function saveAddSheet(){
-  const st=asState, p=asParse(), title=(p.matched?p.title:p.title||'').trim();
+  const st=asState, ed=st.edit;
+  const p=ed?{title:document.getElementById('asTitle').value}:asParse(), title=(p.title||'').trim();
   if(!title){ showToast(st.type==='event'?'Give the event a name':'Give the quest a name'); document.getElementById('asTitle').focus(); return; }
+  const f={title,time:st.time||'',endTime:(st.time&&st.end)||null,location:(st.loc||'').trim(),kind:st.kind,notify:!!st.lead,notifyLeadMin:st.lead||null};
+  if(ed){ asSaveEdit(f); return; }
   if(st.type==='quest'){
     if(st.rank==='S' && !st.time){ showToast('S-rank quests need a time'); return; }
     addTaskCommon(title, st.rank, st.date, st.time||null);
+  } else if(st.repeat!=='none'){
+    // same template shape ED creates (server.js create_event), expanded at render time
+    const d=new Date(st.date+'T00:00:00'), freq=st.repeat==='daily'?'daily':st.repeat==='monthly'?'monthly':'weekly';
+    if(!Array.isArray(APP.recurringEvents)) APP.recurringEvents=[];
+    APP.recurringEvents.push({id:`rec-${Date.now()}`,...f,time:f.time||null,freq,
+      daysOfWeek:freq==='weekly'?(st.repeat==='weekdays'?[1,2,3,4,5]:[d.getDay()]):null,
+      dayOfMonth:freq==='monthly'?d.getDate():null,interval:1,startDate:st.date,endDate:null,exceptions:{}});
+    patchData({recurringEvents:APP.recurringEvents});
   } else {
     if(!APP.events) APP.events={};
     if(!APP.events[st.date]) APP.events[st.date]=[];
-    const notify=document.getElementById('asNotify').checked;
-    const ev={id:genLinkId(),title,time:st.time||'',location:document.getElementById('asLoc').value.trim(),kind:st.kind,notify,notifyLeadMin:notify?parseInt(document.getElementById('asLead').value,10):null};
+    const ev={id:genLinkId(),...f};
     APP.events[st.date].push(ev);
     if(!Array.isArray(APP.tasks)) APP.tasks=[];
     const task={id:genLinkId(),text:title,done:false,rank:'B',date:st.date,time:st.time||null,linkedEventId:ev.id};
@@ -3029,9 +3316,115 @@ function saveAddSheet(){
     patchData({events:APP.events, tasks:APP.tasks});
   }
   closeAddSheet();
-  selectedKey=st.date; const d=new Date(st.date+'T00:00:00'); mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth();
+  calAfterChange(st.date);
+  showToast(`${st.type==='event'?(st.repeat!=='none'?'Repeating event':'Event'):'Quest'} added · ${asDateLabel(st.date)} ◆`);
+}
+function asSaveEdit(f){
+  const st=asState, ed=st.edit;
+  if(ed.rec){
+    const rec=(APP.recurringEvents||[]).find(r=>r.id===ed.rec); if(!rec){ closeAddSheet(); return; }
+    if(st.scope==='series') Object.assign(rec,f,{time:f.time||null});
+    else { rec.exceptions=rec.exceptions||{}; rec.exceptions[ed.key]={...(rec.exceptions[ed.key]||{}),...f}; }
+    patchData({recurringEvents:APP.recurringEvents});
+  } else {
+    const list=(APP.events||{})[ed.key]||[], prev=list[ed.idx]; if(!prev){ closeAddSheet(); return; }
+    const ev={...prev,...f};                     // keeps id, linkedTaskId and anything else stored on it
+    if(st.date!==ed.key){
+      list.splice(ed.idx,1); if(!list.length) delete APP.events[ed.key];
+      (APP.events[st.date]=APP.events[st.date]||[]).push(ev);
+    } else list[ed.idx]=ev;
+    patchData({events:APP.events});
+    if(ev.linkedTaskId && Array.isArray(APP.tasks)){
+      const t=APP.tasks.find(x=>x.id===ev.linkedTaskId);
+      if(t){ t.text=f.title; t.time=f.time||null; t.date=st.date; saveTasks(); }
+    }
+  }
+  closeAddSheet();
+  calAfterChange(ed.rec?ed.key:st.date);
+  showToast(ed.rec&&st.scope==='series'?'Every repeat updated ◆':'Event updated ◆');
+}
+// After any calendar change: jump to that day and redraw every view that shows events
+function calAfterChange(key){
+  if(key){ selectedKey=key; const d=new Date(key+'T00:00:00'); mobCalYear=d.getFullYear(); mobCalMonth=d.getMonth(); }
   renderMobMonthGrid(); renderMobTasks();
-  showToast(`${st.type==='event'?'Event':'Quest'} added · ${asDateLabel(st.date)} ◆`);
+  if(typeof renderMobTimeline==='function') renderMobTimeline();
+}
+
+// ── EVENT SHEET: tap any event → details + Move / Duplicate / Delete / Edit ──
+// ref = 'o:<index in APP.events[key]>' for one-offs, 'r:<recurringId>' for repeats
+function calEvFromRef(key,ref){
+  if(String(ref).startsWith('o:')){ const i=+ref.slice(2), e=((APP.events||{})[key]||[])[i]; return e?{e,idx:i,rec:null}:null; }
+  const id=String(ref).slice(2), rec=(APP.recurringEvents||[]).find(r=>String(r.id)===id);
+  return rec&&occursOn(rec,key)?{e:occurrenceForDate(rec,key),idx:-1,rec}:null;
+}
+function evRepeatText(r){
+  const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], n=r.interval||1;
+  if(r.freq==='daily') return n>1?`Every ${n} days`:'Every day';
+  if(r.freq==='monthly') return `${n>1?`Every ${n} months`:'Monthly'} on the ${r.dayOfMonth}${ordSfx(r.dayOfMonth)}`;
+  const days=(r.daysOfWeek||[]).slice().sort((a,b)=>a-b);
+  const list=days.join()==='1,2,3,4,5'?'weekdays':days.map(d=>DOW[d]).join(' & ').replace(/ & (?=.* & )/g,', ');
+  return `Every ${n>1?n+' weeks on ':''}${list}`;
+}
+function openEvSheet(key,ref){
+  const r=calEvFromRef(key,ref); if(!r) return;
+  const e=r.e, col=KIND_COLORS[e.kind||'focus']||'#666', d=new Date(key+'T00:00:00'), dur=evDurMin(e.time,e.endTime);
+  let rel='';
+  if(key===TODAY()&&e.time){ const now=new Date(), m=tlMins(e.time)-(now.getHours()*60+now.getMinutes());
+    rel=m>0?`starts in ${tlDur(m)}`:m+(dur||TL_EVENT_MIN)>0?'happening now':'earlier today'; }
+  const lead=AS_LEADS.find(([m])=>m===e.notifyLeadMin);
+  const row=(ic,main,sub)=>`<div class="evs-row">${asIcon(ic,22)}<div>${main}${sub?`<small>${sub}</small>`:''}</div></div>`;
+  const act=(ic,label,click,cls)=>`<button type="button" class="evs-act${cls?' '+cls:''}" onclick="${click}">${asIcon(ic,22)}<span>${label}</span></button>`;
+  const q=`'${key}','${esc(String(ref))}'`;
+  farmSheet('evSheet',`
+    <div class="evs-hd">
+      <span class="evs-tile" style="background:${col};color:${kindInk(col)}">${kindIcon(e.kind,26)}</span>
+      <div class="evs-ttl"><div class="evs-name">${esc(e.title)}</div><div class="evs-kind" style="color:${col}">${esc(kindName(e.kind))}${rel?` · ${rel}`:''}</div></div>
+      <button type="button" class="as-x" onclick="document.getElementById('evSheet').remove()" aria-label="Close">${asIcon('<path d="M6 6l12 12M18 6L6 18"/>',18)}</button>
+    </div>
+    <div class="evs-info">
+      ${row(AS_ICON.clock,`${d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})} · ${e.time?fmtTimeRange(e.time,e.endTime):'Anytime'}`,dur?tlDur(dur):'')}
+      ${e.location?row(AS_ICON.pin,esc(e.location)):''}
+      ${e.notify?row(AS_ICON.bell,`Reminder ${lead?lead[1]:(e.notifyLeadMin||30)+' min'} before`):''}
+      ${r.rec?row(KIND_ICON_PATHS.routine,esc(evRepeatText(r.rec))):''}
+    </div>
+    <div class="evs-acts">
+      ${r.rec?act(AS_ICON.skip,'Skip this day',`evSkipDay(${q})`):act(AS_ICON.arrow,'Tomorrow',`evMoveTomorrow(${q})`)}
+      ${act(AS_ICON.copy,'Duplicate',`evDuplicate(${q})`)}
+      ${act(AS_ICON.trash,r.rec?'Delete series':'Delete',`evDelete(this,${q})`,'danger')}
+    </div>
+    <button type="button" class="evs-edit" onclick="document.getElementById('evSheet').remove();openEditSheet(${q})">${asIcon(AS_ICON.pencil,20)}Edit event</button>`);
+}
+function evSheetDone(key,msg){ document.getElementById('evSheet')?.remove(); calAfterChange(key); showToast(msg); }
+function evMoveTomorrow(key,ref){
+  const r=calEvFromRef(key,ref); if(!r||r.rec) return;
+  const d=new Date(key+'T00:00:00'); d.setDate(d.getDate()+1); const nk=dateKey(d);
+  const list=APP.events[key]; list.splice(r.idx,1); if(!list.length) delete APP.events[key];
+  (APP.events[nk]=APP.events[nk]||[]).push(r.e);
+  patchData({events:APP.events});
+  const t=r.e.linkedTaskId&&Array.isArray(APP.tasks)?APP.tasks.find(x=>x.id===r.e.linkedTaskId):null;
+  if(t){ t.date=nk; saveTasks(); }
+  evSheetDone(key,`Moved to ${asDateLabel(nk)} ◆`);
+}
+function evSkipDay(key,ref){
+  const r=calEvFromRef(key,ref); if(!r||!r.rec) return;
+  r.rec.exceptions=r.rec.exceptions||{}; r.rec.exceptions[key]={skip:true};
+  patchData({recurringEvents:APP.recurringEvents});
+  evSheetDone(key,'Skipped for this day ◆');
+}
+function evDuplicate(key,ref){
+  const r=calEvFromRef(key,ref); if(!r) return; const e=r.e;
+  document.getElementById('evSheet')?.remove();
+  openAddSheet(key,{title:e.title,time:e.time||'',end:(e.time&&e.endTime)||'',kind:e.kind||'focus',loc:e.location||'',lead:e.notify?(e.notifyLeadMin||30):0});
+}
+// Delete needs a second tap within 3s (no confirm() dialog)
+function evDelete(btn,key,ref){
+  if(!btn.classList.contains('armed')){
+    btn.classList.add('armed'); const s=btn.querySelector('span'), orig=s.textContent; s.textContent='Tap to confirm';
+    setTimeout(()=>{ if(btn.isConnected){ btn.classList.remove('armed'); s.textContent=orig; } },3000); return;
+  }
+  const r=calEvFromRef(key,ref); if(!r) return;
+  if(r.rec){ APP.recurringEvents=APP.recurringEvents.filter(x=>x.id!==r.rec.id); patchData({recurringEvents:APP.recurringEvents}); evSheetDone(key,'Series deleted ◆'); }
+  else { deleteDayEv(key,r.idx); evSheetDone(key,'Event deleted ◆'); }
 }
 
 // ── STRUCTURED-STYLE TIMELINE ─────────────────────────────────────────────────
@@ -3094,8 +3487,8 @@ function calItemsForDate(key){
   return items;
 }
 function tlItemClick(key,it){
-  if(it.e && !it.e.recurring && it.oneoffIdx>-1) return `openEditEvent('${key}',${it.oneoffIdx})`;
-  if(it.e && it.e.recurring) return `editRecurringOccurrence('${key}','${esc(String(it.e.recurringId))}')`;
+  if(it.e && !it.e.recurring && it.oneoffIdx>-1) return `openEvSheet('${key}','o:${it.oneoffIdx}')`;
+  if(it.e && it.e.recurring) return `openEvSheet('${key}','r:${esc(String(it.e.recurringId))}')`;
   return `openDayModalFor('${key}')`;
 }
 function tlPill(it,extraCls){
@@ -3122,60 +3515,72 @@ function tlSub(it){
   return parts.join(' · ')+rep;
 }
 
+// One event/quest card (Day timeline + Month agenda): icon tile, title, details, checkbox
+function cdSub(it,withTime){
+  const parts=[];
+  if(it.e){
+    if(withTime||!it.time) parts.push(it.time?fmtTimeRange(it.time,it.e.endTime):'Anytime');
+    else if(it.e.endTime) parts.push(fmtTimeRange(it.time,it.e.endTime));
+    if(it.e.endTime&&it.time) parts.push(tlDur(tlItemDur(it)));
+    if(it.e.location) parts.push(esc(it.e.location));
+    if(it.task) parts.push('Quest');
+  } else {
+    parts.push(`Quest · ${it.task.rank||'B'}-rank`);
+    if(withTime&&it.time) parts.push(fmtTime(it.time));
+  }
+  return parts.join(' · ')+(it.e&&it.e.recurring?` <span class="tl-rep" title="Repeats" aria-label="Repeats">${ICON_REPEAT}</span>`:'');
+}
+function cdTile(it){
+  if(it.e){ const col=KIND_COLORS[it.kind]||'#666'; return `<span class="cd-tile" style="background:${col};color:${kindInk(col)}">${kindIcon(it.kind,20)}</span>`; }
+  const rank=it.task.rank||'B'; return `<span class="cd-tile quest" style="--kc:${RANK_COLORS[rank]||RANK_COLORS.B}">${rank}</span>`;
+}
+function cdCardHTML(key,it,o){
+  o=o||{};
+  return `<div class="cd-card${o.next?' next':''}"${o.h?` style="min-height:${o.h}px"`:''}>
+    <button type="button" class="cd-main" onclick="${tlItemClick(key,it)}">${cdTile(it)}<span class="cd-txt"><span class="cd-title">${esc(it.title)}</span><span class="cd-sub">${cdSub(it,o.withTime)}</span></span></button>
+    ${o.next?'<span class="cd-badge">Next</span>':''}${it.task?tlCheck(it):''}
+  </div>`;
+}
+
 function renderCalDay(){
   const list=document.getElementById('tlList'); if(!list)return;
   const key=selectedKey, d=new Date(key+'T00:00:00'), isToday=key===TODAY();
   const nm=document.getElementById('tlDayName');
-  if(nm) nm.textContent = isToday ? 'Today' : d.toLocaleDateString('en-US',{weekday:'long'});
+  if(nm) nm.textContent=`${isToday?'Today':d.toLocaleDateString('en-US',{weekday:'long'})}, ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
   const items=calItemsForDate(key);
-  const q=items.filter(x=>x.task), qd=q.filter(x=>x.task.done).length;
+  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
+  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
+  const nextIt=isToday?timed.find(x=>x.e&&tlMins(x.time)>nowMin):null;
+  const nEv=items.filter(x=>x.e).length, q=items.filter(x=>x.task&&!x.e), qd=q.filter(x=>x.task.done).length;
   const meta=document.getElementById('tlDayMeta');
-  if(meta) meta.textContent = `${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}${isToday?' · '+d.toLocaleDateString('en-US',{weekday:'long'}):''}`
-    + (items.some(x=>x.e&&!x.task) ? ` · ${items.filter(x=>x.e&&!x.task).length} event${items.filter(x=>x.e&&!x.task).length===1?'':'s'}` : '')
-    + (q.length ? ` · ${qd}/${q.length} quests` : '');
+  if(meta) meta.innerHTML=[nEv?`${nEv} event${nEv===1?'':'s'}`:'', q.length?(qd?`${qd}/${q.length} quests done`:`${q.length} quest${q.length===1?'':'s'}`):'',
+    nextIt?`next in <b>${tlDur(tlMins(nextIt.time)-nowMin)}</b>`:''].filter(Boolean).join(' · ')||'Nothing planned';
   const tb=document.getElementById('tlTodayBtn'); if(tb) tb.hidden=isToday;
 
   if(!items.length){
-    list.innerHTML=`<div class="tl-empty"><div class="tl-empty-t">Nothing planned</div><div class="tl-empty-s">Tap + to add an event or quest.</div></div>`;
+    list.innerHTML=`<div class="cd-empty"><div class="cd-empty-t">Nothing planned</div><div class="cd-empty-s">A free day. Add an event or a quest?</div><button type="button" class="cal-pill accent" onclick="openAddSheet('${key}')">Add something</button></div>`;
     return;
   }
-  const now=new Date(), nowMin=now.getHours()*60+now.getMinutes();
-  const untimed=items.filter(x=>!x.time), timed=items.filter(x=>x.time);
-  let html='';
-  if(untimed.length){
-    html+=`<div class="tl-section">Anytime</div><div class="tl-anytime">`+untimed.map(it=>`
-      <div class="tl-row${it.task&&it.task.done?' done':''}">
-        <div class="tl-rail">${tlPill(it)}</div>
-        <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
-        ${tlCheck(it)}
-      </div>`).join('')+`</div>`;
-    if(timed.length) html+=`<div class="tl-section">Schedule</div>`;
-  }
-  let rows='', nowPlaced=!isToday;
-  const nowRow=()=>`<div class="tl-now"><div class="tl-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`)}</div><div class="tl-rail"><div class="tl-now-dot"></div></div><div class="tl-now-line"></div></div>`;
+  const row=(it,t,o)=>`<div class="cd-row${it.task&&it.task.done?' done':''}${o&&o.past?' past':''}"><div class="cd-time">${t}</div>${cdCardHTML(key,it,o)}</div>`;
+  let html=untimed.map(it=>row(it,'All day')).join('');
+  let nowPlaced=!isToday;
+  const nowRow=()=>`<div class="cd-now"><div class="cd-time">${fmtTime(`${pad(now.getHours())}:${pad(now.getMinutes())}`).replace(' ','')}</div><div class="cd-now-line"><i></i></div></div>`;
   timed.forEach((it,idx)=>{
     const start=tlMins(it.time), dur=tlItemDur(it);
-    if(!nowPlaced && start>nowMin){ rows+=nowRow(); nowPlaced=true; }
-    const past=isToday && start+dur<=nowMin;
+    if(!nowPlaced && start>nowMin){ html+=nowRow(); nowPlaced=true; }
     const [hm,ap]=fmtTime(it.time).split(' ');
-    // Event bars scale with duration (1px per minute, like Apple Calendar), so a 2h
-    // event is twice as tall as a 1h one. Clamped so tiny events stay tappable and
-    // all-night ones (e.g. sleep) don't take over the screen.
-    const propH = it.e ? Math.max(TL_BAR_MIN_PX, Math.min(TL_BAR_MAX_PX, Math.round(dur*TL_PX_PER_MIN))) : 0;
-    rows+=`<div class="tl-row${it.e?' tl-prop':''}${it.task&&it.task.done?' done':''}${past?' past':''}"${it.e?` style="--bar-h:${propH}px"`:''}>
-      <div class="tl-time">${hm}<small>${ap}</small></div>
-      <div class="tl-rail">${tlPill(it, it.e&&propH<40?'short':'')}</div>
-      <div class="tl-body" onclick="${tlItemClick(key,it)}"><div class="tl-title">${esc(it.title)}</div><div class="tl-sub">${tlSub(it)}</div></div>
-      ${tlCheck(it)}
-    </div>`;
+    // Event cards grow with duration (1px per minute, clamped) so a 4h shift reads longer
+    // than a 1h class; short ones keep the normal card height.
+    const h=it.e&&dur>70?Math.min(TL_BAR_MAX_PX,Math.round(dur*TL_PX_PER_MIN)):0;
+    html+=row(it,`${hm}<small>${ap||''}</small>`,{past:isToday&&start+dur<=nowMin,next:it===nextIt,h});
     const next=timed[idx+1];
     if(next){
       const free=tlMins(next.time)-(start+dur);
-      if(free>=TL_GAP_MIN) rows+=`<div class="tl-gap"><div></div><div class="tl-rail"></div><div class="tl-gap-txt">${tlDur(free)} free</div></div>`;
+      if(free>=TL_GAP_MIN) html+=`<div class="cd-gap"><div></div><div class="cd-gap-txt">${tlDur(free)} free</div></div>`;
     }
   });
-  if(!nowPlaced && timed.length) rows+=nowRow();
-  list.innerHTML=html+rows;
+  if(!nowPlaced && timed.length) html+=nowRow();
+  list.innerHTML=html;
 }
 
 function renderCalWeek(){
@@ -3184,31 +3589,51 @@ function renderCalWeek(){
   const sun=new Date(ref); sun.setDate(ref.getDate()-ref.getDay());
   const sat=new Date(sun); sat.setDate(sun.getDate()+6);
   const f=o=>o.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-  const rg=document.getElementById('wkRange'); if(rg) rg.textContent=`${f(sun)} – ${f(sat)}`;
-  const todayK=TODAY(); let total=0, inWeek=false, html='';
+  const rg=document.getElementById('wkRange'); if(rg) rg.textContent=`${f(sun)} – ${sun.getMonth()===sat.getMonth()?sat.getDate():f(sat)}`;
+  const todayK=TODAY(); let nEv=0, nQ=0, inWeek=false, html='';
   for(let i=0;i<7;i++){
     const d=new Date(sun); d.setDate(sun.getDate()+i);
     const key=dateKey(d), items=calItemsForDate(key), isToday=key===todayK;
     if(isToday) inWeek=true;
-    total+=items.length;
-    const rows=items.map(it=>`<div class="wk-row${it.task&&it.task.done?' done':''}">
-        <span class="wk-t">${it.time?fmtTime(it.time):'Anytime'}${it.time&&it.e&&it.e.endTime?`<small>${tlDur(tlItemDur(it))}</small>`:''}</span>
-        ${it.e?`<span class="wk-dot" style="--kc:${KIND_COLORS[it.kind]||'#666'};color:${kindInk(KIND_COLORS[it.kind]||'#666')};">${kindIcon(it.kind,12)}</span>`:`<span class="wk-dot quest" style="--kc:${RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B};">${it.task.rank||'B'}</span>`}
-        <span class="wk-title" onclick="${tlItemClick(key,it)}" style="cursor:pointer;">${esc(it.title)}</span>
-        ${it.task?tlCheck(it):'<span></span>'}
-      </div>`).join('');
-    html+=`<div class="wk-day${isToday?' today':''}">
-      <button type="button" class="wk-day-hd" onclick="selectedKey='${key}';setCalView('day');renderMobMonthGrid();renderMobCalQuests();">
-        <span class="wk-day-name">${d.toLocaleDateString('en-US',{weekday:'short'})} ${d.getDate()}${isToday?' · Today':''}</span>
-        <span class="wk-day-count">${items.length?items.length+' item'+(items.length===1?'':'s'):''} ›</span>
+    nEv+=items.filter(x=>x.e).length; nQ+=items.filter(x=>!x.e).length;
+    const rows=items.map(it=>{
+      const col=it.e?KIND_COLORS[it.kind]||'#666':RANK_COLORS[it.task.rank||'B']||RANK_COLORS.B;
+      return `<div class="wd-row${it.task&&it.task.done?' done':''}">
+        <button type="button" class="wd-main" onclick="${tlItemClick(key,it)}"><span class="wd-t">${it.time?fmtTime(it.time):'Anytime'}</span><span class="wd-bar${it.e?'':' quest'}" style="--kc:${col}"></span><span class="wd-title">${esc(it.title)}</span></button>
+        ${it.task?tlCheck(it):''}
+      </div>`; }).join('');
+    html+=`<div class="wd${isToday?' today':''}${items.length?'':' free'}">
+      <button type="button" class="wd-hd" onclick="selectedKey='${key}';setCalView('day');renderMobMonthGrid();renderMobCalQuests();" aria-label="Open ${d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}">
+        <span class="wd-num"><small>${d.toLocaleDateString('en-US',{weekday:'short'}).toUpperCase()}</small><b>${d.getDate()}</b></span>
+        <span class="wd-name">${isToday?'Today':d.toLocaleDateString('en-US',{weekday:'long'})}</span>
+        <span class="wd-cnt">${items.length||'Free'}</span>
       </button>
-      ${items.length?`<div class="wk-rows">${rows}</div>`:'<div class="wk-free">Free day</div>'}
+      ${items.length?`<div class="wd-rows">${rows}</div>`:''}
     </div>`;
   }
   el.innerHTML=html;
-  const mt=document.getElementById('wkMeta'); if(mt) mt.textContent=total?`${total} item${total===1?'':'s'} this week`:'Nothing planned this week';
+  const mt=document.getElementById('wkMeta'); if(mt) mt.textContent=nEv||nQ?[nEv?`${nEv} event${nEv===1?'':'s'}`:'',nQ?`${nQ} quest${nQ===1?'':'s'}`:''].filter(Boolean).join(' · '):'Nothing planned this week';
   const tb=document.getElementById('wkTodayBtn'); if(tb) tb.hidden=inWeek;
 }
+
+// Swipe left/right anywhere on the Calendar tab: Day → ±1 day (±1 week on the date
+// strip), Week → ±1 week, Month → ±1 month. Mostly-vertical drags are left to scrolling.
+(function calSwipe(){
+  const pane=document.getElementById('mobTabCal'); if(!pane) return;
+  let x0=0, y0=0, t0=0, onStrip=false, skip=false;
+  pane.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1){ skip=true; return; }
+    const t=e.touches[0]; x0=t.clientX; y0=t.clientY; t0=Date.now();
+    skip=!!e.target.closest('input,textarea,select,.mob-quest-list'); onStrip=!!e.target.closest('.mob-week-strip');
+  },{passive:true});
+  pane.addEventListener('touchend',e=>{
+    if(skip) return; const t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Date.now()-t0>700 || Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.6) return;
+    const dir=dx<0?1:-1;
+    if(calView==='month') changeMobCalMonth(dir);
+    else shiftCalDay(dir*(calView==='week'||onStrip?7:1));
+  },{passive:true});
+})();
 
 function renderCalViews(){
   const pane=document.getElementById('mobTabCal'); if(!pane)return;
@@ -3228,6 +3653,16 @@ function renderMobDaySummary(){
 function renderDaySummaryInto(key,el,isMob){
   if(!el)return;
   const d=new Date(key+'T00:00:00');
+  // Month view: "Thursday, Oct 29" + that day's event cards (quests list separately below)
+  if(isMob){
+    el.textContent=`${key===TODAY()?'Today':d.toLocaleDateString('en-US',{weekday:'long'})}, ${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+    const items=calItemsForDate(key).filter(x=>x.e);
+    const cnt=document.getElementById('cmDayCount'); if(cnt) cnt.textContent=items.length?`${items.length} event${items.length===1?'':'s'}`:'';
+    const listEl=document.getElementById('mobDayEventList'); if(!listEl)return;
+    listEl.innerHTML=items.length?items.map(it=>cdCardHTML(key,it,{withTime:true})).join('')
+      :`<div class="cm-none">No events. <button type="button" onclick="openAddSheet('${key}')">Add one</button></div>`;
+    return;
+  }
   const evs=eventsForDate(key);
   const pt = k => KIND_POKE_TYPE[k]||KIND_POKE_TYPE.routine;
   const chip = (e)=>`<span class="kind-type-chip" style="background:${KIND_COLORS[e.kind||'focus']||'#666'};">${pt(e.kind||'focus').icon} ${(e.kind||'').toUpperCase()}</span>`;
@@ -6392,7 +6827,7 @@ function renderFarmJobs(el,mini){
       act=late.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('cal')">See quests</button>`:bills.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('gil')">See bills</button>`:''; }
     else if(J.id==='focus'){ const fo=f.focus; if(fo&&!fo.done){ const left=Math.max(0,fo.end-Date.now()); body=`<div class="farm-job-body"><span class="farm-timer" data-farm-timer>${farmFmt(left)}</span><br>The fire keeps going while you work.</div>`; act=`<button type="button" class="farm-btn sm" onclick="stopFarmFocus()">Stop</button>`; } else { body=`<div class="farm-job-body">${f.focusCount?.date===TODAY()?`${f.focusCount.n} focus session${f.focusCount.n>1?'s':''} today. `:''}Ready for 25 minutes of focus?</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="startFarmFocus()">Start focus</button>`; } }
     else if(J.id==='scholar'){ body=`<div class="farm-job-body" data-farm-wiki>${farmWikiPick?`Today’s page: <b>${esc(farmWikiPick.slug)}</b>${farmWikiPick.summary?`<br><span style="color:var(--fg-dim)">${esc(farmWikiPick.summary)}</span>`:''}`:'Looking through your wiki…'}</div>`; act=farmWikiPick?`<button type="button" class="farm-btn sm primary" onclick="openFarmWiki()">Read</button>`:''; if(!farmWikiPick) farmPickWiki(); }
-    else if(J.id==='coach'){ body=`<div class="farm-job-body" data-coach-mini>${coachMiniHTML()}</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="openCoach('ask')">Ask ${esc(pokeLabel(id))}</button><button type="button" class="farm-btn sm" onclick="openCoach('trade')">Trade calc</button><button type="button" class="farm-btn sm" onclick="openCoach('scores')">Scores</button><button type="button" class="farm-btn sm" onclick="openCoach('injuries')">Injuries</button>`; if(!coachBoard) coachLoadBoard().then(()=>document.querySelectorAll('[data-coach-mini]').forEach(e=>e.innerHTML=coachMiniHTML())); }
+    else if(J.id==='coach'){ body=`<div class="farm-job-body" data-coach-mini>${coachMiniHTML()}</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="openCoach('ask')">Ask ${esc(pokeLabel(id))}</button><button type="button" class="farm-btn sm" onclick="openCoach('teams')">My Teams</button><button type="button" class="farm-btn sm" onclick="openCoach('bills')">Bills</button><button type="button" class="farm-btn sm" onclick="openCoach('scores')">Scores</button>`; if(!coachBoard) coachLoadBoard().then(()=>document.querySelectorAll('[data-coach-mini]').forEach(e=>e.innerHTML=coachMiniHTML())); }
     else if(J.id==='forager'){ const n=f.plots.filter(t=>t>Date.now()).length; body=`<div class="farm-job-body">Picks ripe berries on its own (+1 extra per plot). ${n} plot${n!==1?'s':''} growing.</div>`; }
     if(mini) return `<div class="farm-line" style="cursor:pointer" onclick="setFarmView('jobs')"><div class="fl-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div class="fl-t">${J.name}<div class="fl-s"${id?` id="farmMiniNm${J.id}"`:''}>${id?esc(pokeLabel(id)):'No helper yet'}</div></div></div>`;
     return `<div class="farm-job"><div class="farm-job-hd"><div class="farm-job-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div><div class="farm-job-t">${J.name}</div><div class="farm-job-s">${id&&farmFits(J.id,id)?'<span class="farm-fit">Great fit</span>':`Best: ${J.fitTxt}`}</div></div>${monBtn}</div>${body}${act?`<div class="farm-job-row">${act}</div>`:''}</div>`;
@@ -6781,6 +7216,156 @@ function meetFarmVisitor(){
   .coach-home .buddy-bubble b { color:#ffd08a; }
   .chh-acts { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
   .chh-acts .farm-chip { flex-shrink:0; min-height:34px; padding:6px 12px; font-size:12.5px; }
+
+  /* ── Coach refresh (2026-10): 4 icon tabs + ⋯ menu, big matchup card, Bills tab,
+     tappable games → stats sheet, real team logos. Overrides the rules above. ── */
+  .coach-hd { position:relative; }
+  .coach-hd .ch-t { font-family:var(--font-display); font-size:22px; font-weight:700; }
+  .coach-hd .ch-s { font-size:13px; color:#9db3cc; }
+  .coach-ic { width:44px; height:44px; border-radius:50%; border:none; background:#1a3352; color:var(--fg); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .coach-ic[aria-expanded="true"] { box-shadow:inset 0 0 0 2px #ffb547; }
+  .coach-menu { position:absolute; top:52px; right:52px; z-index:20; width:250px; background:#1a3352; border-radius:20px; padding:6px; box-shadow:0 18px 40px rgba(0,0,0,.55); display:flex; flex-direction:column; }
+  .coach-menu[hidden] { display:none; }
+  .coach-menu button { display:flex; align-items:center; gap:12px; min-height:50px; border:none; background:none; color:var(--fg); font-family:inherit; font-size:15px; font-weight:600; padding:0 12px; border-radius:14px; cursor:pointer; text-align:left; }
+  .coach-menu button svg { color:#ffb547; flex-shrink:0; }
+  .coach-menu button:hover, .coach-menu button:focus-visible { background:rgba(223,238,255,.08); outline:none; }
+  .coach-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:2px; padding:4px; background:var(--surface); border-radius:18px; margin-bottom:14px; }
+  .coach-tabs button { flex:none; min-height:54px; border-radius:14px; background:none; color:#9db3cc; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-size:12.5px; font-weight:700; padding:0 2px; }
+  .coach-tabs button.on { background:#ffb547; color:#241505; }
+  .coach-tabs button span { white-space:nowrap; }
+  .coach-subhd { display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-size:19px; font-weight:700; margin-bottom:2px; }
+  .coach-lbl { font-size:12px; color:#9db3cc; margin:6px 0 -4px; }
+  .coach-chips { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; flex-shrink:0; padding-bottom:2px; }
+  .coach-chips::-webkit-scrollbar { display:none; }
+  .coach-chips.end { justify-content:flex-end; }
+  .coach-chip { flex-shrink:0; display:inline-flex; align-items:center; gap:7px; min-height:40px; padding:0 14px; border:none; border-radius:999px; background:var(--surface); color:var(--fg); font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .coach-chip.on { background:var(--fg); color:var(--bg); }
+  .coach-chip .cpl { height:18px; }
+  .clogo { object-fit:contain; flex-shrink:0; vertical-align:middle; }
+  .pos { background:#b9c7d8; }   /* positions without their own color (S, DT, LB, CB, OL…) — the .pos.QB etc. rules still win */
+  /* matchup hero */
+  .cmx { background:var(--surface); border-radius:22px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .cmx-top { display:flex; justify-content:space-between; font-size:13px; color:#9db3cc; font-weight:600; }
+  .cmx-sc { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:8px; }
+  .cmx-sc .r { text-align:right; }
+  .cmx-nm { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cmx-nm.dim { color:#9db3cc; }
+  .cmx-n { font-family:var(--font-display); font-size:38px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+  .cmx-n.lead { color:#ffb547; }
+  .cmx-n.dim { opacity:.75; }
+  .cmx-p { font-size:12.5px; color:#9db3cc; }
+  .cmx-vs { font-size:13px; color:#9db3cc; font-weight:700; }
+  .cmx-bar { height:10px; border-radius:5px; overflow:hidden; background:var(--bg); }
+  .cmx-bar i { display:block; height:100%; background:#ffb547; border-radius:5px; transition:width .4s; }
+  .cmx-ft { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:13px; font-weight:600; color:#9db3cc; }
+  .cmx-ft .up { color:#ffb547; }
+  .cmx-none { font-size:14px; color:#9db3cc; }
+  .ctm-al { display:flex; align-items:center; gap:10px; background:rgba(255,211,90,.1); color:var(--fg); border-radius:16px; padding:8px 8px 8px 12px; font-size:14px; line-height:1.35; }
+  .ctm-al svg { color:#ffd35a; flex-shrink:0; }
+  .ctm-al.bad { background:rgba(255,107,107,.12); }
+  .ctm-al.bad svg { color:#ff8a8a; }
+  .ctm-al span { flex:1; min-width:0; }
+  .ctm-al button { flex-shrink:0; min-height:40px; padding:0 14px; border:none; border-radius:999px; background:#ffb547; color:#241505; font-family:inherit; font-size:13.5px; font-weight:800; cursor:pointer; }
+  .cpr-list .cpr { padding:9px 0; }
+  .cpr-nm { font-size:15px; font-weight:600; }
+  .cpr-nm small { font-size:12.5px; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .cpr-lg { object-fit:contain; }
+  .cpr-pt { font-size:16px; font-weight:700; }
+  .ctm-more summary { min-height:48px; display:flex; align-items:center; justify-content:center; background:var(--surface); border-radius:16px; font-size:14px; font-weight:600; color:#9db3cc; list-style:none; }
+  .ctm-more summary::-webkit-details-marker { display:none; }
+  .ctm-more[open] summary { margin-bottom:6px; }
+  /* scores */
+  .cg { width:100%; border:none; color:var(--fg); font-family:inherit; text-align:left; cursor:pointer; background:var(--surface); border-radius:20px; padding:12px 14px; display:grid; grid-template-columns:minmax(0,1fr) auto 20px; gap:6px 10px; }
+  .cg:active { transform:scale(.985); }
+  .cg-tm { display:flex; align-items:center; gap:10px; font-size:15.5px; font-weight:600; min-width:0; }
+  .cg-tm img { width:28px; height:28px; }
+  .cg-nm { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cg-tm.lose, .cg-sc.lose { opacity:.55; }
+  .cg-sc { font-family:var(--font-display); font-size:20px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; align-self:center; }
+  .cg-sc.rec { font-family:inherit; font-size:13.5px; font-weight:600; color:#9db3cc; }
+  .cg-chev { grid-row:span 2; align-self:center; color:#9db3cc; display:flex; }
+  .cg-ft { grid-column:1/-1; display:flex; gap:8px; align-items:center; flex-wrap:wrap; font-size:12.5px; color:#9db3cc; margin-top:2px; }
+  .cg-ft b { color:var(--fg); }
+  .cg.live .cg-ft b { color:#ff9a9a; }
+  .cg-mine { height:22px; padding:0 8px; border-radius:999px; background:rgba(255,181,71,.15); color:#ffb547; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; }
+  /* game sheet */
+  .cgs-top { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px; }
+  .cgs-live { display:flex; align-items:center; gap:7px; font-size:13px; font-weight:800; color:#ff9a9a; }
+  .cgs-live i { width:8px; height:8px; border-radius:50%; background:#ff5a5a; box-shadow:0 0 0 3px rgba(255,90,90,.25); }
+  .cgs-st { font-size:13.5px; font-weight:700; color:#9db3cc; }
+  .cgs-hero { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; text-align:center; margin:4px 0 6px; }
+  .cgs-team { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:14px; font-weight:600; }
+  .cgs-team img { width:56px; height:56px; object-fit:contain; }
+  .cgs-team small { font-size:12px; color:#9db3cc; font-weight:500; }
+  .cgs-score { font-family:var(--font-display); font-size:44px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:10px; }
+  .cgs-score i { font-style:normal; color:#56718f; }
+  .cgs-score .lose { opacity:.55; }
+  .cgs-vs { font-size:15px; font-weight:800; color:#9db3cc; }
+  .cgs-lines { display:grid; background:var(--bg); border-radius:16px; padding:10px 14px; font-size:14px; text-align:center; gap:4px 0; font-variant-numeric:tabular-nums; }
+  .cgs-lines .h { font-size:11.5px; font-weight:700; color:#9db3cc; }
+  .cgs-lines .l { text-align:left; font-weight:700; display:flex; align-items:center; gap:6px; }
+  .cgs-stats { display:flex; flex-direction:column; gap:12px; }
+  .cgs-key { display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:#9db3cc; }
+  .cgs-key span { display:flex; align-items:center; gap:6px; }
+  .cgs-key i { width:10px; height:10px; border-radius:3px; }
+  .cgs-stat { display:grid; grid-template-columns:52px minmax(0,1fr) 52px; gap:10px; align-items:center; font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .cgs-stat .r { text-align:right; }
+  .cgs-stat small { display:block; text-align:center; font-size:12px; color:#9db3cc; font-weight:600; margin-bottom:5px; }
+  .cgs-bar { display:flex; gap:3px; height:6px; }
+  .cgs-bar i { height:100%; border-radius:3px; min-width:3px; }
+  .cgs-leaders { display:flex; flex-direction:column; }
+  .cgs-ld { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(223,238,255,.07); }
+  .cgs-ld:last-child { border-bottom:none; }
+  .cgs-ld .k { width:40px; font-size:11.5px; font-weight:800; color:#9db3cc; letter-spacing:.04em; flex-shrink:0; }
+  .cgs-ld img { width:22px; height:22px; object-fit:contain; flex-shrink:0; }
+  .cgs-ld .nm { flex:1; min-width:0; font-size:14.5px; font-weight:600; }
+  .cgs-ld .nm small { display:block; font-size:12.5px; color:#9db3cc; font-weight:500; }
+  .cgs-yours { height:20px; padding:0 7px; border-radius:999px; background:rgba(255,181,71,.15); color:#ffb547; font-size:11px; font-weight:800; display:inline-flex; align-items:center; vertical-align:2px; }
+  .cgs-mine { font-size:14px; font-weight:600; color:#ffb547; }
+  /* Bills */
+  .cb-hero { display:flex; align-items:center; gap:14px; border-radius:22px; padding:16px; background:linear-gradient(135deg,#0b3a8f 0%,var(--surface) 72%); }
+  .cb-hero img { width:64px; height:64px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 4px 8px rgba(0,0,0,.35)); }
+  .cb-nm { font-size:15px; font-weight:600; }
+  .cb-rec { font-family:var(--font-display); font-size:36px; font-weight:700; line-height:1.05; }
+  .cb-sub { font-size:13px; color:#c9dcff; }
+  .cb-next { width:100%; display:flex; align-items:center; gap:10px; border:none; background:var(--surface); color:var(--fg); font-family:inherit; font-size:14.5px; font-weight:600; border-radius:16px; padding:10px 14px; min-height:48px; cursor:pointer; text-align:left; box-shadow:inset 0 0 0 1.5px rgba(255,181,71,.5); }
+  .cb-next b { font-size:12px; font-weight:800; color:#ffb547; }
+  .cb-next b.live { color:#ff9a9a; }
+  .cb-next span { flex:1; min-width:0; }
+  .cb-next svg { color:#9db3cc; flex-shrink:0; }
+  .cb-table { background:var(--surface); border-radius:20px; padding:10px 12px; }
+  .cb-th, .cb-tr { display:grid; grid-template-columns:22px minmax(0,1fr) 54px 40px; gap:8px; align-items:center; padding:7px 4px; font-size:14.5px; font-variant-numeric:tabular-nums; }
+  .cb-th { grid-template-columns:minmax(0,1fr) 54px 40px; font-size:12px; font-weight:700; color:#9db3cc; padding-top:2px; }
+  .cb-th .coach-lbl { margin:0; }
+  .cb-tr.fav { background:rgba(0,51,141,.4); border-radius:10px; font-weight:700; }
+  .cb-rk { color:#9db3cc; font-weight:700; font-size:13px; }
+  .cb-tm { display:flex; align-items:center; gap:8px; min-width:0; }
+  .cb-tm img { width:22px; height:22px; object-fit:contain; flex-shrink:0; }
+  .cb-tr .dim { color:#9db3cc; }
+  .cb-inj { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid rgba(223,238,255,.07); }
+  .cb-inj:last-child { border-bottom:none; }
+  .cb-inj .nm { flex:1; min-width:0; font-size:14.5px; font-weight:600; }
+  .cb-inj .nm small { display:block; font-size:12.5px; color:#9db3cc; font-weight:500; }
+  .cb-inj .nm small b { color:#ffb547; }
+  /* ask */
+  .cc-b { font-size:15px; }
+  .cc-sugs button { min-height:40px; font-size:13.5px; }
+  .cc-comp { border-radius:24px; padding:5px 5px 5px 16px; background:var(--surface); }
+  .cc-comp button { width:46px; height:46px; }
+  /* Home card */
+  .buddy-card.coach-home { background:var(--surface); gap:12px; padding:16px; border-radius:24px; }
+  .chh-nm { font-family:var(--font-display); font-size:20px; font-weight:700; }
+  .chh-sub { font-size:13px; color:#ffb547; font-weight:600; }
+  .chh-tip { font-size:13.5px; color:#9db3cc; }
+  .chh-ask { min-height:44px; padding:0 18px; }
+  .coach-home .cmu { background:var(--bg); border-radius:18px; padding:12px 14px; }
+  .coach-home .cmu-s { font-family:var(--font-display); font-size:20px; }
+  .chh-fav { display:flex; align-items:center; gap:12px; width:100%; border:none; color:var(--fg); font-family:inherit; text-align:left; cursor:pointer; border-radius:18px; padding:12px 14px; background:linear-gradient(135deg,#0b3a8f,var(--surface) 80%); }
+  .chh-fav img { width:40px; height:40px; object-fit:contain; flex-shrink:0; }
+  .chh-fav span { flex:1; min-width:0; }
+  .chh-fav b { display:block; font-size:15px; font-weight:700; }
+  .chh-fav small { display:block; font-size:13px; color:#c9dcff; margin-top:1px; }
+  .chh-fav svg { color:#c9dcff; flex-shrink:0; }
 </style>
 <script>
 // ══════════════════════════════════════════════════════════════
@@ -6790,7 +7375,9 @@ function meetFarmVisitor(){
 // plus web search. Trade math matches football.js exactly.
 // ══════════════════════════════════════════════════════════════
 let coachInj=null, coachInjKey='', coachInjFilter='mine', coachInjQ='';
-let coachBoard=null, coachNews=null, coachTrend=null, coachVals={}, coachTab='ask', coachBusy=false;
+let coachBoard=null, coachNews=null, coachTrend=null, coachVals={}, coachTab='teams', coachBusy=false;
+let coachBills=null, coachBillsAt=0, coachStand=null, coachInjAll=null, coachScoreFilter='all', coachLgSel=0;
+const COACH_FAV='BUF';   // the user's team — the Bills tab, the Home strip and the Scores filter follow it
 const COACH_STAR=1.35;
 function coachState(){ const f=farmState(); f.coach=f.coach||{}; const c=f.coach;
   c.league=Object.assign({ppr:1,teams:12,qbs:1,dynasty:false},c.league||{}); c.a=c.a||[]; c.b=c.b||[]; c.chat=c.chat||[]; c.roster=c.roster||''; c.accounts=Object.assign({sleeper:'',espn:[]},c.accounts||{}); if(!Array.isArray(c.accounts.espn)) c.accounts.espn=[]; return c; }
@@ -6829,49 +7416,199 @@ function coachEval(A,B,all){
 }
 
 // ── sheet ──
+// Four tabs built around the user's own teams: My Teams · Bills · Scores · Ask. The
+// trade calculator, league-wide injuries, waiver trends/headlines and league linking
+// live behind the ⋯ menu (each opens as its own view with a back button).
+const COACH_TABS=[
+  ['teams','My Teams','<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0113 0M16 4.5a3.5 3.5 0 010 7M21.5 20a6.5 6.5 0 00-4-6"/>'],
+  ['bills','Bills','<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'],
+  ['scores','Scores','<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M12 5v14M7 10v4M17 10v4"/>'],
+  ['ask','Ask','<path d="M4 5h16v11H9l-5 4z"/>'],
+];
+const COACH_MENU=[
+  ['trade','Trade calculator','<path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>'],
+  ['injuries','League injuries','<path d="M12 5v14M5 12h14"/>'],
+  ['waivers','Waiver trends & news','<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'],
+  ['edit','Edit leagues','<path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"/>'],
+];
+const coachSvg=(p,s)=>`<svg width="${s||20}" height="${s||20}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+// ESPN team logo by abbreviation (Sleeper/ESPN spell a few teams differently)
+const COACH_ABBR={WAS:'WSH',JAC:'JAX',LA:'LAR',OAK:'LV',SD:'LAC'};
+const coachAbbr=a=>{ const x=String(a||'').toUpperCase(); return COACH_ABBR[x]||x; };
+function coachLogo(abbr,size,cls){ const a=coachAbbr(abbr); if(!a||a==='FA') return ''; return `<img class="${cls||'clogo'}" src="https://a.espncdn.com/i/teamlogos/nfl/500/${a.toLowerCase()}.png" width="${size}" height="${size}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`; }
 function openCoach(tab){
   const id=farmJobMon('coach');
   if(!id){ showToast('Give a Pokémon the Coach job first'); setFarmView('jobs'); return; }
-  coachTab=tab||coachTab; const f=farmState(), c=coachState();
+  coachTab=tab||coachTab; const f=farmState();
+  const views=[...COACH_TABS,...COACH_MENU.filter(m=>m[0]!=='edit')].map(([k])=>`<div class="coach-view" data-v="${k}"></div>`).join('');
   farmSheet('coachOv',`
-    <div class="coach-hd">${farmPortrait(id,52)}<div style="flex:1;min-width:0"><div class="ch-t" id="coachNm">${esc(pokeLabel(id))}</div><div class="ch-s">Coach · NFL &amp; fantasy football</div></div><button type="button" class="as-x" onclick="document.getElementById('coachOv').remove()" aria-label="Close">✕</button></div>
-    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['teams','Teams'],['trade','Trade'],['scores','Scores'],['injuries','Injuries']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
-    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="teams"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div><div class="coach-view" data-v="injuries"></div>`,true);
+    <div class="coach-hd">${farmPortrait(id,52)}<div style="flex:1;min-width:0"><div class="ch-t" id="coachNm">${esc(pokeLabel(id))}</div><div class="ch-s" id="coachSub">Coach · NFL &amp; fantasy</div></div>
+      <button type="button" class="coach-ic" id="coachMenuBtn" onclick="coachMenu()" aria-label="More options" aria-expanded="false">${coachSvg('<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>')}</button>
+      <button type="button" class="coach-ic" onclick="document.getElementById('coachOv').remove()" aria-label="Close">${coachSvg('<path d="M6 6l12 12M18 6L6 18"/>',18)}</button>
+      <div class="coach-menu" id="coachMenuBox" hidden>${COACH_MENU.map(([k,l,ic])=>`<button type="button" onclick="coachMenu(false);${k==='edit'?"coachTeamsEdit=true;coachSetTab('teams')":`coachSetTab('${k}')`}">${coachSvg(ic)}${l}</button>`).join('')}</div>
+    </div>
+    <div class="coach-tabs" role="tablist">${COACH_TABS.map(([k,l,ic])=>`<button type="button" role="tab" data-t="${k}" onclick="coachSetTab('${k}')">${coachSvg(ic,18)}<span>${l}</span></button>`).join('')}</div>
+    ${views}`,true);
   if(!POKE_NAMES[id]) fillName(id,'coachNm');
   if(f.coachDay!==TODAY()){ f.coachDay=TODAY(); farmGive(id,1); farmSave(); }
   coachSetTab(coachTab);
+  if(!coachBoard) coachLoadBoard().then(coachSubLine); else coachSubLine();
+}
+function coachSubLine(){ const s=document.getElementById('coachSub'); if(s&&coachBoard?.week) s.textContent=`Week ${coachBoard.week} · NFL & fantasy`; }
+function coachMenu(open){
+  const box=document.getElementById('coachMenuBox'), btn=document.getElementById('coachMenuBtn'); if(!box) return;
+  const show=open===undefined?box.hidden:open; box.hidden=!show; btn?.setAttribute('aria-expanded',String(show));
 }
 function coachSetTab(t){
   coachTab=t; const ov=document.getElementById('coachOv'); if(!ov) return;
-  ov.querySelectorAll('.coach-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  coachMenu(false);
+  ov.querySelectorAll('.coach-tabs button').forEach(b=>{ const on=b.dataset.t===t; b.classList.toggle('on',on); b.setAttribute('aria-selected',String(on)); });
   ov.querySelectorAll('.coach-view').forEach(v=>v.classList.toggle('on',v.dataset.v===t));
-  if(t==='ask') coachRenderAsk(); if(t==='teams') coachRenderTeams(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores(); if(t==='injuries') coachRenderInjuries();
+  ({ask:coachRenderAsk,teams:coachRenderTeams,bills:coachRenderBills,scores:coachRenderScores,trade:coachRenderTrade,injuries:coachRenderInjuries,waivers:coachRenderWaivers})[t]?.();
 }
 function coachView(t){ return document.querySelector(`#coachOv .coach-view[data-v="${t}"]`); }
+// back-to-tabs header for the ⋯ menu views
+function coachSubHd(title){ return `<div class="coach-subhd"><button type="button" class="coach-ic" onclick="coachSetTab('teams')" aria-label="Back">${coachSvg('<path d="M15 6l-6 6 6 6"/>',18)}</button><span>${title}</span></div>`; }
 
-// scores tab
-function coachGameHTML(g){
-  const live=g.state==='in', post=g.state==='post', a=g.away, h=g.home;
-  const tm=(t,o)=>`<div class="cg-tm${post&&!t.winner&&o.winner?' lose':''}">${t.logo?`<img src="${esc(t.logo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:''}<span>${esc(t.short||t.abbr)}</span>${t.record?`<span class="rec">${esc(t.record)}</span>`:''}</div>`;
-  return `<div class="cg${live?' live':''}">${tm(a,h)}<div class="cg-sc">${g.state==='pre'?'':esc(a.score)}</div>${tm(h,a)}<div class="cg-sc">${g.state==='pre'?'':esc(h.score)}</div>
-    <div class="cg-ft"><b>${esc(live?g.detail:post?g.detail:coachGameWhen(g))}</b>${g.situation&&live?`<span>${esc(g.situation)}</span>`:''}${g.odds?.line&&!post?`<span>${esc(g.odds.line)}${g.odds.total?` · O/U ${g.odds.total}`:''}</span>`:''}${g.tv&&!post?`<span>${esc(g.tv)}</span>`:''}</div></div>`;
+// ── Scores tab: every game this week; tap one for its stats ──
+// Which of the user's fantasy players (starters + bench) play for each NFL team
+function coachMyByTeam(){
+  const m={};
+  (coachTeams?.leagues||[]).forEach(L=>{ if(!L.me) return; [...L.me.starters,...L.me.bench].forEach(p=>{ if(!p.team||p.name==='(empty)'||p.pos==='DEF') return; const a=coachAbbr(p.team); (m[a]=m[a]||new Set()).add(p.name); }); });
+  return m;
 }
+function coachGameHTML(g,my){
+  const live=g.state==='in', post=g.state==='post', a=g.away, h=g.home;
+  const mine=[...(my?.[coachAbbr(a.abbr)]||[]),...(my?.[coachAbbr(h.abbr)]||[])];
+  const tm=(t,o)=>`<span class="cg-tm${post&&!t.winner&&o.winner?' lose':''}">${t.logo?`<img src="${esc(t.logo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:coachLogo(t.abbr,28,'')}<span class="cg-nm">${esc(t.short||t.abbr)}</span></span>`;
+  const sc=(t,o)=>`<span class="cg-sc${post&&!t.winner&&o.winner?' lose':''}${g.state==='pre'?' rec':''}">${esc(g.state==='pre'?t.record:t.score)}</span>`;
+  return `<button type="button" class="cg${live?' live':''}" onclick="coachOpenGame('${esc(g.id)}')" aria-label="${esc(a.short||a.abbr)} at ${esc(h.short||h.abbr)} — game stats">
+    ${tm(a,h)}${sc(a,h)}<span class="cg-chev" aria-hidden="true">${coachSvg('<path d="M9 6l6 6-6 6"/>',18)}</span>
+    ${tm(h,a)}${sc(h,a)}
+    <span class="cg-ft"><b>${esc(live||post?g.detail:coachGameWhen(g))}</b>${g.situation&&live?`<span>${esc(g.situation)}</span>`:''}${g.tv&&!post?`<span>${esc(g.tv)}</span>`:''}${mine.length?`<span class="cg-mine">${mine.length>1?`${mine.length} of yours`:esc(mine[0])}</span>`:''}</span>
+  </button>`;
+}
+function coachScoreSet(f){ coachScoreFilter=f; coachRenderScores(); }
 async function coachRenderScores(){
   const el=coachView('scores'); if(!el) return;
   const draw=()=>{
-    const g=(coachBoard?.games||[]), live=g.filter(x=>x.state==='in'), up=g.filter(x=>x.state==='pre').sort((a,b)=>a.date.localeCompare(b.date)), fin=g.filter(x=>x.state==='post');
-    el.innerHTML=(coachBoard?`<div class="coach-lbl">${coachBoard.week?`Week ${coachBoard.week}`:'This week'}${coachBoard.season?` · ${coachBoard.season}`:''}</div>`:'')
-      +(!coachBoard?'<div class="farm-empty">Loading scores…</div>':!g.length?`<div class="farm-empty">${coachBoard.err?'Couldn’t reach the scoreboard. Pull to refresh in a minute.':'No games this week.'}</div>`:'')
-      +(live.length?`<div class="coach-lbl"><span class="live-dot"></span>Live</div>${live.map(coachGameHTML).join('')}`:'')
-      +(up.length?`<div class="coach-lbl">Upcoming</div>${up.map(coachGameHTML).join('')}`:'')
-      +(fin.length?`<div class="coach-lbl">Final</div>${fin.map(coachGameHTML).join('')}`:'')
-      +`<div class="coach-lbl">Waiver pulse · most added today</div>${coachTrend?coachTrend.length?`<div class="ctr">${coachTrend.slice(0,8).map(p=>`<span class="ctr-c"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>${esc(p.name)}</span>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
-      +`<div class="coach-lbl">Headlines</div>${coachNews?coachNews.length?`<div>${coachNews.slice(0,6).map(n=>`<a class="cn" href="${esc(n.url)}" target="_blank" rel="noopener">${n.image?`<img src="${esc(n.image)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div><div class="cn-t">${esc(n.headline)}</div><div class="cn-s">${n.published?new Date(n.published).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''}</div></div></a>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
-      +`<div class="coach-src">Scores &amp; news: ESPN · Trending: Sleeper</div>`;
+    const my=coachMyByTeam(), fav=coachAbbr(COACH_FAV);
+    let g=(coachBoard?.games||[]);
+    if(coachScoreFilter==='mine') g=g.filter(x=>my[coachAbbr(x.away.abbr)]||my[coachAbbr(x.home.abbr)]);
+    if(coachScoreFilter==='bills') g=g.filter(x=>coachAbbr(x.away.abbr)===fav||coachAbbr(x.home.abbr)===fav);
+    const live=g.filter(x=>x.state==='in'), up=g.filter(x=>x.state==='pre').sort((a,b)=>a.date.localeCompare(b.date)), fin=g.filter(x=>x.state==='post');
+    const chip=(k,l)=>`<button type="button" class="coach-chip${coachScoreFilter===k?' on':''}" onclick="coachScoreSet('${k}')">${l}</button>`;
+    const sec=(lbl,list)=>list.length?`<div class="coach-lbl">${lbl}</div>${list.map(x=>coachGameHTML(x,my)).join('')}`:'';
+    el.innerHTML=`<div class="coach-chips">${chip('all','All games')}${chip('mine','My players')}${chip('bills','Bills')}</div>`
+      +(!coachBoard?'<div class="farm-empty">Loading scores…</div>'
+        :!(coachBoard.games||[]).length?`<div class="farm-empty">${coachBoard.err?'Couldn’t reach the scoreboard. Try again in a minute.':'No games this week.'}</div>`
+        :!g.length?`<div class="farm-empty">${coachScoreFilter==='mine'?(coachLinked()?'None of your players are playing in a game this week.':'Link your leagues (⋯ → Edit leagues) to see your players’ games.'):'No Bills game this week — bye week.'}</div>`:'')
+      +sec('<span class="live-dot"></span>Live',live)+sec('Upcoming',up)+sec('Final',fin)
+      +`<div class="coach-src">${coachBoard?.week?`Week ${coachBoard.week} · `:''}Scores: ESPN · tap a game for stats</div>`;
   };
   draw();
-  await Promise.all([coachLoadBoard(),coachNews?null:coachLoadNews(),coachTrend?null:coachLoadTrend()]);
+  await Promise.all([coachLoadBoard(),coachLinked()?coachLoadTeams():null]);
   if(coachTab==='scores') draw();
+}
+
+// ── Game sheet: line score, team stats, leaders, your players (live games refresh) ──
+let coachGameTimer=0;
+function coachStatNum(v){ const s=String(v||''); if(/^\d+:\d+$/.test(s)){ const [m,x]=s.split(':').map(Number); return m+x/60; } if(/^\d+-\d+$/.test(s)){ const [a,b]=s.split('-').map(Number); return b?a/b:0; } return parseFloat(s.replace(/,/g,''))||0; }
+async function coachOpenGame(id){
+  clearTimeout(coachGameTimer);
+  if(!document.getElementById('coachGameOv')) farmSheet('coachGameOv',`<div class="cgs-top"><span></span><button type="button" class="coach-ic" onclick="document.getElementById('coachGameOv').remove()" aria-label="Close">${coachSvg('<path d="M6 6l12 12M18 6L6 18"/>',18)}</button></div><div class="farm-empty" id="cgsBody">Loading game…</div>`,true);
+  let g; try{ g=await coachGet(`/api/nfl/game/${encodeURIComponent(id)}`); if(g.error) throw new Error(g.message); }
+  catch(e){ const b=document.getElementById('cgsBody'); if(b) b.textContent='Couldn’t load this game’s stats right now.'; return; }
+  const ov=document.getElementById('coachGameOv'); if(!ov) return;
+  const a=g.away, h=g.home, live=g.state==='in', pre=g.state==='pre', post=g.state==='post';
+  const my=coachMyNames(), isMine=nm=>{ const pn=my.n(nm); return my.set.some(m=>pn===m||pn.endsWith(' '+m)||(m.length>5&&pn.includes(m))); };
+  const status=live?`<span class="cgs-live"><i></i>LIVE · ${esc(g.detail)}</span>`:pre?`<span class="cgs-st">${esc(coachGameWhen(g))}${g.tv?` · ${esc(g.tv)}`:''}</span>`:`<span class="cgs-st">${esc(g.detail||'Final')}</span>`;
+  const team=t=>`<div class="cgs-team">${t.logo?`<img src="${esc(t.logo)}" alt="" width="56" height="56" onerror="this.style.visibility='hidden'">`:coachLogo(t.abbr,56,'')}<span>${esc(t.short||t.abbr)}</span>${t.record?`<small>${esc(t.record)}</small>`:''}</div>`;
+  const score=pre?'<div class="cgs-vs">VS</div>':`<div class="cgs-score"><span class="${post&&!a.winner&&h.winner?'lose':''}">${esc(a.score)}</span><i>–</i><span class="${post&&!h.winner&&a.winner?'lose':''}">${esc(h.score)}</span></div>`;
+  const nQ=Math.max(a.lines.length,h.lines.length);
+  const lines=nQ?`<div class="cgs-lines" style="grid-template-columns:1fr repeat(${nQ+1},minmax(30px,40px))"><span class="h l">Team</span>${[...Array(nQ)].map((_,i)=>`<span class="h">${i<4?i+1:'OT'}</span>`).join('')}<span class="h">T</span>
+      ${[a,h].map(t=>`<span class="l">${coachLogo(t.abbr,18,'')}${esc(t.abbr)}</span>${[...Array(nQ)].map((_,i)=>`<span>${esc(t.lines[i]??'')}</span>`).join('')}<b>${esc(t.score)}</b>`).join('')}</div>`:'';
+  const stats=g.stats.length?`<div class="coach-lbl">${g.kind==='season'?'Season averages':'Team stats'}</div><div class="cgs-stats"><div class="cgs-key"><span><i style="background:#ffb547"></i>${esc(a.abbr)}</span><span>${esc(h.abbr)}<i style="background:#66c8ff"></i></span></div>${g.stats.map(s=>{ const x=coachStatNum(s.away), y=coachStatNum(s.home), tot=(x+y)||1;
+      return `<div class="cgs-stat"><span>${esc(s.away)}</span><div><small>${esc(s.label)}</small><div class="cgs-bar"><i style="flex:${x/tot};background:#ffb547"></i><i style="flex:${y/tot};background:#66c8ff"></i></div></div><span class="r">${esc(s.home)}</span></div>`; }).join('')}</div>`:'';
+  const leaders=g.leaders.length?`<div class="coach-lbl">${g.kind==='season'?'Season leaders':'Leaders'}</div><div class="cgs-leaders">${['PASS','RUSH','REC'].map(cat=>g.leaders.filter(l=>l.cat===cat).map(l=>`<div class="cgs-ld"><span class="k">${cat}</span>${coachLogo(l.team,22,'')}<span class="nm">${esc(l.name)}${isMine(l.name)?' <span class="cgs-yours">YOURS</span>':''}<small>${esc(l.line)}</small></span></div>`).join('')).join('')}</div>`:'';
+  const myGame=post||live?g.players.filter(p=>isMine(p.name)):[];
+  const byTeam=coachMyByTeam(), myPre=pre?[...(byTeam[coachAbbr(a.abbr)]||[]),...(byTeam[coachAbbr(h.abbr)]||[])]:[];
+  const yours=myGame.length?`<div class="coach-lbl">Your players</div><div class="cgs-leaders">${myGame.map(p=>`<div class="cgs-ld">${coachLogo(p.team,22,'')}<span class="nm">${esc(p.name)}<small>${esc(p.line)}</small></span></div>`).join('')}</div>`
+    :myPre.length?`<div class="coach-lbl">Your players in this game</div><div class="cgs-mine">${myPre.map(esc).join(' · ')}</div>`:'';
+  const ask=`Break down ${a.short||a.abbr} vs ${h.short||h.abbr}${pre?' before kickoff':''} for me${myGame.length||myPre.length?' — especially how my players are doing':''}.`;
+  ov.querySelector('.add-sheet').innerHTML=`<div class="as-grab"></div>
+    <div class="cgs-top">${status}<button type="button" class="coach-ic" onclick="clearTimeout(coachGameTimer);document.getElementById('coachGameOv').remove()" aria-label="Close">${coachSvg('<path d="M6 6l12 12M18 6L6 18"/>',18)}</button></div>
+    <div class="cgs-hero">${team(a)}${score}${team(h)}</div>
+    ${lines}${yours}${stats}${leaders}
+    <div class="farm-job-row"><button type="button" class="farm-btn primary" onclick="document.getElementById('coachGameOv').remove();openCoach('ask');coachSend(${esc(JSON.stringify(ask))})">Ask ${esc(coachName())} about this game</button></div>
+    <div class="coach-src">Stats: ESPN${live?' · updates every 30s':''}</div>`;
+  if(live) coachGameTimer=setTimeout(()=>{ if(document.getElementById('coachGameOv')) coachOpenGame(id); },30000);
+}
+
+// ── Bills tab: record + division, next game, injury report, news ──
+async function coachLoadBills(force){
+  if(!force&&coachBills&&Date.now()-coachBillsAt<10*60*1000) return coachBills;
+  try{ coachBills=await coachGet(`/api/nfl/team?abbr=${COACH_FAV.toLowerCase()}`); if(coachBills.error) throw 0; coachBillsAt=Date.now(); }catch{ coachBills=coachBills||{err:true}; }
+  return coachBills;
+}
+async function coachLoadStand(){ if(coachStand) return coachStand; try{ coachStand=await coachGet('/api/nfl/standings'); if(coachStand.error) throw 0; }catch{ coachStand={divisions:[],err:true}; } return coachStand; }
+async function coachLoadInjAll(){ if(coachInjAll) return coachInjAll; try{ coachInjAll=(await coachGet('/api/nfl/injuries?all=1')).players||[]; }catch{ coachInjAll=null; } return coachInjAll; }
+function coachFavDivision(){
+  const fav=coachAbbr(COACH_FAV), dv=(coachStand?.divisions||[]).find(d=>d.teams.some(t=>coachAbbr(t.abbr)===fav)); if(!dv) return null;
+  const wl=r=>{ const [w,l,t]=String(r||'0-0').split('-').map(Number); return {w:w||0,l:l||0,t:t||0}; };
+  const pct=t=>{ const x=wl(t.record), n=x.w+x.l+x.t; return n?(x.w+x.t/2)/n:0; };
+  const teams=dv.teams.slice().sort((a,b)=>pct(b)-pct(a)), top=wl(teams[0]?.record);
+  return { name:dv.division.replace(/^(AFC|NFC)\s*/,m=>m), rows:teams.map((t,i)=>{ const x=wl(t.record), gb=((top.w-x.w)+(x.l-top.l))/2; return {...t,rank:i+1,gb:i===0||gb<=0?'—':gb.toFixed(1)}; }) };
+}
+function coachFavStanding(){ const dv=coachFavDivision(), r=dv?.rows.find(x=>coachAbbr(x.abbr)===coachAbbr(COACH_FAV)); return r?`${r.rank}${ordSfx(r.rank)} in ${dv.name}`:(coachBills?.standing||''); }
+function coachStreakText(s){ const m=String(s||'').match(/^([WL])(\d+)$/); if(!m||+m[2]<2) return ''; return `${m[1]==='W'?'won':'lost'} ${m[2]} straight`; }
+function coachNextGameHTML(n,compact){
+  if(!n) return '';
+  const fav=coachAbbr(COACH_FAV), home=coachAbbr(n.home.abbr)===fav, opp=home?n.away:n.home, live=n.state==='in';
+  const label=live?`<b class="live">LIVE</b>`:`<b>NEXT</b>`;
+  const txt=live?`${esc(n.away.abbr)} ${esc(n.away.score)}–${esc(n.home.score)} ${esc(n.home.abbr)} · ${esc(n.detail)}`:`${home?'vs':'@'} ${esc(opp.short||opp.abbr)} · ${esc(coachGameWhen(n))}${n.tv&&!compact?` · ${esc(n.tv)}`:''}`;
+  return `<button type="button" class="cb-next${live?' live':''}" onclick="${compact?`openCoach('bills');`:''}coachOpenGame('${esc(n.id)}')">${label}${coachLogo(opp.abbr,24,'')}<span>${txt}</span>${coachSvg('<path d="M9 6l6 6-6 6"/>',18)}</button>`;
+}
+async function coachRenderBills(){
+  const el=coachView('bills'); if(!el) return;
+  const draw=()=>{
+    const B=coachBills, dv=coachFavDivision(), favRow=dv?.rows.find(r=>coachAbbr(r.abbr)===coachAbbr(COACH_FAV));
+    const standing=esc(coachFavStanding());
+    const streak=coachStreakText(favRow?.streak);
+    const my=coachMyNames(), mine=p=>{ const pn=my.n(p.name); return my.set.some(m=>pn===m||pn.endsWith(' '+m)); };
+    // ESPN's report also lists players just activated off it ("Active") — those aren't hurt
+    const inj=(coachInjAll||[]).filter(p=>coachAbbr(p.team)===coachAbbr(COACH_FAV)&&!/^active$/i.test(p.status||''));
+    el.innerHTML=`
+      <div class="cb-hero">${B?.logo?`<img src="${esc(B.logo)}" alt="" width="64" height="64">`:coachLogo(COACH_FAV,64,'')}
+        <div><div class="cb-nm">${esc(B?.name||'Buffalo Bills')}</div><div class="cb-rec">${esc(B?.record||favRow?.record||'—')}</div><div class="cb-sub">${[standing,streak].filter(Boolean).join(' · ')||(B?'':'Loading…')}</div></div></div>
+      ${B?.next?coachNextGameHTML(B.next):''}
+      ${dv?`<div class="cb-table"><div class="cb-th"><span class="coach-lbl">${esc(dv.name)}</span><span>W-L</span><span>GB</span></div>
+        ${dv.rows.map(r=>`<div class="cb-tr${coachAbbr(r.abbr)===coachAbbr(COACH_FAV)?' fav':''}"><span class="cb-rk">${r.rank}</span><span class="cb-tm">${r.logo?`<img src="${esc(r.logo)}" alt="" width="22" height="22" loading="lazy">`:coachLogo(r.abbr,22,'')}${esc(String(r.name).split(' ').pop())}</span><span>${esc(r.record)}</span><span class="dim">${r.gb}</span></div>`).join('')}</div>`
+        :coachStand?.err?'<div class="farm-empty">Standings are unavailable right now.</div>':'<div class="farm-empty">Loading standings…</div>'}
+      <div class="coach-lbl">Injury report</div>
+      ${!coachInjAll?'<div class="farm-empty">Loading the injury report…</div>':!inj.length?'<div class="farm-empty">No Bills on the injury report.</div>'
+        :`<div>${inj.map(p=>`<div class="cb-inj"><span class="pos ${esc(p.pos)}">${esc(p.pos||'—')}</span><span class="nm">${esc(p.name)}<small>${esc(p.injury||'')}${p.injury&&mine(p)?' · ':''}${mine(p)?'<b>on your team</b>':''}</small></span><span class="ci-st" style="color:${coachInjColor(p.status)};background:${coachInjColor(p.status)}22">${esc(p.status||'Listed')}</span></div>`).join('')}</div>`}
+      <div class="coach-lbl">Bills news</div>
+      ${!B?'<div class="farm-empty">Loading…</div>':!(B.news||[]).length?'<div class="farm-empty">No Bills headlines right now.</div>'
+        :`<div>${B.news.map(n=>`<a class="cn" href="${esc(n.url)}" target="_blank" rel="noopener">${n.image?`<img src="${esc(n.image)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div><div class="cn-t">${esc(n.headline)}</div><div class="cn-s">ESPN${n.published?' · '+coachAgo(n.published):''}</div></div></a>`).join('')}</div>`}
+      <div class="farm-job-row"><button type="button" class="farm-btn" onclick="coachSetTab('ask');coachSend('How are the Bills looking this week? Matchup, injuries, and what it means for my fantasy players.')">Ask ${esc(coachName())} about the Bills</button></div>
+      <div class="coach-src">Bills data: ESPN</div>`;
+  };
+  draw();
+  await Promise.all([coachLoadBills(),coachLoadStand(),coachLoadInjAll(),coachLinked()?coachLoadTeams():null]);
+  if(coachTab==='bills') draw();
+}
+function coachAgo(iso){ const m=Math.round((Date.now()-new Date(iso))/60000); if(!(m>=0)) return ''; if(m<60) return `${Math.max(1,m)}m ago`; if(m<1440) return `${Math.round(m/60)}h ago`; return new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+
+// ── ⋯ → Waiver trends & news (moved off the Scores tab) ──
+async function coachRenderWaivers(){
+  const el=coachView('waivers'); if(!el) return;
+  const draw=()=>{ el.innerHTML=coachSubHd('Waiver trends &amp; news')
+      +`<div class="coach-lbl">Most added today</div>${coachTrend?coachTrend.length?`<div class="ctr">${coachTrend.slice(0,12).map(p=>`<span class="ctr-c"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>${esc(p.name)}</span>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
+      +`<div class="coach-lbl">Headlines</div>${coachNews?coachNews.length?`<div>${coachNews.slice(0,8).map(n=>`<a class="cn" href="${esc(n.url)}" target="_blank" rel="noopener">${n.image?`<img src="${esc(n.image)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div><div class="cn-t">${esc(n.headline)}</div><div class="cn-s">${n.published?coachAgo(n.published):''}</div></div></a>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
+      +`<div class="farm-job-row"><button type="button" class="farm-btn" onclick="coachSetTab('ask');coachSend('Best waiver pickups for my teams right now?')">Ask about pickups</button></div>`
+      +`<div class="coach-src">Trending: Sleeper · News: ESPN</div>`; };
+  draw(); await Promise.all([coachNews?null:coachLoadNews(),coachTrend?null:coachLoadTrend()]); if(coachTab==='waivers') draw();
 }
 
 // injuries tab — ESPN's league-wide report, joined to fantasy values so stars sort first;
@@ -6897,7 +7634,7 @@ async function coachRenderInjuries(){
     else if(coachInjFilter==='top') rows=rows.filter(p=>/out|reserve|doubtful|questionable|day/i.test(p.status)).slice(0,40);
     if(coachInjQ){ const q=coachInjQ.toLowerCase(); rows=(coachInj||[]).filter(p=>p.name.toLowerCase().includes(q)||String(p.team).toLowerCase()===q); }
     const chip=(k,l)=>`<button type="button" class="farm-chip${coachInjFilter===k&&!coachInjQ?' on':''}" onclick="coachInjQ='';coachInjSet('${k}')">${l}</button>`;
-    el.innerHTML=`<div class="ct-set">${chip('mine',`My players${nMine?` · ${nMine}`:''}`)}${chip('top','Biggest names')}${chip('all','Everyone')}</div>
+    el.innerHTML=`${coachSubHd('League injuries')}<div class="ct-set">${chip('mine',`My players${nMine?` · ${nMine}`:''}`)}${chip('top','Biggest names')}${chip('all','Everyone')}</div>
       <div class="ct-add"><input id="coachInjQ" placeholder="Search a player or team (e.g. KC)" value="${esc(coachInjQ)}" oninput="coachInjQ=this.value.trim();coachRenderInjuriesKeep()"></div>
       ${!coachInj?'<div class="farm-empty">Loading the injury report…</div>'
         :!rows.length?`<div class="farm-empty">${coachInjQ?'No one on the report matches that.':coachInjFilter==='mine'?'None of your players are on the injury report. Add your roster in the Ask tab (or players to the trade) and they’ll show up here.':'The injury report is empty right now.'}</div>`
@@ -6916,7 +7653,7 @@ const COACH_SET=[['dynasty',[[false,'Redraft'],[true,'Dynasty']]],['ppr',[[1,'PP
 function coachSetLeague(k,v){ const c=coachState(); c.league[k]=v; farmSave(); coachTrend=null; coachRenderTrade(); }
 async function coachRenderTrade(){
   const el=coachView('trade'); if(!el) return; const c=coachState(), L=c.league;
-  el.innerHTML=`<div class="ct-set">${COACH_SET.map(([k,opts])=>opts.map(([v,l])=>`<button type="button" class="farm-chip${L[k]===v?' on':''}" onclick='coachSetLeague("${k}",${JSON.stringify(v)})'>${l}</button>`).join('')).join('<span style="width:4px"></span>')}</div>
+  el.innerHTML=`${coachSubHd('Trade calculator')}<div class="ct-set">${COACH_SET.map(([k,opts])=>opts.map(([v,l])=>`<button type="button" class="farm-chip${L[k]===v?' on':''}" onclick='coachSetLeague("${k}",${JSON.stringify(v)})'>${l}</button>`).join('')).join('<span style="width:4px"></span>')}</div>
     <div id="coachTradeBody"><div class="farm-empty">Loading trade values…</div></div>`;
   const all=await coachLoadVals(); if(coachTab!=='trade') return;
   const body=document.getElementById('coachTradeBody'); if(!body) return;
@@ -6961,7 +7698,7 @@ function coachRenderAsk(){
   const msgs=c.chat.length?c.chat.map(m=>coachMsgHTML(m.role,m.content)).join('')
     :coachMsgHTML('assistant',coachLinked()?`Coach ${nm} here! I’ve got your lineups, this week’s matchups, live scores, injuries and trade values. What are we working on?`:`Coach ${nm} here! I’ve got live scores, injury news, and trade values for your ${c.league.teams}-team ${c.league.ppr===1?'PPR':c.league.ppr===0.5?'half-PPR':'standard'} league. What are we working on?`);
   el.innerHTML=`<div class="cc-msgs" id="coachMsgs">${msgs}</div>
-    <div class="cc-sugs">${['Who should I start this week?','Best waiver pickups right now?','Any big injuries today?','Who’s a buy-low trade target?','What are tonight’s games?'].map(s=>`<button type="button" onclick="coachSend(this.textContent)">${s}</button>`).join('')}</div>
+    <div class="cc-sugs">${['Set my lineup','Best waiver pickups right now?','Bills outlook this week?','Any big injuries today?','Who’s a buy-low trade target?'].map(s=>`<button type="button" onclick="coachSend(this.textContent)">${s}</button>`).join('')}</div>
     ${coachLinked()?`<button type="button" class="cc-linked" onclick="coachSetTab('teams')">${coachTeamsBadges()} <span>${esc(coachName())} can see your ${coachTeams?.leagues?.length>1?`${coachTeams.leagues.length} teams`:'team'}</span></button>`:`<button type="button" class="cc-linked off" onclick="coachSetTab('teams')">🔗 <span>Link ESPN or Sleeper so ${esc(coachName())} can see your teams</span></button>`}
     <details class="cc-roster"${c.roster?'':''}><summary>${c.roster?'Extra roster notes ✓ (tap to edit)':'Or type a roster by hand'}</summary><textarea placeholder="e.g. Mahomes, Bijan Robinson, Jahmyr Gibbs, Ja'Marr Chase, Puka Nacua, Kelce…" onchange="coachState().roster=this.value.trim();farmSave()">${esc(c.roster)}</textarea></details>
     <div class="cc-comp"><textarea id="coachInp" rows="1" placeholder="Ask ${nm} anything about football…" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();coachSend()}"></textarea><button type="button" id="coachSendBtn" onclick="coachSend()" aria-label="Send"${coachBusy?' disabled':''}>↑</button></div>`;
@@ -7044,20 +7781,46 @@ function coachMatchHTML(L,big){
 // ── Teams tab ──
 let coachTeamsEdit=false;
 function coachPlayerRow(p){ const bad=COACH_BAD.test(p.status||''), q=COACH_Q.test(p.status||'');
-  return `<div class="cpr${bad?' bad':q?' q':''}"><span class="cpr-sl">${esc(p.slot||'')}</span><span class="pos ${esc(p.pos)}">${esc(p.pos||'—')}</span><span class="cpr-nm">${esc(p.name)}<small>${esc(p.team||'')}${p.status?` · <b>${esc(p.status)}</b>`:''}</small></span><span class="cpr-pt">${p.pts!=null?coachPts(p.pts):p.proj!=null?`<small>proj</small> ${coachPts(p.proj)}`:''}</span></div>`; }
+  return `<div class="cpr${bad?' bad':q?' q':''}"><span class="cpr-sl">${esc(p.slot||'')}</span><span class="pos ${esc(p.pos)}">${esc(p.pos||'—')}</span><span class="cpr-nm">${esc(p.name)}<small>${p.team?coachLogo(p.team,14,'cpr-lg'):''}${esc(p.team||'')}${p.status?` · <b>${esc(p.status)}</b>`:''}</small></span><span class="cpr-pt">${p.pts!=null?coachPts(p.pts):p.proj!=null?`<small>proj</small> ${coachPts(p.proj)}`:''}</span></div>`; }
+// Big matchup card at the top of a league on My Teams
+function coachHeroHTML(L){
+  const me=L.me, op=L.opp, a=me.score||0, b=op?.score||0, tot=(a+b)||1, diff=a-b, pd=(me.proj||0)-(op?.proj||0);
+  if(!op) return `<div class="cmx"><div class="cmx-top"><span>${coachRec(me.record)}${me.rank?` · ${coachOrd(me.rank)} place`:''}</span></div><div class="cmx-none">${esc(me.name)} · no matchup this week</div></div>`;
+  const lead=(a||b)?(diff>=0?'me':'op'):'';
+  return `<div class="cmx">
+    <div class="cmx-top"><span>${coachRec(me.record)}${me.rank?` · ${coachOrd(me.rank)} place`:''}</span><span>${coachTeams?.week?`Week ${coachTeams.week}`:''}</span></div>
+    <div class="cmx-sc">
+      <div><div class="cmx-nm">${esc(me.name)}</div><div class="cmx-n${lead==='me'?' lead':''}">${coachPts(me.score)}</div>${me.proj?`<div class="cmx-p">proj ${coachPts(me.proj)}</div>`:''}</div>
+      <div class="cmx-vs">VS</div>
+      <div class="r"><div class="cmx-nm dim">${esc(op.name)}</div><div class="cmx-n${lead==='op'?' lead':' dim'}">${coachPts(op.score)}</div>${op.proj?`<div class="cmx-p">proj ${coachPts(op.proj)}</div>`:''}</div>
+    </div>
+    <div class="cmx-bar" aria-hidden="true"><i style="width:${Math.round(a/tot*100)}%"></i></div>
+    <div class="cmx-ft"><span class="${diff>=0?'up':''}">${!(a||b)?'Not started':Math.abs(diff)<0.05?'Tied':`${diff>0?'Leading':'Trailing'} by ${coachPts(Math.abs(diff))}`}</span>${me.proj&&op.proj?`<span>Projected to ${pd>=0?'win':'lose'} by ${coachPts(Math.abs(pd))}</span>`:''}</div>
+  </div>`;
+}
+// "Fix lineup": hand the hurt/empty starters straight to the coach
+function coachFixLineup(i){
+  const L=(coachTeams?.leagues||[])[i]; const al=L?coachAlerts(L):[];
+  const who=al.map(p=>p.name==='(empty)'?`an empty ${p.slot} slot`:`${p.name} (${p.status})`).join(', ');
+  openCoach('ask'); coachSend(`Fix my lineup${L?` in ${L.name}`:''}${who?` — ${who}`:''}. Who should I start instead?`);
+}
+function coachAlertHTML(L,i){
+  const al=coachAlerts(L); if(!al.length) return '';
+  const bad=al.some(p=>p.name==='(empty)'||COACH_BAD.test(p.status||''));
+  const txt=al.length<=2?al.map(p=>p.name==='(empty)'?`Empty <b>${esc(p.slot)}</b> slot`:`<b>${esc(p.name)}</b> ${esc(String(p.status).toLowerCase())}`).join(' · '):`<b>${al.length} starters</b> need a look`;
+  return `<div class="ctm-al${bad?' bad':''}">${coachSvg('<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>',20)}<span>${txt}</span><button type="button" onclick="coachFixLineup(${i})">Fix lineup</button></div>`;
+}
 function coachLeagueHTML(L,i){
   if(L.error) return `<div class="ctm">${coachMatchHTML(L)}</div>`;
   if(L.needsTeam){ const ai=coachState().accounts.espn.findIndex(e=>e.id===L.id);
     return `<div class="ctm"><div class="cmu-hd">${coachPlatBadge('espn')}<span class="cmu-lg">${esc(L.name)}</span></div>
       <div class="ct-v-s">Which team is yours?</div><div class="ctr">${(L.teams||[]).map(t=>`<button type="button" class="ctr-c" onclick="coachPickEspnTeam(${ai},${t.id})">${esc(t.name)}</button>`).join('')}</div></div>`; }
-  const me=L.me, al=coachAlerts(L);
-  return `<div class="ctm">${coachMatchHTML(L,true)}
-    ${al.length?`<div class="ctm-al">⚠ ${al.map(p=>p.name==='(empty)'?`Empty ${esc(p.slot)} slot`:`<b>${esc(p.name)}</b> ${esc(p.status)}`).join(' · ')}</div>`:''}
-    <div class="coach-lbl">Starters</div><div>${me.starters.map(coachPlayerRow).join('')}</div>
-    <details class="ctm-more"><summary>Bench${me.ir?.length?' & IR':''} · ${me.bench.length+(me.ir?.length||0)}</summary>${me.bench.map(coachPlayerRow).join('')}${(me.ir||[]).map(p=>coachPlayerRow({...p,slot:'IR'})).join('')}</details>
-    ${L.opp?`<details class="ctm-more"><summary>${esc(L.opp.name)}’s lineup</summary>${L.opp.starters.map(coachPlayerRow).join('')}</details>`:''}
-    <div class="farm-job-row"><button type="button" class="farm-btn sm primary" onclick="coachSetTab('ask');coachSend('Set my lineup for ${esc(L.name).replace(/'/g,"\\'")} this week — who should I start and sit?')">Set my lineup</button><button type="button" class="farm-btn sm" onclick="coachSetTab('ask');coachSend('How do I beat ${esc(L.opp?.name||'my opponent').replace(/'/g,"\\'")} this week in ${esc(L.name).replace(/'/g,"\\'")}?')">Matchup plan</button><button type="button" class="farm-btn sm" onclick="coachUseFormat(${i})">Use for trades</button></div>
-  </div>`;
+  const me=L.me;
+  return `${coachHeroHTML(L)}${coachAlertHTML(L,i)}
+    <div class="coach-lbl">Starters</div><div class="cpr-list">${me.starters.map(coachPlayerRow).join('')}</div>
+    <details class="ctm-more"><summary>Bench${me.ir?.length?' & IR':''} (${me.bench.length+(me.ir?.length||0)})</summary><div class="cpr-list">${me.bench.map(coachPlayerRow).join('')}${(me.ir||[]).map(p=>coachPlayerRow({...p,slot:'IR'})).join('')}</div></details>
+    ${L.opp?`<details class="ctm-more"><summary>${esc(L.opp.name)}’s lineup</summary><div class="cpr-list">${L.opp.starters.map(coachPlayerRow).join('')}</div></details>`:''}
+    <div class="farm-job-row"><button type="button" class="farm-btn sm primary" onclick="coachSetTab('ask');coachSend('Set my lineup for ${esc(L.name).replace(/'/g,"\\'")} this week — who should I start and sit?')">Set my lineup</button><button type="button" class="farm-btn sm" onclick="coachSetTab('ask');coachSend('How do I beat ${esc(L.opp?.name||'my opponent').replace(/'/g,"\\'")} this week in ${esc(L.name).replace(/'/g,"\\'")}?')">Matchup plan</button><button type="button" class="farm-btn sm" onclick="coachUseFormat(${i})">Use for trades</button></div>`;
 }
 function coachAccountsHTML(){
   const a=coachState().accounts, priv=(coachTeams?.errors||[]).some(e=>/private|ESPN_S2|cookies/i.test(e));
@@ -7086,10 +7849,11 @@ async function coachRenderTeams(){
   const el=coachView('teams'); if(!el) return;
   const draw=()=>{
     if(!coachLinked()||coachTeamsEdit){ el.innerHTML=coachAccountsHTML(); return; }
-    const T=coachTeams;
-    el.innerHTML=`<div class="coach-lbl">${T?.week?`Week ${T.week}`:'This week'}${T?.season?` · ${T.season}`:''}<span style="margin-left:auto;display:flex;gap:6px"><button type="button" class="farm-chip" onclick="coachLoadTeams(true).then(()=>{coachRenderTeams();renderBuddy();})">↻ Refresh</button><button type="button" class="farm-chip" onclick="coachTeamsEdit=true;coachRenderTeams()">Edit leagues</button></span></div>
+    const T=coachTeams, lgs=T?.leagues||[]; if(coachLgSel>=lgs.length) coachLgSel=0;
+    el.innerHTML=`${lgs.length>1?`<div class="coach-chips">${lgs.map((L,i)=>`<button type="button" class="coach-chip lg${i===coachLgSel?' on':''}" onclick="coachLgSel=${i};coachRenderTeams()">${coachPlatBadge(L.platform)}${esc(L.name)}</button>`).join('')}</div>`:''}
       ${!T?'<div class="farm-empty">Pulling up your leagues…</div>':''}
-      ${T?(T.leagues||[]).map(coachLeagueHTML).join(''):''}
+      ${lgs[coachLgSel]?coachLeagueHTML(lgs[coachLgSel],coachLgSel):''}
+      <div class="coach-chips end"><button type="button" class="coach-chip" onclick="coachLoadTeams(true).then(()=>{coachRenderTeams();renderBuddy();})">${coachSvg('<path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/>',16)} Refresh</button></div>
       ${T?.errors?.length?`<div class="cacc-warn">${T.errors.map(esc).join('<br>')}${T.errors.some(e=>/private|ESPN_S2|cookies/i.test(e))?'<br><button type="button" class="farm-btn sm" style="margin-top:8px" onclick="coachTeamsEdit=true;coachRenderTeams()">How to fix</button>':''}</div>`:''}
       ${T&&!T.leagues?.length&&!T.errors?.length?'<div class="farm-empty">No leagues found for this season.</div>':''}
       <div class="coach-src">Leagues: ${coachTeamsBadges()} · refreshes every 90s</div>`;
@@ -7104,29 +7868,28 @@ function renderHomeCoach(el){
   el.className='buddy-card coach-home';
   const nm=esc(pokeLabel(id)), T=coachTeams, linked=coachLinked();
   const lgs=(T?.leagues||[]);
-  let tip;
-  if(!linked) tip=`Link your ESPN or Sleeper league and I’ll keep your matchups right here.`;
-  else if(!T) tip='Pulling up your matchups…';
-  else { const al=lgs.flatMap(L=>coachAlerts(L).map(p=>({p,L})));
-    tip=al.length?`Heads up: ${al.slice(0,2).map(({p})=>p.name==='(empty)'?`you have an empty ${p.slot} slot`:`<b>${esc(p.name)}</b> is ${esc(String(p.status).toLowerCase())}`).join(', ')}${al.length>2?` (+${al.length-2} more)`:''}. Want me to fix your lineup?`
-      :coachBoard?coachMiniHTML():'Lineups look healthy. Ask me anything.'; }
+  // first league with a hurt/empty starter gets the "Fix lineup" line
+  const ai=lgs.findIndex(L=>!L.error&&!L.needsTeam&&coachAlerts(L).length), al=ai>-1?coachAlerts(lgs[ai]):[];
+  const alTxt=al.length?(al.length===1?(al[0].name==='(empty)'?`Empty <b>${esc(al[0].slot)}</b> slot`:`<b>${esc(al[0].name)}</b> is ${esc(String(al[0].status).toLowerCase())}`):`<b>${al.length} starters</b> need a look`):'';
   el.innerHTML=`
-    <div class="chh-top" onclick="openCoach('ask')">
-      ${farmPortrait(id,60)}
-      <div class="chh-txt"><div class="buddy-name"><span id="homeCoachNm">${nm}</span></div><div class="buddy-level" style="color:#ffb547">Coach${T?.week?` · Week ${T.week}`:''}</div></div>
+    <div class="chh-top" onclick="openCoach('teams')">
+      ${farmPortrait(id,56)}
+      <div class="chh-txt"><div class="chh-nm" id="homeCoachNm">${nm}</div><div class="chh-sub">Coach${T?.week?` · Week ${T.week}`:''}${lgs.length?` · ${lgs.length} league${lgs.length===1?'':'s'}`:''}</div></div>
       <button type="button" class="chh-ask" onclick="event.stopPropagation();openCoach('ask')">Ask</button>
     </div>
-    ${linked?(lgs.length?`<div class="chh-lgs">${lgs.slice(0,3).map(L=>coachMatchHTML(L)).join('')}</div>`:'')
-      :`<button type="button" class="cmu link" onclick="openCoach('teams')">🔗 <b>Link ESPN or Sleeper</b><span>so ${nm} can see your teams</span></button>`}
-    ${T?.errors?.length&&!lgs.length?`<div class="buddy-bubble">⚠ ${esc(T.errors[0])}</div>`:`<div class="buddy-bubble" onclick="openCoach('ask')">${tip}</div>`}
-    <div class="chh-acts"><button type="button" class="farm-chip" onclick="openCoach('teams')">My teams</button><button type="button" class="farm-chip" onclick="openCoach('scores')">Scores</button><button type="button" class="farm-chip" onclick="openCoach('injuries')">Injuries</button><button type="button" class="farm-chip" onclick="openCoach('trade')">Trade</button></div>`;
+    ${linked?(lgs.length?`<div class="chh-lgs">${lgs.slice(0,3).map(L=>coachMatchHTML(L)).join('')}</div>`:T?'':'<div class="chh-tip">Pulling up your matchups…</div>')
+      :`<button type="button" class="cmu link" onclick="openCoach('teams')">${coachSvg('<path d="M10 14a4 4 0 006 0l3-3a4 4 0 00-6-6l-1 1M14 10a4 4 0 00-6 0l-3 3a4 4 0 006 6l1-1"/>',18)} <b>Link ESPN or Sleeper</b><span>so ${nm} can see your teams</span></button>`}
+    ${coachBills&&!coachBills.err?`<button type="button" class="chh-fav" onclick="openCoach('bills')">${coachBills.logo?`<img src="${esc(coachBills.logo)}" alt="" width="40" height="40">`:coachLogo(COACH_FAV,40,'')}<span><b>${esc(coachBills.short||'Bills')} ${esc(coachBills.record||'')}${coachFavStanding()?` · ${esc(coachFavStanding())}`:''}</b>${coachBills.next?`<small>${coachBills.next.state==='in'?`LIVE · ${esc(coachBills.next.away.abbr)} ${esc(coachBills.next.away.score)}–${esc(coachBills.next.home.score)} ${esc(coachBills.next.home.abbr)}`:`${coachAbbr(coachBills.next.home.abbr)===coachAbbr(COACH_FAV)?'vs':'@'} ${esc((coachAbbr(coachBills.next.home.abbr)===coachAbbr(COACH_FAV)?coachBills.next.away:coachBills.next.home).short||'')} · ${esc(coachGameWhen(coachBills.next))}`}</small>`:''}</span>${coachSvg('<path d="M9 6l6 6-6 6"/>',18)}</button>`:''}
+    ${T?.errors?.length&&!lgs.length?`<div class="ctm-al bad">${coachSvg('<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>',20)}<span>${esc(T.errors[0])}</span></div>`:''}
+    ${alTxt?`<div class="ctm-al">${coachSvg('<path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/>',20)}<span>${alTxt}</span><button type="button" onclick="coachFixLineup(${ai})">Fix lineup</button></div>`:''}`;
   if(!POKE_NAMES[id]) fillName(id,'homeCoachNm');
   const stale=linked&&(!T||coachTeamsKey!==coachAccKey()||Date.now()-coachTeamsAt>90000);
   if(stale&&!coachTeamsLoading) coachLoadTeams().then(()=>renderBuddy());
   if(!coachBoard&&!coachHomeBoardTried){ coachHomeBoardTried=true; coachLoadBoard().then(()=>renderBuddy()); }
+  if(!coachHomeBillsTried||(coachBills&&Date.now()-coachBillsAt>10*60*1000)){ coachHomeBillsTried=true; coachBillsAt=Date.now(); Promise.all([coachLoadBills(true),coachLoadStand()]).then(()=>renderBuddy()); }
   return true;
 }
-let coachHomeBoardTried=false;
+let coachHomeBoardTried=false, coachHomeBillsTried=false;
 // keep the Home scores live while it's on screen
 setInterval(()=>{ try{ if(document.visibilityState==='visible'&&document.getElementById('mobTabHome')?.classList.contains('active')&&farmJobMon('coach')&&coachLinked()) coachLoadTeams(true).then(()=>renderBuddy()); }catch{} },120000);
 try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
