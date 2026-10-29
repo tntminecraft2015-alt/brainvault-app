@@ -57,6 +57,46 @@ function findVevents(lines) {
   return out;
 }
 
+// ── Alerts (VALARM) ──────────────────────────────────────────────────────────
+// Relative trigger → minutes before start ("-PT15M" → 15, "-P1D" → 1440, "PT0S" → 0).
+// Absolute (date-time) triggers return null; they're kept on read but not editable here.
+function parseTriggerMin(prop) {
+  if (!prop || (prop.params.VALUE || '').toUpperCase() === 'DATE-TIME') return null;
+  const m = /^([+-])?P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/i.exec(prop.value.trim());
+  if (!m) return null;
+  const min = (+m[2] || 0) * 10080 + (+m[3] || 0) * 1440 + (+m[4] || 0) * 60 + (+m[5] || 0) + Math.round((+m[6] || 0) / 60);
+  return m[1] === '+' ? -min : min;
+}
+// The VALARM blocks nested directly inside one VEVENT: [{ start, end, minutes }].
+function alarmBlocks(lines, vevent) {
+  const out = []; let cur = null;
+  for (let i = vevent.start + 1; i < vevent.end; i++) {
+    const l = lines[i];
+    if (/^BEGIN:VALARM$/i.test(l)) { cur = { start: i, minutes: null }; continue; }
+    if (!cur) continue;
+    if (/^END:VALARM$/i.test(l)) { cur.end = i; out.push(cur); cur = null; continue; }
+    const p = parsePropLine(l);
+    if (p && p.name === 'TRIGGER') cur.minutes = parseTriggerMin(p);
+  }
+  return out;
+}
+function triggerFor(min) {
+  if (min <= 0) return 'TRIGGER:-PT0S';
+  if (min % 1440 === 0) return `TRIGGER:-P${min / 1440}D`;
+  const h = Math.floor(min / 60), m = min % 60;
+  return `TRIGGER:-PT${h ? h + 'H' : ''}${m ? m + 'M' : ''}`;
+}
+function alarmLines(min, title) {
+  return ['BEGIN:VALARM', `UID:${require('crypto').randomUUID().toUpperCase()}`, triggerFor(min), 'ACTION:DISPLAY', `DESCRIPTION:${icsEscape(title || 'Reminder')}`, 'END:VALARM'];
+}
+function alertLabel(min) {
+  if (min == null) return 'custom time';
+  if (min === 0) return 'at start';
+  if (min % 1440 === 0) return `${min / 1440} day${min > 1440 ? 's' : ''} before`;
+  if (min >= 60 && min % 60 === 0) return `${min / 60} hr before`;
+  return `${min} min before`;
+}
+
 // ── Time zones ───────────────────────────────────────────────────────────────
 function tzOffsetMinutes(date, tz) {
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -196,6 +236,7 @@ function parseAppleObject(obj, appTz) {
     return s ? { dateKey: s.dateKey, time: s.time, endTime: e && !e.allDay ? e.time : null,
                  title: icsUnescape((g('SUMMARY') || {}).value || ''), location: icsUnescape((g('LOCATION') || {}).value || '') } : null;
   }).filter(Boolean);
+  const alerts = alarmBlocks(lines, master).map(a => a.minutes);
   const rr = get('RRULE');
   const endTime = !start.allDay ? utcToLocal(new Date(start.instant.getTime() + durationMin * 60000), appTz).time : null;
   return {
@@ -204,7 +245,7 @@ function parseAppleObject(obj, appTz) {
     location: icsUnescape((get('LOCATION') || {}).value || ''),
     dateKey: start.dateKey, time: start.time, endTime, allDay: start.allDay, durationMin,
     rrule: rr ? parseRrule(rr.value) : null, rruleText: rr ? rr.value : null,
-    exdates, overrides,
+    exdates, overrides, alerts,
     // How the series is anchored, so each occurrence's local time can be worked out
     // correctly across DST (a UTC-anchored 6 PM series becomes 5 PM after November).
     anchor: start.allDay ? null : (() => {
@@ -221,7 +262,7 @@ function parseAppleObject(obj, appTz) {
 function appleOccurrences(events, fromKey, toKey, appTz) {
   const out = [];
   for (const ev of events) {
-    const base = { uid: ev.uid, title: ev.title, location: ev.location, time: ev.time, endTime: ev.endTime, allDay: ev.allDay, recurring: !!ev.rrule };
+    const base = { uid: ev.uid, title: ev.title, location: ev.location, time: ev.time, endTime: ev.endTime, allDay: ev.allDay, recurring: !!ev.rrule, alerts: ev.alerts || [] };
     if (ev.rrule) {
       expandRecurrence(ev, fromKey, toKey).forEach(dateKey => {
         let time = ev.time, endTime = ev.endTime;
@@ -311,6 +352,14 @@ function editAppleIcs(raw, changes, appTz) {
     const line = changes.location ? `LOCATION:${icsEscape(changes.location)}` : '';
     if (l) replace.set(l.line, line); else if (line) insertAfterStart.push(line);
   }
+  // Alerts: `changes.alerts` is the complete new list (minutes before start; [] clears them).
+  const dropLines = new Set(), alarmInsert = [];
+  if (Array.isArray(changes.alerts)) {
+    alarmBlocks(lines, master).forEach(b => { for (let i = b.start; i <= b.end; i++) dropLines.add(i); });
+    const title = changes.title !== undefined ? changes.title : ev.title;
+    [...new Set(changes.alerts.map(n => Math.max(0, Math.round(Number(n) || 0))))].slice(0, 5).sort((a, b) => a - b)
+      .forEach(min => alarmInsert.push(...alarmLines(min, title)));
+  }
   // Bump SEQUENCE + DTSTAMP so iOS treats it as a newer revision.
   const seq = get('SEQUENCE');
   const nextSeq = `SEQUENCE:${(parseInt(seq ? seq.value : '0', 10) || 0) + 1}`;
@@ -321,6 +370,8 @@ function editAppleIcs(raw, changes, appTz) {
   const out = [];
   lines.forEach((l, idx) => {
     if (l === '' && idx === lines.length - 1) return;
+    if (idx === master.end) out.push(...alarmInsert);
+    if (dropLines.has(idx)) return;
     if (replace.has(idx)) { const r = replace.get(idx); if (r) out.push(r); }
     else out.push(l);
     if (idx === startProp.line) out.push(...insertAfterStart);
@@ -415,7 +466,7 @@ async function deleteAppleEvent(client, calendarUrl, url, { occurrenceDate, appT
 }
 
 module.exports = {
-  OWN_UID_SUFFIX,
+  OWN_UID_SUFFIX, alertLabel, parseTriggerMin,
   parseAppleObject, appleOccurrences, expandRecurrence, editAppleIcs, addExdateIcs,
   fetchAppleEvents, updateAppleEvent, deleteAppleEvent, addDaysKey,
 };

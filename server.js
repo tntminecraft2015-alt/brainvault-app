@@ -1330,14 +1330,14 @@ function buildAppleCalendarContext(data) {
   const t = today();
   const fmt12 = hm => { if (!hm) return 'all day'; const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h >= 12 ? 'PM' : 'AM'}`; };
   const occ = appleCal.appleOccurrences(appleCache.events, addDays(t, -3), addDays(t, 21), APP_TZ);
-  const lines = occ.map(o => `- ${o.date}${o.date === t ? ' (TODAY)' : ''}: ${o.allDay ? 'all day' : fmt12(o.time) + (o.endTime ? '–' + fmt12(o.endTime) : '')} — ${o.title}${o.location ? ` @ ${o.location}` : ''}${o.recurring ? (o.moved ? ' (repeating, this one moved on the phone — read-only)' : ' (repeating)') : ''} [apple ${appleShortId(o.uid)}]`);
+  const lines = occ.map(o => `- ${o.date}${o.date === t ? ' (TODAY)' : ''}: ${o.allDay ? 'all day' : fmt12(o.time) + (o.endTime ? '–' + fmt12(o.endTime) : '')} — ${o.title}${o.location ? ` @ ${o.location}` : ''}${o.recurring ? (o.moved ? ' (repeating, this one moved on the phone — read-only)' : ' (repeating)') : ''}${o.alerts && o.alerts.length ? ` · alerts: ${o.alerts.map(appleCal.alertLabel).join(', ')}` : ' · no alerts'} [apple ${appleShortId(o.uid)}]`);
   const stale = appleCache.error ? `\n(Last refresh failed: ${appleCache.error} — this list may be a few minutes old.)` : '';
   return `Read from iCloud ${Math.round((Date.now() - appleCache.fetchedAt) / 60000)} min ago. 3 days ago → 3 weeks ahead.${stale}\n${lines.length ? lines.join('\n') : '(nothing — every event on their Apple Calendar in this window came from Mission Control)'}`;
 }
 
 const EDIT_APPLE_EVENT_TOOL = {
   name: 'edit_apple_event',
-  description: 'Change an event that lives only in the user\'s Apple Calendar (listed in the APPLE CALENDAR section with an [apple ...] id). Edits it directly on iCloud, so it updates on their phone. Pass only the fields that change. For a repeating Apple event this edits the whole series (title, location, time of day); a single occurrence of an Apple series cannot be edited here, and a series cannot be moved to a new start date. Never use this for Mission Control events — use edit_calendar_event for those.',
+  description: 'Change an event that lives only in the user\'s Apple Calendar (listed in the APPLE CALENDAR section with an [apple ...] id) — including its notifications/alerts. Edits it directly on iCloud, so it updates on their phone. Pass only the fields that change. For a repeating Apple event this edits the whole series (title, location, time of day); a single occurrence of an Apple series cannot be edited here, and a series cannot be moved to a new start date. Never use this for Mission Control events — use edit_calendar_event for those.',
   input_schema: {
     type: 'object',
     properties: {
@@ -1348,6 +1348,7 @@ const EDIT_APPLE_EVENT_TOOL = {
       end_time: { type: 'string', description: 'New end time, 24h HH:MM. If omitted when moving, the original length is kept.' },
       location: { type: 'string', description: 'New location; empty string removes it.' },
       all_day:  { type: 'boolean', description: 'true to make it an all-day event.' },
+      alerts:   { type: 'array', items: { type: 'integer', minimum: 0, maximum: 20160 }, description: 'The COMPLETE new list of notifications for this event, in minutes before it starts (0 = at start time, 15, 60, 1440 = 1 day). Replaces whatever alerts it has now, so include any existing ones the user wants to keep (they are listed after "alerts:" in the APPLE CALENDAR section). Empty array [] removes all alerts. Omit to leave alerts unchanged. Up to 5.' },
     },
     required: ['apple_id'],
   },
@@ -1378,7 +1379,8 @@ async function editAppleEventTool(input) {
   if (input.end_time && !HM_RE.test(input.end_time)) return { ok: false, error: 'end_time must be HH:MM (24h).' };
   if (input.date && !DATE_RE.test(input.date)) return { ok: false, error: 'date must be YYYY-MM-DD.' };
   const changes = {};
-  for (const k of ['title', 'date', 'time', 'end_time', 'location', 'all_day']) if (input[k] !== undefined) changes[k] = input[k];
+  for (const k of ['title', 'date', 'time', 'end_time', 'location', 'all_day', 'alerts']) if (input[k] !== undefined) changes[k] = input[k];
+  if (changes.alerts !== undefined && (!Array.isArray(changes.alerts) || changes.alerts.some(n => !Number.isFinite(Number(n)) || n < 0))) return { ok: false, error: 'alerts must be a list of minutes before the start, e.g. [15, 60].' };
   if (!Object.keys(changes).length) return { ok: false, error: 'Nothing to change.' };
   try {
     const client = await getCaldavClient(data.caldav.appleId);
@@ -1386,7 +1388,8 @@ async function editAppleEventTool(input) {
     appendLog('note', `ED edited Apple Calendar event "${ev.title}"`, [], []);
     await refreshAppleEvents(data, { force: true });
     const when = updated.allDay ? `${updated.dateKey}, all day` : `${updated.dateKey} ${updated.time}${updated.endTime ? '–' + updated.endTime : ''}`;
-    return { ok: true, message: `Updated "${updated.title}" in Apple Calendar (${ev.rrule ? 'whole series, ' : ''}${when}).` };
+    const al = (updated.alerts || []).length ? ` Alerts: ${updated.alerts.map(appleCal.alertLabel).join(', ')}.` : changes.alerts ? ' All alerts removed.' : '';
+    return { ok: true, message: `Updated "${updated.title}" in Apple Calendar (${ev.rrule ? 'whole series, ' : ''}${when}).${al}` };
   } catch (e) {
     console.error('Apple edit failed:', e.message);
     return { ok: false, error: e.message };
