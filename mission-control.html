@@ -5742,7 +5742,8 @@ const FARM_IC = {
   plus:'<path d="M12 5v14M5 12h14"/>',
   heart:'<path d="M12 20s-7.5-4.4-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10z"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
-  star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>'
+  star:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>',
+  football:'<ellipse cx="12" cy="12" rx="9.5" ry="5.8" transform="rotate(-38 12 12)"/><path d="M9.2 14.8l5.6-5.6M10.4 11.4l2.2 2.2M12 9.8l2.2 2.2"/>'
 };
 function farmIc(n,color){ return `<svg class="farm-ic" viewBox="0 0 24 24" ${color?`style="color:${color}"`:''} aria-hidden="true">${FARM_IC[n]}</svg>`; }
 
@@ -5766,6 +5767,7 @@ const FARM_JOBS = [
   {id:'watch',   name:'Deadline Watch', ic:'eye',    col:'#b9a8ff', fit:['dark','ghost'],             fitTxt:'Dark or Ghost', desc:'Spots unfinished quests from earlier days and bills that are due.'},
   {id:'focus',   name:'Focus Flame',    ic:'flame',  col:'#ff8a4c', fit:['fire','dragon'],            fitTxt:'Fire or Dragon', desc:'Keeps a 25-minute focus timer burning. Finish one for +2 berries.'},
   {id:'scholar', name:'Wiki Scholar',   ic:'book',   col:'#5aa9ff', fit:['water','ice'],              fitTxt:'Water or Ice', desc:'Brings you one page from your wiki each day.'},
+  {id:'coach',   name:'Coach',          ic:'football', col:'#ffb547', fit:['fighting','normal'],      fitTxt:'Fighting or Normal', desc:'Your NFL and fantasy football expert: live scores, headlines, a trade calculator with real market values, and start/sit advice on demand.'},
   {id:'forager', name:'Forager',        ic:'basket', col:'#ff5a7a', fit:['ground','rock','fighting','steel'], fitTxt:'Ground, Rock, Fighting or Steel', desc:'Picks ripe berries while you’re away and finds an extra one each time.'}
 ];
 const FARM_HABITATS = [
@@ -6386,6 +6388,7 @@ function renderFarmJobs(el,mini){
       act=late.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('cal')">See quests</button>`:bills.length?`<button type="button" class="farm-btn sm" onclick="goToMobTab('gil')">See bills</button>`:''; }
     else if(J.id==='focus'){ const fo=f.focus; if(fo&&!fo.done){ const left=Math.max(0,fo.end-Date.now()); body=`<div class="farm-job-body"><span class="farm-timer" data-farm-timer>${farmFmt(left)}</span><br>The fire keeps going while you work.</div>`; act=`<button type="button" class="farm-btn sm" onclick="stopFarmFocus()">Stop</button>`; } else { body=`<div class="farm-job-body">${f.focusCount?.date===TODAY()?`${f.focusCount.n} focus session${f.focusCount.n>1?'s':''} today. `:''}Ready for 25 minutes of focus?</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="startFarmFocus()">Start focus</button>`; } }
     else if(J.id==='scholar'){ body=`<div class="farm-job-body" data-farm-wiki>${farmWikiPick?`Today’s page: <b>${esc(farmWikiPick.slug)}</b>${farmWikiPick.summary?`<br><span style="color:var(--fg-dim)">${esc(farmWikiPick.summary)}</span>`:''}`:'Looking through your wiki…'}</div>`; act=farmWikiPick?`<button type="button" class="farm-btn sm primary" onclick="openFarmWiki()">Read</button>`:''; if(!farmWikiPick) farmPickWiki(); }
+    else if(J.id==='coach'){ body=`<div class="farm-job-body" data-coach-mini>${coachMiniHTML()}</div>`; act=`<button type="button" class="farm-btn sm primary" onclick="openCoach('ask')">Ask ${esc(pokeLabel(id))}</button><button type="button" class="farm-btn sm" onclick="openCoach('trade')">Trade calc</button><button type="button" class="farm-btn sm" onclick="openCoach('scores')">Scores</button>`; if(!coachBoard) coachLoadBoard().then(()=>document.querySelectorAll('[data-coach-mini]').forEach(e=>e.innerHTML=coachMiniHTML())); }
     else if(J.id==='forager'){ const n=f.plots.filter(t=>t>Date.now()).length; body=`<div class="farm-job-body">Picks ripe berries on its own (+1 extra per plot). ${n} plot${n!==1?'s':''} growing.</div>`; }
     if(mini) return `<div class="farm-line" style="cursor:pointer" onclick="setFarmView('jobs')"><div class="fl-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div class="fl-t">${J.name}<div class="fl-s"${id?` id="farmMiniNm${J.id}"`:''}>${id?esc(pokeLabel(id)):'No helper yet'}</div></div></div>`;
     return `<div class="farm-job"><div class="farm-job-hd"><div class="farm-job-ic" style="background:${J.col}22;color:${J.col}">${farmIc(J.ic)}</div><div><div class="farm-job-t">${J.name}</div><div class="farm-job-s">${id&&farmFits(J.id,id)?'<span class="farm-fit">Great fit</span>':`Best: ${J.fitTxt}`}</div></div>${monBtn}</div>${body}${act?`<div class="farm-job-row">${act}</div>`:''}</div>`;
@@ -6628,6 +6631,264 @@ function meetFarmVisitor(){
   .home-card:hover, .home-mini:hover { background:rgba(223,238,255,.065); }
 }
 </style>
+<!-- ══════════════ COACH (Farm helper job: NFL + fantasy football) ══════════════ -->
+<style>
+  .coach-hd { display:flex; align-items:center; gap:12px; margin:0 0 12px; flex-shrink:0; }
+  .coach-hd .farm-port { width:52px; height:52px; }
+  .coach-hd .ch-t { font-size:18px; font-weight:800; }
+  .coach-hd .ch-s { font-size:12.5px; color:var(--fg-dim); margin-top:1px; }
+  .coach-tabs { display:flex; gap:6px; margin-bottom:12px; flex-shrink:0; }
+  .coach-tabs button { flex:1; border:none; border-radius:999px; background:rgba(223,238,255,.07); color:var(--fg); font-family:inherit; font-size:13.5px; font-weight:700; min-height:40px; cursor:pointer; }
+  .coach-tabs button.on { background:#ffb547; color:#241505; }
+  .coach-view { display:none; flex-direction:column; gap:12px; flex:1; min-height:0; }
+  .coach-view.on { display:flex; }
+  .coach-lbl { font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-dim); margin:4px 0 -4px; display:flex; align-items:center; gap:8px; }
+  .coach-lbl .live-dot { width:7px; height:7px; border-radius:50%; background:#ff5a5a; box-shadow:0 0 0 3px rgba(255,90,90,.2); }
+  /* scores */
+  .cg { background:rgba(223,238,255,.045); border-radius:18px; padding:10px 12px; display:grid; grid-template-columns:1fr auto; gap:4px 10px; align-items:center; }
+  .cg.live { box-shadow:inset 0 0 0 1.5px rgba(255,90,90,.45); }
+  .cg-tm { display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; min-width:0; }
+  .cg-tm img { width:24px; height:24px; object-fit:contain; flex-shrink:0; }
+  .cg-tm .rec { font-size:11.5px; color:var(--fg-dim); font-weight:500; }
+  .cg-tm.lose { opacity:.55; }
+  .cg-sc { font-size:17px; font-weight:800; font-variant-numeric:tabular-nums; text-align:right; }
+  .cg-ft { grid-column:1/-1; display:flex; gap:8px; font-size:11.5px; color:var(--fg-dim); margin-top:2px; flex-wrap:wrap; }
+  .cg-ft b { color:var(--fg); font-weight:700; }
+  .cg.live .cg-ft b { color:#ff8a8a; }
+  .cn { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid rgba(223,238,255,.07); text-decoration:none; color:var(--fg); }
+  .cn:last-child { border-bottom:none; }
+  .cn img { width:64px; height:44px; border-radius:10px; object-fit:cover; flex-shrink:0; background:rgba(223,238,255,.06); }
+  .cn .cn-t { font-size:13.5px; font-weight:700; line-height:1.3; }
+  .cn .cn-s { font-size:11.5px; color:var(--fg-dim); margin-top:2px; }
+  .ctr { display:flex; flex-wrap:wrap; gap:6px; }
+  .ctr-c { display:inline-flex; align-items:center; gap:6px; border:none; border-radius:999px; background:rgba(223,238,255,.07); color:var(--fg); font-family:inherit; font-size:12.5px; font-weight:700; padding:6px 10px 6px 6px; }
+  .pos { display:inline-flex; align-items:center; justify-content:center; min-width:26px; height:20px; padding:0 5px; border-radius:6px; font-size:10.5px; font-weight:900; color:#0a1929; letter-spacing:.02em; }
+  .pos.QB{background:#ff8fab}.pos.RB{background:#7fe3a0}.pos.WR{background:#7fd0ff}.pos.TE{background:#ffc37a}.pos.K,.pos.DEF,.pos.PICK{background:#c9c1ff}
+  /* trade */
+  .ct-set { display:flex; flex-wrap:wrap; gap:6px; }
+  .ct-set .farm-chip { min-height:34px; padding:6px 12px; font-size:12.5px; }
+  .ct-sides { display:grid; grid-template-columns:1fr; gap:8px; }
+  @media (min-width:640px){ .ct-sides { grid-template-columns:1fr 1fr; } }
+  .ct-side { background:rgba(223,238,255,.045); border-radius:18px; padding:10px; display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .ct-side-hd { display:flex; align-items:baseline; justify-content:space-between; gap:6px; }
+  .ct-side-t { font-size:13px; font-weight:800; }
+  .ct-side-v { font-size:12px; color:var(--fg-dim); font-variant-numeric:tabular-nums; }
+  .ct-p { display:flex; align-items:center; gap:6px; background:rgba(223,238,255,.06); border-radius:12px; padding:6px 6px 6px 8px; min-width:0; }
+  .ct-p .nm { flex:1; min-width:0; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ct-p .nm small { display:block; font-size:11px; color:var(--fg-dim); font-weight:500; }
+  .ct-p .vl { font-size:12px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .ct-p .x { border:none; background:none; color:var(--fg-dim); font-size:15px; width:26px; height:26px; cursor:pointer; }
+  .ct-add { position:relative; }
+  .ct-add input { width:100%; box-sizing:border-box; border:none; outline:none; border-radius:12px; background:rgba(223,238,255,.06); color:var(--fg); font-family:inherit; font-size:16px; padding:9px 10px; }
+  .ct-add input::placeholder { color:rgba(223,238,255,.35); font-size:13px; }
+  .ct-sug { position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:5; background:#132b44; border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.45); overflow:hidden; }
+  .ct-sug button { display:flex; width:100%; align-items:center; gap:8px; border:none; background:none; color:var(--fg); font-family:inherit; font-size:13px; font-weight:700; padding:9px 10px; text-align:left; cursor:pointer; }
+  .ct-sug button span.t { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ct-sug button small { color:var(--fg-dim); font-weight:500; }
+  .ct-sug button:hover, .ct-sug button:focus { background:rgba(223,238,255,.08); outline:none; }
+  .ct-verdict { background:rgba(223,238,255,.045); border-radius:20px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+  .ct-v-t { font-size:19px; font-weight:800; }
+  .ct-v-s { font-size:12.5px; color:var(--fg-dim); margin-top:2px; }
+  .ct-bar { display:flex; height:12px; border-radius:6px; overflow:hidden; background:rgba(223,238,255,.08); }
+  .ct-bar i { display:block; height:100%; transition:width .3s; }
+  .ct-bar-l { display:flex; justify-content:space-between; font-size:11.5px; color:var(--fg-dim); font-variant-numeric:tabular-nums; }
+  .ct-even { font-size:12.5px; color:var(--fg-dim); }
+  .ct-even .ctr { margin-top:6px; }
+  .ct-even button.ctr-c { cursor:pointer; }
+  /* ask */
+  .cc-msgs { flex:1; min-height:160px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; padding:2px 0 6px; }
+  .cc-m { display:flex; gap:8px; align-items:flex-end; }
+  .cc-m .farm-port { width:30px; height:30px; }
+  .cc-b { max-width:84%; padding:10px 13px; border-radius:18px 18px 18px 6px; background:rgba(223,238,255,.07); font-size:14px; line-height:1.45; }
+  .cc-m.you { justify-content:flex-end; }
+  .cc-m.you .cc-b { border-radius:18px 18px 6px 18px; background:#ffb547; color:#241505; font-weight:600; }
+  .cc-m.sys .cc-b { background:rgba(255,128,128,.12); color:#ffc2c2; font-size:13px; }
+  .cc-b.typing { display:flex; gap:4px; padding:14px; }
+  .cc-b.typing i { width:6px; height:6px; border-radius:50%; background:var(--fg-dim); animation:ccDot 1s infinite; }
+  .cc-b.typing i:nth-child(2){animation-delay:.15s}.cc-b.typing i:nth-child(3){animation-delay:.3s}
+  @keyframes ccDot { 0%,60%,100%{opacity:.3;transform:none} 30%{opacity:1;transform:translateY(-3px)} }
+  .cc-sugs { display:flex; gap:6px; overflow-x:auto; flex-shrink:0; padding-bottom:2px; scrollbar-width:none; }
+  .cc-sugs button { flex-shrink:0; border:none; border-radius:999px; background:rgba(255,181,71,.12); color:#ffd08a; font-family:inherit; font-size:12.5px; font-weight:700; padding:8px 12px; cursor:pointer; white-space:nowrap; }
+  .cc-comp { display:flex; gap:8px; align-items:flex-end; background:rgba(223,238,255,.06); border-radius:22px; padding:4px 4px 4px 14px; flex-shrink:0; }
+  .cc-comp textarea { flex:1; background:none; border:none; outline:none; resize:none; color:var(--fg); font-family:inherit; font-size:16px; line-height:1.4; padding:9px 0; max-height:120px; }
+  .cc-comp button { width:40px; height:40px; border-radius:50%; border:none; background:#ffb547; color:#241505; font-size:17px; font-weight:900; cursor:pointer; flex-shrink:0; }
+  .cc-comp button:disabled { opacity:.4; }
+  .cc-roster summary { font-size:12.5px; color:var(--fg-dim); cursor:pointer; font-weight:700; }
+  .cc-roster textarea { width:100%; box-sizing:border-box; margin-top:6px; min-height:64px; border:none; outline:none; border-radius:12px; background:rgba(223,238,255,.06); color:var(--fg); font-family:inherit; font-size:14px; padding:9px 10px; resize:vertical; }
+  .coach-src { font-size:11px; color:var(--fg-dim); text-align:center; padding:4px 0 2px; }
+</style>
+<script>
+// ══════════════════════════════════════════════════════════════
+// COACH — the Pokémon on the "Coach" job is a football/fantasy expert.
+// Scores + headlines (ESPN), trade values (FantasyCalc, league-tuned),
+// waiver pulse (Sleeper trending), and a chat that uses all of them
+// plus web search. Trade math matches football.js exactly.
+// ══════════════════════════════════════════════════════════════
+let coachBoard=null, coachNews=null, coachTrend=null, coachVals={}, coachTab='ask', coachBusy=false;
+const COACH_STAR=1.35;
+function coachState(){ const f=farmState(); f.coach=f.coach||{}; const c=f.coach;
+  c.league=Object.assign({ppr:1,teams:12,qbs:1,dynasty:false},c.league||{}); c.a=c.a||[]; c.b=c.b||[]; c.chat=c.chat||[]; c.roster=c.roster||''; return c; }
+function coachLeagueKey(L){ return `${L.dynasty?1:0}-${L.qbs}-${L.teams}-${L.ppr}`; }
+function coachName(){ const id=farmJobMon('coach'); return id?pokeLabel(id):'Coach'; }
+async function coachGet(path){ const r=await fetch(`${SERVER}${path}`,{signal:AbortSignal.timeout(12000)}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+async function coachLoadBoard(){ try{ coachBoard=await coachGet('/api/nfl/scoreboard'); }catch{ coachBoard=coachBoard||{games:[],err:true}; } return coachBoard; }
+async function coachLoadNews(){ try{ coachNews=(await coachGet('/api/nfl/news')).articles||[]; }catch{ coachNews=coachNews||[]; } }
+async function coachLoadTrend(){ const L=coachState().league; try{ coachTrend=(await coachGet(`/api/fantasy/trending?kind=add&ppr=${L.ppr}&teams=${L.teams}&qbs=${L.qbs}&dynasty=${L.dynasty}`)).players||[]; }catch{ coachTrend=coachTrend||[]; } }
+async function coachLoadVals(){ const L=coachState().league, k=coachLeagueKey(L); if(coachVals[k]) return coachVals[k];
+  try{ const d=await coachGet(`/api/fantasy/values?ppr=${L.ppr}&teams=${L.teams}&qbs=${L.qbs}&dynasty=${L.dynasty}`); coachVals[k]=d.players||[]; }catch{ coachVals[k]=null; }
+  return coachVals[k]; }
+function coachGameWhen(g){ const d=new Date(g.date); return d.toLocaleDateString('en-US',{weekday:'short'})+' '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}); }
+function coachMiniHTML(){
+  if(!coachBoard) return 'Checking the scoreboard…';
+  const g=coachBoard.games||[]; if(coachBoard.err&&!g.length) return 'Scoreboard is offline right now — I can still help with trades and advice.';
+  if(!g.length) return 'No games this week. Good time to work the trade market.';
+  const live=g.filter(x=>x.state==='in'), next=g.filter(x=>x.state==='pre').sort((a,b)=>a.date.localeCompare(b.date))[0], fin=g.filter(x=>x.state==='post').length;
+  const wk=coachBoard.week?`<b>Week ${coachBoard.week}</b> · `:'';
+  if(live.length) return `${wk}<b style="color:#ff8a8a">${live.length} live</b> · ${live.slice(0,2).map(x=>`${x.away.abbr} ${x.away.score}–${x.home.score} ${x.home.abbr}`).join(', ')}`;
+  if(next) return `${wk}${fin?`${fin} final · `:''}Next up: <b>${esc(next.away.abbr)} @ ${esc(next.home.abbr)}</b>, ${coachGameWhen(next)}`;
+  return `${wk}All ${g.length} games are final.`;
+}
+
+// ── trade math (identical to football.js) ──
+const coachEff=v=>Math.pow(Math.max(0,v),COACH_STAR), coachBack=e=>Math.pow(Math.max(0,e),1/COACH_STAR);
+function coachEval(A,B,all){
+  const raw=s=>s.reduce((t,p)=>t+p.value,0), eff=s=>coachBack(s.reduce((t,p)=>t+coachEff(p.value),0));
+  const a=eff(A), b=eff(B), hi=Math.max(a,b)||1, gap=Math.abs(a-b), pct=Math.round(gap/hi*100);
+  const winner=gap/hi<0.05?'even':a>b?'a':'b';
+  const verdict=winner==='even'?'Fair trade':pct<12?'Slight edge':pct<25?'Clear edge':'Lopsided';
+  let even=[];
+  if(winner!=='even'&&all){ const lo=winner==='a'?B:A, need=coachBack(coachEff(Math.max(a,b))-lo.reduce((t,p)=>t+coachEff(p.value),0)), used=new Set([...A,...B].map(p=>p.id));
+    even=all.filter(p=>!used.has(p.id)).map(p=>({p,d:Math.abs(p.value-need)})).sort((x,y)=>x.d-y.d).slice(0,3).map(x=>x.p); }
+  return {a:{raw:raw(A),adj:Math.round(a)}, b:{raw:raw(B),adj:Math.round(b)}, winner, verdict, pct, even, evenSide:winner==='a'?'b':winner==='b'?'a':null};
+}
+
+// ── sheet ──
+function openCoach(tab){
+  const id=farmJobMon('coach');
+  if(!id){ showToast('Give a Pokémon the Coach job first'); setFarmView('jobs'); return; }
+  coachTab=tab||coachTab; const f=farmState(), c=coachState();
+  farmSheet('coachOv',`
+    <div class="coach-hd">${farmPortrait(id,52)}<div style="flex:1;min-width:0"><div class="ch-t" id="coachNm">${esc(pokeLabel(id))}</div><div class="ch-s">Coach · NFL &amp; fantasy football</div></div><button type="button" class="as-x" onclick="document.getElementById('coachOv').remove()" aria-label="Close">✕</button></div>
+    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['trade','Trade'],['scores','Scores']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
+    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div>`,true);
+  if(!POKE_NAMES[id]) fillName(id,'coachNm');
+  if(f.coachDay!==TODAY()){ f.coachDay=TODAY(); farmGive(id,1); farmSave(); }
+  coachSetTab(coachTab);
+}
+function coachSetTab(t){
+  coachTab=t; const ov=document.getElementById('coachOv'); if(!ov) return;
+  ov.querySelectorAll('.coach-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  ov.querySelectorAll('.coach-view').forEach(v=>v.classList.toggle('on',v.dataset.v===t));
+  if(t==='ask') coachRenderAsk(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores();
+}
+function coachView(t){ return document.querySelector(`#coachOv .coach-view[data-v="${t}"]`); }
+
+// scores tab
+function coachGameHTML(g){
+  const live=g.state==='in', post=g.state==='post', a=g.away, h=g.home;
+  const tm=(t,o)=>`<div class="cg-tm${post&&!t.winner&&o.winner?' lose':''}">${t.logo?`<img src="${esc(t.logo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:''}<span>${esc(t.short||t.abbr)}</span>${t.record?`<span class="rec">${esc(t.record)}</span>`:''}</div>`;
+  return `<div class="cg${live?' live':''}">${tm(a,h)}<div class="cg-sc">${g.state==='pre'?'':esc(a.score)}</div>${tm(h,a)}<div class="cg-sc">${g.state==='pre'?'':esc(h.score)}</div>
+    <div class="cg-ft"><b>${esc(live?g.detail:post?g.detail:coachGameWhen(g))}</b>${g.situation&&live?`<span>${esc(g.situation)}</span>`:''}${g.odds?.line&&!post?`<span>${esc(g.odds.line)}${g.odds.total?` · O/U ${g.odds.total}`:''}</span>`:''}${g.tv&&!post?`<span>${esc(g.tv)}</span>`:''}</div></div>`;
+}
+async function coachRenderScores(){
+  const el=coachView('scores'); if(!el) return;
+  const draw=()=>{
+    const g=(coachBoard?.games||[]), live=g.filter(x=>x.state==='in'), up=g.filter(x=>x.state==='pre').sort((a,b)=>a.date.localeCompare(b.date)), fin=g.filter(x=>x.state==='post');
+    el.innerHTML=(coachBoard?`<div class="coach-lbl">${coachBoard.week?`Week ${coachBoard.week}`:'This week'}${coachBoard.season?` · ${coachBoard.season}`:''}</div>`:'')
+      +(!coachBoard?'<div class="farm-empty">Loading scores…</div>':!g.length?`<div class="farm-empty">${coachBoard.err?'Couldn’t reach the scoreboard. Pull to refresh in a minute.':'No games this week.'}</div>`:'')
+      +(live.length?`<div class="coach-lbl"><span class="live-dot"></span>Live</div>${live.map(coachGameHTML).join('')}`:'')
+      +(up.length?`<div class="coach-lbl">Upcoming</div>${up.map(coachGameHTML).join('')}`:'')
+      +(fin.length?`<div class="coach-lbl">Final</div>${fin.map(coachGameHTML).join('')}`:'')
+      +`<div class="coach-lbl">Waiver pulse · most added today</div>${coachTrend?coachTrend.length?`<div class="ctr">${coachTrend.slice(0,8).map(p=>`<span class="ctr-c"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>${esc(p.name)}</span>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
+      +`<div class="coach-lbl">Headlines</div>${coachNews?coachNews.length?`<div>${coachNews.slice(0,6).map(n=>`<a class="cn" href="${esc(n.url)}" target="_blank" rel="noopener">${n.image?`<img src="${esc(n.image)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div><div class="cn-t">${esc(n.headline)}</div><div class="cn-s">${n.published?new Date(n.published).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):''}</div></div></a>`).join('')}</div>`:'<div class="farm-empty">Not available right now.</div>':'<div class="farm-empty">Loading…</div>'}`
+      +`<div class="coach-src">Scores &amp; news: ESPN · Trending: Sleeper</div>`;
+  };
+  draw();
+  await Promise.all([coachLoadBoard(),coachNews?null:coachLoadNews(),coachTrend?null:coachLoadTrend()]);
+  if(coachTab==='scores') draw();
+}
+
+// trade tab
+const COACH_SET=[['dynasty',[[false,'Redraft'],[true,'Dynasty']]],['ppr',[[1,'PPR'],[0.5,'Half'],[0,'Std']]],['qbs',[[1,'1QB'],[2,'Superflex']]],['teams',[[10,'10 tm'],[12,'12 tm'],[14,'14 tm']]]];
+function coachSetLeague(k,v){ const c=coachState(); c.league[k]=v; farmSave(); coachTrend=null; coachRenderTrade(); }
+async function coachRenderTrade(){
+  const el=coachView('trade'); if(!el) return; const c=coachState(), L=c.league;
+  el.innerHTML=`<div class="ct-set">${COACH_SET.map(([k,opts])=>opts.map(([v,l])=>`<button type="button" class="farm-chip${L[k]===v?' on':''}" onclick='coachSetLeague("${k}",${JSON.stringify(v)})'>${l}</button>`).join('')).join('<span style="width:4px"></span>')}</div>
+    <div id="coachTradeBody"><div class="farm-empty">Loading trade values…</div></div>`;
+  const all=await coachLoadVals(); if(coachTab!=='trade') return;
+  const body=document.getElementById('coachTradeBody'); if(!body) return;
+  if(!all){ body.innerHTML='<div class="farm-empty">Couldn’t load trade values right now. Try again in a minute — or ask in the Ask tab.</div>'; return; }
+  const byId=new Map(all.map(p=>[p.id,p]));
+  const A=c.a.map(i=>byId.get(i)).filter(Boolean), B=c.b.map(i=>byId.get(i)).filter(Boolean);
+  const side=(k,title,list)=>`<div class="ct-side"><div class="ct-side-hd"><span class="ct-side-t">${title}</span><span class="ct-side-v">${list.length?list.reduce((t,p)=>t+p.value,0).toLocaleString():''}</span></div>
+    ${list.map(p=>`<div class="ct-p"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span><span class="nm">${esc(p.name)}<small>${esc(p.team||'FA')}${p.posRank?` · ${esc(p.pos)}${p.posRank}`:''}${p.age?` · ${p.age}y`:''}</small></span><span class="vl">${p.value.toLocaleString()}</span><button type="button" class="x" onclick="coachDrop('${k}','${p.id}')" aria-label="Remove ${esc(p.name)}">✕</button></div>`).join('')}
+    <div class="ct-add"><input id="coachIn${k}" placeholder="+ Add player" autocomplete="off" oninput="coachSuggest('${k}')" onfocus="coachSuggest('${k}')" onblur="setTimeout(()=>document.getElementById('coachSug${k}')?.remove(),180)"></div></div>`;
+  let v='';
+  if(A.length&&B.length){ const r=coachEval(A,B,all), tot=(r.a.adj+r.b.adj)||1, wa=Math.round(r.a.adj/tot*100);
+    const youWin=r.winner==='a', title=r.winner==='even'?'Fair trade 🤝':youWin?`You win · ${r.verdict.toLowerCase()}`:`They win · ${r.verdict.toLowerCase()}`;
+    v=`<div class="ct-verdict"><div><div class="ct-v-t" style="color:${r.winner==='even'?'var(--green)':youWin?'#7fd0ff':'#ffb547'}">${title}</div><div class="ct-v-s">${r.winner==='even'?'Within 5% — a deal both sides can live with.':`${r.pct}% edge after the star adjustment.`}</div></div>
+      <div class="ct-bar" aria-hidden="true"><i style="width:${wa}%;background:#7fd0ff"></i><i style="width:${100-wa}%;background:#ffb547"></i></div>
+      <div class="ct-bar-l"><span>You get ${r.a.adj.toLocaleString()}</span><span>You give ${r.b.adj.toLocaleString()}</span></div>
+      ${r.even.length?`<div class="ct-even">${r.evenSide==='a'?'To make it fair for you, ask them to add one of':'To make it fair for them, you could add one of'}:<div class="ctr">${r.even.map(p=>`<button type="button" class="ctr-c" onclick="coachAdd('${r.evenSide}','${p.id}')"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span>${esc(p.name)} · ${p.value.toLocaleString()}</button>`).join('')}</div></div>`:''}
+      <div class="ct-v-s">Raw totals ${r.a.raw.toLocaleString()} vs ${r.b.raw.toLocaleString()}. Stars count extra, so two good players don’t automatically beat one great one.</div>
+      <div class="farm-job-row"><button type="button" class="farm-btn primary" onclick="coachAskTrade()">Ask ${esc(coachName())} about this trade</button><button type="button" class="farm-btn sm" onclick="coachClearTrade()">Clear</button></div></div>`;
+  } else v=`<div class="ct-verdict"><div class="ct-v-s">Add players to both sides. Values come from thousands of real fantasy trades and update with your league settings.</div></div>`;
+  body.innerHTML=`<div class="ct-sides">${side('a','You get',A)}${side('b','You give',B)}</div>${v}<div class="coach-src">Trade values: FantasyCalc · ${L.teams}-team ${L.ppr===1?'PPR':L.ppr===0.5?'half-PPR':'standard'} ${L.qbs===2?'superflex':'1QB'} ${L.dynasty?'dynasty':'redraft'}</div>`;
+}
+function coachSuggest(k){
+  const inp=document.getElementById('coachIn'+k); if(!inp) return; document.getElementById('coachSug'+k)?.remove();
+  const q=inp.value.trim().toLowerCase(), all=coachVals[coachLeagueKey(coachState().league)]||[]; if(q.length<2) return;
+  const c=coachState(), used=new Set([...c.a,...c.b]);
+  const hits=all.filter(p=>!used.has(p.id)&&p.name.toLowerCase().includes(q)).slice(0,6); if(!hits.length) return;
+  const box=document.createElement('div'); box.className='ct-sug'; box.id='coachSug'+k;
+  box.innerHTML=hits.map(p=>`<button type="button" onmousedown="event.preventDefault()" onclick="coachAdd('${k}','${p.id}')"><span class="pos ${esc(p.pos)}">${esc(p.pos)}</span><span class="t">${esc(p.name)} <small>${esc(p.team||'FA')}</small></span><small>${p.value.toLocaleString()}</small></button>`).join('');
+  inp.parentElement.appendChild(box);
+}
+function coachAdd(k,id){ const c=coachState(); if(![...c.a,...c.b].includes(id)) c[k].push(id); farmSave(); coachRenderTrade().then(()=>document.getElementById('coachIn'+k)?.focus()); }
+function coachDrop(k,id){ const c=coachState(); c[k]=c[k].filter(x=>x!==id); farmSave(); coachRenderTrade(); }
+function coachClearTrade(){ const c=coachState(); c.a=[]; c.b=[]; farmSave(); coachRenderTrade(); }
+function coachAskTrade(){
+  const c=coachState(), all=coachVals[coachLeagueKey(c.league)]||[], nm=ids=>ids.map(i=>all.find(p=>p.id===i)?.name).filter(Boolean).join(', ');
+  coachSetTab('ask'); coachSend(`Should I do this trade? I get: ${nm(c.a)}. I give: ${nm(c.b)}.`);
+}
+
+// ask tab
+function coachRenderAsk(){
+  const el=coachView('ask'); if(!el) return; const c=coachState(), id=farmJobMon('coach'), nm=esc(coachName());
+  const msgs=c.chat.length?c.chat.map(m=>coachMsgHTML(m.role,m.content)).join('')
+    :coachMsgHTML('assistant',`Coach ${nm} here! I’ve got live scores, injury news, and trade values for your ${c.league.teams}-team ${c.league.ppr===1?'PPR':c.league.ppr===0.5?'half-PPR':'standard'} league. What are we working on?`);
+  el.innerHTML=`<div class="cc-msgs" id="coachMsgs">${msgs}</div>
+    <div class="cc-sugs">${['Who should I start this week?','Best waiver pickups right now?','Any big injuries today?','Who’s a buy-low trade target?','What are tonight’s games?'].map(s=>`<button type="button" onclick="coachSend(this.textContent)">${s}</button>`).join('')}</div>
+    <details class="cc-roster"${c.roster?'':''}><summary>${c.roster?'My roster ✓ (tap to edit)':'Add my roster for personal advice'}</summary><textarea placeholder="e.g. Mahomes, Bijan Robinson, Jahmyr Gibbs, Ja'Marr Chase, Puka Nacua, Kelce…" onchange="coachState().roster=this.value.trim();farmSave()">${esc(c.roster)}</textarea></details>
+    <div class="cc-comp"><textarea id="coachInp" rows="1" placeholder="Ask ${nm} anything about football…" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();coachSend()}"></textarea><button type="button" id="coachSendBtn" onclick="coachSend()" aria-label="Send"${coachBusy?' disabled':''}>↑</button></div>`;
+  const sc=document.getElementById('coachMsgs'); sc.scrollTop=sc.scrollHeight;
+}
+function coachMsgHTML(role,text){
+  const id=farmJobMon('coach');
+  if(role==='user') return `<div class="cc-m you"><div class="cc-b">${esc(text)}</div></div>`;
+  if(role==='sys') return `<div class="cc-m sys"><div class="cc-b">${esc(text)}</div></div>`;
+  return `<div class="cc-m">${id?farmPortrait(id,30):''}<div class="cc-b">${formatChatText(text)}</div></div>`;
+}
+async function coachSend(text){
+  const inp=document.getElementById('coachInp'); const msg=(text||inp?.value||'').trim(); if(!msg||coachBusy) return;
+  if(inp){ inp.value=''; inp.style.height='auto'; }
+  const c=coachState(), sc=document.getElementById('coachMsgs'); if(!sc) return;
+  if(!c.chat.length) sc.innerHTML='';
+  sc.insertAdjacentHTML('beforeend',coachMsgHTML('user',msg)+`<div class="cc-m" id="coachTyping">${farmPortrait(farmJobMon('coach'),30)}<div class="cc-b typing"><i></i><i></i><i></i></div></div>`); sc.scrollTop=sc.scrollHeight;
+  coachBusy=true; document.getElementById('coachSendBtn')?.setAttribute('disabled','1');
+  const history=c.chat.slice(-12).map(m=>({role:m.role,content:m.content}));
+  let reply=null, err=null;
+  try{
+    const r=await fetch(`${SERVER}/api/coach-chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history,name:coachName(),league:c.league,roster:c.roster}),signal:AbortSignal.timeout(90000)});
+    const d=await r.json(); if(d.error) err=d.message||d.error; else reply=d.response;
+  }catch(e){ err=serverOnline?'Request failed: '+(e.message||'timeout'):'Server offline — start the server to chat with your coach.'; }
+  coachBusy=false; document.getElementById('coachTyping')?.remove(); document.getElementById('coachSendBtn')?.removeAttribute('disabled');
+  const sc2=document.getElementById('coachMsgs');
+  if(reply){ c.chat.push({role:'user',content:msg},{role:'assistant',content:reply}); c.chat=c.chat.slice(-24); farmSave(); sc2?.insertAdjacentHTML('beforeend',coachMsgHTML('assistant',reply)); }
+  else sc2?.insertAdjacentHTML('beforeend',coachMsgHTML('sys','⚠ '+err));
+  if(sc2) sc2.scrollTop=sc2.scrollHeight;
+}
+</script>
 <!-- ══════════════ QUEST RUNNER (laptop-only mini game) ══════════════ -->
 <style>
   .desk-game { flex-direction:column; gap:10px; }

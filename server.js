@@ -1981,6 +1981,9 @@ app.post('/api/red-chat', async (req, res) => {
   }
 });
 
+// ── FOOTBALL COACH (Farm helper job: live NFL + fantasy trade calculator) ──
+require('./football')(app, { getApiKey, makeClient, runChatTurn });
+
 app.post('/api/sync', (req, res) => {
   try {
     const { type, data, date } = req.body;
