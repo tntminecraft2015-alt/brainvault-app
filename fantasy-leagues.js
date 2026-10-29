@@ -117,10 +117,15 @@ async function sleeperLeagues(username, week, season) {
       const myM = (matchups || []).find(m => m.roster_id === mine.roster_id);
       const oppM = myM && myM.matchup_id != null ? (matchups || []).find(m => m.matchup_id === myM.matchup_id && m.roster_id !== mine.roster_id) : null;
       const oppR = oppM ? (rosters || []).find(r => r.roster_id === oppM.roster_id) : null;
+      const allTeams = ranked.map((r, i) => {
+        const st = new Set(r.starters || []), ir = new Set(r.reserve || []);
+        return { name: teamName(r), record: rec(r), rank: i + 1, mine: r === mine,
+          players: (r.players || []).map(id => { const p = P(id); return { name: p.name, pos: p.pos, team: p.team, status: p.status, slot: ir.has(id) ? 'IR' : st.has(id) ? 'start' : 'bench' }; }) };
+      });
       out.push({
         platform: 'sleeper', id: lg.league_id, name: lg.name || 'Sleeper league', season, week,
         format: sleeperFormat(lg), status: lg.status,
-        me: side(mine, myM), opp: side(oppR, oppM),
+        me: side(mine, myM), opp: side(oppR, oppM), allTeams,
       });
     } catch (e) {
       out.push({ platform: 'sleeper', id: lg.league_id, name: lg.name || 'Sleeper league', error: `Couldn’t load (${e.message})` });
@@ -202,7 +207,57 @@ async function espnLeague(leagueId, teamId, week, season) {
   const meSide = game ? (game.home?.teamId === mine.id ? game.home : game.away) : null;
   const opSide = game ? (game.home?.teamId === mine.id ? game.away : game.home) : null;
   const opp = opSide ? teams.find(t => t.id === opSide.teamId) : null;
-  return { ...base, me: side(mine, meSide), opp: side(opp, opSide) };
+  const allTeams = ranked.map((t, i) => ({
+    name: teamName(t), record: rec(t), rank: i + 1, mine: t === mine,
+    players: (t.roster?.entries || []).map(e => { const pl = e.playerPoolEntry?.player || {}; const sl = ESPN_SLOT[e.lineupSlotId] || 'FLEX';
+      return { name: pl.fullName || `#${e.playerId}`, pos: ESPN_POS[pl.defaultPositionId] || '', team: ESPN_TEAM[pl.proTeamId] || '', status: ESPN_STATUS[pl.injuryStatus] ?? '', slot: sl === 'BN' ? 'bench' : sl === 'IR' ? 'IR' : 'start' }; }),
+  }));
+  return { ...base, me: side(mine, meSide), opp: side(opp, opSide), allTeams };
+}
+
+// Every league without the all-teams rosters (what the phone and get_my_teams need)
+function slimTeams(t) { return t ? { ...t, leagues: (t.leagues || []).map(({ allTeams, ...l }) => l) } : t; }
+
+// One league's full picture for scouting: every team's record, rank and roster
+function leagueRosters(t, which) {
+  const q = String(which || '').toLowerCase();
+  const lgs = (t?.leagues || []).filter(l => l.allTeams);
+  const l = lgs.find(x => x.id === which || x.name.toLowerCase() === q) || lgs.find(x => x.name.toLowerCase().includes(q)) || (lgs.length === 1 ? lgs[0] : null);
+  if (!l) return { ok: false, message: lgs.length ? `Which league? ${lgs.map(x => `"${x.name}"`).join(', ')}` : 'No league rosters available.' };
+  return { league: l.name, platform: l.platform, week: l.week, format: l.format,
+    teams: l.allTeams.map(tm => ({ team: tm.name, yours: tm.mine, record: `${tm.record.w}-${tm.record.l}${tm.record.t ? `-${tm.record.t}` : ''}`, rank: tm.rank, pointsFor: tm.record.pf,
+      roster: tm.players.map(p => `${p.name}${p.pos ? ` ${p.pos}` : ''}${p.team ? ` ${p.team}` : ''}${p.status ? ` [${p.status}]` : ''}${p.slot === 'bench' ? ' (bench)' : p.slot === 'IR' ? ' (IR)' : ''}`) })) };
+}
+
+// Compare every team's roster to the last snapshot and return what changed. A player who
+// left one team and joined another in the same league is logged as a trade.
+// snaps: { [platform:leagueId]: { [teamName]: [playerName] } } — updated in place.
+function diffRosters(t, snaps, dateStr) {
+  const moves = [];
+  for (const l of (t?.leagues || [])) {
+    if (!l.allTeams) continue;
+    const k = `${l.platform}:${l.id}`, prev = snaps[k], now = {};
+    for (const tm of l.allTeams) now[tm.name] = tm.players.map(p => p.name);
+    if (prev) {
+      const added = {}, dropped = {};
+      for (const [team, names] of Object.entries(now)) {
+        if (!prev[team]) continue;                     // renamed team: just re-baseline it
+        const was = new Set(prev[team]), is = new Set(names);
+        added[team] = names.filter(n => !was.has(n)); dropped[team] = prev[team].filter(n => !is.has(n));
+      }
+      const gone = new Map(); for (const [team, ns] of Object.entries(dropped)) for (const n of ns) gone.set(n, team);
+      for (const [team, ns] of Object.entries(added)) {
+        const fromTrade = ns.filter(n => gone.has(n) && gone.get(n) !== team);
+        if (fromTrade.length) moves.push({ date: dateStr, league: l.name, team, type: 'trade', players: fromTrade, from: [...new Set(fromTrade.map(n => gone.get(n)))].join(', ') });
+        const adds = ns.filter(n => !fromTrade.includes(n));
+        if (adds.length) moves.push({ date: dateStr, league: l.name, team, type: 'add', players: adds });
+      }
+      const traded = new Set(moves.filter(m => m.type === 'trade').flatMap(m => m.players));
+      for (const [team, ns] of Object.entries(dropped)) { const d = ns.filter(n => !traded.has(n)); if (d.length) moves.push({ date: dateStr, league: l.name, team, type: 'drop', players: d }); }
+    }
+    snaps[k] = now;
+  }
+  return moves;
 }
 
 // ═══════════════════════════════ BOTH ═══════════════════════════════
@@ -246,4 +301,4 @@ function teamsSummary(t) {
   }).join('\n');
 }
 
-module.exports = { getMyTeams, teamsSummary, cleanAccounts, hasAccounts, espnCookies, nflState };
+module.exports = { getMyTeams, teamsSummary, cleanAccounts, hasAccounts, espnCookies, nflState, slimTeams, leagueRosters, diffRosters };

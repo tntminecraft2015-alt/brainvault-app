@@ -553,9 +553,12 @@ You also have persistent memory across every conversation, not just this one —
     '# OVERVIEW\n' + overviewMd,
     '# LIVE APP FACTS (auto-extracted just now from the real mission-control.html)\n' + buildLiveAppFacts(),
     '# PENDING CHANGE QUEUE (things already queued for Claude Code — use exact ids for remove_queued_change)\n' + pendingText,
-    '# WHAT ED REMEMBERS ABOUT THE USER (across all past conversations — use exact ids for forget_memory)\n' + memoryText,
+    '# WHAT ED REMEMBERS ABOUT THE USER (across all past conversations — use exact ids for forget_memory)\n' + memoryText + '\n(Notes are also saved for you automatically after each chat — you don\'t need to call save_memory for everything, and never announce that you\'re remembering.)',
     "# RED'S RESEARCH TASKS (ones you assigned, newest first)\n" + buildRedTasksContext(appData),
   ];
+  // ED's own daily research into making the user's life easier (edDailyResearch below)
+  const ideas = (appData.edInsights || []).slice(0, 2);
+  if (ideas.length) parts.push(`# IDEAS YOU'VE RESEARCHED TO MAKE THE USER'S LIFE EASIER (yours, from your daily research — newest first)\nWork one in when it fits the conversation (e.g. they mention the thing it helps with, or ask "anything I should know?"). Never dump the list unprompted, and don't repeat one they've already heard or turned down.\n` + ideas.map(i => `## ${i.date}\n${i.text}`).join('\n\n'));
   if (taskPage)     parts.push("# TODAY'S TASKS\n" + taskPage);
   if (schedPage)    parts.push('# MISSION SCHEDULE\n' + schedPage);
   parts.push('# CALENDAR (LIVE)\n' + buildLiveCalendarContext(appData));
@@ -1861,6 +1864,8 @@ If it's a receipt you may offer to log it with log_expense; for anything else, j
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, system, tools, messages, ED_TOOL_HANDLERS, images.length ? 6 : 4, images.length ? 4096 : 2048);
     saveConversation(images.length ? `${message}${message ? ' ' : ''}[sent ${images.length} photo${images.length > 1 ? 's' : ''}]` : message, responseText);
     res.json({ response: responseText, tokens: usage, toolActions });
+    brain.reflect(ED_AGENT, [...history.slice(-4), { role: 'user', content: userText + (images.length ? ` [+${images.length} photo]` : '') }, { role: 'assistant', content: responseText }])
+      .then(() => runBrainJobs()).catch(() => {});
   } catch (err) {
     console.error('Claude API error:', err.status, err.message);
     const msg = String(err.message || '');
@@ -1938,6 +1943,7 @@ app.post('/api/red-chat', async (req, res) => {
     const tools = [SAVE_RED_MEMORY_TOOL, FORGET_RED_MEMORY_TOOL, START_RED_RESEARCH_TOOL];
     const { text: responseText, usage, toolActions } = await runChatTurn(anthropic, buildRedChatSystemPrompt(), tools, messages, RED_TOOL_HANDLERS);
     res.json({ response: responseText, tokens: usage, toolActions });
+    brain.reflect(RED_AGENT, [...history.slice(-4), { role: 'user', content: message }, { role: 'assistant', content: responseText }]).catch(() => {});
   } catch (err) {
     console.error('Red chat API error:', err.status, err.message);
     const msg = String(err.message || '');
@@ -1984,8 +1990,60 @@ app.post('/api/red-chat', async (req, res) => {
   }
 });
 
+// ── BRAIN: every assistant keeps getting smarter (brain.js) ──
+// After each chat a background pass updates that assistant's memory; daily/weekly jobs
+// research and self-grade. Memories: edMemory, redMemory, coachMemory.
+const brain = require('./brain')({ getAppData, saveAppData, getApiKey, makeClient, today });
+const ED_AGENT = {
+  name: 'ED', memoryKey: 'edMemory', idPrefix: 'mem-', cap: 150,
+  focus: "who the user is and how their life runs — routines, schedule patterns (classes, work shifts, gym), goals, people in their life, places, money habits, interests and tastes, how they like ED to talk and help, things that annoyed them, and recurring problems ED could make easier.",
+};
+const RED_AGENT = {
+  name: 'Red', memoryKey: 'redMemory', idPrefix: 'rmem-', cap: 150,
+  focus: "the user's research interests and goals, the topics and sources they find useful, how they like findings presented, design tastes (what they liked or rejected), and corrections to how Red researches.",
+};
+
+// Daily: ED researches concrete ways to make the user's life easier, from what it knows
+async function edDailyResearch() {
+  const d = getAppData();
+  const mem = (d.edMemory || []).slice(0, 80).map(m => `- ${m.text}`).join('\n') || '(nothing yet)';
+  const upcoming = [];
+  for (let i = 0; i < 7; i++) {
+    const k = new Date(Date.now() + i * 864e5).toLocaleDateString('en-CA', { timeZone: APP_TZ });
+    const evs = (d.events?.[k] || []).map(e => `${e.time || 'anytime'} ${e.title}`);
+    if (evs.length) upcoming.push(`${k}: ${evs.join('; ')}`);
+  }
+  const tasks = (Array.isArray(d.tasks) ? d.tasks : []).filter(t => !t.done).slice(0, 25).map(t => `- ${t.text}${t.date ? ` (${t.date})` : ''}`).join('\n');
+  const past = (d.edInsights || []).slice(0, 6).map(i => i.text).join('\n---\n');
+  let text = await brain.research({
+    maxSearches: 6, maxTokens: 2500,
+    system: `You are ED's research desk. ED is the user's personal AI assistant in their Mission Control app. Today is ${today()}. Using what ED knows about the user, their week ahead and open tasks, search the web for 2–4 concrete, specific ideas that would genuinely make their life easier right now — a timely deal or deadline, a smarter way to handle something on their calendar, a tool or habit for a recurring problem, local things near where they live (only if ED knows where that is) relevant to their plans, prep for something coming up. Each idea: a bold one-line title, 1–2 sentences on why it helps THEM, and a source link if from the web. Skip anything generic ("drink water"), anything already in PREVIOUS IDEAS, and anything you can't tie to something you actually know about them. Work with whatever you know, even if it's little — one fact (a job, a savings goal, an event) is enough to research something useful. Never ask questions or say you need more information; nobody will read that. Output only the ideas as a short markdown list, or exactly NONE if you truly have nothing to tie an idea to.`,
+    prompt: `WHAT ED KNOWS ABOUT THE USER:\n${mem}\n\nTHEIR NEXT 7 DAYS:\n${upcoming.join('\n') || '(nothing scheduled)'}\n\nOPEN TASKS:\n${tasks || '(none)'}\n\nPREVIOUS IDEAS (don't repeat):\n${past || '(none)'}`,
+  });
+  if (/^\s*NONE\s*$/i.test(text) || /need (more|to know|at least)|more (information|context) about you|(don't|do not) have (any|enough) (information|info|context)|share (something|more|a bit)/i.test(text)) { console.log('  ED: daily life-research — nothing to go on yet'); return; }
+  const first = text.search(/^\s*(?:[-*] |\d+\. |\*\*)/m); if (first > 0) text = text.slice(first);   // drop "I'll search for…" preamble
+  if (text.length < 80) throw new Error('research came back empty');
+  const fresh = getAppData();
+  fresh.edInsights = [{ date: today(), text: text.slice(0, 4000) }, ...(fresh.edInsights || [])].slice(0, 14);
+  saveAppData(fresh);
+  console.log('  ED: daily life-research saved');
+}
+
 // ── FOOTBALL COACH (Farm helper job: live NFL + fantasy trade calculator) ──
-require('./football')(app, { getApiKey, makeClient, runChatTurn });
+const coach = require('./football')(app, { getApiKey, makeClient, runChatTurn, getAppData, saveAppData, brain, today });
+
+// All daily/weekly learning jobs; each runs at most once per day (or week), so calling
+// this often is cheap. Render's free tier sleeps, so chats also call it to catch up.
+let brainJobsRunning = false;
+async function runBrainJobs() {
+  if (brainJobsRunning || !getApiKey()) return;
+  brainJobsRunning = true;
+  try {
+    await brain.once('edResearch', today(), edDailyResearch);
+    await coach.runCoachJobs();
+  } catch (e) { console.error('Brain jobs failed:', e.message); }
+  finally { brainJobsRunning = false; }
+}
 
 app.post('/api/sync', (req, res) => {
   try {
@@ -3202,6 +3260,10 @@ async function main() {
 
   pruneOldEvents().catch(console.error);
   setInterval(() => pruneOldEvents().catch(console.error), 24 * 60 * 60 * 1000);
+
+  // learning jobs (ED + Coach daily research, coach scouting + weekly self-grading)
+  setTimeout(() => runBrainJobs(), 60 * 1000);
+  setInterval(() => runBrainJobs(), 3 * 60 * 60 * 1000);
 
   syncCaldavCalendar(getAppData()).catch(console.error);
   setInterval(() => syncCaldavCalendar(getAppData()).catch(console.error), 24 * 60 * 60 * 1000);

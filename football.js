@@ -16,11 +16,12 @@ const mine = require('./fantasy-leagues');
 const fs = require('fs');
 const path = require('path');
 
-// Researched season background (coach-season-2026.md) — re-read when the file changes so
-// refreshed notes go live without a restart.
+// Researched season background. The daily research job rewrites it into app-data
+// (coachBrain.notes, persisted to GitHub on Render); coach-season-2026.md is the seed copy
+// used until the first refresh lands — re-read when the file changes.
 const SEASON_NOTES = path.join(__dirname, 'coach-season-2026.md');
 let seasonNotes = { mtime: 0, text: '' };
-function getSeasonNotes() {
+function getSeasonNotesFile() {
   try {
     const m = fs.statSync(SEASON_NOTES).mtimeMs;
     if (m !== seasonNotes.mtime) seasonNotes = { mtime: m, text: fs.readFileSync(SEASON_NOTES, 'utf8').slice(0, 40000) };
@@ -301,9 +302,11 @@ const COACH_TOOLS = [
     input_schema: { type: 'object', properties: { kind: { type: 'string', enum: ['add', 'drop'] } } } },
   { name: 'get_my_teams', description: "The user's OWN fantasy teams, read live from their linked ESPN and Sleeper leagues: each league's scoring format, their team's record and standing, full lineup (starters by slot, bench, IR) with injury tags and points, and this week's head-to-head matchup including the opponent's lineup and the live/projected score. Pass a week to look at another week's matchup. Call this before any start/sit, waiver, trade or 'how's my team doing' answer.",
     input_schema: { type: 'object', properties: { week: { type: 'integer', description: 'NFL week. Omit for the current week.' } } } },
+  { name: 'get_league', description: "Scout one of the user's leagues: EVERY team's record, rank, points for and full roster (starters, bench, IR, injury tags), plus the adds/drops/trades you've seen each manager make. Use for trade targets (who is deep where the user is thin, who needs what the user has), who's rostered, league standings and sizing up any manager.",
+    input_schema: { type: 'object', properties: { league: { type: 'string', description: 'League name (or id). Omit if the user has only one league.' } } } },
 ];
 
-function coachHandlers(league, accounts) {
+function coachHandlers(league, accounts, ctx = {}) {
   const lookup = async names => {
     const { players } = await getValues(league);
     return names.map(n => ({ asked: n, match: findPlayer(players, n) }));
@@ -328,12 +331,33 @@ function coachHandlers(league, accounts) {
     get_trending: async i => { try { return { kind: i.kind || 'add', players: await getTrending(i.kind, league) }; } catch (e) { return { ok: false, message: `Trending unavailable (${e.message}).` }; } },
     get_my_teams: async i => {
       if (!mine.hasAccounts(accounts)) return { ok: false, message: 'No ESPN or Sleeper league linked yet. Tell the user to open the Coach → Teams tab and add their Sleeper username or ESPN league ID.' };
-      try { return await mine.getMyTeams(accounts, i.week); } catch (e) { return { ok: false, message: `Couldn't load their leagues (${e.message}).` }; }
+      try { return mine.slimTeams(await mine.getMyTeams(accounts, i.week)); } catch (e) { return { ok: false, message: `Couldn't load their leagues (${e.message}).` }; }
+    },
+    get_league: async i => {
+      if (!mine.hasAccounts(accounts)) return { ok: false, message: 'No league linked yet.' };
+      try {
+        const t = ctx.teams || await mine.getMyTeams(accounts);
+        const r = mine.leagueRosters(t, i.league);
+        if (r.teams) r.recentMoves = (ctx.moves || []).filter(m => m.league === r.league).slice(0, 40);
+        return r;
+      } catch (e) { return { ok: false, message: `Couldn't load the league (${e.message}).` }; }
     },
   };
 }
 
-function coachSystem({ name, league, board, roster, todayStr, teams, notes }) {
+// What the coach has learned, grouped for the prompt
+const MEM_CATS = [['you', 'About the user (how they like advice, risk appetite, habits)'], ['league', 'Their leagues (rules, quirks, history)'], ['manager', 'Other managers (tendencies, needs, how to deal with them)'], ['lesson', 'Lessons from your own past calls'], ['player', 'Player notes worth carrying forward']];
+function coachMemoryText(memory, moves, graded) {
+  const mem = memory || [];
+  const groups = MEM_CATS.map(([c, label]) => { const ms = mem.filter(m => (m.cat || 'you') === c); return ms.length ? `${label}:\n${ms.map(m => `- ${m.text}`).join('\n')}` : ''; }).filter(Boolean);
+  const other = mem.filter(m => m.cat && !MEM_CATS.some(([c]) => c === m.cat));
+  if (other.length) groups.push(`Other:\n${other.map(m => `- ${m.text}`).join('\n')}`);
+  const mv = (moves || []).slice(0, 25).map(m => `- ${m.date} · ${m.league} · ${m.team} ${m.type === 'trade' ? `traded for ${m.players.join(', ')} (from ${m.from})` : `${m.type === 'add' ? 'added' : 'dropped'} ${m.players.join(', ')}`}`);
+  const rec = (graded || []).slice(0, 12).map(a => `- Wk ${a.week} ${a.type} "${a.call}" → ${a.grade}${a.note ? `: ${a.note}` : ''}`);
+  return [groups.length ? groups.join('\n\n') : '', mv.length ? `Recent moves you've seen in their leagues (newest first):\n${mv.join('\n')}` : '', rec.length ? `Your recent calls, graded against what actually happened:\n${rec.join('\n')}` : ''].filter(Boolean).join('\n\n');
+}
+
+function coachSystem({ name, league, board, roster, todayStr, teams, notes, memory }) {
   const L = leagueParams(league);
   const fmt = `${L.teams}-team ${L.ppr === 1 ? 'PPR' : L.ppr === 0.5 ? 'half-PPR' : 'standard'} ${L.qbs === 2 ? 'superflex' : '1QB'} ${L.dynasty ? 'dynasty' : 'redraft'}`;
   const games = board?.games?.length
@@ -343,7 +367,9 @@ function coachSystem({ name, league, board, roster, todayStr, teams, notes }) {
 
 Today is ${todayStr}. The NFL changes daily, so never answer from memory about injuries, depth charts, trades, signings, suspensions, coaching changes or anything "current" — use your tools and web_search first, and say how fresh the info is if it matters. Your training knowledge is older than this season.
 
-Tools: get_scoreboard (live ESPN scores), get_standings (live division standings + seeds), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), get_my_teams (the user's own linked ESPN/Sleeper rosters and matchups), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
+Tools: get_scoreboard (live ESPN scores), get_standings (live division standings + seeds), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), get_my_teams (the user's own linked ESPN/Sleeper rosters and matchups), get_league (every team's roster in one of their leagues + each manager's recent moves — use it to find trade partners and targets), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
+
+You keep learning: everything under YOUR MEMORY below is what you've picked up from past conversations, from watching the other managers, and from grading your own old calls. Use it — tailor advice to how this user likes to play, lean on what you know about each manager when suggesting trades, and don't repeat mistakes your lessons warn about. Notes are saved for you automatically after each chat, so you don't need to announce that you'll remember something. When you make a clear start/sit, add/drop or trade call, state it plainly (player + verdict) so it can be graded later.
 
 Trades: always call evaluate_trade with the actual players before giving a verdict, quote the edge %, then add the context numbers miss — injuries, bye weeks, roster fit, playoff schedule, the user's positional needs. Stars are worth more than the sum of depth pieces. If it's close, say what to ask for to tip it.
 
@@ -352,6 +378,9 @@ ${teams.summary}${teams.errors?.length ? `\n(Couldn't load: ${teams.errors.join(
 When you value trades for one of these leagues, keep its own format in mind; the calculator below is set to the user's default.` : "The user hasn't linked an ESPN or Sleeper league yet — if they ask about \"my team\", use the roster below if any, and mention they can link their leagues in the Coach's Teams tab."}
 
 User's default calculator league: ${fmt}.${roster ? `\nUser's roster (as they typed it): ${roster}` : ''}
+
+# YOUR MEMORY
+${memory || '(nothing learned yet — this is one of your first conversations)'}
 
 Current scoreboard (Week ${board?.week ?? '?'}, ${board?.season ?? ''}):
 ${games}${notes ? `
@@ -365,8 +394,112 @@ ${notes}
 </season_notes>` : ''}`;
 }
 
-module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTurn }) {
+module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTurn, getAppData, saveAppData, brain, today }) {
   const send = (res, fn) => fn().then(d => res.json(d)).catch(e => res.status(502).json({ error: 'SOURCE_DOWN', message: e.message }));
+
+  // ── the coach's brain: memory, scouting log, advice log, daily notes ──
+  // data.coachMemory = [{ id, date, text, cat }]  (cat: you | league | manager | lesson | player)
+  // data.coachBrain  = { notes:{ text, date }, rosters:{…snapshots}, moves:[…], advice:[…] }
+  const coachBrain = d => { d.coachBrain = d.coachBrain || {}; const b = d.coachBrain; b.rosters = b.rosters || {}; b.moves = b.moves || []; b.advice = b.advice || []; return b; };
+  const getSeasonNotes = () => getAppData().coachBrain?.notes?.text || getSeasonNotesFile();
+  const savedAccounts = () => getAppData().farm?.coach?.accounts || {};
+  const COACH_AGENT = {
+    name: 'Coach', memoryKey: 'coachMemory', idPrefix: 'cmem-', cap: 200,
+    cats: ['you', 'league', 'manager', 'lesson', 'player'],
+    focus: "the user's fantasy football style and preferences (risk appetite, how they like advice delivered, players they love or refuse to start, their goals in each league), facts about their leagues (scoring quirks, rivals, history, trade deadlines), what you learn about other managers in their leagues (who they are, what they need, how they trade), and lessons about your own advice (calls the user disagreed with, things that turned out wrong). The user is a Buffalo Bills fan.",
+    extraKey: 'advice',
+    extraInstructions: `- Also list every clear recommendation ${'the Coach'} made in its LAST reply under "advice": [{"type":"start|sit|add|drop|trade|other","league":"league name or ''","players":["…"],"call":"one short line, e.g. Start Cook over Shakir"}]. Empty if it made no concrete call.`,
+  };
+  // roster snapshots → moves log (no extra API calls: reuses the league data already fetched)
+  function recordMoves(fullTeams) {
+    if (!fullTeams?.leagues?.some(l => l.allTeams)) return [];
+    const d = getAppData(), b = coachBrain(d), before = JSON.stringify(b.rosters);
+    const moves = mine.diffRosters(fullTeams, b.rosters, today());
+    b.moves = [...moves, ...b.moves].slice(0, 200);
+    if (moves.length || JSON.stringify(b.rosters) !== before) saveAppData(d);   // the Home card refreshes every 90s — only write on change
+    return moves;
+  }
+  function addAdvice(d, items, wk, season) {
+    const b = coachBrain(d);
+    let n = 0;
+    for (const a of items.slice(0, 6)) {
+      const call = String(a.call || '').trim().slice(0, 160); if (!call) continue;
+      b.advice.unshift({ id: `adv-${Date.now()}${n}`, date: today(), season, week: wk, type: String(a.type || 'other').slice(0, 10), league: String(a.league || '').slice(0, 80), players: (a.players || []).map(String).slice(0, 6), call, graded: false });
+      n++;
+    }
+    b.advice = b.advice.slice(0, 150);
+    return n;
+  }
+
+  // Daily: rewrite the season notes with fresh web research
+  async function coachResearch() {
+    const prev = getSeasonNotes(), st = await mine.nflState();
+    let mineTxt = '';
+    if (mine.hasAccounts(savedAccounts())) { try { mineTxt = mine.teamsSummary(await mine.getMyTeams(savedAccounts())); } catch {} }
+    const text = await brain.research({
+      maxSearches: 10, maxTokens: 8000,
+      system: `You are the research desk for a fantasy football coach. Today is ${today()} (NFL ${st.season}, week ${st.week}). You keep a living briefing the coach reads before every conversation. Search the web for what changed since the previous briefing — injuries and return timelines, depth chart and role changes, trades/signings/cuts, coaching changes, bye weeks, breakout and slumping players, waiver targets, and everything about the Buffalo Bills (the user's team). Prioritize players on the user's rosters. Then output the COMPLETE updated briefing in markdown (not a diff): keep what's still true, fix what changed, drop what's stale, date anything time-sensitive, and mark unconfirmed items "(verify)". Max ~12,000 characters. Output only the briefing.`,
+      prompt: `${mineTxt ? `The user's rosters right now:\n${mineTxt}\n\n` : ''}PREVIOUS BRIEFING:\n${prev || '(none yet — write one from scratch)'}`,
+    });
+    if (text.length < 1500) throw new Error('research came back too short');
+    const d = getAppData(); coachBrain(d).notes = { text: text.slice(0, 40000), date: today() }; saveAppData(d);
+    console.log('  Coach: season notes refreshed', text.length, 'chars');
+  }
+
+  // Daily: snapshot every league, log moves, and update what it knows about each manager
+  async function coachScout() {
+    const acc = savedAccounts(); if (!mine.hasAccounts(acc)) return;
+    const t = await mine.getMyTeams(acc);
+    recordMoves(t);
+    const d = getAppData(), b = coachBrain(d);
+    const recent = b.moves.filter(m => m.date >= new Date(Date.now() - 21 * 864e5).toISOString().slice(0, 10));
+    const standings = (t.leagues || []).filter(l => l.allTeams).map(l => `${l.name}: ${l.allTeams.map(tm => `${tm.name}${tm.mine ? ' (USER)' : ''} ${tm.record.w}-${tm.record.l}`).join(', ')}`).join('\n');
+    if (!recent.length && !standings) return;
+    const mem = (d.coachMemory || []).filter(m => m.cat === 'manager');
+    const resp = await makeClient(getApiKey()).messages.create({
+      model: brain.MODEL, max_tokens: 900,
+      system: `You keep a fantasy coach's notes on the OTHER managers in the user's leagues. From their standings and recent roster moves, write or update one short note per manager when there's something useful: their record/situation, positional needs or surpluses, and tendencies (active on waivers, chases last week's points, trades a lot, panics after losses). Skip managers with nothing notable. Never write notes about the user's own team. Reply ONLY JSON: {"add":[{"text":"…","cat":"manager"}],"update":[{"id":"…","text":"…"}],"remove":[]}`,
+      messages: [{ role: 'user', content: `STANDINGS:\n${standings}\n\nRECENT MOVES (last 3 weeks):\n${recent.map(m => `${m.date} ${m.league} — ${m.team}: ${m.type} ${m.players.join(', ')}${m.from ? ` from ${m.from}` : ''}`).join('\n') || '(none)'}\n\nCURRENT MANAGER NOTES:\n${mem.map(m => `${m.id} | ${m.text}`).join('\n') || '(none)'}` }],
+    });
+    const ops = brain.parseJson(brain.textOf(resp)); if (!ops) return;
+    const fresh = getAppData();
+    if (brain.applyMemoryOps(fresh, 'coachMemory', 'cmem-', ops, COACH_AGENT.cap)) saveAppData(fresh);
+  }
+
+  // Weekly: grade last week's calls against the real points and keep the lessons
+  async function coachGrade() {
+    const acc = savedAccounts(); const d0 = getAppData(), b0 = coachBrain(d0), st = await mine.nflState();
+    const due = b0.advice.filter(a => !a.graded && a.week && a.week < st.week && String(a.season) === String(st.season));
+    if (!due.length || !mine.hasAccounts(acc)) return;
+    const weeks = [...new Set(due.map(a => a.week))].slice(0, 3), pts = {};
+    for (const w of weeks) {
+      try {
+        const t = await mine.getMyTeams(acc, w);
+        for (const l of t.leagues || []) for (const p of [...(l.me?.starters || []), ...(l.me?.bench || []), ...(l.opp?.starters || [])]) if (p.pts != null) pts[`${w}|${p.name}`] = p.pts;
+      } catch {}
+    }
+    const lines = due.map(a => `${a.id} | week ${a.week} | ${a.type} | ${a.league} | "${a.call}" | points that week: ${a.players.map(n => `${n}=${pts[`${a.week}|${n}`] ?? '?'}`).join(', ')}`).join('\n');
+    const resp = await makeClient(getApiKey()).messages.create({
+      model: brain.MODEL, max_tokens: 1200,
+      system: `You grade a fantasy football coach's past recommendations against what actually happened, so it gets better. For each call give grade "right", "wrong", "mixed" or "unknown" (unknown when the points don't settle it, e.g. trades — judge those only if obvious) and a short note. Then write 0-3 general lessons worth remembering (patterns, not one-offs), e.g. "Overrated rookies in tough matchups twice — weigh matchup more." Reply ONLY JSON: {"grades":[{"id":"…","grade":"…","note":"…"}],"lessons":[{"text":"…"}]}`,
+      messages: [{ role: 'user', content: lines }],
+    });
+    const out = brain.parseJson(brain.textOf(resp)); if (!out) return;
+    const d = getAppData(), b = coachBrain(d);
+    for (const g of out.grades || []) { const a = b.advice.find(x => x.id === g.id); if (a) { a.graded = true; a.grade = String(g.grade || 'unknown').slice(0, 10); a.note = String(g.note || '').slice(0, 200); } }
+    for (const a of b.advice) if (due.some(x => x.id === a.id)) a.graded = true;   // don't retry forever
+    brain.applyMemoryOps(d, 'coachMemory', 'cmem-', { add: (out.lessons || []).map(l => ({ text: l.text, cat: 'lesson' })) }, COACH_AGENT.cap);
+    saveAppData(d);
+  }
+
+  // Called by server.js on a timer and lazily from chats; each job runs once per period
+  async function runCoachJobs() {
+    if (!getApiKey()) return;
+    const st = await mine.nflState().catch(() => null);
+    await brain.once('coachScout', today(), coachScout);
+    await brain.once('coachResearch', today(), coachResearch);
+    if (st) await brain.once('coachGrade', `${st.season}-w${st.week}`, coachGrade);
+  }
 
   app.get('/api/nfl/scoreboard', (req, res) => send(res, () => getScoreboard(req.query.week)));
   app.get('/api/nfl/standings', (req, res) => send(res, () => getStandings()));
@@ -377,7 +510,11 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
   app.get('/api/fantasy/values', (req, res) => send(res, () => getValues(req.query)));
   app.get('/api/fantasy/trending', (req, res) => send(res, async () => ({ players: await getTrending(req.query.kind, req.query) })));
   // the user's own leagues (accounts come from the client; ESPN private-league cookies from env only)
-  app.post('/api/fantasy/my-teams', (req, res) => send(res, () => mine.getMyTeams(req.body?.accounts || {}, req.body?.week)));
+  app.post('/api/fantasy/my-teams', (req, res) => send(res, async () => {
+    const t = await mine.getMyTeams(req.body?.accounts || {}, req.body?.week);
+    if (!req.body?.week) { try { recordMoves(t); } catch {} }   // every refresh doubles as a scouting snapshot
+    return mine.slimTeams(t);
+  }));
   app.get('/api/fantasy/espn-login', (req, res) => res.json({ configured: !!mine.espnCookies() }));
   app.post('/api/fantasy/trade', (req, res) => send(res, async () => {
     const { players } = await getValues(req.body.league || {});
@@ -392,26 +529,36 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
     const { message = '', history = [], name = 'Coach', league = {}, roster = '', accounts = {} } = req.body || {};
     if (!message.trim()) return res.status(400).json({ error: 'Empty message' });
     try {
-      let board = null, teams = null;
+      let board = null, teams = null, full = null;
       await Promise.all([
         getScoreboard().then(b => { board = b; }).catch(() => {}),
         mine.hasAccounts(accounts)
           ? Promise.race([mine.getMyTeams(accounts), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 15000))])
-              .then(t => { teams = { week: t.week, summary: mine.teamsSummary(t), errors: t.errors }; }).catch(() => {})
+              .then(t => { full = t; teams = { week: t.week, summary: mine.teamsSummary(t), errors: t.errors }; }).catch(() => {})
           : null,
       ]);
+      try { recordMoves(full); } catch {}
+      const d = getAppData(), b = coachBrain(d), moves = b.moves;
+      const memory = coachMemoryText(d.coachMemory, moves, b.advice.filter(a => a.graded && a.grade && a.grade !== 'unknown'));
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: process.env.APP_TZ || 'America/New_York' });
-      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr, teams, notes: getSeasonNotes() });
-      const messages = [...history.slice(-16).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') })), { role: 'user', content: message }];
+      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr, teams, notes: getSeasonNotes(), memory });
+      const hist = history.slice(-16).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') }));
+      const messages = [...hist, { role: 'user', content: message }];
       const tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 6 }, ...COACH_TOOLS];
-      const out = await runChatTurn(makeClient(key), system, tools, messages, coachHandlers(league, accounts), 6, 1600);
+      const out = await runChatTurn(makeClient(key), system, tools, messages, coachHandlers(league, accounts, { teams: full, moves }), 6, 1600);
       res.json({ response: out.text, tokens: out.usage, toolActions: out.toolActions });
+      // learn from this exchange in the background, then catch up on any due daily/weekly jobs
+      const week = full?.week || board?.week || null, season = full?.season || board?.season || null;
+      brain.reflect(COACH_AGENT, [...hist.slice(-4), { role: 'user', content: message }, { role: 'assistant', content: out.text }], (dd, items) => addAdvice(dd, items, week, season))
+        .then(() => runCoachJobs()).catch(() => {});
     } catch (err) {
       const msg = String(err.message || '');
       const status = err.status === 429 ? 429 : err.status === 401 ? 401 : (err.status === 529 || err.status === 503) ? 503 : 500;
       res.status(status).json({ error: status === 429 ? 'RATE_LIMIT' : status === 401 ? 'AUTH_ERROR' : 'UNKNOWN', message: status === 503 ? "Claude's servers are busy — try again in a minute." : msg || 'Something went wrong.' });
     }
   });
+
+  return { runCoachJobs };
 };
 module.exports.evaluateTrade = evaluateTrade;
 module.exports.findPlayer = findPlayer;
