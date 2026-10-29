@@ -2324,6 +2324,10 @@ function buddyMood(){
 }
 function renderBuddy(){
   const el=document.getElementById('buddyCard'); if(!el) return;
+  // Once a Pokémon works the Coach job, the coach takes over this Home spot
+  // (live fantasy matchups at a glance); otherwise it's the buddy as before.
+  if(typeof renderHomeCoach==='function' && renderHomeCoach(el)) return;
+  el.className='buddy-card';
   const b=APP.buddy;
   if(!b){
     el.innerHTML=`<div class="buddy-pick"><div class="buddy-pick-t">Choose a buddy</div><div class="buddy-pick-s">Your buddy hangs out here, cheers you on, and levels up as you finish quests.</div>
@@ -6727,6 +6731,56 @@ function meetFarmVisitor(){
   .ci-rt { font-size:11.5px; color:var(--fg-dim); margin-top:3px; }
   .coach-tabs button { font-size:13px; }
   .coach-src { font-size:11px; color:var(--fg-dim); text-align:center; padding:4px 0 2px; }
+  /* my teams + home coach */
+  .cpl { display:inline-flex; align-items:center; height:18px; padding:0 6px; border-radius:5px; font-size:10px; font-weight:900; letter-spacing:.03em; flex-shrink:0; }
+  .cpl.espn { background:#d00; color:#fff; } .cpl.slp { background:#13e2c6; color:#062a2a; }
+  .cmu { display:flex; flex-direction:column; gap:4px; width:100%; text-align:left; border:none; background:rgba(10,25,41,.45); border-radius:16px; padding:10px 12px; color:var(--fg); font-family:inherit; cursor:pointer; box-sizing:border-box; }
+  .cmu.big { background:none; padding:0; cursor:default; }
+  .cmu.err { flex-direction:row; flex-wrap:wrap; align-items:center; gap:6px; font-size:12.5px; color:var(--fg-dim); }
+  .cmu.err b { color:var(--fg); }
+  .cmu.link { flex-direction:row; flex-wrap:wrap; align-items:center; gap:6px; font-size:14px; }
+  .cmu.link span { font-size:12.5px; color:var(--fg-dim); }
+  .cmu-hd { display:flex; align-items:center; gap:7px; min-width:0; }
+  .cmu-lg { flex:1; min-width:0; font-size:12px; font-weight:700; color:var(--fg-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cmu-rec { font-size:11.5px; font-weight:700; color:var(--fg-dim); font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .cmu-row { display:flex; align-items:baseline; gap:8px; }
+  .cmu-t { flex:1; min-width:0; font-size:14.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cmu-t.dim { color:var(--fg-dim); font-weight:600; }
+  .cmu-t small { font-size:11px; font-weight:500; }
+  .cmu-s { font-size:18px; font-weight:800; font-variant-numeric:tabular-nums; opacity:.6; }
+  .cmu-row.lead .cmu-s { opacity:1; color:#ffb547; }
+  .cmu.big .cmu-s { font-size:22px; }
+  .cmu-bar { height:5px; border-radius:3px; background:rgba(223,238,255,.1); overflow:hidden; margin-top:2px; }
+  .cmu-bar i { display:block; height:100%; background:#ffb547; border-radius:3px; transition:width .4s; }
+  .cmu-proj { font-size:11.5px; color:var(--fg-dim); }
+  .ctm { background:rgba(223,238,255,.045); border-radius:20px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .ctm-al { font-size:12.5px; color:#ffd35a; background:rgba(255,211,90,.1); border-radius:12px; padding:8px 10px; line-height:1.4; }
+  .cpr { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid rgba(223,238,255,.06); }
+  .cpr:last-child { border-bottom:none; }
+  .cpr-sl { width:42px; flex-shrink:0; font-size:10.5px; font-weight:800; color:var(--fg-dim); letter-spacing:.03em; }
+  .cpr-nm { flex:1; min-width:0; font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cpr-nm small { display:block; font-size:11px; font-weight:500; color:var(--fg-dim); }
+  .cpr.q .cpr-nm small b { color:#ffd35a; } .cpr.bad .cpr-nm small b { color:#ff6b6b; }
+  .cpr-pt { font-size:13.5px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .cpr-pt small { font-size:10px; color:var(--fg-dim); font-weight:600; }
+  .ctm-more summary { font-size:12.5px; font-weight:700; color:var(--fg-dim); cursor:pointer; padding:4px 0; }
+  .cacc-f { display:flex; align-items:center; gap:8px; background:rgba(223,238,255,.06); border-radius:12px; padding:4px 10px; }
+  .cacc-f input { flex:1; min-width:0; border:none; outline:none; background:none; color:var(--fg); font-family:inherit; font-size:16px; padding:8px 0; }
+  .cacc-f input::placeholder { color:rgba(223,238,255,.35); font-size:14px; }
+  .cacc-hint { font-size:11.5px; color:var(--fg-dim); line-height:1.4; margin:-2px 2px 2px; }
+  .cacc-warn { font-size:12.5px; line-height:1.45; color:#ffd8a8; background:rgba(255,181,71,.1); border-radius:14px; padding:10px 12px; }
+  .cc-linked { display:flex; align-items:center; gap:6px; border:none; background:rgba(223,238,255,.05); border-radius:12px; padding:7px 10px; color:var(--fg-dim); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; flex-shrink:0; text-align:left; }
+  .cc-linked.off { background:rgba(255,181,71,.12); color:#ffd08a; }
+  .buddy-card.coach-home { flex-direction:column; align-items:stretch; gap:10px; padding:14px; background:linear-gradient(150deg,rgba(255,181,71,.16),rgba(223,238,255,.04) 60%); }
+  .chh-top { display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .chh-top .farm-port { width:60px; height:60px; }
+  .chh-txt { flex:1; min-width:0; }
+  .chh-ask { border:none; border-radius:999px; background:#ffb547; color:#241505; font-family:inherit; font-size:13.5px; font-weight:800; padding:9px 16px; cursor:pointer; }
+  .chh-lgs { display:flex; flex-direction:column; gap:8px; }
+  .coach-home .buddy-bubble { margin-top:0; cursor:pointer; }
+  .coach-home .buddy-bubble b { color:#ffd08a; }
+  .chh-acts { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; }
+  .chh-acts .farm-chip { flex-shrink:0; min-height:34px; padding:6px 12px; font-size:12.5px; }
 </style>
 <script>
 // ══════════════════════════════════════════════════════════════
@@ -6739,7 +6793,7 @@ let coachInj=null, coachInjKey='', coachInjFilter='mine', coachInjQ='';
 let coachBoard=null, coachNews=null, coachTrend=null, coachVals={}, coachTab='ask', coachBusy=false;
 const COACH_STAR=1.35;
 function coachState(){ const f=farmState(); f.coach=f.coach||{}; const c=f.coach;
-  c.league=Object.assign({ppr:1,teams:12,qbs:1,dynasty:false},c.league||{}); c.a=c.a||[]; c.b=c.b||[]; c.chat=c.chat||[]; c.roster=c.roster||''; return c; }
+  c.league=Object.assign({ppr:1,teams:12,qbs:1,dynasty:false},c.league||{}); c.a=c.a||[]; c.b=c.b||[]; c.chat=c.chat||[]; c.roster=c.roster||''; c.accounts=Object.assign({sleeper:'',espn:[]},c.accounts||{}); if(!Array.isArray(c.accounts.espn)) c.accounts.espn=[]; return c; }
 function coachLeagueKey(L){ return `${L.dynasty?1:0}-${L.qbs}-${L.teams}-${L.ppr}`; }
 function coachName(){ const id=farmJobMon('coach'); return id?pokeLabel(id):'Coach'; }
 async function coachGet(path){ const r=await fetch(`${SERVER}${path}`,{signal:AbortSignal.timeout(12000)}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
@@ -6781,8 +6835,8 @@ function openCoach(tab){
   coachTab=tab||coachTab; const f=farmState(), c=coachState();
   farmSheet('coachOv',`
     <div class="coach-hd">${farmPortrait(id,52)}<div style="flex:1;min-width:0"><div class="ch-t" id="coachNm">${esc(pokeLabel(id))}</div><div class="ch-s">Coach · NFL &amp; fantasy football</div></div><button type="button" class="as-x" onclick="document.getElementById('coachOv').remove()" aria-label="Close">✕</button></div>
-    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['trade','Trade'],['scores','Scores'],['injuries','Injuries']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
-    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div><div class="coach-view" data-v="injuries"></div>`,true);
+    <div class="coach-tabs" role="tablist">${[['ask','Ask'],['teams','Teams'],['trade','Trade'],['scores','Scores'],['injuries','Injuries']].map(([k,l])=>`<button type="button" role="tab" data-t="${k}" class="${coachTab===k?'on':''}" onclick="coachSetTab('${k}')">${l}</button>`).join('')}</div>
+    <div class="coach-view" data-v="ask"></div><div class="coach-view" data-v="teams"></div><div class="coach-view" data-v="trade"></div><div class="coach-view" data-v="scores"></div><div class="coach-view" data-v="injuries"></div>`,true);
   if(!POKE_NAMES[id]) fillName(id,'coachNm');
   if(f.coachDay!==TODAY()){ f.coachDay=TODAY(); farmGive(id,1); farmSave(); }
   coachSetTab(coachTab);
@@ -6791,7 +6845,7 @@ function coachSetTab(t){
   coachTab=t; const ov=document.getElementById('coachOv'); if(!ov) return;
   ov.querySelectorAll('.coach-tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   ov.querySelectorAll('.coach-view').forEach(v=>v.classList.toggle('on',v.dataset.v===t));
-  if(t==='ask') coachRenderAsk(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores(); if(t==='injuries') coachRenderInjuries();
+  if(t==='ask') coachRenderAsk(); if(t==='teams') coachRenderTeams(); if(t==='trade') coachRenderTrade(); if(t==='scores') coachRenderScores(); if(t==='injuries') coachRenderInjuries();
 }
 function coachView(t){ return document.querySelector(`#coachOv .coach-view[data-v="${t}"]`); }
 
@@ -6827,7 +6881,8 @@ function coachInjColor(st){ const k=String(st||'').toLowerCase(); return COACH_I
 function coachMyNames(){ const c=coachState(), all=coachVals[coachLeagueKey(c.league)]||[], n=s=>s.toLowerCase().replace(/[.'’,-]/g,'').replace(/\b(jr|sr|ii|iii|iv)\b/g,'').replace(/\s+/g,' ').trim();
   const fromTrade=[...c.a,...c.b].map(i=>all.find(p=>p.id===i)?.name).filter(Boolean);
   const fromRoster=c.roster.split(/[,\n;]+/).map(x=>x.trim()).filter(x=>x.length>2);
-  return {set:[...fromTrade,...fromRoster].map(n), n}; }
+  const fromLeagues=(coachTeams?.leagues||[]).flatMap(l=>l.me?[...l.me.starters,...l.me.bench,...(l.me.ir||[])]:[]).filter(p=>p.pos!=='DEF'&&p.name&&p.name!=='(empty)').map(p=>p.name);
+  return {set:[...fromTrade,...fromRoster,...fromLeagues].map(n), n}; }
 async function coachLoadInj(){ const L=coachState().league, k=coachLeagueKey(L); if(coachInj&&coachInjKey===k) return;
   try{ coachInj=(await coachGet(`/api/nfl/injuries?ppr=${L.ppr}&teams=${L.teams}&qbs=${L.qbs}&dynasty=${L.dynasty}`)).players||[]; coachInjKey=k; }catch{ coachInj=coachInj||null; } }
 function coachInjSet(f){ coachInjFilter=f; coachRenderInjuries(); }
@@ -6904,10 +6959,11 @@ function coachAskTrade(){
 function coachRenderAsk(){
   const el=coachView('ask'); if(!el) return; const c=coachState(), id=farmJobMon('coach'), nm=esc(coachName());
   const msgs=c.chat.length?c.chat.map(m=>coachMsgHTML(m.role,m.content)).join('')
-    :coachMsgHTML('assistant',`Coach ${nm} here! I’ve got live scores, injury news, and trade values for your ${c.league.teams}-team ${c.league.ppr===1?'PPR':c.league.ppr===0.5?'half-PPR':'standard'} league. What are we working on?`);
+    :coachMsgHTML('assistant',coachLinked()?`Coach ${nm} here! I’ve got your lineups, this week’s matchups, live scores, injuries and trade values. What are we working on?`:`Coach ${nm} here! I’ve got live scores, injury news, and trade values for your ${c.league.teams}-team ${c.league.ppr===1?'PPR':c.league.ppr===0.5?'half-PPR':'standard'} league. What are we working on?`);
   el.innerHTML=`<div class="cc-msgs" id="coachMsgs">${msgs}</div>
     <div class="cc-sugs">${['Who should I start this week?','Best waiver pickups right now?','Any big injuries today?','Who’s a buy-low trade target?','What are tonight’s games?'].map(s=>`<button type="button" onclick="coachSend(this.textContent)">${s}</button>`).join('')}</div>
-    <details class="cc-roster"${c.roster?'':''}><summary>${c.roster?'My roster ✓ (tap to edit)':'Add my roster for personal advice'}</summary><textarea placeholder="e.g. Mahomes, Bijan Robinson, Jahmyr Gibbs, Ja'Marr Chase, Puka Nacua, Kelce…" onchange="coachState().roster=this.value.trim();farmSave()">${esc(c.roster)}</textarea></details>
+    ${coachLinked()?`<button type="button" class="cc-linked" onclick="coachSetTab('teams')">${coachTeamsBadges()} <span>${esc(coachName())} can see your ${coachTeams?.leagues?.length>1?`${coachTeams.leagues.length} teams`:'team'}</span></button>`:`<button type="button" class="cc-linked off" onclick="coachSetTab('teams')">🔗 <span>Link ESPN or Sleeper so ${esc(coachName())} can see your teams</span></button>`}
+    <details class="cc-roster"${c.roster?'':''}><summary>${c.roster?'Extra roster notes ✓ (tap to edit)':'Or type a roster by hand'}</summary><textarea placeholder="e.g. Mahomes, Bijan Robinson, Jahmyr Gibbs, Ja'Marr Chase, Puka Nacua, Kelce…" onchange="coachState().roster=this.value.trim();farmSave()">${esc(c.roster)}</textarea></details>
     <div class="cc-comp"><textarea id="coachInp" rows="1" placeholder="Ask ${nm} anything about football…" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();coachSend()}"></textarea><button type="button" id="coachSendBtn" onclick="coachSend()" aria-label="Send"${coachBusy?' disabled':''}>↑</button></div>`;
   const sc=document.getElementById('coachMsgs'); sc.scrollTop=sc.scrollHeight;
 }
@@ -6927,7 +6983,7 @@ async function coachSend(text){
   const history=c.chat.slice(-12).map(m=>({role:m.role,content:m.content}));
   let reply=null, err=null;
   try{
-    const r=await fetch(`${SERVER}/api/coach-chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history,name:coachName(),league:c.league,roster:c.roster}),signal:AbortSignal.timeout(90000)});
+    const r=await fetch(`${SERVER}/api/coach-chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,history,name:coachName(),league:c.league,roster:c.roster,accounts:c.accounts}),signal:AbortSignal.timeout(90000)});
     const d=await r.json(); if(d.error) err=d.message||d.error; else reply=d.response;
   }catch(e){ err=serverOnline?'Request failed: '+(e.message||'timeout'):'Server offline — start the server to chat with your coach.'; }
   coachBusy=false; document.getElementById('coachTyping')?.remove(); document.getElementById('coachSendBtn')?.removeAttribute('disabled');
@@ -6936,6 +6992,144 @@ async function coachSend(text){
   else sc2?.insertAdjacentHTML('beforeend',coachMsgHTML('sys','⚠ '+err));
   if(sc2) sc2.scrollTop=sc2.scrollHeight;
 }
+
+// ── MY TEAMS (linked ESPN + Sleeper leagues) ──
+// Accounts (a Sleeper username, ESPN league ids + which team is yours) live in
+// farm.coach.accounts. ESPN private-league cookies never touch the page — they're
+// Render env vars (ESPN_S2 / ESPN_SWID) the server adds itself.
+let coachTeams=null, coachTeamsAt=0, coachTeamsKey='', coachTeamsLoading=null, coachEspnLogin=null;
+function coachLinked(){ const a=coachState().accounts; return !!(a.sleeper||a.espn.some(e=>e.id)); }
+function coachAccKey(){ return JSON.stringify(coachState().accounts); }
+async function coachLoadTeams(force){
+  if(!coachLinked()){ coachTeams=null; return null; }
+  const k=coachAccKey();
+  if(!force&&coachTeams&&coachTeamsKey===k&&Date.now()-coachTeamsAt<90000) return coachTeams;
+  if(coachTeamsLoading) return coachTeamsLoading;
+  coachTeamsLoading=(async()=>{
+    try{
+      const r=await fetch(`${SERVER}/api/fantasy/my-teams`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accounts:coachState().accounts}),signal:AbortSignal.timeout(30000)});
+      const d=await r.json(); if(d.error) throw new Error(d.message||d.error);
+      coachTeams=d; coachTeamsAt=Date.now(); coachTeamsKey=k; coachEspnLogin=!!d.espnLogin;
+    }catch(e){ if(!coachTeams||coachTeamsKey!==k) coachTeams={leagues:[],errors:[serverOnline?`Couldn’t load your leagues (${e.message||'timeout'})`:'Server offline — your leagues will load when it’s back.'],week:null}; }
+    coachTeamsLoading=null; return coachTeams;
+  })();
+  return coachTeamsLoading;
+}
+function coachPlatBadge(p){ return p==='espn'?'<span class="cpl espn">ESPN</span>':'<span class="cpl slp">Sleeper</span>'; }
+function coachTeamsBadges(){ const a=coachState().accounts; return `${a.espn.some(e=>e.id)?coachPlatBadge('espn'):''}${a.sleeper?coachPlatBadge('sleeper'):''}`; }
+const coachRec=r=>r?`${r.w}-${r.l}${r.t?`-${r.t}`:''}`:'';
+const coachOrd=n=>n?n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th'):'';
+const coachPts=v=>v==null?'—':(Math.round(v*10)/10).toFixed(1);
+const COACH_BAD=/^(out|ir|doubtful|sus|pup|injured)/i, COACH_Q=/^questionable/i;
+function coachAlerts(L){ // starters who need a look
+  return (L.me?.starters||[]).filter(p=>p.name==='(empty)'||COACH_BAD.test(p.status||'')||COACH_Q.test(p.status||'')); }
+
+// matchup scoreboard row (Home card + Teams tab)
+function coachMatchHTML(L,big){
+  if(L.error) return `<div class="cmu err">${coachPlatBadge(L.platform)} <b>${esc(L.name)}</b> · ${esc(L.error)}</div>`;
+  if(L.needsTeam) return `<button type="button" class="cmu err" onclick="openCoach('teams')">${coachPlatBadge(L.platform)} <b>${esc(L.name)}</b> · tap to pick which team is yours</button>`;
+  const me=L.me, op=L.opp, a=me.score||0, b=op?.score||0, tot=(a+b)||1;
+  const lead=op&&(a||b)?(a>=b?'me':'op'):'';
+  const tag=big?'div':'button';
+  return `<${tag} ${big?'':`type="button" onclick="openCoach('teams')"`} class="cmu${big?' big':''}">
+    <div class="cmu-hd">${coachPlatBadge(L.platform)}<span class="cmu-lg">${esc(L.name)}</span><span class="cmu-rec">${coachRec(me.record)} · ${coachOrd(me.rank)}</span></div>
+    ${op?`<div class="cmu-row ${lead==='me'?'lead':''}"><span class="cmu-t">${esc(me.name)}</span><span class="cmu-s">${coachPts(me.score)}</span></div>
+    <div class="cmu-row ${lead==='op'?'lead':''}"><span class="cmu-t dim">${esc(op.name)} <small>${coachRec(op.record)}</small></span><span class="cmu-s">${coachPts(op.score)}</span></div>
+    <div class="cmu-bar" aria-hidden="true"><i style="width:${Math.round(a/tot*100)}%"></i></div>
+    ${me.proj?`<div class="cmu-proj">Projected ${coachPts(me.proj)}${op.proj?` – ${coachPts(op.proj)}`:''}</div>`:''}`
+    :`<div class="cmu-proj">${esc(me.name)} · no matchup this week</div>`}
+  </${tag}>`;
+}
+
+// ── Teams tab ──
+let coachTeamsEdit=false;
+function coachPlayerRow(p){ const bad=COACH_BAD.test(p.status||''), q=COACH_Q.test(p.status||'');
+  return `<div class="cpr${bad?' bad':q?' q':''}"><span class="cpr-sl">${esc(p.slot||'')}</span><span class="pos ${esc(p.pos)}">${esc(p.pos||'—')}</span><span class="cpr-nm">${esc(p.name)}<small>${esc(p.team||'')}${p.status?` · <b>${esc(p.status)}</b>`:''}</small></span><span class="cpr-pt">${p.pts!=null?coachPts(p.pts):p.proj!=null?`<small>proj</small> ${coachPts(p.proj)}`:''}</span></div>`; }
+function coachLeagueHTML(L,i){
+  if(L.error) return `<div class="ctm">${coachMatchHTML(L)}</div>`;
+  if(L.needsTeam){ const ai=coachState().accounts.espn.findIndex(e=>e.id===L.id);
+    return `<div class="ctm"><div class="cmu-hd">${coachPlatBadge('espn')}<span class="cmu-lg">${esc(L.name)}</span></div>
+      <div class="ct-v-s">Which team is yours?</div><div class="ctr">${(L.teams||[]).map(t=>`<button type="button" class="ctr-c" onclick="coachPickEspnTeam(${ai},${t.id})">${esc(t.name)}</button>`).join('')}</div></div>`; }
+  const me=L.me, al=coachAlerts(L);
+  return `<div class="ctm">${coachMatchHTML(L,true)}
+    ${al.length?`<div class="ctm-al">⚠ ${al.map(p=>p.name==='(empty)'?`Empty ${esc(p.slot)} slot`:`<b>${esc(p.name)}</b> ${esc(p.status)}`).join(' · ')}</div>`:''}
+    <div class="coach-lbl">Starters</div><div>${me.starters.map(coachPlayerRow).join('')}</div>
+    <details class="ctm-more"><summary>Bench${me.ir?.length?' & IR':''} · ${me.bench.length+(me.ir?.length||0)}</summary>${me.bench.map(coachPlayerRow).join('')}${(me.ir||[]).map(p=>coachPlayerRow({...p,slot:'IR'})).join('')}</details>
+    ${L.opp?`<details class="ctm-more"><summary>${esc(L.opp.name)}’s lineup</summary>${L.opp.starters.map(coachPlayerRow).join('')}</details>`:''}
+    <div class="farm-job-row"><button type="button" class="farm-btn sm primary" onclick="coachSetTab('ask');coachSend('Set my lineup for ${esc(L.name).replace(/'/g,"\\'")} this week — who should I start and sit?')">Set my lineup</button><button type="button" class="farm-btn sm" onclick="coachSetTab('ask');coachSend('How do I beat ${esc(L.opp?.name||'my opponent').replace(/'/g,"\\'")} this week in ${esc(L.name).replace(/'/g,"\\'")}?')">Matchup plan</button><button type="button" class="farm-btn sm" onclick="coachUseFormat(${i})">Use for trades</button></div>
+  </div>`;
+}
+function coachAccountsHTML(){
+  const a=coachState().accounts, priv=(coachTeams?.errors||[]).some(e=>/private|ESPN_S2|cookies/i.test(e));
+  return `<div class="ctm cacc">
+    <div class="coach-lbl">Link your leagues</div>
+    <label class="cacc-f">${coachPlatBadge('sleeper')}<input id="coachAccSlp" placeholder="Sleeper username" autocomplete="off" autocapitalize="none" value="${esc(a.sleeper)}"></label>
+    <div class="cacc-hint">All your Sleeper leagues load from just your username.</div>
+    ${[...a.espn,{id:''}].map((e,i)=>`<label class="cacc-f">${coachPlatBadge('espn')}<input class="coachAccEspn" inputmode="numeric" placeholder="${i?'Another ':''}ESPN league ID" autocomplete="off" value="${esc(e.id)}"></label>`).join('')}
+    <div class="cacc-hint">Open your league on the ESPN site or app → share/invite link: the number after <b>leagueId=</b>.${coachEspnLogin?' ✓ ESPN login is set up, so private leagues work.':''}</div>
+    ${priv&&!coachEspnLogin?`<div class="cacc-warn"><b>Private ESPN league?</b> ESPN needs your login cookies for those. On a computer, sign in at fantasy.espn.com, then in the browser’s dev tools open Application → Cookies and copy <b>espn_s2</b> and <b>SWID</b>. Add them on Render as the environment variables <b>ESPN_S2</b> and <b>ESPN_SWID</b> (or send them to Claude to set up). They stay on the server — never in Mission Control’s data.</div>`:''}
+    <div class="farm-job-row"><button type="button" class="farm-btn primary" onclick="coachSaveAccounts()">Save &amp; load my teams</button>${coachLinked()?'<button type="button" class="farm-btn sm" onclick="coachTeamsEdit=false;coachRenderTeams()">Cancel</button>':''}</div>
+  </div>`;
+}
+function coachSaveAccounts(){
+  const c=coachState(), prev=c.accounts.espn;
+  const sl=(document.getElementById('coachAccSlp')?.value||'').trim().replace(/^@/,'');
+  const ids=[...document.querySelectorAll('.coachAccEspn')].map(i=>{ const v=i.value.trim(), m=v.match(/leagueId=(\d+)/i); return m?m[1]:v.replace(/\D/g,''); }).filter(Boolean);
+  c.accounts={sleeper:sl, espn:[...new Set(ids)].slice(0,4).map(id=>({id, team:prev.find(e=>e.id===id)?.team??null}))};
+  farmSave(); coachTeamsEdit=false; coachTeams=null; coachRenderTeams(); renderBuddy();
+}
+function coachPickEspnTeam(i,team){ const c=coachState(); if(c.accounts.espn[i]){ c.accounts.espn[i].team=team; farmSave(); coachTeams=null; coachRenderTeams(); renderBuddy(); } }
+function coachUseFormat(i){ const L=coachTeams?.leagues?.[i]; if(!L?.format) return; const c=coachState(), f=L.format;
+  c.league={ppr:f.ppr, teams:[10,12,14].includes(f.teams)?f.teams:(f.teams<11?10:f.teams<13?12:14), qbs:f.qbs, dynasty:!!f.dynasty}; farmSave(); coachTrend=null; coachInj=null;
+  showToast(`Trade calculator set to ${L.name}`); coachSetTab('trade'); }
+async function coachRenderTeams(){
+  const el=coachView('teams'); if(!el) return;
+  const draw=()=>{
+    if(!coachLinked()||coachTeamsEdit){ el.innerHTML=coachAccountsHTML(); return; }
+    const T=coachTeams;
+    el.innerHTML=`<div class="coach-lbl">${T?.week?`Week ${T.week}`:'This week'}${T?.season?` · ${T.season}`:''}<span style="margin-left:auto;display:flex;gap:6px"><button type="button" class="farm-chip" onclick="coachLoadTeams(true).then(()=>{coachRenderTeams();renderBuddy();})">↻ Refresh</button><button type="button" class="farm-chip" onclick="coachTeamsEdit=true;coachRenderTeams()">Edit leagues</button></span></div>
+      ${!T?'<div class="farm-empty">Pulling up your leagues…</div>':''}
+      ${T?(T.leagues||[]).map(coachLeagueHTML).join(''):''}
+      ${T?.errors?.length?`<div class="cacc-warn">${T.errors.map(esc).join('<br>')}${T.errors.some(e=>/private|ESPN_S2|cookies/i.test(e))?'<br><button type="button" class="farm-btn sm" style="margin-top:8px" onclick="coachTeamsEdit=true;coachRenderTeams()">How to fix</button>':''}</div>`:''}
+      ${T&&!T.leagues?.length&&!T.errors?.length?'<div class="farm-empty">No leagues found for this season.</div>':''}
+      <div class="coach-src">Leagues: ${coachTeamsBadges()} · refreshes every 90s</div>`;
+  };
+  draw(); if(coachLinked()&&!coachTeamsEdit){ await coachLoadTeams(); if(coachTab==='teams') draw(); }
+}
+
+// ── HOME: the coach replaces the buddy card ──
+function renderHomeCoach(el){
+  let id=null; try{ id=farmJobMon('coach'); }catch{}
+  if(!id) return false;
+  el.className='buddy-card coach-home';
+  const nm=esc(pokeLabel(id)), T=coachTeams, linked=coachLinked();
+  const lgs=(T?.leagues||[]);
+  let tip;
+  if(!linked) tip=`Link your ESPN or Sleeper league and I’ll keep your matchups right here.`;
+  else if(!T) tip='Pulling up your matchups…';
+  else { const al=lgs.flatMap(L=>coachAlerts(L).map(p=>({p,L})));
+    tip=al.length?`Heads up: ${al.slice(0,2).map(({p})=>p.name==='(empty)'?`you have an empty ${p.slot} slot`:`<b>${esc(p.name)}</b> is ${esc(String(p.status).toLowerCase())}`).join(', ')}${al.length>2?` (+${al.length-2} more)`:''}. Want me to fix your lineup?`
+      :coachBoard?coachMiniHTML():'Lineups look healthy. Ask me anything.'; }
+  el.innerHTML=`
+    <div class="chh-top" onclick="openCoach('ask')">
+      ${farmPortrait(id,60)}
+      <div class="chh-txt"><div class="buddy-name"><span id="homeCoachNm">${nm}</span></div><div class="buddy-level" style="color:#ffb547">Coach${T?.week?` · Week ${T.week}`:''}</div></div>
+      <button type="button" class="chh-ask" onclick="event.stopPropagation();openCoach('ask')">Ask</button>
+    </div>
+    ${linked?(lgs.length?`<div class="chh-lgs">${lgs.slice(0,3).map(L=>coachMatchHTML(L)).join('')}</div>`:'')
+      :`<button type="button" class="cmu link" onclick="openCoach('teams')">🔗 <b>Link ESPN or Sleeper</b><span>so ${nm} can see your teams</span></button>`}
+    ${T?.errors?.length&&!lgs.length?`<div class="buddy-bubble">⚠ ${esc(T.errors[0])}</div>`:`<div class="buddy-bubble" onclick="openCoach('ask')">${tip}</div>`}
+    <div class="chh-acts"><button type="button" class="farm-chip" onclick="openCoach('teams')">My teams</button><button type="button" class="farm-chip" onclick="openCoach('scores')">Scores</button><button type="button" class="farm-chip" onclick="openCoach('injuries')">Injuries</button><button type="button" class="farm-chip" onclick="openCoach('trade')">Trade</button></div>`;
+  if(!POKE_NAMES[id]) fillName(id,'homeCoachNm');
+  const stale=linked&&(!T||coachTeamsKey!==coachAccKey()||Date.now()-coachTeamsAt>90000);
+  if(stale&&!coachTeamsLoading) coachLoadTeams().then(()=>renderBuddy());
+  if(!coachBoard&&!coachHomeBoardTried){ coachHomeBoardTried=true; coachLoadBoard().then(()=>renderBuddy()); }
+  return true;
+}
+let coachHomeBoardTried=false;
+// keep the Home scores live while it's on screen
+setInterval(()=>{ try{ if(document.visibilityState==='visible'&&document.getElementById('mobTabHome')?.classList.contains('active')&&farmJobMon('coach')&&coachLinked()) coachLoadTeams(true).then(()=>renderBuddy()); }catch{} },120000);
+try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
 </script>
 <!-- ══════════════ QUEST RUNNER (laptop-only mini game) ══════════════ -->
 <style>

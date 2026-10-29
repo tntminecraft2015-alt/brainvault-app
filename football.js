@@ -12,6 +12,7 @@
 const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
 const FC   = 'https://api.fantasycalc.com/values/current';
 const SLP  = 'https://api.sleeper.app/v1';
+const mine = require('./fantasy-leagues');
 
 const cache = new Map();
 async function cachedJson(url, ttlMs) {
@@ -180,9 +181,11 @@ const COACH_TOOLS = [
     input_schema: { type: 'object', properties: { players: { type: 'array', items: { type: 'string' } } } } },
   { name: 'get_trending', description: 'Most-added or most-dropped players across Sleeper leagues in the last 24 hours — the waiver wire pulse.',
     input_schema: { type: 'object', properties: { kind: { type: 'string', enum: ['add', 'drop'] } } } },
+  { name: 'get_my_teams', description: "The user's OWN fantasy teams, read live from their linked ESPN and Sleeper leagues: each league's scoring format, their team's record and standing, full lineup (starters by slot, bench, IR) with injury tags and points, and this week's head-to-head matchup including the opponent's lineup and the live/projected score. Pass a week to look at another week's matchup. Call this before any start/sit, waiver, trade or 'how's my team doing' answer.",
+    input_schema: { type: 'object', properties: { week: { type: 'integer', description: 'NFL week. Omit for the current week.' } } } },
 ];
 
-function coachHandlers(league) {
+function coachHandlers(league, accounts) {
   const lookup = async names => {
     const { players } = await getValues(league);
     return names.map(n => ({ asked: n, match: findPlayer(players, n) }));
@@ -204,10 +207,14 @@ function coachHandlers(league) {
     },
     get_injuries: async i => { try { return { players: await fantasyInjuries(league, i.players) }; } catch (e) { return { ok: false, message: `Injury report unavailable (${e.message}) — use web search.` }; } },
     get_trending: async i => { try { return { kind: i.kind || 'add', players: await getTrending(i.kind, league) }; } catch (e) { return { ok: false, message: `Trending unavailable (${e.message}).` }; } },
+    get_my_teams: async i => {
+      if (!mine.hasAccounts(accounts)) return { ok: false, message: 'No ESPN or Sleeper league linked yet. Tell the user to open the Coach → Teams tab and add their Sleeper username or ESPN league ID.' };
+      try { return await mine.getMyTeams(accounts, i.week); } catch (e) { return { ok: false, message: `Couldn't load their leagues (${e.message}).` }; }
+    },
   };
 }
 
-function coachSystem({ name, league, board, roster, todayStr }) {
+function coachSystem({ name, league, board, roster, todayStr, teams }) {
   const L = leagueParams(league);
   const fmt = `${L.teams}-team ${L.ppr === 1 ? 'PPR' : L.ppr === 0.5 ? 'half-PPR' : 'standard'} ${L.qbs === 2 ? 'superflex' : '1QB'} ${L.dynasty ? 'dynasty' : 'redraft'}`;
   const games = board?.games?.length
@@ -217,11 +224,15 @@ function coachSystem({ name, league, board, roster, todayStr }) {
 
 Today is ${todayStr}. The NFL changes daily, so never answer from memory about injuries, depth charts, trades, signings, suspensions, coaching changes or anything "current" — use your tools and web_search first, and say how fresh the info is if it matters. Your training knowledge is older than this season.
 
-Tools: get_scoreboard (live ESPN scores), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
+Tools: get_scoreboard (live ESPN scores), get_nfl_news, get_injuries (ESPN injury report — check it before any start/sit or trade call), get_trade_values and evaluate_trade (FantasyCalc market values — the same numbers the user's trade calculator shows), get_trending (Sleeper adds/drops), get_my_teams (the user's own linked ESPN/Sleeper rosters and matchups), and web_search for injuries, beat reports, snap counts, matchups, weather, Vegas lines and anything else.
 
 Trades: always call evaluate_trade with the actual players before giving a verdict, quote the edge %, then add the context numbers miss — injuries, bye weeks, roster fit, playoff schedule, the user's positional needs. Stars are worth more than the sum of depth pieces. If it's close, say what to ask for to tip it.
 
-User's league: ${fmt}.${roster ? `\nUser's roster (as they typed it): ${roster}` : ''}
+${teams ? `The user's REAL fantasy teams, read live from their linked ESPN/Sleeper accounts (week ${teams.week}). This is ground truth for who is on their roster and who they're playing — use it instead of asking. If they have more than one league and the question doesn't say which, answer for each briefly or ask which one:
+${teams.summary}${teams.errors?.length ? `\n(Couldn't load: ${teams.errors.join('; ')})` : ''}
+When you value trades for one of these leagues, keep its own format in mind; the calculator below is set to the user's default.` : "The user hasn't linked an ESPN or Sleeper league yet — if they ask about \"my team\", use the roster below if any, and mention they can link their leagues in the Coach's Teams tab."}
+
+User's default calculator league: ${fmt}.${roster ? `\nUser's roster (as they typed it): ${roster}` : ''}
 
 Current scoreboard (Week ${board?.week ?? '?'}, ${board?.season ?? ''}):
 ${games}`;
@@ -235,6 +246,9 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
   app.get('/api/nfl/injuries', (req, res) => send(res, async () => ({ players: req.query.all === '1' ? await getInjuries() : await fantasyInjuries(req.query) })));
   app.get('/api/fantasy/values', (req, res) => send(res, () => getValues(req.query)));
   app.get('/api/fantasy/trending', (req, res) => send(res, async () => ({ players: await getTrending(req.query.kind, req.query) })));
+  // the user's own leagues (accounts come from the client; ESPN private-league cookies from env only)
+  app.post('/api/fantasy/my-teams', (req, res) => send(res, () => mine.getMyTeams(req.body?.accounts || {}, req.body?.week)));
+  app.get('/api/fantasy/espn-login', (req, res) => res.json({ configured: !!mine.espnCookies() }));
   app.post('/api/fantasy/trade', (req, res) => send(res, async () => {
     const { players } = await getValues(req.body.league || {});
     const ids = arr => (arr || []).map(String);
@@ -245,15 +259,22 @@ module.exports = function mountFootball(app, { getApiKey, makeClient, runChatTur
   app.post('/api/coach-chat', async (req, res) => {
     const key = getApiKey();
     if (!key) return res.status(401).json({ error: 'NO_KEY', message: 'No API key found.' });
-    const { message = '', history = [], name = 'Coach', league = {}, roster = '' } = req.body || {};
+    const { message = '', history = [], name = 'Coach', league = {}, roster = '', accounts = {} } = req.body || {};
     if (!message.trim()) return res.status(400).json({ error: 'Empty message' });
     try {
-      let board = null; try { board = await getScoreboard(); } catch {}
+      let board = null, teams = null;
+      await Promise.all([
+        getScoreboard().then(b => { board = b; }).catch(() => {}),
+        mine.hasAccounts(accounts)
+          ? Promise.race([mine.getMyTeams(accounts), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 15000))])
+              .then(t => { teams = { week: t.week, summary: mine.teamsSummary(t), errors: t.errors }; }).catch(() => {})
+          : null,
+      ]);
       const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: process.env.APP_TZ || 'America/New_York' });
-      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr });
+      const system = coachSystem({ name: String(name).slice(0, 40), league, board, roster: String(roster).slice(0, 1200), todayStr, teams });
       const messages = [...history.slice(-16).map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content || '') })), { role: 'user', content: message }];
       const tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }, ...COACH_TOOLS];
-      const out = await runChatTurn(makeClient(key), system, tools, messages, coachHandlers(league), 6, 1600);
+      const out = await runChatTurn(makeClient(key), system, tools, messages, coachHandlers(league, accounts), 6, 1600);
       res.json({ response: out.text, tokens: out.usage, toolActions: out.toolActions });
     } catch (err) {
       const msg = String(err.message || '');
