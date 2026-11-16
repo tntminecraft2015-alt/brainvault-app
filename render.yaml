@@ -1,0 +1,39 @@
+# Clip worker for the Clips tab (see worker/README.md). The main brainvault-app web service
+# is managed in the Render dashboard, not by this file.
+services:
+  - type: pserv
+    name: brainvault-clip-worker
+    runtime: docker
+    plan: starter
+    region: ohio            # same region as brainvault-app, so they share the private network
+    rootDir: worker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    disk:
+      name: clipdata
+      mountPath: /data
+      sizeGB: 2
+    envVars:
+      - key: SERVER_URL
+        value: https://brainvault-app.onrender.com
+      - key: FILES_BASE_URL
+        value: https://brainvault-app.onrender.com/clipfiles
+      - key: DATA_DIR
+        value: /data
+      - key: MAX_HEIGHT
+        value: "720"
+      - key: KEEP_DAYS
+        value: "7"
+      - key: LOCAL_WHISPER
+        value: "0"
+      - key: WORKER_SECRET      # must match WORKER_SECRET on brainvault-app
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: VAPID_PUBLIC_KEY   # copy from brainvault-app so the worker can send "clips ready" itself
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_CONTACT_EMAIL
+        sync: false

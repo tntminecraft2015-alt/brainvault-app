@@ -12,7 +12,15 @@ Phone ─tap "Clip this"─▶ Mission Control (Render) ──POST /jobs──�
 * The worker sends the "clips ready" push itself, so it arrives even if Render has been asleep for hours.
 * The queue is saved on disk. A reboot or restart resumes the job, and results are re-reported until Mission Control accepts them.
 
-## One-time setup (about 30 min)
+## Option A: Render private service (what Mission Control uses now)
+`render.yaml` at the repo root defines it: a **Starter private service** (512 MB, $7/mo) in the same region as `brainvault-app`, plus a 2 GB disk (~$0.50/mo) for the queue and finished clips.
+* **Transcription:** goes to Groq's free Whisper API (`GROQ_API_KEY`, from console.groq.com), since local Whisper doesn't fit in 512 MB. Long VODs may pause for the free hourly limit; the worker waits that out on its own.
+* **Clip files:** this service has no public address, so phones fetch clips through Mission Control's `/clipfiles/…` pass-through (`FILES_BASE_URL`).
+* **On brainvault-app, set:**
+  * `WORKER_URL=http://<worker internal address>:10000`, found under the worker's **Connect → Internal** in the Render dashboard
+  * `WORKER_SECRET`, the same value as the worker's
+
+## Option B: your own VM (one-time setup, about 30 min)
 
 1. **Hetzner Cloud server.** Sign up at accounts.hetzner.com, then in the Cloud Console create a project → **Add Server**:
    * **Location:** Falkenstein, Nuremberg or Helsinki. The EU locations are much cheaper than US ones, and location doesn't matter for this.

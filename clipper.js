@@ -8,6 +8,7 @@
 // on this server being awake. Job state lives in app-data (data.clips), persisted like everything else.
 
 const crypto = require('crypto');
+const { Readable } = require('stream');
 
 const HAIKU = 'claude-haiku-4-5-20251001';
 const HAIKU_IN = 1 / 1e6, HAIKU_OUT = 5 / 1e6;           // $ per token
@@ -283,7 +284,8 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   // Worker startup catch-up: it asks for anything it should be working on, and this re-sends it
   app.post('/api/clips/worker/hello', workerOnly, async (req, res) => {
     const have = new Set(Array.isArray(req.body?.have) ? req.body.have : []);
-    const ids = clipsOf(getAppData()).jobs.filter(j => ['queued', 'sent'].includes(j.status) && !have.has(j.id)).map(j => j.id);
+    // anything unfinished the worker doesn't have (e.g. its disk was wiped mid-job) gets sent again
+    const ids = clipsOf(getAppData()).jobs.filter(j => !['done', 'failed'].includes(j.status) && !have.has(j.id)).map(j => j.id);
     mutate(c => { for (const id of ids) { const j = findJob(c, id); if (j) j.status = 'queued'; } });
     res.json({ ok: true, resending: ids.length });
     for (const id of ids) await sendToWorker(id);
@@ -382,6 +384,22 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
       if (j.recutOf) { const old = findJob(c, j.parentId)?.clips.find(x => x.id === j.recutOf); if (old) delete old.recutting; }
     });
     res.json({ ok: true });
+  });
+
+  // On Render the worker is a private service with no public address, so its finished clips are
+  // passed through here. Range requests are forwarded: iOS won't play a video without them.
+  app.get('/clipfiles/:name', async (req, res) => {
+    if (!WORKER_URL || !/^[a-f0-9]{24}\.(mp4|jpg)$/.test(req.params.name)) return res.status(404).end();
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), 30000);
+    res.on('close', () => ac.abort());
+    try {
+      const r = await fetch(`${WORKER_URL}/files/${req.params.name}`, { headers: req.headers.range ? { Range: req.headers.range } : {}, signal: ac.signal });
+      clearTimeout(t);
+      res.status(r.status);
+      for (const h of ['content-type', 'content-length', 'content-range', 'accept-ranges', 'last-modified', 'etag', 'cache-control']) { const v = r.headers.get(h); if (v) res.set(h, v); }
+      if (!r.body) return res.end();
+      Readable.fromWeb(r.body).on('error', () => res.destroy()).pipe(res);
+    } catch { clearTimeout(t); if (!res.headersSent) res.status(502).end(); }
   });
 
   // ── Stats: spend, clip counts, estimated campaign earnings ──

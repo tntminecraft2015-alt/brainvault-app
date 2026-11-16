@@ -1,8 +1,9 @@
 // ── CLIP WORKER ─────────────────────────────────────────────────────────────
-// Runs on the Oracle free VM (or any Docker host). Mission Control POSTs a job to /jobs;
-// this downloads the source (yt-dlp), transcribes it (faster-whisper), asks Mission Control
-// which moments to cut (Claude runs there), renders 9:16 clips with burned captions (ffmpeg),
-// stores them (R2, or served from /files here), sends the "clips ready" push itself,
+// Runs as a Render private service (or any Docker host). Mission Control POSTs a job to /jobs;
+// this downloads the source (yt-dlp), transcribes it (Groq's Whisper API, or local faster-whisper),
+// asks Mission Control which moments to cut (Claude runs there), renders 9:16 clips with burned
+// captions (ffmpeg), stores them (R2, or served from /files here — on Render, Mission Control
+// passes /files through at /clipfiles since this has no public address), sends the "clips ready" push itself,
 // and reports back, retrying until Mission Control (which may be asleep) accepts the result.
 // The queue is saved to disk, so a restart picks up exactly where it left off.
 
@@ -18,15 +19,18 @@ const PORT = +process.env.PORT || 8080;
 const SECRET = process.env.WORKER_SECRET || '';
 const SERVER = (process.env.SERVER_URL || '').replace(/\/+$/, '');
 const PUBLIC = (process.env.PUBLIC_URL || '').replace(/\/+$/, '');
+// where phones fetch finished clips: this worker's own /files, or (on Render) Mission Control's /clipfiles pass-through
+const FILES_BASE = (process.env.FILES_BASE_URL || (PUBLIC ? PUBLIC + '/files' : '')).replace(/\/+$/, '');
 const DATA = process.env.DATA_DIR || path.join(__dirname, 'data');
 const KEEP_DAYS = +process.env.KEEP_DAYS || 14;
+const MAX_HEIGHT = +process.env.MAX_HEIGHT || 1080;   // source resolution cap; 720 keeps small servers quick
 const FONTS = path.join(__dirname, 'fonts');
 const PY = process.env.PYTHON || 'python3';
 const R2 = process.env.R2_BUCKET && process.env.R2_ACCOUNT_ID && process.env.R2_ACCESS_KEY_ID && process.env.R2_SECRET_ACCESS_KEY && process.env.R2_PUBLIC_BASE;
 const PUSH = !!(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
 
 if (!SECRET || !SERVER) { console.error('WORKER_SECRET and SERVER_URL are required'); process.exit(1); }
-if (!R2 && !PUBLIC) { console.error('Set PUBLIC_URL (this worker\'s https address) or the R2_* variables so clips have somewhere to live'); process.exit(1); }
+if (!R2 && !FILES_BASE) { console.error('Set PUBLIC_URL (this worker\'s https address), FILES_BASE_URL, or the R2_* variables so clips have somewhere to live'); process.exit(1); }
 if (PUSH) webpush.setVapidDetails(process.env.VAPID_CONTACT_EMAIL || 'mailto:admin@example.com', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
 const dirs = { work: path.join(DATA, 'work'), src: path.join(DATA, 'src'), out: path.join(DATA, 'out') };
@@ -93,7 +97,8 @@ async function download(job) {
   if (fs.existsSync(file)) { fs.utimesSync(file, new Date(), new Date()); return file; }
   // leftovers from a run that died mid-merge (separate audio/video streams) must not be mistaken for the result
   for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${key}.mp4.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
-  const args = ['-f', 'bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]/bv*[height<=1080]+ba/b', '--merge-output-format', 'mp4', '--no-playlist', '--no-part', '--newline', '-o', file + '.dl.%(ext)s'];
+  const h = MAX_HEIGHT;
+  const args = ['-f', `bv*[height<=${h}][ext=mp4]+ba[ext=m4a]/b[height<=${h}][ext=mp4]/bv*[height<=${h}]+ba/b`, '--merge-output-format', 'mp4', '--no-playlist', '--no-part', '--newline', '-o', file + '.dl.%(ext)s'];
   if (job.range && (job.range.start != null || job.range.end != null)) args.push('--download-sections', `*${job.range.start ?? 0}-${job.range.end ?? 'inf'}`, '--force-keyframes-at-cuts');
   args.push(job.source.url);
   await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', +m[1] * 0.25, `Downloading… ${Math.round(+m[1])}%`); } });
@@ -104,23 +109,66 @@ async function download(job) {
   return file;
 }
 
-// Transcribe [from, to) of the source (whole file when omitted); returns segments in source seconds
+// Transcribe [from, to) of the source (whole file when omitted); returns segments in source seconds.
+// With GROQ_API_KEY set it uses Groq's free Whisper API (small servers); otherwise local faster-whisper.
 async function transcribe(job, src, dur, from = 0, to = null) {
   const cache = `${src}.${from}-${to ?? 'end'}.json`;
   if (fs.existsSync(cache)) return JSON.parse(fs.readFileSync(cache, 'utf8'));
-  const wav = path.join(dirs.work, `${job.id}.wav`);
-  const a = ['-y', '-v', 'error'];
-  if (from) a.push('-ss', String(from));
-  if (to != null) a.push('-t', String(to - from));
-  await run('ffmpeg', [...a, '-i', src, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', wav]);
-  const json = path.join(dirs.work, `${job.id}.tx.json`);
   const span = (to ?? dur) - from;
+  const segs = GROQ ? await transcribeGroq(job, src, from, span) : await transcribeLocal(job, src, from, span);
+  fs.writeFileSync(cache, JSON.stringify(segs));
+  return segs;
+}
+const cutArgs = (from, span) => ['-y', '-v', 'error', ...(from ? ['-ss', String(from)] : []), '-t', String(span)];
+
+async function transcribeLocal(job, src, from, span) {
+  const wav = path.join(dirs.work, `${job.id}.wav`), json = path.join(dirs.work, `${job.id}.tx.json`);
+  await run('ffmpeg', [...cutArgs(from, span), '-i', src, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', wav]);
   await run(PY, [path.join(__dirname, 'transcribe.py'), wav, json], { onLine: l => { const m = l.match(/^PROGRESS ([\d.]+)/); if (m) { const pct = +m[1]; progress(job, 'transcribing', 25 + pct * 40, `Listening… ${Math.round(pct * span / 60)} of ${Math.max(1, Math.round(span / 60))} min`); } } });
   const tx = JSON.parse(fs.readFileSync(json, 'utf8'));
-  const segs = (tx.segments || []).map(s => ({ s: s.s + from, e: s.e + from, t: s.t, w: (s.w || []).map(([ws, we, w]) => [ws + from, we + from, w]) }));
-  fs.writeFileSync(cache, JSON.stringify(segs));
   fs.rmSync(wav, { force: true }); fs.rmSync(json, { force: true });
+  return (tx.segments || []).map(s => ({ s: s.s + from, e: s.e + from, t: s.t, w: (s.w || []).map(([ws, we, w]) => [ws + from, we + from, w]) }));
+}
+
+// Groq: 10-minute mono MP3 chunks (~2.4 MB each, well under the 25 MB upload cap), waiting out rate limits
+const GROQ = process.env.GROQ_API_KEY || '';
+const CHUNK = 600;
+async function transcribeGroq(job, src, from, span) {
+  const dir = path.join(dirs.work, `${job.id}-audio`); fs.mkdirSync(dir, { recursive: true });
+  await run('ffmpeg', [...cutArgs(from, span), '-i', src, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'libmp3lame', '-b:a', '32k', '-f', 'segment', '-segment_time', String(CHUNK), path.join(dir, 'a%03d.mp3')]);
+  const parts = fs.readdirSync(dir).filter(f => f.endsWith('.mp3')).sort();
+  const segs = [];
+  for (let i = 0; i < parts.length; i++) {
+    progress(job, 'transcribing', 25 + 40 * i / parts.length, `Listening… ${Math.min(Math.round(span / 60), i * CHUNK / 60)} of ${Math.max(1, Math.round(span / 60))} min`);
+    const off = from + i * CHUNK;
+    const tx = await groqChunk(job, path.join(dir, parts[i]));
+    const words = (tx.words || []).map(w => [w.start + off, w.end + off, String(w.word || '').trim()]);
+    for (const s of tx.segments || []) {
+      const s0 = s.start + off, e0 = s.end + off;
+      segs.push({ s: s0, e: e0, t: String(s.text || '').trim(), w: words.filter(([ws]) => ws >= s0 - 0.05 && ws < e0) });
+    }
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
   return segs;
+}
+async function groqChunk(job, file) {
+  for (let i = 0; ; i++) {
+    const form = new FormData();
+    form.append('file', new Blob([fs.readFileSync(file)], { type: 'audio/mpeg' }), path.basename(file));
+    form.append('model', process.env.GROQ_MODEL || 'whisper-large-v3-turbo');
+    form.append('response_format', 'verbose_json');
+    form.append('timestamp_granularities[]', 'word');
+    form.append('timestamp_granularities[]', 'segment');
+    const r = await fetch(process.env.GROQ_URL || 'https://api.groq.com/openai/v1/audio/transcriptions', { method: 'POST', headers: { Authorization: `Bearer ${GROQ}` }, body: form, signal: AbortSignal.timeout(180000) }).catch(e => ({ ok: false, status: 0, e }));
+    if (r.ok) return r.json();
+    // free tier: an hour of audio per hour or so; long VODs wait for the window to reset
+    if ((r.status === 429 || r.status >= 500 || r.status === 0) && i < 12) {
+      const wait = Math.min(15 * 60, +(r.headers?.get?.('retry-after')) || 30 * 2 ** Math.min(i, 4));
+      if (r.status === 429) progress(job, 'transcribing', 30, `Free transcription limit hit, waiting ${Math.ceil(wait / 60)} min…`);
+      await sleep(wait * 1000); continue;
+    }
+    throw new Error(`Transcription failed (Groq HTTP ${r.status}${r.status === 401 ? ': check GROQ_API_KEY' : ''})`);
+  }
 }
 
 const CROP_XY = { tl: ['0', '0'], tr: ['iw-ow', '0'], bl: ['0', 'ih-oh'], br: ['iw-ow', 'ih-oh'] };
@@ -159,7 +207,7 @@ async function store(file, type) {
     return `${process.env.R2_PUBLIC_BASE.replace(/\/+$/, '')}/clips/${name}`;
   }
   fs.copyFileSync(file, path.join(dirs.out, name));
-  return `${PUBLIC}/files/${name}`;
+  return `${FILES_BASE}/${name}`;
 }
 
 async function sendPush(job, n) {
@@ -276,7 +324,7 @@ app.post('/jobs', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`Clip worker on :${PORT} → reporting to ${SERVER} · storage ${R2 ? 'R2' : PUBLIC + '/files'} · push ${PUSH ? 'on' : 'off'} · ${queue.length} job(s) resumed`);
+  console.log(`Clip worker on :${PORT} → reporting to ${SERVER} · storage ${R2 ? 'R2' : FILES_BASE} · transcribe ${GROQ ? 'Groq' : 'local whisper'} · push ${PUSH ? 'on' : 'off'} · ${queue.length} job(s) resumed`);
   sweep(); setInterval(sweep, 3600 * 1000);
   // keep yt-dlp current; sites change their players often (non-fatal)
   const updateYtDlp = () => run(PY, ['-m', 'pip', 'install', '-q', '-U', 'yt-dlp']).catch(e => console.error('yt-dlp update skipped:', e.message));

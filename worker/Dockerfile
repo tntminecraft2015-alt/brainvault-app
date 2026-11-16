@@ -3,7 +3,10 @@ FROM node:20-bookworm-slim
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ffmpeg python3 python3-venv ca-certificates curl fonts-dejavu-core \
  && rm -rf /var/lib/apt/lists/*
-RUN python3 -m venv /opt/py && /opt/py/bin/pip install --no-cache-dir faster-whisper yt-dlp
+# LOCAL_WHISPER=0 skips the local speech model (~500 MB) when transcription goes to Groq's API
+ARG LOCAL_WHISPER=1
+RUN python3 -m venv /opt/py && /opt/py/bin/pip install --no-cache-dir yt-dlp \
+ && if [ "$LOCAL_WHISPER" = "1" ]; then /opt/py/bin/pip install --no-cache-dir faster-whisper; fi
 ENV PATH=/opt/py/bin:$PATH PYTHON=/opt/py/bin/python DATA_DIR=/data HF_HOME=/data/hf
 
 WORKDIR /app
