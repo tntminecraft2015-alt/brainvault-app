@@ -8279,7 +8279,7 @@ function clipCardHTML(j,c){
       <input class="as-inp" value="${esc(c.title||'')}" aria-label="YouTube title" onchange="clipsSave('${esc(id)}',{title:this.value})">
       <textarea class="as-inp" aria-label="Caption" onchange="clipsSave('${esc(id)}',{caption:this.value})">${esc(c.caption||'')}</textarea>
       <div class="clp-tags">${(c.hashtags||[]).map(h=>'#'+esc(h)).join(' ')}</div>
-      ${c.status==='review'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">${clipsState?.youtube?.connected?'Approve &amp; post':'Approve'}</button><button type="button" class="farm-btn sm" onclick="clipsRecut('${esc(id)}')">Re-cut</button><button type="button" class="farm-btn sm ghost" onclick="clipsSave('${esc(id)}',{status:'rejected'},true)">Reject</button></div>`:''}
+      ${c.status==='review'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">${clipsState?.youtube?.connected||clipsState?.tiktok?.connected?'Approve &amp; post':'Approve'}</button><button type="button" class="farm-btn sm" onclick="clipsRecut('${esc(id)}')">Re-cut</button><button type="button" class="farm-btn sm ghost" onclick="clipsSave('${esc(id)}',{status:'rejected'},true)">Reject</button></div>`:''}
       ${c.status!=='review'?clpYoutubeLine(id,c):''}
       ${c.status==='approved'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Save / Share'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button><button type="button" class="farm-btn sm" onclick="openClipPosted('${esc(id)}')">Mark posted</button></div>
         <div class="clp-s">Save / Share copies the caption too, so you can paste it straight into TikTok or YouTube.</div>`:''}
@@ -8397,27 +8397,71 @@ async function clipsRenderStats(){
 // Open the tab from a notification (sw.js → ?open=clips, or a message to an already-open window)
 // ── YouTube posting + autopilot ──
 function clpYoutubeLine(id,c){
-  const yt=clipsState?.youtube||{};
-  if(c.postLinks?.youtube) return `<div class="clp-s">On YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}</div>`;
-  if(c.posting) return '<div class="clp-note" style="padding:8px 12px">Uploading to YouTube…</div>';
-  if(yt.connected) return `<div class="clp-row"><button type="button" class="farm-btn sm" onclick="clipsPost('${esc(id)}',this)">Post to YouTube</button></div>`;
-  return '';
+  const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, out=[];
+  if(c.posting) return '<div class="clp-note" style="padding:8px 12px">Posting…</div>';
+  if(c.postLinks?.youtube) out.push(`YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
+  if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener" style="color:#8fc8ff">posted</a>`:esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
+  const missing=(yt.connected&&!c.postLinks?.youtube)||(tt.connected&&!c.ttPublishId);
+  return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing&&c.status!=='review'?`<div class="clp-row"><button type="button" class="farm-btn sm" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
 }
+// Approve & post. YouTube only: posts straight away. TikTok connected: a short sheet first, because
+// TikTok requires the poster to choose privacy and interaction settings on each post themselves.
 async function clipsApprove(id,btn){
-  if(!clipsState?.youtube?.connected) return clipsSave(id,{status:'approved'},true);
-  btn.disabled=true; btn.textContent='Posting…';
-  await clipsPost(id,btn);
+  const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, {c}=clpFind(id); if(!c) return;
+  const needYt=yt.connected&&!c.postLinks?.youtube, needTt=tt.connected&&!c.ttPublishId;
+  if(!needYt&&!needTt) return clipsSave(id,{status:'approved'},true);
+  if(!needTt) return clipsPost(id,{youtube:true},btn);
+  openTikTokSheet(id,needYt);
 }
-async function clipsPost(id,btn){
+async function openTikTokSheet(id,withYt){
+  const {c}=clpFind(id);
+  const ov=farmSheet('clpPostOv','<div class="clp-empty">Checking your TikTok account…</div>');
+  let ci; try{ ci=await clipsApi('/api/clips/tiktok/creator'); }catch(e){ ov.querySelector('.mc-sheet').innerHTML=`<div class="as-grab"></div><div class="clp-note">${esc(e.message)}</div>${withYt?`<button type="button" class="farm-btn primary" style="margin-top:12px" onclick="document.getElementById('clpPostOv').remove();clipsPost('${esc(id)}',{youtube:true})">Post to YouTube only</button>`:''}`; return; }
+  const long=ci.max_video_post_duration_sec&&(c.end-c.start)>ci.max_video_post_duration_sec;
+  const PRIV={PUBLIC_TO_EVERYONE:'Everyone',MUTUAL_FOLLOW_FRIENDS:'Friends',FOLLOWER_OF_CREATOR:'Followers',SELF_ONLY:'Only me'};
+  const tog=(k,l,off)=>`<label class="clp-row" style="font-size:14px;margin-top:8px${off?';opacity:.45':''}"><input type="checkbox" data-t="${k}" ${off?'disabled':''}> ${l}${off?' (turned off in your TikTok settings)':''}</label>`;
+  ov.querySelector('.mc-sheet').innerHTML=`<div class="as-grab"></div><div class="clp-card-t" style="font-size:18px">Post this clip</div>
+    <div class="clp-s" style="margin-top:4px">${withYt?`YouTube: <b>${esc(clipsState.youtube.channel?.title||'your channel')}</b><br>`:''}TikTok: <b>${esc(ci.creator_nickname||ci.creator_username||'your account')}</b></div>
+    ${long?`<div class="clp-note" style="margin-top:10px">This clip is longer than your TikTok account allows (${ci.max_video_post_duration_sec}s). Re-cut it shorter to post it there.</div>`:''}
+    <div class="as-label">Who can see this on TikTok?</div>
+    <select id="clpTtPriv" class="as-inp"><option value="" selected disabled>Choose…</option>${(ci.privacy_level_options||[]).map(p=>`<option value="${esc(p)}">${PRIV[p]||esc(p)}</option>`).join('')}</select>
+    <div class="as-label">Let people</div>
+    ${tog('comment','Comment',ci.comment_disabled)}${tog('duet','Duet',ci.duet_disabled)}${tog('stitch','Stitch',ci.stitch_disabled)}
+    <div class="as-label">Content disclosure</div>
+    <label class="clp-row" style="font-size:14px"><input type="checkbox" id="clpTtDisclose"> This promotes a brand, product or service</label>
+    <div id="clpTtBrand" hidden style="margin-left:24px">
+      <label class="clp-row" style="font-size:14px;margin-top:6px"><input type="checkbox" data-b="yourBrand"> Your brand (you're promoting yourself)</label>
+      <label class="clp-row" style="font-size:14px;margin-top:6px"><input type="checkbox" data-b="brandedContent"> Branded content (paid partnership, e.g. a Whop campaign)</label></div>
+    <div class="clp-s" id="clpTtConsent" style="margin-top:12px">By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener" style="color:#8fc8ff">Music Usage Confirmation</a>.</div>
+    <div class="clp-s" style="margin-top:6px">After posting, TikTok can take a few minutes to process the video before it shows on your profile.</div>
+    <div class="clp-row" style="margin-top:14px"><button type="button" class="farm-btn primary" id="clpTtGo" disabled>Post${withYt?' to both':''}</button>${withYt?`<button type="button" class="farm-btn ghost" id="clpYtOnly">YouTube only</button>`:''}</div>`;
+  const go=ov.querySelector('#clpTtGo'), sel=ov.querySelector('#clpTtPriv'), dis=ov.querySelector('#clpTtDisclose'), brandBox=ov.querySelector('#clpTtBrand');
+  const brandSel=()=>[...ov.querySelectorAll('[data-b]')].filter(x=>x.checked).map(x=>x.dataset.b);
+  const refresh=()=>{
+    const b=brandSel(), branded=b.includes('brandedContent');
+    brandBox.hidden=!dis.checked;
+    // TikTok: branded content can't be private, and disclosure needs at least one box ticked
+    [...sel.options].forEach(o=>{ if(o.value==='SELF_ONLY') o.disabled=dis.checked&&branded; });
+    if(sel.value==='SELF_ONLY'&&dis.checked&&branded) sel.value='';
+    ov.querySelector('#clpTtConsent').innerHTML=`By posting, you agree to TikTok's ${dis.checked&&branded?'<a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener" style="color:#8fc8ff">Branded Content Policy</a> and ':''}<a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener" style="color:#8fc8ff">Music Usage Confirmation</a>.`;
+    go.disabled=long||!sel.value||(dis.checked&&!b.length);
+  };
+  ov.addEventListener('change',refresh); refresh();
+  go.onclick=()=>{ const t={privacy:sel.value}; ov.querySelectorAll('[data-t]').forEach(x=>t[x.dataset.t]=x.checked); if(dis.checked) brandSel().forEach(k=>t[k]=true); ov.remove(); clipsPost(id,{youtube:withYt,tiktok:t}); };
+  ov.querySelector('#clpYtOnly')?.addEventListener('click',()=>{ ov.remove(); clipsPost(id,{youtube:true}); });
+}
+async function clipsPost(id,body,btn){
   const {jid,cid,c}=clpFind(id); if(!c) return;
-  if(btn){ btn.disabled=true; btn.textContent='Uploading…'; }
-  showToast('Uploading to YouTube…');
-  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',timeout:330000}); Object.assign(c,d.clip); showToast(d.clip?.ytPrivacy==='private'?'Uploaded (private until Google verifies the app)':'Posted to YouTube'); clipsPrefetch(c).catch(()=>{}); }
-  catch(e){ showToast(e.message); if(btn){ btn.disabled=false; btn.textContent='Post to YouTube'; } await clipsLoadState(); }
-  clipsStats=null; clipsRenderReview();
+  if(btn){ btn.disabled=true; btn.textContent='Posting…'; }
+  showToast(body.tiktok&&body.youtube?'Posting to YouTube and TikTok…':body.tiktok?'Posting to TikTok…':'Uploading to YouTube…');
+  try{
+    const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',body,timeout:330000}); Object.assign(c,d.clip);
+    showToast(d.errors?.length?d.errors.join(' · '):'Posted. Links show on the clip once each platform finishes.');
+  }catch(e){ showToast(e.message); await clipsLoadState(); }
+  clipsStats=null; clipsRenderReview(); clipsSchedulePoll();
 }
 function clipsAutopilotCard(){
-  const a=clipsState?.autopilot||{on:false,perDay:10,youtube:[]}, yt=clipsState?.youtube||{};
+  const a=clipsState?.autopilot||{on:false,perDay:10,youtube:[]}, yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{};
   const last=a.lastPick?`Last pick: <b>${esc(a.lastPick.title)}</b> · ${clpAgo(a.lastPick.at)}`:a.lastRun?`Last checked ${clpAgo(a.lastRun)}`:'Checks for new VODs every 2 hours.';
   return `<div class="clp-card"><div class="clp-row" style="justify-content:space-between"><div><div class="clp-card-t">Autopilot</div><div class="clp-s">Keeps about ${a.perDay} clips a day waiting for you, from campaigns, your streamers and the YouTube channels below.</div></div>
       <button type="button" class="clp-chip${a.on?' on':''}" style="min-width:64px;justify-content:center" onclick="clipsAutopilot({on:${!a.on}})">${a.on?'On':'Off'}</button></div>
@@ -8427,18 +8471,20 @@ function clipsAutopilotCard(){
     <div class="clp-chips" style="margin-bottom:8px">${(a.youtube||[]).map(y=>`<button type="button" class="clp-chip" onclick="clipsAutopilot({removeYoutube:'${esc(y.url)}'})">${esc(y.name)} <span class="x">×</span></button>`).join('')||'<span class="clp-s">None yet</span>'}</div>
     <div class="clp-row"><input id="clpYtChan" class="as-inp" type="url" placeholder="https://www.youtube.com/@channel" autocomplete="off"><button type="button" class="farm-btn sm" onclick="clipsAutopilot({addYoutube:document.getElementById('clpYtChan').value.trim()})">Add</button></div>
     <div class="clp-row" style="margin-top:12px;justify-content:space-between"><div class="clp-s">${yt.connected?`YouTube: posting to <b>${esc(yt.channel?.title||'your channel')}</b>${yt.today?` · ${yt.today} today (limit ~6)`:''}`:yt.error?`<span style="color:#ff9b9b">${esc(yt.error)}</span>`:yt.configured?'YouTube not connected: approving won\'t upload yet.':'YouTube posting needs setup (YT_CLIENT_ID / YT_CLIENT_SECRET on Render).'}</div>
-      ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsYtDisconnect()">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect YouTube</a>`):''}</div></div>`;
+      ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('youtube')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect YouTube</a>`):''}</div>
+    <div class="clp-row" style="margin-top:8px;justify-content:space-between"><div class="clp-s">${tt.connected?`TikTok: posting as <b>${esc(tt.user?.name||'your account')}</b>`:tt.error?`<span style="color:#ff9b9b">${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
+      ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect TikTok</a>`):''}</div></div>`;
 }
 async function clipsAutopilot(patch){
   try{ const d=await clipsApi('/api/clips/autopilot',{method:'POST',body:patch}); clipsState.autopilot={...(clipsState.autopilot||{}),...d}; if(patch.on) showToast('Autopilot on. First check within a few minutes.'); }
   catch(e){ showToast(e.message); }
   clipsRenderFind();
 }
-async function clipsYtDisconnect(){ try{ await clipsApi('/api/clips/youtube/disconnect',{method:'POST'}); await clipsLoadState(); clipsRenderFind(); }catch(e){ showToast(e.message); } }
+async function clipsDisconnect(p){ try{ await clipsApi(`/api/clips/${p}/disconnect`,{method:'POST'}); await clipsLoadState(); clipsRenderFind(); }catch(e){ showToast(e.message); } }
 
 function openClipsFromPush(){ clipsView='review'; clipsState=null; goToMobTab('clips'); }
 { const q=new URLSearchParams(location.search);
-  if(q.get('open')==='clips'){ const yt=q.get('yt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt){ clipsView='find'; clipsState=null; goToMobTab('clips'); showToast(yt==='connected'?'YouTube connected':'YouTube connection cancelled'); } else openClipsFromPush(); },400); } }
+  if(q.get('open')==='clips'){ const yt=q.get('yt'), tt=q.get('tt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt||tt){ clipsView='find'; clipsState=null; goToMobTab('clips'); showToast(`${yt?'YouTube':'TikTok'} ${(yt||tt)==='connected'?'connected':'connection cancelled'}`); } else openClipsFromPush(); },400); } }
 navigator.serviceWorker?.addEventListener('message',e=>{ if(e.data?.open==='clips') openClipsFromPush(); });
 </script>
 </body>

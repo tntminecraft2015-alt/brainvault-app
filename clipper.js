@@ -18,6 +18,8 @@ const WORKER_SECRET = process.env.WORKER_SECRET || '';
 const TW_ID = process.env.TWITCH_CLIENT_ID || '', TW_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
 const YT_ID = process.env.YT_CLIENT_ID || '', YT_SECRET = process.env.YT_CLIENT_SECRET || '';
 const YT_REDIRECT = `${(process.env.PUBLIC_BASE_URL || 'https://brainvault-app.onrender.com').replace(/\/+$/, '')}/api/clips/youtube/callback`;
+const TT_KEY = process.env.TIKTOK_CLIENT_KEY || '', TT_SECRET = process.env.TIKTOK_CLIENT_SECRET || '';
+const TT_REDIRECT = `${(process.env.PUBLIC_BASE_URL || 'https://brainvault-app.onrender.com').replace(/\/+$/, '')}/api/clips/tiktok/callback`;
 const LAYOUTS = ['blur', 'center', 'split'];
 const CORNERS = ['tl', 'tr', 'bl', 'br'];
 
@@ -140,6 +142,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const y = c.youtube || {}, a = c.autopilot || {};
     res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET),
       youtube: { configured: !!(YT_ID && YT_SECRET), connected: !!y.tok && !y.error, channel: y.channel || null, error: y.error || null, today: (y.uploads || {})[new Date().toISOString().slice(0, 10)] || 0 },
+      tiktok: { configured: !!(TT_KEY && TT_SECRET), connected: !!c.tiktok?.tok && !c.tiktok?.error, user: c.tiktok?.user || null, error: c.tiktok?.error || null },
       autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
   });
   app.post('/api/clips/streamers', (req, res) => {
@@ -502,9 +505,10 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
   // You connect your channel once (OAuth); the refresh token is kept in app-data encrypted with a key
   // derived from YT_CLIENT_SECRET, since app-data is synced to GitHub. Until Google verifies the app,
   // YouTube keeps API uploads private; they flip to public on their own once it is verified.
-  const tokKey = () => crypto.createHash('sha256').update('clips-yt:' + YT_SECRET).digest();
-  const seal = obj => { const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', tokKey(), iv); const d = Buffer.concat([c.update(JSON.stringify(obj)), c.final()]); return [iv, c.getAuthTag(), d].map(b => b.toString('base64')).join('.'); };
-  const unseal = s => { const [iv, tag, d] = String(s).split('.').map(b => Buffer.from(b, 'base64')); const c = crypto.createDecipheriv('aes-256-gcm', tokKey(), iv); c.setAuthTag(tag); return JSON.parse(Buffer.concat([c.update(d), c.final()]).toString()); };
+  // keyed per platform from that platform's client secret (which only lives in Render's environment)
+  const tokKey = salt => crypto.createHash('sha256').update(salt).digest();
+  const seal = (obj, salt = 'clips-yt:' + YT_SECRET) => { const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', tokKey(salt), iv); const d = Buffer.concat([c.update(JSON.stringify(obj)), c.final()]); return [iv, c.getAuthTag(), d].map(b => b.toString('base64')).join('.'); };
+  const unseal = (s, salt = 'clips-yt:' + YT_SECRET) => { const [iv, tag, d] = String(s).split('.').map(b => Buffer.from(b, 'base64')); const c = crypto.createDecipheriv('aes-256-gcm', tokKey(salt), iv); c.setAuthTag(tag); return JSON.parse(Buffer.concat([c.update(d), c.final()]).toString()); };
   const ytOf = c => (c.youtube = c.youtube || {});
   const oauthStates = new Map();   // state → expiry
   let ytAccessTok = { v: '', exp: 0 };
@@ -572,21 +576,124 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     return { id: v.id, privacy: v.status?.privacyStatus || 'public' };
   }
 
-  // Approve + post: uploads to YouTube right away; TikTok stays the one-tap share until its app review
+  // ── TIKTOK POSTING (Content Posting API, Direct Post) ──
+  // Same pattern as YouTube: connect once (Login Kit OAuth), token sealed in app-data. TikTok's rules:
+  // until the app passes TikTok's review every post is forced to "Only me", and the person posting
+  // must pick the privacy level themselves on each post (no pre-filled default), so the app asks.
+  const TT_SALT = () => 'clips-tt:' + TT_SECRET;
+  const ttOf = c => (c.tiktok = c.tiktok || {});
+  let ttAccessTok = { v: '', exp: 0 };
+  const TT_API = process.env.TIKTOK_API_BASE || 'https://open.tiktokapis.com/v2';
+
+  app.get('/api/clips/tiktok/connect', (req, res) => {
+    if (!TT_KEY || !TT_SECRET) return res.status(400).send('Set TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET on Render first.');
+    const state = crypto.randomBytes(16).toString('hex'); oauthStates.set(state, Date.now() + 15 * 60 * 1000);
+    const q = new URLSearchParams({ client_key: TT_KEY, response_type: 'code', scope: 'user.info.basic,video.publish', redirect_uri: TT_REDIRECT, state });
+    res.redirect(`https://www.tiktok.com/v2/auth/authorize/?${q}`);
+  });
+  async function ttToken(params) {
+    const r = await fetch(`${TT_API}/oauth/token/`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_key: TT_KEY, client_secret: TT_SECRET, ...params }) });
+    const t = await r.json().catch(() => ({}));
+    if (!r.ok || !t.access_token) throw Object.assign(new Error(t.error_description || t.error || `TikTok auth HTTP ${r.status}`), { code: t.error });
+    ttAccessTok = { v: t.access_token, exp: Date.now() + (t.expires_in - 300) * 1000 };
+    return t;
+  }
+  app.get('/api/clips/tiktok/callback', async (req, res) => {
+    const exp = oauthStates.get(String(req.query.state || '')); oauthStates.delete(String(req.query.state || ''));
+    if (!exp || exp < Date.now()) return res.status(400).send('This sign-in link expired. Go back to the Clips tab and tap Connect TikTok again.');
+    if (!req.query.code) return res.redirect('/?open=clips&tt=cancelled');
+    try {
+      const t = await ttToken({ code: String(req.query.code), grant_type: 'authorization_code', redirect_uri: TT_REDIRECT });
+      const u = await (await fetch(`${TT_API}/user/info/?fields=open_id,display_name,avatar_url`, { headers: { Authorization: `Bearer ${t.access_token}` } })).json().catch(() => ({}));
+      mutate(c => { const x = ttOf(c); x.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); x.user = { name: u.data?.user?.display_name || '', avatar: u.data?.user?.avatar_url || '' }; x.connectedAt = new Date().toISOString(); x.error = null; });
+      res.redirect('/?open=clips&tt=connected');
+    } catch (e) { console.error('TikTok connect failed:', e.message); res.status(502).send(`TikTok connection failed: ${String(e.message).replace(/[<>&]/g, '')}`); }
+  });
+  app.post('/api/clips/tiktok/disconnect', (req, res) => { mutate(c => { c.tiktok = {}; }); ttAccessTok = { v: '', exp: 0 }; res.json({ ok: true }); });
+
+  async function ttAccess() {
+    if (ttAccessTok.v && Date.now() < ttAccessTok.exp) return ttAccessTok.v;
+    const x = ttOf(clipsOf(getAppData()));
+    if (!x.tok) throw new Error('TikTok isn\'t connected');
+    try {
+      const t = await ttToken({ grant_type: 'refresh_token', refresh_token: unseal(x.tok, TT_SALT()).refresh_token });
+      if (t.refresh_token) mutate(c => { const y = ttOf(c); y.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); });   // TikTok rotates it
+      return t.access_token;
+    } catch (e) {
+      if (e.code === 'invalid_grant') mutate(c => { ttOf(c).error = 'TikTok sign-in expired. Connect again.'; });
+      throw new Error(e.code === 'invalid_grant' ? 'TikTok sign-in expired. Connect TikTok again.' : e.message);
+    }
+  }
+  async function ttCall(p, body) {
+    const r = await fetch(`${TT_API}${p}`, { method: 'POST', headers: { Authorization: `Bearer ${await ttAccess()}`, 'Content-Type': 'application/json; charset=UTF-8' }, body: JSON.stringify(body || {}) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || (d.error?.code && d.error.code !== 'ok')) throw new Error(`TikTok: ${d.error?.message || d.error?.code || r.status}`);
+    return d.data || {};
+  }
+  // What TikTok says this account may do right now (privacy choices, comment/duet/stitch, max length)
+  app.get('/api/clips/tiktok/creator', async (req, res) => {
+    try { res.json(await ttCall('/post/publish/creator_info/query/')); } catch (e) { res.status(502).json({ error: e.message }); }
+  });
+
+  async function ttUpload(job, cl, o) {
+    const buf = await clipBytes(cl.url);
+    const tags = (cl.hashtags || []).filter(Boolean).map(h => '#' + h).join(' ');
+    const credit = job.source?.login ? ` · credit: twitch.tv/${job.source.login}` : '';
+    const init = await ttCall('/post/publish/video/init/', {
+      post_info: {
+        title: `${cl.caption || cl.title || ''} ${tags}${credit}`.trim().slice(0, 2200),
+        privacy_level: o.privacy, disable_comment: !o.comment, disable_duet: !o.duet, disable_stitch: !o.stitch,
+        brand_content_toggle: !!o.brandedContent, brand_organic_toggle: !!o.yourBrand,
+      },
+      // one chunk: clips are well under TikTok's 64 MB chunk limit
+      source_info: { source: 'FILE_UPLOAD', video_size: buf.length, chunk_size: buf.length, total_chunk_count: 1 },
+    });
+    const up = await fetch(init.upload_url, { method: 'PUT', headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(buf.length), 'Content-Range': `bytes 0-${buf.length - 1}/${buf.length}` }, body: buf, signal: AbortSignal.timeout(300000) });
+    if (!up.ok) throw new Error(`TikTok upload failed (HTTP ${up.status})`);
+    return init.publish_id;
+  }
+  // TikTok processes the upload for a while; check back and fill in the post link when it's live
+  function ttWatch(jobId, clipId, publishId, tries = 0) {
+    setTimeout(async () => {
+      try {
+        const d = await ttCall('/post/publish/status/fetch/', { publish_id: publishId });
+        const done = d.status === 'PUBLISH_COMPLETE', failed = d.status === 'FAILED';
+        if (!done && !failed && tries < 40) return ttWatch(jobId, clipId, publishId, tries + 1);
+        mutate(c => { const x = findJob(c, jobId)?.clips.find(y => y.id === clipId); if (!x) return;
+          x.ttStatus = done ? 'posted' : failed ? `failed: ${d.fail_reason || 'unknown'}` : 'processing';
+          const id = (d.publicaly_available_post_id || d.publicly_available_post_id || [])[0];
+          if (id) x.postLinks = { ...(x.postLinks || {}), tiktok: `https://m.tiktok.com/v/${id}.html` };
+          else if (done) x.postLinks = { ...(x.postLinks || {}), tiktok: x.postLinks?.tiktok || 'https://www.tiktok.com/tiktokstudio/content' }; });
+      } catch (e) { if (tries < 40) ttWatch(jobId, clipId, publishId, tries + 1); else console.error('TikTok status check failed:', e.message); }
+    }, tries < 6 ? 10000 : 30000);
+  }
+
+  // Approve + post: one call sends the clip to every connected platform.
+  // body: { youtube: bool, tiktok: { privacy, comment, duet, stitch, brandedContent, yourBrand } | null }
   app.post('/api/clips/jobs/:id/clips/:cid/post', async (req, res) => {
+    const b = req.body || {};
     const c0 = clipsOf(getAppData()), job = findJob(c0, req.params.id), cl = job?.clips.find(x => x.id === req.params.cid);
     if (!cl) return res.status(404).json({ error: 'Clip not found' });
-    if (cl.postLinks?.youtube) return res.json({ ok: true, clip: cl, already: true });
+    const wantYt = b.youtube !== false && !!ytOf(c0).tok && !cl.postLinks?.youtube;
+    const wantTt = !!b.tiktok && !!ttOf(c0).tok && !cl.ttPublishId;
+    if (wantTt && !['PUBLIC_TO_EVERYONE', 'MUTUAL_FOLLOW_FRIENDS', 'FOLLOWER_OF_CREATOR', 'SELF_ONLY'].includes(b.tiktok.privacy)) return res.status(400).json({ error: 'Pick who can see it on TikTok' });
+    if (!wantYt && !wantTt) return res.json({ ok: true, clip: cl, already: true });
     if (cl.posting && Date.now() - new Date(cl.posting) < 10 * 60 * 1000) return res.status(409).json({ error: 'Already posting this one' });
     mutate(c => { const x = findJob(c, job.id)?.clips.find(y => y.id === cl.id); if (x) { x.posting = new Date().toISOString(); if (x.status === 'review') x.status = 'approved'; } });
-    try {
-      const v = await ytUpload(job, cl);
-      const clip = mutate(c => { const x = findJob(c, job.id).clips.find(y => y.id === cl.id); delete x.posting; x.postLinks = { ...(x.postLinks || {}), youtube: `https://youtube.com/shorts/${v.id}` }; x.ytId = v.id; x.ytPrivacy = v.privacy; x.postedAt = x.postedAt || new Date().toISOString(); const y = ytOf(c); const d = new Date().toISOString().slice(0, 10); y.uploads = { [d]: ((y.uploads || {})[d] || 0) + 1 }; return x; });
-      res.json({ ok: true, clip });
-    } catch (e) {
-      mutate(c => { const x = findJob(c, job.id)?.clips.find(y => y.id === cl.id); if (x) delete x.posting; });
-      res.status(502).json({ error: e.message });
-    }
+    const errors = [];
+    const [yt, tt] = await Promise.allSettled([wantYt ? ytUpload(job, cl) : null, wantTt ? ttUpload(job, cl, b.tiktok) : null]);
+    if (yt.status === 'rejected') errors.push(`YouTube: ${yt.reason.message}`);
+    if (tt.status === 'rejected') errors.push(tt.reason.message.startsWith('TikTok') ? tt.reason.message : `TikTok: ${tt.reason.message}`);
+    const clip = mutate(c => {
+      const x = findJob(c, job.id).clips.find(y => y.id === cl.id); delete x.posting;
+      if (yt.value) { x.postLinks = { ...(x.postLinks || {}), youtube: `https://youtube.com/shorts/${yt.value.id}` }; x.ytId = yt.value.id; x.ytPrivacy = yt.value.privacy; const y = ytOf(c); const d = new Date().toISOString().slice(0, 10); y.uploads = { [d]: ((y.uploads || {})[d] || 0) + 1 }; }
+      if (tt.value) { x.ttPublishId = tt.value; x.ttStatus = 'processing'; x.ttPrivacy = b.tiktok.privacy; }
+      if (yt.value || tt.value) { x.postedAt = x.postedAt || new Date().toISOString(); if ((x.postLinks?.youtube || !ytOf(c).tok) && (x.ttPublishId || !ttOf(c).tok)) x.status = 'posted'; }
+      return x;
+    });
+    if (tt.value) ttWatch(job.id, cl.id, tt.value);
+    if (errors.length && !yt.value && !tt.value) return res.status(502).json({ error: errors.join(' · ') });
+    res.json({ ok: true, clip, errors });
   });
 
   // ── Stats: spend, clip counts, estimated campaign earnings ──
