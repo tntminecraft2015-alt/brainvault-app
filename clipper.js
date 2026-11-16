@@ -16,6 +16,8 @@ const WHOP_FEE = 0.09;                                     // conservative end o
 const WORKER_URL = (process.env.WORKER_URL || '').replace(/\/+$/, '');
 const WORKER_SECRET = process.env.WORKER_SECRET || '';
 const TW_ID = process.env.TWITCH_CLIENT_ID || '', TW_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
+const YT_ID = process.env.YT_CLIENT_ID || '', YT_SECRET = process.env.YT_CLIENT_SECRET || '';
+const YT_REDIRECT = `${(process.env.PUBLIC_BASE_URL || 'https://brainvault-app.onrender.com').replace(/\/+$/, '')}/api/clips/youtube/callback`;
 const LAYOUTS = ['blur', 'center', 'split'];
 const CORNERS = ['tl', 'tr', 'bl', 'br'];
 
@@ -84,6 +86,9 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   // commit the whole app-data.json to GitHub hundreds of times per job. Status changes are saved.
   const live = new Map();       // jobId → { progress, msg, updatedAt }
   const picks = new Map();      // "jobId:attempt" → Promise of moments, so a timed-out retry reuses the same Haiku call
+  const workerOnly = (req, res, next) => secretOk(req.get('x-worker-secret')) ? next() : res.status(401).json({ error: 'bad worker secret' });
+  // a report from an attempt older than the latest "Try again" is ignored
+  const staleAttempt = (j, b) => b.attempt != null && b.attempt !== (j.attempt || 1);
 
   async function haiku(system, prompt, maxTokens) {
     const key = getApiKey(); if (!key) throw new Error('No Anthropic API key set');
@@ -132,7 +137,10 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     // newest 40, plus any older job still holding clips you haven't dealt with; live progress overlaid
     const jobs = c.jobs.filter((j, i) => i < 40 || j.clips?.some(x => x.status === 'review' || x.status === 'approved'))
       .map(j => live.has(j.id) && !['done', 'failed'].includes(j.status) ? { ...j, ...live.get(j.id) } : j);
-    res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET) });
+    const y = c.youtube || {}, a = c.autopilot || {};
+    res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET),
+      youtube: { configured: !!(YT_ID && YT_SECRET), connected: !!y.tok && !y.error, channel: y.channel || null, error: y.error || null, today: (y.uploads || {})[new Date().toISOString().slice(0, 10)] || 0 },
+      autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
   });
   app.post('/api/clips/streamers', (req, res) => {
     const login = str(req.body?.login, 80).toLowerCase().replace(/^.*twitch\.tv\//, '').replace(/[^a-z0-9_]/g, '').slice(0, 25);
@@ -203,15 +211,20 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const start = b.start === '' || b.start == null ? null : num(b.start, 0, 864000, null);
     const end = b.end === '' || b.end == null ? null : num(b.end, 0, 864000, null);
     if (start != null && end != null && end - start < 20) return res.status(400).json({ error: 'Pick a range of at least 20 seconds' });
+    const { job, delivered } = await createJob({ ...b, start, end });
+    res.json({ ok: true, job, delivered, workerConfigured: !!(WORKER_URL && WORKER_SECRET) });
+  });
+
+  async function createJob(b, extra = {}) {
     const login = str(b.login, 40).toLowerCase() || (String(b.url).match(/twitch\.tv\/(?!videos\/)([a-z0-9_]+)/i)?.[1] || '').toLowerCase();
     const now = new Date().toISOString();
     const job = {
       id: newId('job'), type: 'full', status: 'queued', createdAt: now, updatedAt: now,
       source: { url: str(b.url, 500), title: str(b.title, 200) || 'Pasted link', channel: str(b.channel, 60), login, thumb: isUrl(b.thumb) ? str(b.thumb, 500) : '', kind: str(b.kind, 10) || 'link' },
-      range: start != null || end != null ? { start, end } : null,
+      range: b.start != null || b.end != null ? { start: b.start ?? null, end: b.end ?? null } : null,
       campaignId: str(b.campaignId, 40) || null,
       layout: LAYOUTS.includes(b.layout) ? b.layout : null, corner: CORNERS.includes(b.corner) ? b.corner : null,
-      progress: 0, msg: 'Queued', clips: [], costUsd: 0,
+      progress: 0, msg: 'Queued', clips: [], costUsd: 0, ...extra,
     };
     mutate(c => {
       c.jobs.unshift(job);
@@ -219,7 +232,92 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
       c.jobs = c.jobs.filter((j, i) => i < 60 || j.clips?.some(x => x.status === 'review' || x.status === 'approved'));
     });
     const delivered = await sendToWorker(job.id);
-    res.json({ ok: true, job: findJob(clipsOf(getAppData()), job.id), delivered, workerConfigured: !!(WORKER_URL && WORKER_SECRET) });
+    return { job: findJob(clipsOf(getAppData()), job.id), delivered };
+  }
+
+  // ── AUTOPILOT: keep ~N clips a day waiting for review, from campaigns, saved streamers and YouTube ──
+  // The worker is the always-on part (Render's free web service sleeps), so it calls /worker/autopilot
+  // every couple of hours. YouTube channels are listed by the worker (it has yt-dlp) and sent along.
+  // data.clips.autopilot = { on, perDay, youtube:[{url,name}], seen:{sourceKey:date}, lastRun }
+  const apOf = c => { c.autopilot = c.autopilot || {}; const a = c.autopilot; a.perDay = a.perDay || 10; a.youtube = a.youtube || []; a.seen = a.seen || {}; return a; };
+  const day = 864e5;
+
+  app.get('/api/clips/autopilot', (req, res) => {
+    const c = clipsOf(getAppData()), a = apOf(c);
+    res.json({ on: !!a.on, perDay: a.perDay, youtube: a.youtube, lastRun: a.lastRun || null, lastPick: a.lastPick || null });
+  });
+  app.post('/api/clips/autopilot', (req, res) => {
+    const b = req.body || {};
+    const out = mutate(c => {
+      const a = apOf(c);
+      if (b.on != null) a.on = !!b.on;
+      if (b.perDay != null) a.perDay = num(b.perDay, 1, 40, 10);
+      if (b.addYoutube) {
+        const u = str(b.addYoutube, 200).replace(/\/(streams|videos|featured|live)\/?$/, '');
+        if (!/^https:\/\/(www\.|m\.)?youtube\.com\/(@[\w.-]+|channel\/UC[\w-]+|c\/[\w.-]+)$/.test(u)) return { error: 'Paste a YouTube channel link, like https://www.youtube.com/@name' };
+        if (!a.youtube.some(y => y.url === u)) a.youtube.push({ url: u, name: u.split('/').pop() });
+      }
+      if (b.removeYoutube) a.youtube = a.youtube.filter(y => y.url !== b.removeYoutube);
+      return { on: !!a.on, perDay: a.perDay, youtube: a.youtube };
+    });
+    if (out.error) return res.status(400).json(out);
+    res.json({ ok: true, ...out });
+  });
+
+  // What the worker needs to know before its tick: whether to look for work, and which YouTube channels to list
+  function apNeed(c) {
+    const a = apOf(c), now = Date.now();
+    if (!a.on) return { need: false, why: 'off' };
+    if (c.jobs.some(j => !['done', 'failed'].includes(j.status))) return { need: false, why: 'a job is already running' };
+    const made = c.jobs.filter(j => j.type !== 'render' && now - new Date(j.finishedAt || j.createdAt) < day).reduce((n, j) => n + (j.clips?.length || 0), 0);
+    const waiting = c.jobs.reduce((n, j) => n + (j.type === 'render' ? 0 : (j.clips || []).filter(x => x.status === 'review').length), 0);
+    if (made >= a.perDay) return { need: false, why: `made ${made} today` };
+    if (waiting >= a.perDay * 2) return { need: false, why: `${waiting} still waiting for review` };
+    return { need: true };
+  }
+  app.get('/api/clips/worker/autopilot', workerOnly, (req, res) => {
+    const c = clipsOf(getAppData());
+    res.json({ ...apNeed(c), youtube: apOf(c).youtube.map(y => y.url) });
+  });
+
+  // The worker sends what it found on YouTube; this adds Twitch VODs + campaign links, picks one and queues it
+  app.post('/api/clips/worker/autopilot', workerOnly, async (req, res) => {
+    const c0 = clipsOf(getAppData()), a0 = apOf(c0), need = apNeed(c0);
+    mutate(c => { apOf(c).lastRun = new Date().toISOString(); });
+    if (!need.need) return res.json({ queued: false, why: need.why });
+    const cands = [];
+    for (const camp of c0.campaigns.filter(x => x.active && x.sourceUrl))
+      cands.push({ key: `camp:${camp.id}:${camp.sourceUrl}`, url: camp.sourceUrl, title: `${camp.name} source`, login: camp.streamer, campaignId: camp.id, kind: 'link', rank: 1000 + camp.rate });
+    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 60)) {
+      if (!/^[\w-]{11}$/.test(v.id || '') || (v.duration && v.duration < 120)) continue;   // skip Shorts/trailers
+      cands.push({ key: `yt:${v.id}`, url: `https://www.youtube.com/watch?v=${v.id}`, title: str(v.title, 200), channel: str(v.channel, 60), kind: 'vod', views: +v.views || 0, duration: +v.duration || 0, date: v.date || null });
+    }
+    if (TW_ID && TW_SECRET && c0.streamers.length) {
+      try { for (const it of (await getTrending(c0.streamers.map(s => s.login))).filter(i => i.kind === 'vod' && Date.now() - new Date(i.date) < 7 * day))
+        cands.push({ key: it.id, url: it.url, title: it.title, channel: it.channel, login: it.login, thumb: it.thumb, kind: 'vod', views: it.views, duration: it.duration, date: it.date }); }
+      catch (e) { console.error('Autopilot: Twitch lookup failed:', e.message); }
+    }
+    const fresh = cands.filter(x => !a0.seen[x.key]);
+    if (!fresh.length) return res.json({ queued: false, why: 'nothing new to clip' });
+    // campaigns first (they pay), then a quick AI read on which VOD clips best; recency + views break ties
+    const vods = fresh.filter(x => !x.campaignId);
+    if (vods.length > 1) {
+      try {
+        const { json } = await haiku('You rate stream VODs for how well they would clip into viral 30–75s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10}].',
+          vods.slice(0, 25).map((v, n) => `${n}. "${v.title}" by ${v.channel || '?'}, ${v.views || 0} views, ${Math.round((v.duration || 0) / 60)} min`).join('\n'), 600);
+        for (const r of Array.isArray(json) ? json : []) if (vods[r.n]) vods[r.n].rank = num(r.score, 1, 10, 5) * 10;
+      } catch (e) { console.error('Autopilot: scoring failed:', e.message); }
+    }
+    for (const v of vods) v.rank = (v.rank || 50) + Math.min(5, Math.log10((v.views || 0) + 1)) - (v.date ? (Date.now() - new Date(v.date)) / day : 3);
+    const pick = fresh.sort((x, y) => y.rank - x.rank)[0];
+    const streamer = c0.streamers.find(s => s.login === pick.login);
+    mutate(c => { const a = apOf(c); a.seen[pick.key] = new Date().toISOString().slice(0, 10); a.lastPick = { title: pick.title, at: new Date().toISOString() };
+      const cut = new Date(Date.now() - 45 * day).toISOString().slice(0, 10); for (const [k, d] of Object.entries(a.seen)) if (d < cut) delete a.seen[k]; });
+    // long streams: a 3-hour window past the intro, so one VOD stays within Groq's free daily audio
+    const win = pick.campaignId || (pick.duration && pick.duration <= 3.5 * 3600) ? {} : { start: 20 * 60, end: 20 * 60 + 3 * 3600 };
+    const { job, delivered } = await createJob({ ...pick, ...win, layout: streamer?.layout, corner: streamer?.corner }, { autopilot: true });
+    console.log(`  Autopilot: queued "${pick.title}" (${pick.key})`);
+    res.json({ queued: true, jobId: job.id, delivered, title: pick.title });
   });
 
   app.post('/api/clips/jobs/:id/retry', async (req, res) => {
@@ -277,9 +375,6 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   });
 
   // ── Worker callbacks (x-worker-secret) ──
-  // a report from an attempt older than the latest "Try again" is ignored
-  const staleAttempt = (j, b) => b.attempt != null && b.attempt !== (j.attempt || 1);
-  const workerOnly = (req, res, next) => secretOk(req.get('x-worker-secret')) ? next() : res.status(401).json({ error: 'bad worker secret' });
 
   // Worker startup catch-up: it asks for anything it should be working on, and this re-sends it
   app.post('/api/clips/worker/hello', workerOnly, async (req, res) => {
@@ -401,6 +496,97 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
       if (!r.body) return res.end();
       Readable.fromWeb(r.body).on('error', () => res.destroy()).pipe(res);
     } catch { clearTimeout(t); if (!res.headersSent) res.status(502).end(); }
+  });
+
+  // ── YOUTUBE SHORTS POSTING ──
+  // You connect your channel once (OAuth); the refresh token is kept in app-data encrypted with a key
+  // derived from YT_CLIENT_SECRET, since app-data is synced to GitHub. Until Google verifies the app,
+  // YouTube keeps API uploads private; they flip to public on their own once it is verified.
+  const tokKey = () => crypto.createHash('sha256').update('clips-yt:' + YT_SECRET).digest();
+  const seal = obj => { const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', tokKey(), iv); const d = Buffer.concat([c.update(JSON.stringify(obj)), c.final()]); return [iv, c.getAuthTag(), d].map(b => b.toString('base64')).join('.'); };
+  const unseal = s => { const [iv, tag, d] = String(s).split('.').map(b => Buffer.from(b, 'base64')); const c = crypto.createDecipheriv('aes-256-gcm', tokKey(), iv); c.setAuthTag(tag); return JSON.parse(Buffer.concat([c.update(d), c.final()]).toString()); };
+  const ytOf = c => (c.youtube = c.youtube || {});
+  const oauthStates = new Map();   // state → expiry
+  let ytAccessTok = { v: '', exp: 0 };
+
+  app.get('/api/clips/youtube/connect', (req, res) => {
+    if (!YT_ID || !YT_SECRET) return res.status(400).send('Set YT_CLIENT_ID and YT_CLIENT_SECRET on Render first.');
+    const state = crypto.randomBytes(16).toString('hex'); oauthStates.set(state, Date.now() + 15 * 60 * 1000);
+    const q = new URLSearchParams({ client_id: YT_ID, redirect_uri: YT_REDIRECT, response_type: 'code', access_type: 'offline', prompt: 'consent', include_granted_scopes: 'true', state,
+      scope: 'https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.readonly' });
+    res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${q}`);
+  });
+  app.get('/api/clips/youtube/callback', async (req, res) => {
+    const exp = oauthStates.get(String(req.query.state || '')); oauthStates.delete(String(req.query.state || ''));
+    if (!exp || exp < Date.now()) return res.status(400).send('This sign-in link expired. Go back to the Clips tab and tap Connect YouTube again.');
+    if (!req.query.code) return res.redirect('/?open=clips&yt=cancelled');
+    try {
+      const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ code: String(req.query.code), client_id: YT_ID, client_secret: YT_SECRET, redirect_uri: YT_REDIRECT, grant_type: 'authorization_code' }) });
+      const t = await r.json();
+      if (!r.ok || !t.refresh_token) throw new Error(t.error_description || t.error || 'Google sent no refresh token');
+      ytAccessTok = { v: t.access_token, exp: Date.now() + (t.expires_in - 120) * 1000 };
+      const ch = await (await fetch('https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true', { headers: { Authorization: `Bearer ${t.access_token}` } })).json();
+      const it = ch.items?.[0];
+      mutate(c => { const y = ytOf(c); y.tok = seal({ refresh_token: t.refresh_token }); y.channel = it ? { id: it.id, title: it.snippet?.title || '' } : null; y.connectedAt = new Date().toISOString(); y.error = null; });
+      res.redirect('/?open=clips&yt=connected');
+    } catch (e) { console.error('YouTube connect failed:', e.message); res.status(502).send(`YouTube connection failed: ${String(e.message).replace(/[<>&]/g, '')}`); }
+  });
+  app.post('/api/clips/youtube/disconnect', (req, res) => { mutate(c => { c.youtube = {}; }); ytAccessTok = { v: '', exp: 0 }; res.json({ ok: true }); });
+
+  async function ytAccess() {
+    if (ytAccessTok.v && Date.now() < ytAccessTok.exp) return ytAccessTok.v;
+    const y = ytOf(clipsOf(getAppData()));
+    if (!y.tok) throw new Error('YouTube isn\'t connected');
+    const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ refresh_token: unseal(y.tok).refresh_token, client_id: YT_ID, client_secret: YT_SECRET, grant_type: 'refresh_token' }) });
+    const t = await r.json();
+    if (!r.ok) {
+      if (t.error === 'invalid_grant') mutate(c => { ytOf(c).error = 'YouTube sign-in expired. Connect again.'; });
+      throw new Error(t.error === 'invalid_grant' ? 'YouTube sign-in expired. Connect YouTube again.' : `YouTube auth failed (${t.error || r.status})`);
+    }
+    ytAccessTok = { v: t.access_token, exp: Date.now() + (t.expires_in - 120) * 1000 };
+    return ytAccessTok.v;
+  }
+  async function clipBytes(url) {
+    // our own pass-through URL → fetch straight from the worker over the private network
+    const m = String(url).match(/\/clipfiles\/([a-f0-9]{24}\.mp4)$/);
+    const r = await fetch(m && WORKER_URL ? `${WORKER_URL}/files/${m[1]}` : url, { signal: AbortSignal.timeout(120000) });
+    if (!r.ok) throw new Error(`Couldn't load the clip file (${r.status})${r.status === 404 ? '. It may have expired' : ''}`);
+    return Buffer.from(await r.arrayBuffer());
+  }
+  async function ytUpload(job, cl) {
+    const tok = await ytAccess(), buf = await clipBytes(cl.url);
+    const tags = (cl.hashtags || []).filter(Boolean);
+    const credit = job.source?.login ? `\n\nCredit: twitch.tv/${job.source.login}` : job.source?.channel ? `\n\nCredit: ${job.source.channel}` : '';
+    const meta = {
+      snippet: { title: (cl.title || cl.hook || 'Clip').slice(0, 100), description: `${cl.caption || ''}\n\n${tags.map(h => '#' + h).join(' ')} #Shorts${credit}`.trim().slice(0, 4900), tags: tags.slice(0, 15), categoryId: '20' },
+      status: { privacyStatus: 'public', selfDeclaredMadeForKids: false },
+    };
+    const init = await fetch('https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status', {
+      method: 'POST', headers: { Authorization: `Bearer ${tok}`, 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Length': String(buf.length), 'X-Upload-Content-Type': 'video/mp4' }, body: JSON.stringify(meta) });
+    if (!init.ok) { const e = await init.json().catch(() => ({})); throw new Error(e.error?.errors?.[0]?.reason === 'quotaExceeded' ? 'YouTube\'s daily upload limit is used up (about 6 a day). Try again tomorrow.' : `YouTube refused the upload (${e.error?.message || init.status})`); }
+    const up = await fetch(init.headers.get('location'), { method: 'PUT', headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(buf.length) }, body: buf, signal: AbortSignal.timeout(300000) });
+    const v = await up.json().catch(() => ({}));
+    if (!up.ok || !v.id) throw new Error(`YouTube upload failed (${v.error?.message || up.status})`);
+    return { id: v.id, privacy: v.status?.privacyStatus || 'public' };
+  }
+
+  // Approve + post: uploads to YouTube right away; TikTok stays the one-tap share until its app review
+  app.post('/api/clips/jobs/:id/clips/:cid/post', async (req, res) => {
+    const c0 = clipsOf(getAppData()), job = findJob(c0, req.params.id), cl = job?.clips.find(x => x.id === req.params.cid);
+    if (!cl) return res.status(404).json({ error: 'Clip not found' });
+    if (cl.postLinks?.youtube) return res.json({ ok: true, clip: cl, already: true });
+    if (cl.posting && Date.now() - new Date(cl.posting) < 10 * 60 * 1000) return res.status(409).json({ error: 'Already posting this one' });
+    mutate(c => { const x = findJob(c, job.id)?.clips.find(y => y.id === cl.id); if (x) { x.posting = new Date().toISOString(); if (x.status === 'review') x.status = 'approved'; } });
+    try {
+      const v = await ytUpload(job, cl);
+      const clip = mutate(c => { const x = findJob(c, job.id).clips.find(y => y.id === cl.id); delete x.posting; x.postLinks = { ...(x.postLinks || {}), youtube: `https://youtube.com/shorts/${v.id}` }; x.ytId = v.id; x.ytPrivacy = v.privacy; x.postedAt = x.postedAt || new Date().toISOString(); const y = ytOf(c); const d = new Date().toISOString().slice(0, 10); y.uploads = { [d]: ((y.uploads || {})[d] || 0) + 1 }; return x; });
+      res.json({ ok: true, clip });
+    } catch (e) {
+      mutate(c => { const x = findJob(c, job.id)?.clips.find(y => y.id === cl.id); if (x) delete x.posting; });
+      res.status(502).json({ error: e.message });
+    }
   });
 
   // ── Stats: spend, clip counts, estimated campaign earnings ──

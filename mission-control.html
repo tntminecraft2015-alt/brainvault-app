@@ -8169,7 +8169,8 @@ function clipsRenderFind(){
   const el=clpView('find'); if(!el) return;
   const st=clipsState||{streamers:[]};
   el.innerHTML=`${clipsSetupNote()}
-    <div class="clp-card"><div class="clp-card-t">Clip a link</div><div class="clp-s" style="margin:2px 0 10px">A Twitch VOD or clip, a Kick video, or a campaign's source link.</div>
+    ${clipsAutopilotCard()}
+    <div class="clp-card"><div class="clp-card-t">Clip a link</div><div class="clp-s" style="margin:2px 0 10px">A Twitch VOD or clip, a YouTube video, or a campaign's source link.</div>
       <div class="clp-row"><input id="clpLink" class="as-inp" type="url" inputmode="url" placeholder="https://www.twitch.tv/videos/…" autocomplete="off"><button type="button" class="farm-btn sm primary" onclick="openClipSheet({url:document.getElementById('clpLink').value.trim()})">Clip</button></div></div>
     <div class="clp-card"><div class="clp-card-t">My streamers</div><div class="clp-s" style="margin:2px 0 10px">Their latest VODs and top clips show up below. Only clip streamers who allow it (a Whop campaign or a public "clip me" rule).</div>
       <div class="clp-chips">${st.streamers.map(s=>`<button type="button" class="clp-chip" onclick="openStreamerSheet('${esc(s.login)}')">${esc(s.login)} <span class="x">⋯</span></button>`).join('')}<button type="button" class="clp-chip" onclick="openStreamerSheet()">+ Add</button></div></div>
@@ -8278,7 +8279,8 @@ function clipCardHTML(j,c){
       <input class="as-inp" value="${esc(c.title||'')}" aria-label="YouTube title" onchange="clipsSave('${esc(id)}',{title:this.value})">
       <textarea class="as-inp" aria-label="Caption" onchange="clipsSave('${esc(id)}',{caption:this.value})">${esc(c.caption||'')}</textarea>
       <div class="clp-tags">${(c.hashtags||[]).map(h=>'#'+esc(h)).join(' ')}</div>
-      ${c.status==='review'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsSave('${esc(id)}',{status:'approved'},true)">Approve</button><button type="button" class="farm-btn sm" onclick="clipsRecut('${esc(id)}')">Re-cut</button><button type="button" class="farm-btn sm ghost" onclick="clipsSave('${esc(id)}',{status:'rejected'},true)">Reject</button></div>`:''}
+      ${c.status==='review'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">${clipsState?.youtube?.connected?'Approve &amp; post':'Approve'}</button><button type="button" class="farm-btn sm" onclick="clipsRecut('${esc(id)}')">Re-cut</button><button type="button" class="farm-btn sm ghost" onclick="clipsSave('${esc(id)}',{status:'rejected'},true)">Reject</button></div>`:''}
+      ${c.status!=='review'?clpYoutubeLine(id,c):''}
       ${c.status==='approved'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Save / Share'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button><button type="button" class="farm-btn sm" onclick="openClipPosted('${esc(id)}')">Mark posted</button></div>
         <div class="clp-s">Save / Share copies the caption too, so you can paste it straight into TikTok or YouTube.</div>`:''}
       ${c.status==='posted'?`<div class="clp-s">${['tiktok','youtube','instagram'].filter(p=>c.postLinks?.[p]).map(p=>`<a href="${esc(c.postLinks[p])}" target="_blank" rel="noopener" style="color:#8fc8ff">${p}</a>`).join(' · ')||'Posted'} · ${clpNum(c.views)} views</div>
@@ -8393,8 +8395,50 @@ async function clipsRenderStats(){
 }
 
 // Open the tab from a notification (sw.js → ?open=clips, or a message to an already-open window)
+// ── YouTube posting + autopilot ──
+function clpYoutubeLine(id,c){
+  const yt=clipsState?.youtube||{};
+  if(c.postLinks?.youtube) return `<div class="clp-s">On YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}</div>`;
+  if(c.posting) return '<div class="clp-note" style="padding:8px 12px">Uploading to YouTube…</div>';
+  if(yt.connected) return `<div class="clp-row"><button type="button" class="farm-btn sm" onclick="clipsPost('${esc(id)}',this)">Post to YouTube</button></div>`;
+  return '';
+}
+async function clipsApprove(id,btn){
+  if(!clipsState?.youtube?.connected) return clipsSave(id,{status:'approved'},true);
+  btn.disabled=true; btn.textContent='Posting…';
+  await clipsPost(id,btn);
+}
+async function clipsPost(id,btn){
+  const {jid,cid,c}=clpFind(id); if(!c) return;
+  if(btn){ btn.disabled=true; btn.textContent='Uploading…'; }
+  showToast('Uploading to YouTube…');
+  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',timeout:330000}); Object.assign(c,d.clip); showToast(d.clip?.ytPrivacy==='private'?'Uploaded (private until Google verifies the app)':'Posted to YouTube'); clipsPrefetch(c).catch(()=>{}); }
+  catch(e){ showToast(e.message); if(btn){ btn.disabled=false; btn.textContent='Post to YouTube'; } await clipsLoadState(); }
+  clipsStats=null; clipsRenderReview();
+}
+function clipsAutopilotCard(){
+  const a=clipsState?.autopilot||{on:false,perDay:10,youtube:[]}, yt=clipsState?.youtube||{};
+  const last=a.lastPick?`Last pick: <b>${esc(a.lastPick.title)}</b> · ${clpAgo(a.lastPick.at)}`:a.lastRun?`Last checked ${clpAgo(a.lastRun)}`:'Checks for new VODs every 2 hours.';
+  return `<div class="clp-card"><div class="clp-row" style="justify-content:space-between"><div><div class="clp-card-t">Autopilot</div><div class="clp-s">Keeps about ${a.perDay} clips a day waiting for you, from campaigns, your streamers and the YouTube channels below.</div></div>
+      <button type="button" class="clp-chip${a.on?' on':''}" style="min-width:64px;justify-content:center" onclick="clipsAutopilot({on:${!a.on}})">${a.on?'On':'Off'}</button></div>
+    <div class="clp-s" style="margin:8px 0">${last}</div>
+    <div class="clp-row" style="margin-bottom:8px"><span class="clp-s">Clips a day</span>${[5,10,20].map(n=>`<button type="button" class="clp-chip${a.perDay===n?' on':''}" onclick="clipsAutopilot({perDay:${n}})">${n}</button>`).join('')}</div>
+    <div class="clp-s" style="margin-bottom:6px">YouTube channels (only creators who allow clipping)</div>
+    <div class="clp-chips" style="margin-bottom:8px">${(a.youtube||[]).map(y=>`<button type="button" class="clp-chip" onclick="clipsAutopilot({removeYoutube:'${esc(y.url)}'})">${esc(y.name)} <span class="x">×</span></button>`).join('')||'<span class="clp-s">None yet</span>'}</div>
+    <div class="clp-row"><input id="clpYtChan" class="as-inp" type="url" placeholder="https://www.youtube.com/@channel" autocomplete="off"><button type="button" class="farm-btn sm" onclick="clipsAutopilot({addYoutube:document.getElementById('clpYtChan').value.trim()})">Add</button></div>
+    <div class="clp-row" style="margin-top:12px;justify-content:space-between"><div class="clp-s">${yt.connected?`YouTube: posting to <b>${esc(yt.channel?.title||'your channel')}</b>${yt.today?` · ${yt.today} today (limit ~6)`:''}`:yt.error?`<span style="color:#ff9b9b">${esc(yt.error)}</span>`:yt.configured?'YouTube not connected: approving won\'t upload yet.':'YouTube posting needs setup (YT_CLIENT_ID / YT_CLIENT_SECRET on Render).'}</div>
+      ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsYtDisconnect()">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect YouTube</a>`):''}</div></div>`;
+}
+async function clipsAutopilot(patch){
+  try{ const d=await clipsApi('/api/clips/autopilot',{method:'POST',body:patch}); clipsState.autopilot={...(clipsState.autopilot||{}),...d}; if(patch.on) showToast('Autopilot on. First check within a few minutes.'); }
+  catch(e){ showToast(e.message); }
+  clipsRenderFind();
+}
+async function clipsYtDisconnect(){ try{ await clipsApi('/api/clips/youtube/disconnect',{method:'POST'}); await clipsLoadState(); clipsRenderFind(); }catch(e){ showToast(e.message); } }
+
 function openClipsFromPush(){ clipsView='review'; clipsState=null; goToMobTab('clips'); }
-if(new URLSearchParams(location.search).get('open')==='clips'){ history.replaceState(null,'',location.pathname); setTimeout(openClipsFromPush,400); }
+{ const q=new URLSearchParams(location.search);
+  if(q.get('open')==='clips'){ const yt=q.get('yt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt){ clipsView='find'; clipsState=null; goToMobTab('clips'); showToast(yt==='connected'?'YouTube connected':'YouTube connection cancelled'); } else openClipsFromPush(); },400); } }
 navigator.serviceWorker?.addEventListener('message',e=>{ if(e.data?.open==='clips') openClipsFromPush(); });
 </script>
 </body>

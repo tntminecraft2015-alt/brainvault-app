@@ -318,6 +318,38 @@ async function pump() {
     }
   } finally { busy = false; }
   if (queue.some(x => x.state === 'reporting')) setTimeout(pump, 60000);
+  else scheduleTick(5 * 60 * 1000);   // queue drained: see if autopilot wants another one soon
+}
+
+// ── autopilot: every 2 hours (and soon after each job), ask Mission Control whether to make more clips.
+// This worker is the always-on part, so it drives the schedule; it also lists the YouTube channels
+// with yt-dlp (Mission Control can't), and Mission Control picks the source and sends the job back.
+const TICK = 2 * 3600 * 1000;
+let ticking = false, tickTimer = null;
+function scheduleTick(ms) { clearTimeout(tickTimer); tickTimer = setTimeout(autopilotTick, ms); }
+async function listYoutube(url) {
+  for (const tab of ['/streams', '/videos']) {
+    try {
+      const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', '--playlist-end', '8', '--extractor-args', 'youtubetab:approximate_date', url + tab]));
+      const items = (d.entries || []).filter(e => e?.id).map(e => ({ id: e.id, title: e.title, channel: d.channel || d.uploader || d.title, views: e.view_count || 0, duration: e.duration || 0, date: e.timestamp ? new Date(e.timestamp * 1000).toISOString() : null }));
+      if (items.length) return items;
+    } catch (e) { console.error(`autopilot: couldn't list ${url}${tab}:`, e.message.slice(0, 200)); }
+  }
+  return [];
+}
+async function autopilotTick() {
+  scheduleTick(TICK);
+  if (ticking || busy || queue.length) return;
+  ticking = true;
+  try {
+    const r = await fetch(`${SERVER}/api/clips/worker/autopilot`, { headers: { 'x-worker-secret': SECRET }, signal: AbortSignal.timeout(90000) }).then(x => x.json());
+    if (!r.need) { if (r.why && r.why !== 'off') console.log(`autopilot: resting (${r.why})`); return; }
+    const youtube = [];
+    for (const url of r.youtube || []) youtube.push(...await listYoutube(url));
+    const out = await callServer('/api/clips/worker/autopilot', { youtube }, { tries: 3 });
+    console.log(out.queued ? `autopilot: queued "${out.title}"` : `autopilot: nothing queued (${out.why})`);
+  } catch (e) { console.error('autopilot tick failed:', e.message); }
+  finally { ticking = false; }
 }
 
 // ── housekeeping: old clips, cached sources, leftovers ──
@@ -355,6 +387,7 @@ app.listen(PORT, '0.0.0.0', async () => {
   const updateYtDlp = () => run(PY, ['-m', 'pip', 'install', '-q', '-U', 'yt-dlp']).catch(e => console.error('yt-dlp update skipped:', e.message));
   updateYtDlp(); setInterval(updateYtDlp, 864e5);
   pump();
+  scheduleTick(+process.env.AUTOPILOT_FIRST_MS || 3 * 60 * 1000);
   // catch up on anything sent while this worker was down
   callServer('/api/clips/worker/hello', { have: queue.map(x => x.job.id) }, { tries: 10 }).then(r => r.resending && console.log(`Mission Control is re-sending ${r.resending} job(s)`)).catch(e => console.error('hello failed:', e.message));
 });
