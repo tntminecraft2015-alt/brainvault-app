@@ -8139,6 +8139,9 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-links { display:flex; justify-content:center; gap:4px; flex-wrap:wrap; }
   .clp-link { border:none; background:none; color:var(--fg-dim); font-family:inherit; font-size:13.5px; font-weight:700; padding:8px 12px; border-radius:999px; cursor:pointer; }
   .clp-link:hover, .clp-link.on { color:var(--fg); background:rgba(223,238,255,.06); }
+  .clp-flag { font-size:12.5px; color:#ffd59a; background:rgba(255,181,71,.1); border-radius:10px; padding:5px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+  .clp-flag.open { white-space:normal; }
+  .clp-flag b { color:#ffe2b8; }
   .clp-edit { display:flex; flex-direction:column; gap:8px; }
   .clp-edit .as-inp { font-size:14px; }
   .clp-edit textarea.as-inp { resize:vertical; min-height:64px; line-height:1.4; }
@@ -8383,6 +8386,7 @@ function clipsRenderReview(force){
       <div class="clp-s one">${clpDur(c.end-c.start)} · <b style="color:var(--fg)">${c.score}/10</b> · ${esc(j.source?.channel||'')}${camp?` · <b style="color:#ffd59a">${esc(camp.name)}</b>`:''}${c.why?` · <span title="${esc(c.why)}">${esc(c.why)}</span>`:''}</div>
       <div class="t">${esc(c.title||'Untitled')}</div>
       ${c.caption?`<div class="cap">${esc(c.caption)}</div>`:''}
+      ${(c.flags||[]).length?`<div class="clp-flag" title="${esc(c.flags.join(' · '))}" onclick="this.classList.toggle('open')"><b>⚠ Check:</b> ${c.flags.map(esc).join(' · ')}</div>`:''}
       ${c.recutting?'<div class="clp-note" style="padding:8px 12px">Re-cutting this one. The new version shows up here when it\'s done.</div>':''}
     </div>
     <div class="clp-edit" ${clipsEditing?'':'hidden'}>
@@ -8559,6 +8563,7 @@ function clpPostLine(id,c){
   if(clpPosting(c)) return '';
   if(c.postLinks?.youtube) out.push(`YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
   if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener" style="color:#8fc8ff">posted</a>`:esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
+  if(c.ttError&&!c.ttPublishId) out.push(`<span style="color:#ff9b9b">${esc(c.ttError)}</span>`);
   const missing=(yt.connected&&!c.postLinks?.youtube)||(tt.connected&&!c.ttPublishId);
   return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
 }

@@ -73,15 +73,17 @@ function progress(job, status, pct, msg, extra) {
 }
 
 // ── shell helpers ──
-function run(cmd, args, { cwd, onLine } = {}) {
+function run(cmd, args, { cwd, onLine, timeoutMs } = {}) {
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, args, { cwd });
+    let timedOut = false;
+    const timer = timeoutMs ? setTimeout(() => { timedOut = true; p.kill('SIGKILL'); }, timeoutMs) : null;
     let tail = '', out = '';
     const feed = buf => { const s = buf.toString(); tail = (tail + s).slice(-3000); if (onLine) s.split(/\r|\n/).forEach(l => l && onLine(l)); };
     p.stdout.on('data', b => { out += b; feed(b); });
     p.stderr.on('data', feed);
     p.on('error', reject);
-    p.on('close', code => code === 0 ? resolve(out) : reject(new Error(`${path.basename(cmd)} exited ${code}: ${tail.split('\n').filter(Boolean).slice(-3).join(' | ').slice(0, 280)}`)));
+    p.on('close', code => { clearTimeout(timer); if (timedOut) return reject(new Error(`${path.basename(cmd)} took over ${Math.round(timeoutMs / 60000)} min`)); code === 0 ? resolve(out) : reject(new Error(`${path.basename(cmd)} exited ${code}: ${tail.split('\n').filter(Boolean).slice(-3).join(' | ').slice(0, 280)}`)); });
   });
 }
 async function duration(file) {
@@ -255,6 +257,49 @@ async function sendPush(job, n) {
   return results.some(r => r.status === 'fulfilled');
 }
 
+// ── checks before a clip reaches Review ──
+// The transcriber marks sung lyrics / background music with ♪ or [Music]; TikTok mutes or blocks most copyrighted music.
+const MUSIC = /♪|🎵|🎶|\[(music|singing|song)[^\]]*\]|\((music|singing|song)[^)]*\)/i;
+const musicFlag = (segs, m) => segs.some(x => x.e > m.start && x.s < m.end && MUSIC.test(x.t || '')) ? 'Music in the audio: TikTok may mute or block it' : '';
+// TikTok/Shorts specs: H.264, 9:16, at least 3s, 23–60 fps, at least 360px wide
+async function specProblems(file) {
+  const d = JSON.parse(await run('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_name,width,height,r_frame_rate:format=duration', '-of', 'json', file]));
+  const v = d.streams?.[0] || {}, dur = +d.format?.duration, [n, dn] = String(v.r_frame_rate || '0/1').split('/').map(Number), fps = n / (dn || 1), bad = [];
+  if (v.codec_name !== 'h264') bad.push(`codec ${v.codec_name}`);
+  if (!v.width || !v.height || Math.abs(v.width / v.height - 9 / 16) > 0.01) bad.push(`${v.width}x${v.height} isn't 9:16`);
+  if (v.width < 360) bad.push('under 360px wide');
+  if (!(dur >= 3)) bad.push('under 3 seconds');
+  if (!(fps >= 23 && fps <= 60)) bad.push(`${fps.toFixed(1)} fps`);
+  return bad;
+}
+
+// ── chat replay: messages per 30s window, so the picker knows where viewers reacted ──
+// YouTube live replays only (yt-dlp reads them). Twitch has no official way to read past chat.
+async function chatActivity(job) {
+  if (!/^(www\.|m\.)?(youtube\.com|youtu\.be)\//.test(String(job.source.url || '').replace(/^https?:\/\//, ''))) return [];
+  const dir = path.join(dirs.work, job.id, 'chat'); fs.mkdirSync(dir, { recursive: true });
+  // a busy multi-hour replay downloads slowly: give up (and stop yt-dlp) after 6 minutes
+  try { await run('yt-dlp', ['--skip-download', '--write-subs', '--sub-langs', 'live_chat', '--no-playlist', '-o', path.join(dir, 'c.%(ext)s'), job.source.url], { timeoutMs: 6 * 60 * 1000 }); }
+  catch (e) { console.log(`job ${job.id}: no chat replay (${e.message.slice(0, 150)})`); fs.rmSync(dir, { recursive: true, force: true }); return []; }
+  const f = fs.readdirSync(dir).find(x => x.endsWith('.json'));
+  if (!f) { console.log(`job ${job.id}: this video has no chat replay`); fs.rmSync(dir, { recursive: true, force: true }); return []; }
+  const { from, to } = rangeOf(job), buckets = new Map();
+  // streamed line by line: a busy stream's chat file can be hundreds of MB
+  const rl = require('readline').createInterface({ input: fs.createReadStream(path.join(dir, f), 'utf8'), crlfDelay: Infinity });
+  for await (const line of rl) {
+    const m = line.match(/"videoOffsetTimeMsec"\s*:\s*"?(\d+)/); if (!m) continue;
+    const t = +m[1] / 1000 - from; if (t < 0 || (to != null && t > to - from)) continue;   // moment times are relative to the job's range
+    const k = Math.floor(t / 30) * 30; buckets.set(k, (buckets.get(k) || 0) + 1);
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
+  if (!buckets.size) return [];
+  // every window, quiet ones included, so "a typical window" really is typical
+  const last = Math.max(...buckets.keys()), chat = [];
+  for (let k = 0; k <= last; k += 30) chat.push([k, buckets.get(k) || 0]);
+  console.log(`job ${job.id}: chat replay read, ${chat.reduce((a, x) => a + x[1], 0)} messages`);
+  return chat;
+}
+
 async function processJob(job) {
   progress(job, 'downloading', 1, 'Downloading audio…'); lastProg = 0;
   const src = await downloadAudio(job);
@@ -268,11 +313,12 @@ async function processJob(job) {
     segs = fs.existsSync(`${src}.0-end.json`) ? JSON.parse(fs.readFileSync(`${src}.0-end.json`, 'utf8')) : await transcribe(job, src, dur, from, to);
   } else {
     const tt = Date.now();
+    const chatP = chatActivity(job).catch(() => []);   // runs alongside transcription (capped at 6 min), so it rarely adds time
     segs = await transcribe(job, src, dur);
     console.log(`job ${job.id}: ${Math.round(dur / 60)} min of audio transcribed in ${Math.round((Date.now() - tt) / 1000)}s`);
     lastProg = 0; progress(job, 'picking', 66, 'Picking the best moments…', { duration: dur });
     // generous timeout: Render may be waking up AND Haiku reading a long transcript (a retry reuses the server's same call)
-    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })) }, { tries: 6, timeout: 240000 });
+    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })), chat: await chatP }, { tries: 6, timeout: 240000 });
     moments = r.moments || [];
     if (!moments.length) throw new Error('No good moments found in this video');
   }
@@ -282,11 +328,16 @@ async function processJob(job) {
     if (m.end - m.start < 3) continue;
     lastProg = 0; progress(job, 'rendering', 68 + 30 * i / moments.length, `Editing clip ${i + 1} of ${moments.length}…`);
     const { video, thumb } = await render(job, m, i, segs, 68 + 30 * i / moments.length);
+    // a failed check (ffprobe hiccup) keeps the clip: render() already produces these specs, the check is a safety net
+    const bad = await specProblems(video).catch(e => { console.error(`job ${job.id}: spec check skipped for clip ${i + 1}: ${e.message.slice(0, 120)}`); return []; });
+    if (bad.length) { console.error(`job ${job.id}: clip ${i + 1} skipped, fails TikTok specs: ${bad.join(', ')}`); continue; }
+    // the music check goes first: it's the one that doesn't depend on the AI, so it must survive the 4-flag cap
+    const flags = [...new Set([musicFlag(segs, m), ...(moments[i].flags || [])].filter(Boolean))].slice(0, 4);
     const [url, thumbUrl] = [await store(video, 'video/mp4'), await store(thumb, 'image/jpeg')];
-    clips.push({ ...moments[i], start: m.start, end: m.end, url, thumb: thumbUrl });
+    clips.push({ ...moments[i], flags, start: m.start, end: m.end, url, thumb: thumbUrl });
   }
   fs.rmSync(path.join(dirs.work, job.id), { recursive: true, force: true });
-  if (!clips.length) throw new Error('Every picked moment was too short to cut');
+  if (!clips.length) throw new Error('None of the picked moments made a usable clip (too short or failed the format check)');
   return clips;
 }
 
