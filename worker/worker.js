@@ -220,7 +220,7 @@ async function render(job, m, i, segs, pctFrom) {
   const dir = path.join(dirs.work, job.id); fs.mkdirSync(dir, { recursive: true });
   const len = +(m.end - m.start).toFixed(2);
   const words = segs.flatMap(s => s.w).filter(([ws, we]) => we > m.start && ws < m.end).map(([ws, we, w]) => [Math.max(0, ws - m.start), Math.min(len, we - m.start), w]);
-  fs.writeFileSync(path.join(dir, 'sub.ass'), buildAss({ words, hook: m.hook, layout: job.layout, duration: len }));
+  fs.writeFileSync(path.join(dir, 'sub.ass'), buildAss({ words, layout: job.layout, duration: len }));
   const t0 = Date.now();
   const { file: src, pad } = await downloadSection(job, m, pctFrom);
   const t1 = Date.now();

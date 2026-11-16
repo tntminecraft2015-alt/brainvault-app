@@ -1769,7 +1769,7 @@
 
     <!-- CLIPS tab: find streamer moments → the clip worker cuts them → review + post -->
     <div class="mob-tab-pane clips-pane" id="mobTabClips">
-      <div class="home-hd"><div class="home-hd-txt"><div class="home-day">Clips</div><div class="home-date" id="clipsSub">Find it, clip it, post it</div></div></div>
+      <div class="home-hd"><div class="home-hd-txt"><div class="home-day">Clips</div><div class="home-date" id="clipsSub">Find it, clip it, post it</div></div><button type="button" class="ed-round" onclick="openClipsSettings()" aria-label="Clip settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
       <div class="cal-seg clp-seg" id="clipsSeg"><button type="button" data-v="find" onclick="setClipsView('find')">Find</button><button type="button" data-v="review" onclick="setClipsView('review')">Review</button><button type="button" data-v="campaigns" onclick="setClipsView('campaigns')">Campaigns</button><button type="button" data-v="stats" onclick="setClipsView('stats')">Stats</button></div>
       <div class="clp-view" data-v="find"></div>
       <div class="clp-view" data-v="review"></div>
@@ -8072,6 +8072,7 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
 <style>
   .clp-seg { align-self:flex-start; margin:10px 0 14px; }
   .clp-seg button { font-size:13px; padding:7px 14px; min-height:36px; }
+  .clp-seg .n { display:inline-block; min-width:18px; margin-left:5px; padding:0 5px; border-radius:999px; background:var(--accent); color:#1a0e08; font-size:11px; font-weight:800; line-height:18px; text-align:center; }
   .clp-view { display:none; flex-direction:column; gap:12px; }
   .clp-view.on { display:flex; }
   .clp-card { background:rgba(223,238,255,.045); border-radius:22px; padding:14px 16px; }
@@ -8082,45 +8083,87 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-note { background:rgba(255,181,71,.1); color:#ffd59a; border-radius:16px; padding:12px 14px; font-size:13px; line-height:1.45; }
   .clp-note b { color:#ffe2b8; }
   .clp-chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .clp-chips.scroll { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; margin:0 -2px; padding:0 2px; }
+  .clp-chips.scroll::-webkit-scrollbar { display:none; }
+  .clp-chips.scroll .clp-chip { flex-shrink:0; }
   .clp-chip { border:none; border-radius:999px; background:rgba(223,238,255,.07); color:var(--fg); font-family:inherit; font-size:13px; font-weight:700; min-height:34px; padding:0 12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
   .clp-chip.on { background:var(--fg); color:var(--bg); }
+  .clp-chip:disabled { opacity:.4; cursor:default; }
   .clp-chip .x { opacity:.55; font-weight:800; }
-  .clp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
-  .clp-item { background:rgba(223,238,255,.045); border-radius:20px; overflow:hidden; display:flex; flex-direction:column; }
-  .clp-thumb { position:relative; aspect-ratio:16/9; background:#0c1a2a center/cover no-repeat; }
-  .clp-badge { position:absolute; left:8px; top:8px; border-radius:999px; padding:3px 9px; font-size:11.5px; font-weight:800; background:rgba(10,20,32,.82); color:var(--fg); }
+  .clp-lbl { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--fg-dim); }
+  /* Find */
+  .clp-auto { display:flex; align-items:center; gap:10px; width:100%; border:none; text-align:left; cursor:pointer; color:var(--fg); font-family:inherit; }
+  .clp-auto .dot { width:9px; height:9px; border-radius:50%; background:rgba(223,238,255,.25); flex-shrink:0; }
+  .clp-auto .dot.on { background:#6fd38a; box-shadow:0 0 0 4px rgba(111,211,138,.15); }
+  .clp-auto .t { flex:1; min-width:0; }
+  .clp-auto .chev { color:var(--fg-dim); font-size:18px; }
+  .clp-list { display:flex; flex-direction:column; gap:2px; }
+  .clp-item { display:flex; gap:12px; align-items:flex-start; padding:8px; margin:0 -8px; border-radius:16px; cursor:pointer; }
+  .clp-item:hover, .clp-item:focus-visible { background:rgba(223,238,255,.045); outline:none; }
+  .clp-thumb { position:relative; width:128px; aspect-ratio:16/9; border-radius:12px; flex-shrink:0; background:#0c1a2a center/cover no-repeat; }
+  .clp-badge { position:absolute; left:5px; top:5px; border-radius:999px; padding:2px 7px; font-size:10.5px; font-weight:800; background:rgba(10,20,32,.82); color:var(--fg); }
   .clp-badge.live { background:#e5484d; color:#fff; }
-  .clp-score { position:absolute; right:8px; top:8px; border-radius:999px; padding:3px 9px; font-size:12px; font-weight:800; background:#ffb547; color:#241505; }
-  .clp-dur { position:absolute; right:8px; bottom:8px; border-radius:6px; padding:2px 6px; font-size:11.5px; font-weight:700; background:rgba(10,20,32,.82); }
-  .clp-body { padding:10px 12px 12px; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .clp-score { display:inline-block; border-radius:999px; padding:1px 7px; font-size:11.5px; font-weight:800; background:#ffb547; color:#241505; margin-right:4px; }
+  .clp-dur { position:absolute; right:5px; bottom:5px; border-radius:6px; padding:1px 5px; font-size:10.5px; font-weight:700; background:rgba(10,20,32,.82); }
+  .clp-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
   .clp-title { font-size:14px; font-weight:700; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .clp-why { font-size:12.5px; color:#ffd59a; }
-  .clp-body .farm-btn { margin-top:auto; }
+  .clp-body .farm-btn { align-self:flex-start; margin-top:4px; }
+  .clp-iconbtn { border:none; background:rgba(223,238,255,.07); color:var(--fg); width:36px; height:36px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+  .clp-iconbtn svg { width:17px; height:17px; }
+  .clp-iconbtn:disabled { opacity:.3; cursor:default; }
+  /* Review: one clip at a time */
   .clp-bar { height:6px; border-radius:3px; background:rgba(223,238,255,.1); overflow:hidden; }
   .clp-bar i { display:block; height:100%; background:var(--accent); border-radius:3px; transition:width .4s; }
-  .clp-job { display:flex; gap:12px; align-items:center; }
-  .clp-job-th { width:72px; height:44px; border-radius:10px; flex-shrink:0; background:#0c1a2a center/cover no-repeat; }
-  .clp-clip { display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr); gap:14px; }
-  .clp-clip video { width:100%; aspect-ratio:9/16; border-radius:16px; background:#000; object-fit:cover; }
-  .clp-clip .as-inp { font-size:14px; }
-  .clp-clip textarea.as-inp { resize:vertical; min-height:64px; line-height:1.4; }
+  .clp-job { display:flex; gap:12px; align-items:center; padding:10px 14px; }
+  .clp-job-th { width:56px; height:34px; border-radius:8px; flex-shrink:0; background:#0c1a2a center/cover no-repeat; }
+  .clp-rv { display:flex; flex-direction:column; gap:12px; }
+  .clp-rv-hd { display:flex; align-items:center; gap:8px; }
+  .clp-rv-hd .c { flex:1; font-size:14px; font-weight:700; }
+  .clp-rv-hd .c span { color:var(--fg-dim); font-weight:600; }
+  .clp-player { position:relative; align-self:center; height:min(50vh,520px); max-width:100%; aspect-ratio:9/16; border-radius:18px; overflow:hidden; background:#000 center/cover no-repeat; cursor:pointer; }
+  .clp-player video { width:100%; height:100%; object-fit:cover; display:block; background:transparent; }
+  .clp-play { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+  .clp-play i { width:64px; height:64px; border-radius:50%; background:rgba(10,20,32,.6); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  .clp-play svg { width:26px; height:26px; margin-left:4px; fill:#fff; }
+  .clp-player.playing .clp-play { display:none; }
+  .clp-player .clp-load { position:absolute; left:10px; bottom:10px; font-size:11.5px; font-weight:700; color:#fff; background:rgba(10,20,32,.7); border-radius:999px; padding:3px 9px; }
+  .clp-player.playing .clp-load, .clp-player.ready .clp-load { display:none; }
+  .clp-meta { display:flex; flex-direction:column; gap:4px; }
+  .clp-meta .t { font-size:16px; font-weight:800; line-height:1.3; }
+  .clp-meta .one { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clp-meta .cap { font-size:13.5px; color:var(--fg); opacity:.8; line-height:1.4; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; }
+  .clp-big { display:flex; gap:10px; }
+  .clp-big .farm-btn { min-height:52px; font-size:15.5px; }
+  .clp-big .farm-btn.reject { flex:0 0 38%; }
+  .clp-links { display:flex; justify-content:center; gap:4px; flex-wrap:wrap; }
+  .clp-link { border:none; background:none; color:var(--fg-dim); font-family:inherit; font-size:13.5px; font-weight:700; padding:8px 12px; border-radius:999px; cursor:pointer; }
+  .clp-link:hover, .clp-link.on { color:var(--fg); background:rgba(223,238,255,.06); }
+  .clp-edit { display:flex; flex-direction:column; gap:8px; }
+  .clp-edit .as-inp { font-size:14px; }
+  .clp-edit textarea.as-inp { resize:vertical; min-height:64px; line-height:1.4; }
   .clp-tags { font-size:12.5px; color:#8fc8ff; word-break:break-word; }
   .clp-status { display:inline-block; border-radius:999px; padding:2px 9px; font-size:11.5px; font-weight:800; background:rgba(223,238,255,.08); }
   .clp-status.approved { background:rgba(111,211,138,.18); color:#8fe3a6; }
   .clp-status.posted { background:rgba(102,200,255,.18); color:#9ad8ff; }
+  /* Stats */
   .clp-tiles { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
   .clp-tile { background:rgba(223,238,255,.045); border-radius:20px; padding:14px 16px; }
   .clp-tile .v { font-family:var(--font-display); font-size:26px; font-weight:700; letter-spacing:-.02em; }
   .clp-tile .l { font-size:12px; color:var(--fg-dim); margin-top:2px; }
+  .clp-done { display:flex; gap:12px; align-items:flex-start; }
+  .clp-done .th { width:54px; aspect-ratio:9/16; border-radius:10px; flex-shrink:0; background:#0c1a2a center/cover no-repeat; display:block; }
   .clp-empty { text-align:center; color:var(--fg-dim); font-size:13.5px; padding:26px 12px; line-height:1.5; }
-  @media (max-width:520px){ .clp-clip { grid-template-columns:1fr; } .clp-clip video { max-height:50vh; width:auto; max-width:100%; justify-self:center; } }
+  .clp-sw { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 </style>
 <script>
-// Clip Studio front end. Server side: clipper.js (/api/clips/*). Heavy lifting: worker/ on the Oracle VM.
+// Clip Studio front end. Server side: clipper.js (/api/clips/*). Heavy lifting: worker/ on Render.
 let clipsView='find', clipsState=null, clipsTrend=null, clipsFilter='all', clipsStats=null, clipsPoll=null;
-const clipsBlobs={};   // clip id → File, fetched ahead so the iOS share sheet opens on the next tap
+let clipsCur={ id:null, idx:0 }, clipsEditing=false;   // which clip the reviewer is on
+const clipsBlobs={}, clipsBlobUrls={};   // clip id → File (and its object URL), fetched ahead so playback and the iOS share sheet are instant
 const CLP_LAYOUTS=[['blur','Full frame','The whole stream, centered on a blurred background'],['split','Facecam + game','Facecam corner on top, gameplay below'],['center','Center crop','Zoomed into the middle']];
 const CLP_CORNERS=[['tl','Top left'],['tr','Top right'],['bl','Bottom left'],['br','Bottom right']];
+const CLP_IC={ prev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>', next:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>', refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>', play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>' };
 
 async function clipsApi(path,opts={}){
   const r=await fetch(`${SERVER}${path}`,{...opts,headers:{'Content-Type':'application/json',...(opts.headers||{})},body:opts.body&&typeof opts.body!=='string'?JSON.stringify(opts.body):opts.body,signal:AbortSignal.timeout(opts.timeout||20000)});
@@ -8133,20 +8176,30 @@ const clpDur=s=>{ s=Math.round(s||0); const h=Math.floor(s/3600),m=Math.floor(s%
 const clpNum=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(n>=1e4?0:1)+'K':String(n||0);
 const clpActive=j=>!['done','failed'].includes(j.status);
 const clpView=v=>document.querySelector(`#mobTabClips .clp-view[data-v="${v}"]`);
+// every real clip with its job (re-cut jobs only hold a copy; the clip itself lives in the original job)
+const clpAll=()=>(clipsState?.jobs||[]).filter(j=>j.type!=='render').flatMap(j=>(j.clips||[]).map(c=>({j,c})));
+// waiting on you: newest job first, in the order the clips were picked. A clip being posted drops out right away.
+const clpPosting=c=>!!c.posting&&Date.now()-new Date(c.posting)<6e5;
+const clpQueue=()=>clpAll().filter(({c})=>c.status==='review'&&!clpPosting(c));
 
 function renderClips(){
-  document.querySelectorAll('#clipsSeg button').forEach(b=>b.classList.toggle('active',b.dataset.v===clipsView));
   document.querySelectorAll('#mobTabClips .clp-view').forEach(v=>v.classList.toggle('on',v.dataset.v===clipsView));
+  clipsSegCounts();
   if(!clipsState) clipsLoadState().then(()=>renderClips());
   ({find:clipsRenderFind,review:clipsRenderReview,campaigns:clipsRenderCampaigns,stats:clipsRenderStats})[clipsView]?.();
   clipsSchedulePoll();
 }
-function setClipsView(v){ clipsView=v; renderClips(); }
+function clipsSegCounts(){
+  const n=clipsState?clpQueue().length:0, act=(clipsState?.jobs||[]).filter(clpActive).length;
+  const sub=document.getElementById('clipsSub'); if(sub&&clipsState) sub.textContent=act?`${act} job${act>1?'s':''} running`+(n?` · ${n} to review`:''):n?`${n} clip${n>1?'s':''} to review`:'Find it, clip it, post it';
+  document.querySelectorAll('#clipsSeg button').forEach(b=>{ b.classList.toggle('active',b.dataset.v===clipsView); if(b.dataset.v==='review') b.innerHTML=`Review${n?`<span class="n">${n}</span>`:''}`; });
+}
+function setClipsView(v){ clipsView=v; clipsEditing=false; renderClips(); }
+// re-draw whichever view shows clips, after a clip changed
+function clipsRefresh(){ clipsSegCounts(); if(clipsView==='review') clipsRenderReview(); else if(clipsView==='stats') clipsRenderStats(); }
 async function clipsLoadState(){
   try{ clipsState=await clipsApi('/api/clips/state'); }catch(e){ clipsState=clipsState||{streamers:[],campaigns:[],jobs:[],err:e.message}; }
-  // re-cut jobs also hold a copy of their clip (the real one lives in the original job), so skip them
-  const n=(clipsState.jobs||[]).filter(j=>j.type!=='render').reduce((a,j)=>a+(j.clips||[]).filter(c=>c.status==='review').length,0), act=(clipsState.jobs||[]).filter(clpActive).length;
-  const sub=document.getElementById('clipsSub'); if(sub) sub.textContent=act?`${act} job${act>1?'s':''} running`+(n?` · ${n} to review`:''):n?`${n} clip${n>1?'s':''} to review`:'Find it, clip it, post it';
+  clipsSegCounts();
   return clipsState;
 }
 // While a job runs and you're looking at the tab, refresh every 8s. Nothing polls when the tab is hidden,
@@ -8155,33 +8208,39 @@ function clipsSchedulePoll(){
   clearTimeout(clipsPoll);
   const pane=document.getElementById('mobTabClips');
   if(!pane?.classList.contains('active') || document.hidden || !(clipsState?.jobs||[]).some(clpActive)) return;
-  clipsPoll=setTimeout(async()=>{ await clipsLoadState(); if(clipsView==='review') clipsRenderReview(); clipsSchedulePoll(); },8000);
+  clipsPoll=setTimeout(async()=>{ await clipsLoadState(); clipsRefresh(); clipsSchedulePoll(); },8000);
 }
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && document.getElementById('mobTabClips')?.classList.contains('active')) clipsLoadState().then(renderClips); });
 
-// ── FIND: setup notes, paste-a-link, my streamers, trending ──
+// ── FIND: autopilot line, paste-a-link, my streamers, trending ──
 function clipsSetupNote(){
   if(!clipsState||clipsState.err) return clipsState?.err?`<div class="clp-note">Couldn't reach the server: ${esc(clipsState.err)}</div>`:'';
   const miss=[]; if(!clipsState.worker) miss.push('<b>Clip worker</b>: set WORKER_URL and WORKER_SECRET on Render (see worker/README.md)'); if(!clipsState.twitch) miss.push('<b>Twitch</b>: set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET on Render to see trending videos');
   return miss.length?`<div class="clp-note">Setup left:<br>${miss.join('<br>')}</div>`:'';
 }
+function clipsAutoLine(){
+  const a=clipsState?.autopilot||{on:false,perDay:10}, yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{};
+  const last=a.lastPick?`Last pick ${clpAgo(a.lastPick.at)}: ${esc(a.lastPick.title)}`:a.lastRun?`Last checked ${clpAgo(a.lastRun)}`:'Checks for new VODs every 2 hours';
+  const acct=[yt.connected&&'YouTube',tt.connected&&'TikTok'].filter(Boolean);
+  const warn=yt.error||tt.error?'<span style="color:#ff9b9b"> · account needs attention</span>':'';
+  return `<button type="button" class="clp-card clp-auto" onclick="openClipsSettings()"><span class="dot${a.on?' on':''}"></span>
+    <span class="t"><span class="clp-card-t">Autopilot ${a.on?`on · ${a.perDay}/day`:'off'}</span><span class="clp-s" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.on?last:'Turn on to get clips without searching'}${acct.length?` · posting to ${acct.join(' + ')}`:''}${warn}</span></span><span class="chev">›</span></button>`;
+}
 function clipsRenderFind(){
   const el=clpView('find'); if(!el) return;
-  const st=clipsState||{streamers:[]};
-  el.innerHTML=`${clipsSetupNote()}
-    ${clipsAutopilotCard()}
-    <div class="clp-card"><div class="clp-card-t">Clip a link</div><div class="clp-s" style="margin:2px 0 10px">A Twitch VOD or clip, a YouTube video, or a campaign's source link.</div>
-      <div class="clp-row"><input id="clpLink" class="as-inp" type="url" inputmode="url" placeholder="https://www.twitch.tv/videos/…" autocomplete="off"><button type="button" class="farm-btn sm primary" onclick="openClipSheet({url:document.getElementById('clpLink').value.trim()})">Clip</button></div></div>
-    <div class="clp-card"><div class="clp-card-t">My streamers</div><div class="clp-s" style="margin:2px 0 10px">Their latest VODs and top clips show up below. Only clip streamers who allow it (a Whop campaign or a public "clip me" rule).</div>
-      <div class="clp-chips">${st.streamers.map(s=>`<button type="button" class="clp-chip" onclick="openStreamerSheet('${esc(s.login)}')">${esc(s.login)} <span class="x">⋯</span></button>`).join('')}<button type="button" class="clp-chip" onclick="openStreamerSheet()">+ Add</button></div></div>
-    <div class="clp-row" style="justify-content:space-between"><div class="clp-chips" id="clpFilters">${[['all','All'],['mine','My streamers'],['clip','Clips'],['vod','VODs'],['live','Live now']].map(([k,l])=>`<button type="button" class="clp-chip${clipsFilter===k?' on':''}" onclick="clipsFilter='${k}';clipsRenderTrend()">${l}</button>`).join('')}</div>
-      <button type="button" class="farm-btn sm ghost" onclick="clipsTrend=null;clipsRenderTrend(true)">Refresh</button></div>
+  const st=clipsState||{streamers:[]}, typed=document.getElementById('clpLink')?.value||'';
+  el.innerHTML=`${clipsSetupNote()}${clipsAutoLine()}
+    <div class="clp-row"><input id="clpLink" class="as-inp" type="url" inputmode="url" placeholder="Paste a Twitch or YouTube link" autocomplete="off" aria-label="Video link" value="${esc(typed)}" onkeydown="if(event.key==='Enter')openClipSheet({url:this.value.trim()})"><button type="button" class="farm-btn sm primary" onclick="openClipSheet({url:document.getElementById('clpLink').value.trim()})">Clip</button></div>
+    <div><div class="clp-lbl" style="margin:2px 0 8px">My streamers</div>
+      <div class="clp-chips scroll">${st.streamers.map(s=>`<button type="button" class="clp-chip" onclick="openStreamerSheet('${esc(s.login)}')">${esc(s.login)}</button>`).join('')}<button type="button" class="clp-chip" onclick="openStreamerSheet()">+ Add</button></div></div>
+    <div class="clp-row" style="flex-wrap:nowrap"><div class="clp-chips scroll" id="clpFilters" style="flex:1;min-width:0">${[['all','All'],['mine','My streamers'],['clip','Clips'],['vod','VODs'],['live','Live now']].map(([k,l])=>`<button type="button" class="clp-chip${clipsFilter===k?' on':''}" data-f="${k}" onclick="clipsFilter='${k}';clipsRenderTrend()">${l}</button>`).join('')}</div>
+      <button type="button" class="clp-iconbtn" aria-label="Refresh trending" onclick="clipsTrend=null;clipsRenderTrend(true)">${CLP_IC.refresh}</button></div>
     <div id="clpTrend"></div>`;
   clipsRenderTrend(!clipsTrend);
 }
 async function clipsRenderTrend(load){
   const box=document.getElementById('clpTrend'); if(!box) return;
-  document.querySelectorAll('#clpFilters .clp-chip').forEach((b,i)=>b.classList.toggle('on',['all','mine','clip','vod','live'][i]===clipsFilter));
+  document.querySelectorAll('#clpFilters .clp-chip').forEach(b=>b.classList.toggle('on',b.dataset.f===clipsFilter));
   if(load||!clipsTrend){
     box.innerHTML='<div class="clp-empty">Checking what\'s hot on Twitch…</div>';
     try{ clipsTrend=await clipsApi('/api/clips/trending'); }catch(e){ box.innerHTML=`<div class="clp-empty">Couldn't load trending: ${esc(e.message)}</div>`; return; }
@@ -8193,16 +8252,44 @@ async function clipsRenderTrend(load){
   items.sort((a,b)=>(b.score||0)-(a.score||0)||b.velocity-a.velocity);
   if(!items.length){ box.innerHTML=`<div class="clp-empty">${clipsFilter==='mine'?'Add a streamer above to see their latest VODs and clips here.':'Nothing here right now.'}</div>`; return; }
   window.__clpItems=items;
-  box.innerHTML=`<div class="clp-grid">${items.slice(0,40).map((i,n)=>`<div class="clp-item">
-      <div class="clp-thumb" style="background-image:url('${esc(i.thumb||'')}')"><span class="clp-badge${i.kind==='live'?' live':''}">${i.kind==='live'?'LIVE':i.kind==='vod'?'VOD':'CLIP'}</span>${i.score?`<span class="clp-score">${i.score}/10</span>`:''}${i.duration?`<span class="clp-dur">${clpDur(i.duration)}</span>`:''}</div>
-      <div class="clp-body"><div class="clp-title">${esc(i.title||'Untitled')}</div>
-        <div class="clp-s">${esc(i.channel)} · ${clpNum(i.views)} ${i.kind==='live'?'watching':'views'} · ${clpAgo(i.date)}${i.game?` · ${esc(i.game)}`:''}</div>
+  box.innerHTML=`<div class="clp-list">${items.slice(0,40).map((i,n)=>{ const live=i.kind==='live';
+    return `<div class="clp-item" ${live?'':`role="button" tabindex="0" onclick="openClipSheet(window.__clpItems[${n}])" onkeydown="if(event.key==='Enter')this.click()"`}>
+      <div class="clp-thumb" style="background-image:url('${esc(i.thumb||'')}')"><span class="clp-badge${live?' live':''}">${live?'LIVE':i.kind==='vod'?'VOD':'CLIP'}</span>${i.duration?`<span class="clp-dur">${clpDur(i.duration)}</span>`:''}</div>
+      <div class="clp-body"><div class="clp-title">${i.score?`<span class="clp-score">${i.score}/10</span>`:''}${esc(i.title||'Untitled')}</div>
+        <div class="clp-s">${esc(i.channel)} · ${clpNum(i.views)} ${live?'watching':'views'} · ${clpAgo(i.date)}${i.game?` · ${esc(i.game)}`:''}</div>
         ${i.why?`<div class="clp-why">${esc(i.why)}</div>`:''}
-        ${i.kind==='live'
-          ?`<button type="button" class="farm-btn sm" onclick="${i.saved?`showToast('Its VOD shows up here after the stream ends')`:`clipsAddStreamer('${esc(i.login)}')`}">${i.saved?'Saved: clip the VOD later':'Follow this streamer'}</button>`
-          :`<button type="button" class="farm-btn sm primary" onclick="openClipSheet(window.__clpItems[${n}])">Clip this</button>`}
-      </div></div>`).join('')}</div>`;
+        ${live?`<button type="button" class="farm-btn sm" onclick="${i.saved?`showToast('Its VOD shows up here after the stream ends')`:`clipsAddStreamer('${esc(i.login)}')`}">${i.saved?'Saved: clip the VOD later':'Follow this streamer'}</button>`:''}
+      </div></div>`; }).join('')}</div>`;
 }
+
+// ── SETTINGS (gear): autopilot + connected accounts ──
+function openClipsSettings(){ farmSheet('clpSetOv',clipsSettingsHTML()); }
+function clipsSettingsHTML(){
+  const a=clipsState?.autopilot||{on:false,perDay:10,youtube:[]}, yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{};
+  const last=a.lastPick?`Last pick: <b>${esc(a.lastPick.title)}</b> · ${clpAgo(a.lastPick.at)}`:a.lastRun?`Last checked ${clpAgo(a.lastRun)}`:'Checks for new VODs every 2 hours.';
+  return `<div class="clp-card-t" style="font-size:18px">Clip settings</div>
+    <div class="as-label">Autopilot</div>
+    <div class="clp-sw"><div class="clp-s" style="flex:1">Keeps about ${a.perDay} clips a day waiting for you, from campaigns, your streamers and the YouTube channels below.<br>${last}</div>
+      <button type="button" class="clp-chip${a.on?' on':''}" style="min-width:64px;justify-content:center" onclick="clipsAutopilot({on:${!a.on}})">${a.on?'On':'Off'}</button></div>
+    <div class="clp-row" style="margin-top:10px"><span class="clp-s" style="margin-right:4px">Clips a day</span>${[5,10,20].map(n=>`<button type="button" class="clp-chip${a.perDay===n?' on':''}" onclick="clipsAutopilot({perDay:${n}})">${n}</button>`).join('')}</div>
+    <div class="as-label">YouTube channels to clip</div>
+    <div class="clp-s" style="margin:-4px 0 8px">Only creators who allow clipping.</div>
+    <div class="clp-chips" style="margin-bottom:8px">${(a.youtube||[]).map(y=>`<button type="button" class="clp-chip" aria-label="Remove ${esc(y.name)}" onclick="clipsAutopilot({removeYoutube:'${esc(y.url)}'})">${esc(y.name)} <span class="x">×</span></button>`).join('')||'<span class="clp-s">None yet</span>'}</div>
+    <div class="clp-row"><input id="clpYtChan" class="as-inp" type="url" placeholder="https://www.youtube.com/@channel" autocomplete="off" aria-label="YouTube channel link"><button type="button" class="farm-btn sm" onclick="clipsAutopilot({addYoutube:document.getElementById('clpYtChan').value.trim()})">Add</button></div>
+    <div class="as-label">Posting accounts</div>
+    <div class="clp-sw"><div class="clp-s">${yt.connected?`YouTube: <b>${esc(yt.channel?.title||'your channel')}</b>${yt.today?` · ${yt.today} today (limit ~6)`:''}`:yt.error?`<span style="color:#ff9b9b">YouTube: ${esc(yt.error)}</span>`:yt.configured?'YouTube not connected.':'YouTube posting needs setup (YT_CLIENT_ID / YT_CLIENT_SECRET on Render).'}</div>
+      ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('youtube')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect</a>`):''}</div>
+    <div class="clp-sw" style="margin-top:10px"><div class="clp-s">${tt.connected?`TikTok: <b>${esc(tt.user?.name||'your account')}</b>`:tt.error?`<span style="color:#ff9b9b">TikTok: ${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
+      ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect</a>`):''}</div>`;
+}
+function clipsSettingsRedraw(){ const sh=document.querySelector('#clpSetOv .mc-sheet'); if(sh) sh.innerHTML='<div class="as-grab"></div>'+clipsSettingsHTML(); if(clipsView==='find') clipsRenderFind(); }
+async function clipsAutopilot(patch){
+  if(patch.addYoutube===''){ return showToast('Paste a YouTube channel link first'); }
+  try{ const d=await clipsApi('/api/clips/autopilot',{method:'POST',body:patch}); clipsState.autopilot={...(clipsState.autopilot||{}),...d}; if(patch.on) showToast('Autopilot on. First check within a few minutes.'); }
+  catch(e){ showToast(e.message); }
+  clipsSettingsRedraw();
+}
+async function clipsDisconnect(p){ try{ await clipsApi(`/api/clips/${p}/disconnect`,{method:'POST'}); await clipsLoadState(); clipsSettingsRedraw(); }catch(e){ showToast(e.message); } }
 
 // ── streamer + clip-job sheets ──
 async function clipsAddStreamer(login,layout,corner,remove){
@@ -8218,7 +8305,7 @@ const clpPicked=(ov,attr)=>ov.querySelector(`.clp-chip.on[data-${attr}]`)?.datas
 function openStreamerSheet(login){
   const s=login&&clipsState.streamers.find(x=>x.login===login);
   const ov=farmSheet('clpStreamerOv',`<div class="clp-card-t" style="font-size:18px">${s?esc(s.login):'Add a streamer'}</div>
-    ${s?'':`<div class="as-label">Twitch username</div><input id="clpSLogin" class="as-inp" autocomplete="off" autocapitalize="off" placeholder="e.g. kaicenat">`}
+    ${s?'':`<div class="clp-s" style="margin-top:4px">Their latest VODs and top clips show up in Find. Only clip streamers who allow it (a Whop campaign or a public "clip me" rule).</div><div class="as-label">Twitch username</div><input id="clpSLogin" class="as-inp" autocomplete="off" autocapitalize="off" placeholder="e.g. kaicenat">`}
     ${clpLayoutPicker('sl',s?.layout||'blur',s?.corner)}
     <div class="clp-row" style="margin-top:18px"><button type="button" class="farm-btn primary" id="clpSSave">Save</button>${s?`<button type="button" class="farm-btn ghost" onclick="clipsAddStreamer('${esc(s.login)}',null,null,true)">Remove</button>`:''}</div>`);
   ov.querySelector('#clpSSave').onclick=()=>{ const l=s?s.login:ov.querySelector('#clpSLogin').value.trim(); if(!l) return showToast('Type their Twitch username'); clipsAddStreamer(l,clpPicked(ov,'sl'),clpPicked(ov,'corner')); };
@@ -8245,60 +8332,98 @@ function openClipSheet(item){
     try{
       const d=await clipsApi('/api/clips/jobs',{method:'POST',timeout:30000,body:{url:item.url,title:item.title,channel:item.channel,login:item.login,thumb:item.thumb,kind:item.kind,start,end,campaignId:ov.querySelector('#clpCamp')?.value||'',layout:clpPicked(ov,'jl'),corner:clpPicked(ov,'corner')}});
       ov.remove(); clipsState.jobs=[d.job,...(clipsState.jobs||[])];
+      const link=document.getElementById('clpLink'); if(link&&link.value.trim()===item.url) link.value='';
       showToast(d.delivered?'Sent to the clip worker':d.workerConfigured?'Queued. The worker will pick it up when it\'s back.':'Queued. Set up the clip worker to start.');
       setClipsView('review');
     }catch(err){ showToast(err.message); e.target.disabled=false; e.target.textContent='Start clipping'; }
   };
 }
 
-// ── REVIEW: running jobs + clips waiting on you ──
-function clipsRenderReview(){
-  const el=clpView('review'); if(!el) return;
-  const jobs=clipsState?.jobs||[];
-  const running=jobs.filter(j=>clpActive(j)||j.status==='failed');
-  const withClips=jobs.filter(j=>j.type!=='render'&&(j.clips||[]).some(c=>c.status!=='rejected'));
-  // don't wipe a caption the user is typing in
-  if(el.contains(document.activeElement)&&document.activeElement.matches('textarea,input')){ el.querySelectorAll('[data-job-prog]').forEach(p=>{ const j=jobs.find(x=>x.id===p.dataset.jobProg); if(j){ p.querySelector('i').style.width=j.progress+'%'; p.nextElementSibling.textContent=j.msg||j.status; } }); return; }
-  el.innerHTML=(running.length?running.map(j=>`<div class="clp-card clp-job"><div class="clp-job-th" style="background-image:url('${esc(j.source?.thumb||'')}')"></div><div style="flex:1;min-width:0">
-      <div class="clp-title" style="-webkit-line-clamp:1">${j.type==='render'?'Re-cut: ':''}${esc(j.source?.title||'')}</div>
+// ── REVIEW: running jobs, then one clip at a time ──
+function clipsJobsHTML(){
+  const running=(clipsState?.jobs||[]).filter(j=>clpActive(j)||j.status==='failed');
+  return running.map(j=>`<div class="clp-card clp-job"><div class="clp-job-th" style="background-image:url('${esc(j.source?.thumb||'')}')"></div><div style="flex:1;min-width:0">
+      <div class="clp-title" style="-webkit-line-clamp:1;font-size:13.5px">${j.type==='render'?'Re-cut: ':''}${esc(j.source?.title||'')}</div>
       ${j.status==='failed'?`<div class="clp-s" style="color:#ff9b9b">${esc(j.error||'Failed')}</div><div class="clp-row" style="margin-top:6px"><button type="button" class="farm-btn sm" onclick="clipsJobAct('${j.id}','retry')">Try again</button><button type="button" class="farm-btn sm ghost" onclick="clipsJobAct('${j.id}','delete')">Remove</button></div>`
         :`<div class="clp-bar" data-job-prog="${j.id}" style="margin:6px 0 4px"><i style="width:${j.progress||2}%"></i></div><div class="clp-s">${esc(j.msg||j.status)}</div>`}
-    </div></div>`).join(''):'')
-  + (withClips.length?withClips.map(j=>`<div class="clp-s" style="margin:6px 2px -4px">${esc(j.source?.title||'')} · ${esc(j.source?.channel||'')}${j.campaignId?` · <b style="color:#ffd59a">${esc((clipsState.campaigns||[]).find(c=>c.id===j.campaignId)?.name||'campaign')}</b>`:''}</div>
-      ${(j.clips||[]).filter(c=>c.status!=='rejected').map(c=>clipCardHTML(j,c)).join('')}`).join('')
-    :running.length?'':'<div class="clp-empty">No clips yet. Pick a video in <b>Find</b> and the clips land here.</div>');
+    </div></div>`).join('');
 }
+function clipsRenderReview(force){
+  const el=clpView('review'); if(!el) return;
+  const jobs=clipsState?.jobs||[], q=clpQueue();
+  // a background refresh doesn't wipe a title/caption you're typing or a clip you've started watching: it only nudges the progress bars and the count
+  const v=el.querySelector('.clp-player video'), shown=el.querySelector('.clp-rv')?.dataset.clip?.split('|')[1], si=q.findIndex(x=>x.c.id===shown);
+  if(!force && si>=0 && ((el.contains(document.activeElement)&&document.activeElement.matches('textarea,input')) || (v&&(v.controls||!v.paused||v.currentTime>0)))){
+    clipsCur={ id:shown, idx:si };
+    el.querySelectorAll('[data-job-prog]').forEach(p=>{ const j=jobs.find(x=>x.id===p.dataset.jobProg); if(j){ p.querySelector('i').style.width=j.progress+'%'; p.nextElementSibling.textContent=j.msg||j.status; } });
+    const cnt=el.querySelector('.clp-rv-hd .c'); if(cnt) cnt.innerHTML=`${si+1} <span>of ${q.length} to review</span>`;
+    return;
+  }
+  let i=q.findIndex(x=>x.c.id===clipsCur.id);
+  if(i<0) i=Math.min(clipsCur.idx,Math.max(0,q.length-1));   // the clip you were on was posted/rejected: the next one slides into its place
+  if(clipsCur.id!==q[i]?.c.id) clipsEditing=false;
+  clipsCur={ id:q[i]?.c.id||null, idx:i };
+  const jobsHTML=clipsJobsHTML();
+  if(!q.length){
+    const done=clpAll().filter(({c})=>c.status==='approved'||c.status==='posted'||clpPosting(c)).length;
+    el.innerHTML=jobsHTML+(jobsHTML?'':`<div class="clp-empty">${done?`All caught up. Posted clips are in <b>Stats</b>.`:'No clips yet. Pick a video in <b>Find</b> and the clips land here.'}</div>`);
+    return;
+  }
+  const {j,c}=q[i], id=`${j.id}|${c.id}`, camp=j.campaignId&&(clipsState.campaigns||[]).find(x=>x.id===j.campaignId);
+  const canPost=clipsState?.youtube?.connected||clipsState?.tiktok?.connected;
+  const src=clipsBlobUrls[c.id]||c.url;
+  el.innerHTML=`${jobsHTML}<div class="clp-rv" data-clip="${esc(id)}">
+    <div class="clp-rv-hd"><button type="button" class="clp-iconbtn" aria-label="Previous clip" ${i?'':'disabled'} onclick="clipsGo(-1)">${CLP_IC.prev}</button>
+      <div class="c" style="text-align:center">${i+1} <span>of ${q.length} to review</span></div>
+      <button type="button" class="clp-iconbtn" aria-label="Next clip" ${i<q.length-1?'':'disabled'} onclick="clipsGo(1)">${CLP_IC.next}</button></div>
+    <div class="clp-player${clipsBlobUrls[c.id]?' ready':''}" style="background-image:url('${esc(c.thumb||'')}')" onclick="clipsTogglePlay(this)">
+      <video src="${esc(src)}" poster="${esc(c.thumb||'')}" preload="auto" playsinline aria-label="Clip preview"></video>
+      <div class="clp-play"><i>${CLP_IC.play}</i></div><span class="clp-load">Loading…</span></div>
+    <div class="clp-meta">
+      <div class="clp-s one">${clpDur(c.end-c.start)} · <b style="color:var(--fg)">${c.score}/10</b> · ${esc(j.source?.channel||'')}${camp?` · <b style="color:#ffd59a">${esc(camp.name)}</b>`:''}${c.why?` · <span title="${esc(c.why)}">${esc(c.why)}</span>`:''}</div>
+      <div class="t">${esc(c.title||'Untitled')}</div>
+      ${c.caption?`<div class="cap">${esc(c.caption)}</div>`:''}
+      ${c.recutting?'<div class="clp-note" style="padding:8px 12px">Re-cutting this one. The new version shows up here when it\'s done.</div>':''}
+    </div>
+    <div class="clp-edit" ${clipsEditing?'':'hidden'}>
+      <input class="as-inp" value="${esc(c.title||'')}" aria-label="Title" placeholder="Title (YouTube)" onchange="clipsSave('${esc(id)}',{title:this.value})">
+      <textarea class="as-inp" aria-label="Caption" placeholder="Caption" onchange="clipsSave('${esc(id)}',{caption:this.value})">${esc(c.caption||'')}</textarea>
+      <div class="clp-tags">${(c.hashtags||[]).map(h=>'#'+esc(h)).join(' ')}</div></div>
+    <div class="clp-big"><button type="button" class="farm-btn reject" onclick="clipsReject('${esc(id)}')">Reject</button><button type="button" class="farm-btn primary" onclick="clipsApprove('${esc(id)}',this)">${canPost?'Post':'Approve'}</button></div>
+    <div class="clp-links"><button type="button" class="clp-link${clipsEditing?' on':''}" onclick="clipsEditing=!clipsEditing;this.classList.toggle('on',clipsEditing);document.querySelector('#mobTabClips .clp-edit').hidden=!clipsEditing">Edit text</button><button type="button" class="clp-link" onclick="clipsRecut('${esc(id)}')">Re-cut</button>${i<q.length-1?`<button type="button" class="clp-link" onclick="clipsGo(1)">Skip</button>`:''}</div>
+  </div>`;
+  const vid=el.querySelector('.clp-player video'), pl=vid.parentNode;
+  vid.addEventListener('canplay',()=>pl.classList.add('ready'),{once:true});
+  vid.addEventListener('pause',()=>pl.classList.remove('playing'));
+  vid.addEventListener('play',()=>pl.classList.add('playing'));
+  clipsPrefetchAround(q,i);
+}
+function clipsTogglePlay(pl){ const v=pl.querySelector('video'); if(v.controls) return; if(v.paused){ v.play().catch(e=>showToast(e.message)); v.controls=true; } else v.pause(); }
+function clipsGo(d){ const q=clpQueue(), i=Math.max(0,Math.min(q.length-1,clipsCur.idx+d)); clipsCur={id:q[i]?.c.id||null,idx:i}; clipsEditing=false; document.querySelector('#mobTabClips .clp-player video')?.pause(); clipsRenderReview(true); }
+document.addEventListener('keydown',e=>{
+  if(clipsView!=='review'||!document.getElementById('mobTabClips')?.classList.contains('active')||e.target.matches?.('input,textarea,select,video')||document.querySelector('.overlay.active')) return;
+  if(e.key==='ArrowRight') clipsGo(1); else if(e.key==='ArrowLeft') clipsGo(-1);
+});
 function clpCaption(c){ return `${c.caption||''}${c.hashtags?.length?'\n\n'+c.hashtags.map(h=>'#'+h).join(' '):''}`.trim(); }
-function clipCardHTML(j,c){
-  const camp=j.campaignId&&(clipsState.campaigns||[]).find(x=>x.id===j.campaignId), id=`${j.id}|${c.id}`;
-  return `<div class="clp-card clp-clip" data-clip="${esc(id)}">
-    <video src="${esc(c.url)}" poster="${esc(c.thumb||'')}" preload="none" controls playsinline></video>
-    <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
-      <div class="clp-row"><span class="clp-status ${c.status}">${c.status==='review'?'To review':c.status==='approved'?'Approved':'Posted'}</span><span class="clp-s">${clpDur(c.end-c.start)} · ${c.score}/10${c.why?` · ${esc(c.why)}`:''}</span></div>
-      ${c.recutting?'<div class="clp-note" style="padding:8px 12px">Re-cutting this one…</div>':''}
-      <input class="as-inp" value="${esc(c.title||'')}" aria-label="YouTube title" onchange="clipsSave('${esc(id)}',{title:this.value})">
-      <textarea class="as-inp" aria-label="Caption" onchange="clipsSave('${esc(id)}',{caption:this.value})">${esc(c.caption||'')}</textarea>
-      <div class="clp-tags">${(c.hashtags||[]).map(h=>'#'+esc(h)).join(' ')}</div>
-      ${c.status==='review'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">${clipsState?.youtube?.connected||clipsState?.tiktok?.connected?'Approve &amp; post':'Approve'}</button><button type="button" class="farm-btn sm" onclick="clipsRecut('${esc(id)}')">Re-cut</button><button type="button" class="farm-btn sm ghost" onclick="clipsSave('${esc(id)}',{status:'rejected'},true)">Reject</button></div>`:''}
-      ${c.status!=='review'?clpYoutubeLine(id,c):''}
-      ${c.status==='approved'?`<div class="clp-row"><button type="button" class="farm-btn sm primary" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Save / Share'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button><button type="button" class="farm-btn sm" onclick="openClipPosted('${esc(id)}')">Mark posted</button></div>
-        <div class="clp-s">Save / Share copies the caption too, so you can paste it straight into TikTok or YouTube.</div>`:''}
-      ${c.status==='posted'?`<div class="clp-s">${['tiktok','youtube','instagram'].filter(p=>c.postLinks?.[p]).map(p=>`<a href="${esc(c.postLinks[p])}" target="_blank" rel="noopener" style="color:#8fc8ff">${p}</a>`).join(' · ')||'Posted'} · ${clpNum(c.views)} views</div>
-        <div class="clp-row"><button type="button" class="farm-btn sm" onclick="openClipPosted('${esc(id)}')">Update views</button>${camp?.link?`<button type="button" class="farm-btn sm primary" onclick="clipsWhop('${esc(id)}')">Submit to Whop</button>`:''}</div>`:''}
-    </div></div>`;
-}
 const clpFind=id=>{ const [jid,cid]=id.split('|'); const j=(clipsState?.jobs||[]).find(x=>x.id===jid); return { j, c:j?.clips?.find(x=>x.id===cid), jid, cid }; };
 async function clipsSave(id,patch,rerender){
   const {jid,cid,c}=clpFind(id); if(!c) return;
-  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:patch}); Object.assign(c,d.clip); if(rerender) clipsRenderReview(); if(patch.status==='approved') clipsPrefetch(c).catch(()=>{}); }
+  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:patch}); Object.assign(c,d.clip); if(rerender) clipsRefresh(); if(patch.status==='approved'){ clipsLastApproved=c.id; clipsPrefetch(c).catch(()=>{}); } }
   catch(e){ showToast(e.message); }
+}
+// Reject moves on straight away; it's put back if the server says no
+async function clipsReject(id){
+  const {jid,cid,c}=clpFind(id); if(!c) return;
+  const was=c.status; c.status='rejected'; clipsRefresh();
+  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:{status:'rejected'}}); Object.assign(c,d.clip); }
+  catch(e){ c.status=was; showToast(`Couldn't reject: ${e.message}`); clipsRefresh(); }
 }
 async function clipsJobAct(jid,act){
   try{
     if(act==='delete'){ await clipsApi(`/api/clips/jobs/${jid}`,{method:'DELETE'}); clipsState.jobs=clipsState.jobs.filter(j=>j.id!==jid); }
     else { const d=await clipsApi(`/api/clips/jobs/${jid}/retry`,{method:'POST'}); showToast(d.delivered?'Sent again':'Queued. Waiting for the worker.'); await clipsLoadState(); }
   }catch(e){ showToast(e.message); }
-  clipsRenderReview(); clipsSchedulePoll();
+  clipsRefresh(); clipsSchedulePoll();
 }
 function clipsRecut(id){
   const ov=farmSheet('clpRecutOv',`<div class="clp-card-t" style="font-size:18px">Re-cut this clip</div><div class="clp-s" style="margin-top:4px">Say what to change, in plain words.</div>
@@ -8307,20 +8432,34 @@ function clipsRecut(id){
   ov.querySelector('#clpRecutGo').onclick=async e=>{
     const note=ov.querySelector('#clpRecutNote').value.trim(); if(!note) return showToast('Say what to change');
     const {jid,cid}=clpFind(id); e.target.disabled=true; e.target.textContent='Working…';
-    try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/recut`,{method:'POST',body:{note},timeout:45000}); ov.remove(); showToast(d.delivered?'Re-cutting. You\'ll get a notification.':'Queued for the worker'); await clipsLoadState(); clipsRenderReview(); clipsSchedulePoll(); }
+    try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/recut`,{method:'POST',body:{note},timeout:45000}); ov.remove(); showToast(d.delivered?'Re-cutting. You\'ll get a notification.':'Queued for the worker'); await clipsLoadState(); clipsRefresh(); clipsSchedulePoll(); }
     catch(err){ showToast(err.message); e.target.disabled=false; e.target.textContent='Re-cut'; }
   };
 }
 async function clipsCopy(id){ const {c}=clpFind(id); try{ await navigator.clipboard.writeText(clpCaption(c)); showToast('Caption copied'); }catch{ showToast('Copy failed: long-press the caption instead'); } }
-// iOS only opens the share sheet straight from a tap, so the file is fetched ahead of time (on approve)
+
+// Clips are downloaded ahead (the next two after the one on screen), so playback starts instantly and
+// iOS can open the share sheet straight from a tap. Only a few are kept: iOS kills PWAs that hold too much.
+const CLP_KEEP=4;
+let clipsFetching=null, clipsKeep=[], clipsLastApproved=null, clipsFetchGen=0;
 async function clipsPrefetch(c){
   if(clipsBlobs[c.id]) return clipsBlobs[c.id];
   const r=await fetch(c.url); if(!r.ok) throw new Error('Could not download the clip ('+r.status+')');
-  // keep only the 3 most recent videos in memory (iOS kills PWAs that hold too much)
-  const keys=Object.keys(clipsBlobs); if(keys.length>=3) keys.slice(0,keys.length-2).forEach(k=>{ delete clipsBlobs[k]; document.querySelectorAll(`[data-share="${k}"]`).forEach(b=>b.textContent='Save / Share'); });
-  clipsBlobs[c.id]=new File([await r.blob()],`${(c.title||'clip').replace(/[^\w\- ]+/g,'').slice(0,40)||'clip'}.mp4`,{type:'video/mp4'});
+  const f=new File([await r.blob()],`${(c.title||'clip').replace(/[^\w\- ]+/g,'').slice(0,40)||'clip'}.mp4`,{type:'video/mp4'});
+  const keep=[...clipsKeep,clipsLastApproved,c.id];   // read at eviction time, so it's always the current window
+  const old=Object.keys(clipsBlobs).filter(k=>!keep.includes(k));
+  while(Object.keys(clipsBlobs).length>=CLP_KEEP&&old.length){ const k=old.shift(); if(clipsBlobUrls[k]) URL.revokeObjectURL(clipsBlobUrls[k]); delete clipsBlobs[k]; delete clipsBlobUrls[k]; document.querySelectorAll(`[data-share="${k}"]`).forEach(b=>b.textContent='Save / Share'); }
+  clipsBlobs[c.id]=f; clipsBlobUrls[c.id]=URL.createObjectURL(f);
   document.querySelectorAll(`[data-share="${c.id}"]`).forEach(b=>b.textContent='Share now');
-  return clipsBlobs[c.id];
+  return f;
+}
+function clipsPrefetchAround(q,i){
+  const want=q.slice(i+1,i+3).map(x=>x.c), gen=++clipsFetchGen;
+  clipsKeep=q.slice(i,i+3).map(x=>x.c.id);
+  want.forEach(c=>{ if(c.thumb) new Image().src=c.thumb; });
+  // one at a time, in order, so the next clip isn't competing with the one after it; a run from an older position gives up
+  const run=async()=>{ for(const c of want){ if(gen!==clipsFetchGen) return; if(clipsBlobs[c.id]) continue; try{ await clipsPrefetch(c); }catch{ return; } } };
+  clipsFetching=(clipsFetching||Promise.resolve()).then(run);
 }
 async function clipsShare(id,btn){
   const {c}=clpFind(id); if(!c) return;
@@ -8339,7 +8478,7 @@ function openClipPosted(id){
   ov.querySelector('#clpPostedGo').onclick=async()=>{
     const postLinks={}; ov.querySelectorAll('[data-pl]').forEach(i=>postLinks[i.dataset.pl]=i.value.trim());
     if(!Object.values(postLinks).some(Boolean)) return showToast('Paste at least one post link');
-    await clipsSave(id,{status:'posted',postLinks,views:+String(ov.querySelector('#clpViews').value).replace(/[^\d]/g,'')||0},true); ov.remove(); clipsStats=null;
+    clipsStats=null; await clipsSave(id,{status:'posted',postLinks,views:+String(ov.querySelector('#clpViews').value).replace(/[^\d]/g,'')||0},true); ov.remove();
   };
 }
 async function clipsWhop(id){
@@ -8379,30 +8518,49 @@ function openCampaignSheet(id){
   ov.querySelector('#clpCampDel')?.addEventListener('click',()=>send({id,remove:true}));
 }
 
-// ── STATS ──
+// ── STATS: totals, then every approved/posted clip ──
+let clipsStatsAt=0;
 async function clipsRenderStats(){
   const el=clpView('stats'); if(!el) return;
-  if(!clipsStats){ el.innerHTML='<div class="clp-empty">Adding it up…</div>'; try{ clipsStats=await clipsApi('/api/clips/stats'); }catch(e){ el.innerHTML=`<div class="clp-empty">${esc(e.message)}</div>`; return; } setTimeout(()=>{ clipsStats=null; },60000); }
+  if(!clipsStats||Date.now()-clipsStatsAt>60000){
+    if(!clipsStats) el.innerHTML='<div class="clp-empty">Adding it up…</div>';
+    let err=''; try{ clipsStats=await clipsApi('/api/clips/stats'); clipsStatsAt=Date.now(); }catch(e){ err=e.message; }
+    if(clipsView!=='stats') return;
+    if(!clipsStats) el.dataset.err=err; else delete el.dataset.err;
+  }
   const s=clipsStats;
-  el.innerHTML=`<div class="clp-tiles">
+  const done=clpAll().filter(({c})=>c.status==='approved'||c.status==='posted'||clpPosting(c)).sort((a,b)=>new Date(b.c.postedAt||b.j.finishedAt||0)-new Date(a.c.postedAt||a.j.finishedAt||0));
+  el.innerHTML=`${!s?`<div class="clp-note">Couldn't load the totals${el.dataset.err?`: ${esc(el.dataset.err)}`:''}. Your clips are below.</div>`:`<div class="clp-tiles">
       <div class="clp-tile"><div class="v" style="color:#8fe3a6">$${s.estUsd.toFixed(2)}</div><div class="l">Est. campaign earnings (after ~9% Whop fee)</div></div>
       <div class="clp-tile"><div class="v">${clpNum(s.views)}</div><div class="l">Views on posted clips</div></div>
       <div class="clp-tile"><div class="v">${s.counts.posted}</div><div class="l">Clips posted</div></div>
-      <div class="clp-tile"><div class="v">${s.counts.review+s.counts.approved}</div><div class="l">Waiting on you</div></div>
-      <div class="clp-tile"><div class="v">${s.spendUsd>0&&s.spendUsd<0.01?'&lt;1¢':'$'+s.spendUsd.toFixed(2)}</div><div class="l">AI spend so far</div></div></div>
+      <div class="clp-tile"><div class="v">${s.spendUsd>0&&s.spendUsd<0.01?'&lt;1¢':'$'+s.spendUsd.toFixed(2)}</div><div class="l">AI spend so far</div></div></div>`}
+    <div class="clp-lbl" style="margin-top:6px">Your clips</div>
+    ${done.length?done.map(({j,c})=>clipDoneHTML(j,c)).join(''):'<div class="clp-empty" style="padding:12px">Clips you post or approve show up here.</div>'}
     <div class="clp-card"><div class="clp-card-t">Own-channel payouts unlock at</div><div class="clp-s" style="margin-top:6px">TikTok Creator Rewards: 10K followers + 100K views in 30 days, on videos over 1 minute. Your clips are 15–30s, which suits Whop campaigns and Shorts; ask for a longer re-cut on standout moments if you want them to count.<br>YouTube Partner Program: 1K subscribers + 10M Shorts views in 90 days.</div></div>
     <div class="clp-s">Earnings are an estimate from the views you enter under Mark posted. Whop's own dashboard is the real number.</div>`;
 }
+function clipDoneHTML(j,c){
+  const camp=j.campaignId&&(clipsState.campaigns||[]).find(x=>x.id===j.campaignId), id=`${j.id}|${c.id}`;
+  return `<div class="clp-card clp-done" data-clip="${esc(id)}">
+    <a class="th" href="${esc(c.url)}" target="_blank" rel="noopener" aria-label="Watch clip" style="background-image:url('${esc(c.thumb||'')}')"></a>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+      <div class="clp-title" style="-webkit-line-clamp:1">${esc(c.title||'Untitled')}</div>
+      <div class="clp-row"><span class="clp-status ${c.status}">${clpPosting(c)?'Posting…':c.status==='posted'?'Posted':'Approved'}</span><span class="clp-s">${clpDur(c.end-c.start)}${c.status==='posted'?` · ${clpNum(c.views)} views`:''}</span></div>
+      ${clpPostLine(id,c)}
+      ${clpPosting(c)?'':`<div class="clp-row">${c.status==='approved'?`<button type="button" class="farm-btn sm" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Save / Share'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button>`:''}<button type="button" class="farm-btn sm ghost" onclick="openClipPosted('${esc(id)}')">${c.status==='posted'?'Update views':'Mark posted'}</button>${camp?.link&&c.status==='posted'?`<button type="button" class="farm-btn sm primary" onclick="clipsWhop('${esc(id)}')">Submit to Whop</button>`:''}</div>`}
+    </div></div>`;
+}
 
 // Open the tab from a notification (sw.js → ?open=clips, or a message to an already-open window)
-// ── YouTube posting + autopilot ──
-function clpYoutubeLine(id,c){
+// ── Posting (YouTube + TikTok) ──
+function clpPostLine(id,c){
   const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, out=[];
-  if(c.posting) return '<div class="clp-note" style="padding:8px 12px">Posting…</div>';
+  if(clpPosting(c)) return '';
   if(c.postLinks?.youtube) out.push(`YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
   if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener" style="color:#8fc8ff">posted</a>`:esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
   const missing=(yt.connected&&!c.postLinks?.youtube)||(tt.connected&&!c.ttPublishId);
-  return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing&&c.status!=='review'?`<div class="clp-row"><button type="button" class="farm-btn sm" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
+  return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
 }
 // Approve & post. YouTube only: posts straight away. TikTok connected: a short sheet first, because
 // TikTok requires the poster to choose privacy and interaction settings on each post themselves.
@@ -8410,77 +8568,60 @@ async function clipsApprove(id,btn){
   const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, {c}=clpFind(id); if(!c) return;
   const needYt=yt.connected&&!c.postLinks?.youtube, needTt=tt.connected&&!c.ttPublishId;
   if(!needYt&&!needTt) return clipsSave(id,{status:'approved'},true);
-  if(!needTt) return clipsPost(id,{youtube:true},btn);
+  if(!needTt) return clipsPost(id,{youtube:true});
   openTikTokSheet(id,needYt);
 }
 async function openTikTokSheet(id,withYt){
   const {c}=clpFind(id);
   const ov=farmSheet('clpPostOv','<div class="clp-empty">Checking your TikTok account…</div>');
   let ci; try{ ci=await clipsApi('/api/clips/tiktok/creator'); }catch(e){ ov.querySelector('.mc-sheet').innerHTML=`<div class="as-grab"></div><div class="clp-note">${esc(e.message)}</div>${withYt?`<button type="button" class="farm-btn primary" style="margin-top:12px" onclick="document.getElementById('clpPostOv').remove();clipsPost('${esc(id)}',{youtube:true})">Post to YouTube only</button>`:''}`; return; }
+  if(!document.body.contains(ov)) return;   // closed while it was loading
   const long=ci.max_video_post_duration_sec&&(c.end-c.start)>ci.max_video_post_duration_sec;
   const PRIV={PUBLIC_TO_EVERYONE:'Everyone',MUTUAL_FOLLOW_FRIENDS:'Friends',FOLLOWER_OF_CREATOR:'Followers',SELF_ONLY:'Only me'};
-  const tog=(k,l,off)=>`<label class="clp-row" style="font-size:14px;margin-top:8px${off?';opacity:.45':''}"><input type="checkbox" data-t="${k}" ${off?'disabled':''}> ${l}${off?' (turned off in your TikTok settings)':''}</label>`;
+  // TikTok's rules: nothing is picked for you. Privacy has no default and every toggle starts off.
+  const tog=(k,l,off)=>`<button type="button" class="clp-chip" data-t="${k}" aria-pressed="false" ${off?`disabled title="Turned off in your TikTok settings"`:''}>${l}</button>`;
   ov.querySelector('.mc-sheet').innerHTML=`<div class="as-grab"></div><div class="clp-card-t" style="font-size:18px">Post this clip</div>
-    <div class="clp-s" style="margin-top:4px">${withYt?`YouTube: <b>${esc(clipsState.youtube.channel?.title||'your channel')}</b><br>`:''}TikTok: <b>${esc(ci.creator_nickname||ci.creator_username||'your account')}</b></div>
+    <div class="clp-s" style="margin-top:4px">${withYt?`YouTube: <b>${esc(clipsState.youtube.channel?.title||'your channel')}</b> · `:''}TikTok: <b>${esc(ci.creator_nickname||ci.creator_username||'your account')}</b></div>
     ${long?`<div class="clp-note" style="margin-top:10px">This clip is longer than your TikTok account allows (${ci.max_video_post_duration_sec}s). Re-cut it shorter to post it there.</div>`:''}
-    <div class="as-label">Who can see this on TikTok?</div>
-    <select id="clpTtPriv" class="as-inp"><option value="" selected disabled>Choose…</option>${(ci.privacy_level_options||[]).map(p=>`<option value="${esc(p)}">${PRIV[p]||esc(p)}</option>`).join('')}</select>
+    <div class="as-label">Who can see it on TikTok?</div>
+    <div class="clp-chips" id="clpTtPriv">${(ci.privacy_level_options||[]).map(p=>`<button type="button" class="clp-chip" data-priv="${esc(p)}">${PRIV[p]||esc(p)}</button>`).join('')}</div>
     <div class="as-label">Let people</div>
-    ${tog('comment','Comment',ci.comment_disabled)}${tog('duet','Duet',ci.duet_disabled)}${tog('stitch','Stitch',ci.stitch_disabled)}
-    <div class="as-label">Content disclosure</div>
-    <label class="clp-row" style="font-size:14px"><input type="checkbox" id="clpTtDisclose"> This promotes a brand, product or service</label>
-    <div id="clpTtBrand" hidden style="margin-left:24px">
-      <label class="clp-row" style="font-size:14px;margin-top:6px"><input type="checkbox" data-b="yourBrand"> Your brand (you're promoting yourself)</label>
-      <label class="clp-row" style="font-size:14px;margin-top:6px"><input type="checkbox" data-b="brandedContent"> Branded content (paid partnership, e.g. a Whop campaign)</label></div>
-    <div class="clp-s" id="clpTtConsent" style="margin-top:12px">By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener" style="color:#8fc8ff">Music Usage Confirmation</a>.</div>
-    <div class="clp-s" style="margin-top:6px">After posting, TikTok can take a few minutes to process the video before it shows on your profile.</div>
-    <div class="clp-row" style="margin-top:14px"><button type="button" class="farm-btn primary" id="clpTtGo" disabled>Post${withYt?' to both':''}</button>${withYt?`<button type="button" class="farm-btn ghost" id="clpYtOnly">YouTube only</button>`:''}</div>`;
-  const go=ov.querySelector('#clpTtGo'), sel=ov.querySelector('#clpTtPriv'), dis=ov.querySelector('#clpTtDisclose'), brandBox=ov.querySelector('#clpTtBrand');
-  const brandSel=()=>[...ov.querySelectorAll('[data-b]')].filter(x=>x.checked).map(x=>x.dataset.b);
+    <div class="clp-chips">${tog('comment','Comment',ci.comment_disabled)}${tog('duet','Duet',ci.duet_disabled)}${tog('stitch','Stitch',ci.stitch_disabled)}</div>
+    <label class="clp-row" style="font-size:14px;margin-top:14px"><input type="checkbox" id="clpTtDisclose"> This promotes a brand, product or service</label>
+    <div class="clp-chips" id="clpTtBrand" hidden style="margin-top:8px"><button type="button" class="clp-chip" data-b="yourBrand" aria-pressed="false">Your brand</button><button type="button" class="clp-chip" data-b="brandedContent" aria-pressed="false">Branded content (paid, e.g. Whop)</button></div>
+    <div class="clp-s" id="clpTtConsent" style="margin-top:12px"></div>
+    <div class="clp-row" style="margin-top:14px"><button type="button" class="farm-btn primary" id="clpTtGo" disabled>Post${withYt?' to both':''}</button>${withYt?`<button type="button" class="farm-btn ghost" id="clpYtOnly">YouTube only</button>`:''}</div>
+    <div class="clp-s" style="margin-top:8px;text-align:center">TikTok can take a few minutes to process it before it shows on your profile.</div>`;
+  const go=ov.querySelector('#clpTtGo'), dis=ov.querySelector('#clpTtDisclose'), brandBox=ov.querySelector('#clpTtBrand');
+  const on=sel=>[...ov.querySelectorAll(sel)].filter(x=>x.classList.contains('on'));
+  const priv=()=>on('[data-priv]')[0]?.dataset.priv||'';
+  const brandSel=()=>on('[data-b]').map(x=>x.dataset.b);
   const refresh=()=>{
-    const b=brandSel(), branded=b.includes('brandedContent');
+    const b=brandSel(), branded=dis.checked&&b.includes('brandedContent');
     brandBox.hidden=!dis.checked;
     // TikTok: branded content can't be private, and disclosure needs at least one box ticked
-    [...sel.options].forEach(o=>{ if(o.value==='SELF_ONLY') o.disabled=dis.checked&&branded; });
-    if(sel.value==='SELF_ONLY'&&dis.checked&&branded) sel.value='';
-    ov.querySelector('#clpTtConsent').innerHTML=`By posting, you agree to TikTok's ${dis.checked&&branded?'<a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener" style="color:#8fc8ff">Branded Content Policy</a> and ':''}<a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener" style="color:#8fc8ff">Music Usage Confirmation</a>.`;
-    go.disabled=long||!sel.value||(dis.checked&&!b.length);
+    ov.querySelectorAll('[data-priv="SELF_ONLY"]').forEach(x=>{ x.disabled=branded; if(branded) x.classList.remove('on'); x.title=branded?'Branded content can\'t be private':''; });
+    ov.querySelector('#clpTtConsent').innerHTML=`By posting, you agree to TikTok's ${branded?'<a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank" rel="noopener" style="color:#8fc8ff">Branded Content Policy</a> and ':''}<a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank" rel="noopener" style="color:#8fc8ff">Music Usage Confirmation</a>.`;
+    go.disabled=long||!priv()||(dis.checked&&!b.length);
   };
-  ov.addEventListener('change',refresh); refresh();
-  go.onclick=()=>{ const t={privacy:sel.value}; ov.querySelectorAll('[data-t]').forEach(x=>t[x.dataset.t]=x.checked); if(dis.checked) brandSel().forEach(k=>t[k]=true); ov.remove(); clipsPost(id,{youtube:withYt,tiktok:t}); };
+  ov.querySelectorAll('[data-priv]').forEach(x=>x.onclick=()=>{ ov.querySelectorAll('[data-priv]').forEach(y=>y.classList.toggle('on',y===x)); refresh(); });
+  ov.querySelectorAll('[data-t],[data-b]').forEach(x=>x.onclick=()=>{ x.classList.toggle('on'); x.setAttribute('aria-pressed',x.classList.contains('on')); refresh(); });
+  dis.onchange=refresh; refresh();
+  go.onclick=()=>{ const t={privacy:priv()}; ov.querySelectorAll('[data-t]').forEach(x=>t[x.dataset.t]=x.classList.contains('on')); if(dis.checked) brandSel().forEach(k=>t[k]=true); ov.remove(); clipsPost(id,{youtube:withYt,tiktok:t}); };
   ov.querySelector('#clpYtOnly')?.addEventListener('click',()=>{ ov.remove(); clipsPost(id,{youtube:true}); });
 }
-async function clipsPost(id,body,btn){
+// Posting can take a few minutes, so the clip is marked as posting and the reviewer moves on to the next one
+async function clipsPost(id,body){
   const {jid,cid,c}=clpFind(id); if(!c) return;
-  if(btn){ btn.disabled=true; btn.textContent='Posting…'; }
+  c.posting=new Date().toISOString(); clipsRefresh();
   showToast(body.tiktok&&body.youtube?'Posting to YouTube and TikTok…':body.tiktok?'Posting to TikTok…':'Uploading to YouTube…');
   try{
-    const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',body,timeout:330000}); Object.assign(c,d.clip);
-    showToast(d.errors?.length?d.errors.join(' · '):'Posted. Links show on the clip once each platform finishes.');
-  }catch(e){ showToast(e.message); await clipsLoadState(); }
-  clipsStats=null; clipsRenderReview(); clipsSchedulePoll();
+    const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',body,timeout:330000});
+    const now=clpFind(id).c||c; Object.assign(now,d.clip); delete now.posting; if(now!==c){ Object.assign(c,d.clip); delete c.posting; }
+    showToast(d.errors?.length?d.errors.join(' · '):`Posted "${(now.title||'clip').slice(0,40)}". Links are in Stats.`);
+  }catch(e){ delete c.posting; await clipsLoadState(); const now=clpFind(id).c; showToast(`Posting failed: ${e.message}. ${now?.status==='review'?'It is back in Review.':'It is in Stats to try again.'}`); }
+  clipsStats=null; clipsRefresh(); clipsSchedulePoll();
 }
-function clipsAutopilotCard(){
-  const a=clipsState?.autopilot||{on:false,perDay:10,youtube:[]}, yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{};
-  const last=a.lastPick?`Last pick: <b>${esc(a.lastPick.title)}</b> · ${clpAgo(a.lastPick.at)}`:a.lastRun?`Last checked ${clpAgo(a.lastRun)}`:'Checks for new VODs every 2 hours.';
-  return `<div class="clp-card"><div class="clp-row" style="justify-content:space-between"><div><div class="clp-card-t">Autopilot</div><div class="clp-s">Keeps about ${a.perDay} clips a day waiting for you, from campaigns, your streamers and the YouTube channels below.</div></div>
-      <button type="button" class="clp-chip${a.on?' on':''}" style="min-width:64px;justify-content:center" onclick="clipsAutopilot({on:${!a.on}})">${a.on?'On':'Off'}</button></div>
-    <div class="clp-s" style="margin:8px 0">${last}</div>
-    <div class="clp-row" style="margin-bottom:8px"><span class="clp-s">Clips a day</span>${[5,10,20].map(n=>`<button type="button" class="clp-chip${a.perDay===n?' on':''}" onclick="clipsAutopilot({perDay:${n}})">${n}</button>`).join('')}</div>
-    <div class="clp-s" style="margin-bottom:6px">YouTube channels (only creators who allow clipping)</div>
-    <div class="clp-chips" style="margin-bottom:8px">${(a.youtube||[]).map(y=>`<button type="button" class="clp-chip" onclick="clipsAutopilot({removeYoutube:'${esc(y.url)}'})">${esc(y.name)} <span class="x">×</span></button>`).join('')||'<span class="clp-s">None yet</span>'}</div>
-    <div class="clp-row"><input id="clpYtChan" class="as-inp" type="url" placeholder="https://www.youtube.com/@channel" autocomplete="off"><button type="button" class="farm-btn sm" onclick="clipsAutopilot({addYoutube:document.getElementById('clpYtChan').value.trim()})">Add</button></div>
-    <div class="clp-row" style="margin-top:12px;justify-content:space-between"><div class="clp-s">${yt.connected?`YouTube: posting to <b>${esc(yt.channel?.title||'your channel')}</b>${yt.today?` · ${yt.today} today (limit ~6)`:''}`:yt.error?`<span style="color:#ff9b9b">${esc(yt.error)}</span>`:yt.configured?'YouTube not connected: approving won\'t upload yet.':'YouTube posting needs setup (YT_CLIENT_ID / YT_CLIENT_SECRET on Render).'}</div>
-      ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('youtube')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect YouTube</a>`):''}</div>
-    <div class="clp-row" style="margin-top:8px;justify-content:space-between"><div class="clp-s">${tt.connected?`TikTok: posting as <b>${esc(tt.user?.name||'your account')}</b>`:tt.error?`<span style="color:#ff9b9b">${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
-      ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect TikTok</a>`):''}</div></div>`;
-}
-async function clipsAutopilot(patch){
-  try{ const d=await clipsApi('/api/clips/autopilot',{method:'POST',body:patch}); clipsState.autopilot={...(clipsState.autopilot||{}),...d}; if(patch.on) showToast('Autopilot on. First check within a few minutes.'); }
-  catch(e){ showToast(e.message); }
-  clipsRenderFind();
-}
-async function clipsDisconnect(p){ try{ await clipsApi(`/api/clips/${p}/disconnect`,{method:'POST'}); await clipsLoadState(); clipsRenderFind(); }catch(e){ showToast(e.message); } }
 
 function openClipsFromPush(){ clipsView='review'; clipsState=null; goToMobTab('clips'); }
 { const q=new URLSearchParams(location.search);

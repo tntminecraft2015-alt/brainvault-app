@@ -351,14 +351,17 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     res.json({ ok: true, clip });
   });
 
-  // Re-cut: Haiku turns a plain-English note into new timings, then a render-only job goes to the worker
+  // Re-cut: Haiku turns a plain-English note into new timings, then a render-only job goes to the worker.
+  // { same: true } skips Haiku and re-renders the clip exactly as it is (e.g. after a caption style change).
   app.post('/api/clips/jobs/:id/clips/:cid/recut', async (req, res) => {
-    const note = str(req.body?.note, 300);
+    const same = req.body?.same === true, note = same ? 'Re-rendered with the current caption style' : str(req.body?.note, 300);
     if (!note) return res.status(400).json({ error: 'Say what to change' });
     const c0 = clipsOf(getAppData()), job = findJob(c0, req.params.id), cl = job?.clips.find(x => x.id === req.params.cid);
     if (!cl) return res.status(404).json({ error: 'Clip not found' });
+    if (same && cl.status !== 'review') return res.status(409).json({ error: 'Only clips waiting for review can be re-rendered' });
+    if (same && cl.recutting) return res.status(409).json({ error: 'Already re-cutting this clip' });
     try {
-      const { json, cost } = await haiku(
+      const { json, cost } = same ? { json: {}, cost: 0 } : await haiku(
         'You adjust one short-form video clip based on the editor\'s note. Times are seconds in the source video. Keep length 10–45s (ideally 15–30s) unless the note says otherwise. Reply ONLY with JSON: {"start":n,"end":n,"title":"…","hook":"…","caption":"…"}. Keep fields unchanged unless the note asks.',
         `CURRENT: ${JSON.stringify({ start: cl.start, end: cl.end, title: cl.title, hook: cl.hook, caption: cl.caption })}\nSOURCE LENGTH: ${job.duration || 'unknown'}s\nTRANSCRIPT NEAR CLIP:\n${cl.context || '(none)'}\nNOTE: ${note}`, 600);
       const max = job.duration || 864000;
