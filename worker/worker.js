@@ -96,11 +96,12 @@ const hash = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 16)
 // All moment times are seconds from the start of the job's range (0 when there is no range).
 const rangeOf = job => ({ from: job.range?.start ?? 0, to: job.range?.end ?? null });
 
-async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label) {
+async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label, exactCuts = true) {
   // leftovers from a run that died mid-download must not be mistaken for the result
   for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${base}.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
   const args = ['-f', format, '--no-playlist', '--no-part', '--newline', ...extra, '-o', path.join(dirs.src, `${base}.dl.%(ext)s`)];
-  if (section) args.push('--download-sections', `*${section[0]}-${section[1] ?? 'inf'}`, '--force-keyframes-at-cuts');
+  // exact cuts make yt-dlp re-encode the section, which takes ~10 min on half a CPU for video
+  if (section) args.push('--download-sections', `*${section[0]}-${section[1] ?? 'inf'}`, ...(exactCuts ? ['--force-keyframes-at-cuts'] : []));
   args.push(job.source.url);
   await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', pctFrom + +m[1] / 100 * pctSpan, `${label}… ${Math.round(+m[1])}%`); } });
   const outs = fs.readdirSync(dirs.src).filter(f => f.startsWith(`${base}.dl.`) && !/\.part$|\.ytdl$/.test(f));
@@ -119,15 +120,18 @@ async function downloadAudio(job) {
   return file;
 }
 
-// Just one moment's video (+ a little padding so the cut lands cleanly); returns { file, pad }
+// Just one moment's video, copied without re-encoding; returns { file, pad } where pad is how far
+// into the file the moment starts. A copy can only start on a keyframe (every ~2s on Twitch), so
+// the file usually begins a little before what was asked for: that lead-in is measured and skipped.
 async function downloadSection(job, m, pctFrom) {
   const { from } = rangeOf(job);
-  const pad = Math.min(2, m.start);
+  const pad = Math.min(2, m.start), tail = 1;
   const h = MAX_HEIGHT;
   const base = `${hash(job.source.url + `${from + m.start}-${from + m.end}`)}.sec`;
   const file = await ytdlp(job, base, `bv*[height<=${h}][ext=mp4]+ba[ext=m4a]/b[height<=${h}][ext=mp4]/bv*[height<=${h}]+ba/b`,
-    [from + m.start - pad, from + m.end + 1], ['--merge-output-format', 'mp4'], pctFrom, 3, 'Downloading clip video');
-  return { file, pad };
+    [from + m.start - pad, from + m.end + tail], ['--merge-output-format', 'mp4'], pctFrom, 3, 'Downloading clip video', false);
+  const asked = m.end - m.start + pad + tail, got = await duration(file).catch(() => asked);
+  return { file, pad: pad + Math.min(6, Math.max(0, got - asked)) };
 }
 
 // Transcribe [from, to) of the source (whole file when omitted); returns segments in source seconds.
@@ -217,7 +221,9 @@ async function render(job, m, i, segs, pctFrom) {
   const len = +(m.end - m.start).toFixed(2);
   const words = segs.flatMap(s => s.w).filter(([ws, we]) => we > m.start && ws < m.end).map(([ws, we, w]) => [Math.max(0, ws - m.start), Math.min(len, we - m.start), w]);
   fs.writeFileSync(path.join(dir, 'sub.ass'), buildAss({ words, hook: m.hook, layout: job.layout, duration: len }));
+  const t0 = Date.now();
   const { file: src, pad } = await downloadSection(job, m, pctFrom);
+  const t1 = Date.now();
   const out = `clip${i}.mp4`;
   await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(pad), '-t', String(len), '-i', src,
     '-filter_complex', filterFor(job.layout, job.corner), '-map', '[v]', '-map', '0:a?',
@@ -225,6 +231,7 @@ async function render(job, m, i, segs, pctFrom) {
     '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-movflags', '+faststart', out], { cwd: dir });
   await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(Math.min(1, len / 2)), '-i', out, '-frames:v', '1', '-vf', 'scale=360:-2', `thumb${i}.jpg`], { cwd: dir });
   fs.rmSync(src, { force: true });
+  console.log(`job ${job.id}: clip ${i + 1} (${len}s) downloaded in ${Math.round((t1 - t0) / 1000)}s, rendered in ${Math.round((Date.now() - t1) / 1000)}s (lead-in ${pad.toFixed(1)}s)`);
   return { video: path.join(dir, out), thumb: path.join(dir, `thumb${i}.jpg`) };
 }
 
@@ -260,7 +267,9 @@ async function processJob(job) {
     const from = Math.max(0, Math.floor(Math.min(...moments.map(m => m.start)))), to = Math.min(dur, Math.ceil(Math.max(...moments.map(m => m.end))));
     segs = fs.existsSync(`${src}.0-end.json`) ? JSON.parse(fs.readFileSync(`${src}.0-end.json`, 'utf8')) : await transcribe(job, src, dur, from, to);
   } else {
+    const tt = Date.now();
     segs = await transcribe(job, src, dur);
+    console.log(`job ${job.id}: ${Math.round(dur / 60)} min of audio transcribed in ${Math.round((Date.now() - tt) / 1000)}s`);
     lastProg = 0; progress(job, 'picking', 66, 'Picking the best moments…', { duration: dur });
     // generous timeout: Render may be waking up AND Haiku reading a long transcript (a retry reuses the server's same call)
     const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })) }, { tries: 6, timeout: 240000 });
