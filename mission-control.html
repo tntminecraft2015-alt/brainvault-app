@@ -8430,8 +8430,8 @@ async function clipsSave(id,patch,rerender){
 // Edit / Back to Review: move a clip between the two lists straight away; put back if the server says no
 async function clipsSetStatus(id,status,doneMsg){
   const {jid,cid,c}=clpFind(id); if(!c) return;
-  const was=c.status; c.status=status; delete clipsDrafts[c.id]; clipsRefresh();
-  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:{status}}); Object.assign(c,d.clip); if(doneMsg) showToast(doneMsg); }
+  const was=c.status; c.status=status; clipsRefresh();
+  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:{status}}); Object.assign(c,d.clip); delete clipsDrafts[c.id]; if(doneMsg) showToast(doneMsg); }
   catch(e){ c.status=was; showToast(`Couldn't move it: ${e.message}`); clipsRefresh(); }
 }
 const clipsToEditing=id=>clipsSetStatus(id,'editing','Moved to Editing');
@@ -8447,7 +8447,7 @@ const clpT=s=>{ const t=Math.round(Math.max(0,s)*10), h=Math.floor(t/36000), m=M
 function clpEditCardHTML(j,c){
   const id=`${j.id}|${c.id}`;
   return `<div class="clp-card clp-ed" data-clip="${esc(id)}">
-    <div class="clp-ed-top"><video src="${esc(clipsBlobUrls[c.id]||c.url)}" poster="${esc(c.thumb||'')}" preload="none" controls playsinline aria-label="Clip"></video>
+    <div class="clp-ed-top"><video src="${esc(c.url)}" poster="${esc(c.thumb||'')}" preload="none" controls playsinline aria-label="Clip"></video>
       <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
         <div class="clp-title">${esc(c.title||'Untitled')}</div>
         <div class="clp-s">${esc(j.source?.channel||'')} · ${c.score}/10</div>
@@ -8486,7 +8486,12 @@ function clipsRenderEditing(force){
   if(same&&!force){ list.forEach(({j,c})=>clipsEditCtl(j,c)); return; }   // same clips: keep the video elements
   el.innerHTML=list.map(({j,c})=>clpEditCardHTML(j,c)).join('');
 }
-function clipsEditCtl(j,c){ const box=clpView('editing')?.querySelector(`.clp-ed[data-clip="${CSS.escape(`${j.id}|${c.id}`)}"] .clp-ed-ctl`); if(box) box.innerHTML=clpEditCtlHTML(j,c); }
+function clipsEditCtl(j,c){
+  const box=clpView('editing')?.querySelector(`.clp-ed[data-clip="${CSS.escape(`${j.id}|${c.id}`)}"] .clp-ed-ctl`); if(!box) return;
+  const typed=[...box.querySelectorAll('input.as-inp,textarea.as-inp')].map(x=>x.value);   // may not be saved yet
+  box.innerHTML=clpEditCtlHTML(j,c);
+  box.querySelectorAll('input.as-inp,textarea.as-inp').forEach((x,i)=>{ if(typed[i]!=null) x.value=typed[i]; });
+}
 function clipsNudge(id,k,n){ const {j,c}=clpFind(id); if(!c) return; const d=clpDraft(j,c); d[k]=Math.max(0,Math.min(j.duration||864000,+(d[k]+n).toFixed(2))); clipsEditCtl(j,c); }
 function clipsDraftSet(id,patch){ const {j,c}=clpFind(id); if(!c) return; Object.assign(clpDraft(j,c),patch); clipsEditCtl(j,c); }
 async function clipsEditRender(id,btn){
@@ -8500,12 +8505,7 @@ async function clipsEditRender(id,btn){
 }
 
 // Reject moves on straight away; it's put back if the server says no
-async function clipsReject(id){
-  const {jid,cid,c}=clpFind(id); if(!c) return;
-  const was=c.status; c.status='rejected'; clipsRefresh();
-  try{ const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}`,{method:'POST',body:{status:'rejected'}}); Object.assign(c,d.clip); }
-  catch(e){ c.status=was; showToast(`Couldn't reject: ${e.message}`); clipsRefresh(); }
-}
+const clipsReject=id=>clipsSetStatus(id,'rejected');
 async function clipsJobAct(jid,act){
   try{
     if(act==='delete'){ await clipsApi(`/api/clips/jobs/${jid}`,{method:'DELETE'}); clipsState.jobs=clipsState.jobs.filter(j=>j.id!==jid); }

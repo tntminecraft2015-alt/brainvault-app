@@ -399,7 +399,8 @@ function scheduleTick(ms) { clearTimeout(tickTimer); tickTimer = setTimeout(auto
 async function searchYoutube(q) {
   try {
     const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', `ytsearchdate15:${q} stream`], { timeoutMs: 2 * 60 * 1000 }));
-    return (d.entries || []).filter(e => e?.id && e.duration >= 600 && !['is_live', 'is_upcoming'].includes(e.live_status)).map(e => ({ id: e.id, title: e.title, channel: e.channel || e.uploader || '', views: e.view_count || 0, duration: e.duration || 0, date: e.timestamp ? new Date(e.timestamp * 1000).toISOString() : null }));
+    // ytsearchdate lists newest first; flat results often have no exact date, so the first 10 long ones are taken as recent
+    return (d.entries || []).filter(e => e?.id && e.duration >= 600 && !['is_live', 'is_upcoming'].includes(e.live_status)).slice(0, 10).map(e => { const ts = e.timestamp || e.release_timestamp; return { id: e.id, title: e.title, channel: e.channel || e.uploader || '', views: e.view_count || 0, duration: e.duration || 0, date: ts ? new Date(ts * 1000).toISOString() : null }; });
   } catch (e) { console.error(`autopilot: YouTube search for "${q}" failed:`, e.message.slice(0, 200)); return []; }
 }
 async function listYoutube(url) {

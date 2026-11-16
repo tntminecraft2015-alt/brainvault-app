@@ -279,6 +279,11 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const addTopic = str(b.addTopic, 40);
     if (b.addTopic != null && !addTopic) return res.status(400).json({ error: 'Type a topic, like GTA 6' });
     let topic = null;
+    if (addTopic) {
+      const have = apOf(clipsOf(getAppData())).topics;
+      if (have.some(t => t.q.toLowerCase() === addTopic.toLowerCase())) return res.status(400).json({ error: `"${addTopic}" is already a topic` });
+      if (have.length >= 8) return res.status(400).json({ error: 'Up to 8 topics. Remove one first.' });
+    }
     if (addTopic) { try { topic = await resolveTopic(addTopic); } catch (e) { return res.status(502).json({ error: `Couldn't reach Twitch to match that topic (${e.message}). Try again in a minute.` }); } }
     const out = mutate(c => {
       const a = apOf(c);
@@ -290,7 +295,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
         if (!a.youtube.some(y => y.url === u)) a.youtube.push({ url: u, name: u.split('/').pop() });
       }
       if (b.removeYoutube) a.youtube = a.youtube.filter(y => y.url !== b.removeYoutube);
-      if (topic && !a.topics.some(t => t.q.toLowerCase() === topic.q.toLowerCase())) { if (a.topics.length >= 8) return { error: 'Up to 8 topics' }; a.topics.push(topic); }
+      if (topic && !a.topics.some(t => t.q.toLowerCase() === topic.q.toLowerCase()) && a.topics.length < 8) a.topics.push(topic);
       if (b.removeTopic) a.topics = a.topics.filter(t => t.q !== b.removeTopic);
       return { on: !!a.on, perDay: a.perDay, youtube: a.youtube, topics: a.topics };
     });
@@ -304,7 +309,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     if (!a.on) return { need: false, why: 'off' };
     if (c.jobs.some(j => !['done', 'failed'].includes(j.status))) return { need: false, why: 'a job is already running' };
     const made = c.jobs.filter(j => j.type !== 'render' && now - new Date(j.finishedAt || j.createdAt) < day).reduce((n, j) => n + (j.clips?.length || 0), 0);
-    const waiting = c.jobs.reduce((n, j) => n + (j.type === 'render' ? 0 : (j.clips || []).filter(x => x.status === 'review').length), 0);
+    const waiting = c.jobs.reduce((n, j) => n + (j.type === 'render' ? 0 : (j.clips || []).filter(x => x.status === 'review' || x.status === 'editing').length), 0);
     if (made >= a.perDay) return { need: false, why: `made ${made} today` };
     if (waiting >= a.perDay * 2) return { need: false, why: `${waiting} still waiting for review` };
     return { need: true };
@@ -322,7 +327,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const cands = [];
     for (const camp of c0.campaigns.filter(x => x.active && x.sourceUrl))
       cands.push({ key: `camp:${camp.id}:${camp.sourceUrl}`, url: camp.sourceUrl, title: `${camp.name} source`, login: camp.streamer, campaignId: camp.id, kind: 'link', rank: 1000 + camp.rate });
-    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 100)) {
+    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 250)) {
       if (!/^[\w-]{11}$/.test(v.id || '') || (v.duration && v.duration < 120)) continue;   // skip Shorts/trailers
       cands.push({ key: `yt:${v.id}`, url: `https://www.youtube.com/watch?v=${v.id}`, title: str(v.title, 200), channel: str(v.channel, 60), kind: 'vod', views: +v.views || 0, duration: +v.duration || 0, date: v.date || null, topic: str(v.topic, 40) || null });
     }
@@ -335,7 +340,10 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const fresh = cands.filter(x => !a0.seen[x.key]);
     if (!fresh.length) return res.json({ queued: false, why: 'nothing new to clip' });
     // campaigns first (they pay), then a quick AI read on which VOD clips best; recency + views break ties
-    const vods = fresh.filter(x => !x.campaignId);
+    const groups = new Map();
+    for (const x of fresh.filter(x => !x.campaignId)) { const g = x.topic ? `topic:${x.topic}` : x.key.startsWith('yt:') ? `yt:${x.channel}` : 'twitch'; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(x); }
+    const vods = [];
+    for (let i = 0; vods.length < fresh.length && [...groups.values()].some(l => l.length > i); i++) for (const l of groups.values()) if (l[i]) vods.push(l[i]);
     if (vods.length > 1) {
       try {
         const { json } = await haiku('You rate stream VODs for how well they would clip into viral 15–30s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10}].',
@@ -357,7 +365,9 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
 
   app.post('/api/clips/jobs/:id/retry', async (req, res) => {
     // not for jobs the worker already has ('sent' and later): it would still be running the old attempt
-    const ok = mutate(c => { const j = findJob(c, req.params.id); if (!j || !['failed', 'queued'].includes(j.status)) return false; Object.assign(j, { status: 'queued', error: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: new Date().toISOString() }); return true; });
+    const ok = mutate(c => { const j = findJob(c, req.params.id); if (!j || !['failed', 'queued'].includes(j.status)) return false; Object.assign(j, { status: 'queued', error: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: new Date().toISOString() });
+      if (j.recutOf) { const old = findJob(c, j.parentId)?.clips.find(x => x.id === j.recutOf); if (old) old.recutting = j.id; }
+      return true; });
     if (!ok) return res.status(404).json({ error: 'No retryable job' });
     res.json({ ok: true, delivered: await sendToWorker(req.params.id) });
   });
@@ -409,7 +419,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
       const s = manual ? manual.start : num(json.start, 0, max, cl.start), e = manual ? manual.end : num(json.end, s + 5, max, cl.end);
       const moment = { start: s, end: e, title: str(json.title, 100) || cl.title, hook: str(json.hook, 60) || cl.hook, caption: str(json.caption, 2200) || cl.caption, hashtags: cl.hashtags, score: cl.score, why: cl.why, context: cl.context,
         // same footage: keep the AI's warnings (the worker re-checks music itself). New timing: the old warnings may not apply.
-        flags: same && !(manual && (Math.abs(manual.start - cl.start) > 0.05 || Math.abs(manual.end - cl.end) > 0.05)) ? (cl.flags || []).filter(f => !/^Music in the audio/.test(f)) : [] };
+        flags: same && (!manual || Math.max(0, Math.min(manual.end, cl.end) - Math.max(manual.start, cl.start)) >= 0.5 * (cl.end - cl.start)) ? (cl.flags || []).filter(f => !/^Music in the audio/.test(f)) : [] };
       const now = new Date().toISOString();
       // The worker cuts from the full source, so the moment times stay in source seconds;
       // range-limited parents are re-downloaded with the same range so offsets still line up.
@@ -520,7 +530,7 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
       if (j.recutOf) {        // a re-cut replaces the old clip inside its original job
         const parent = findJob(c, j.parentId), old = parent?.clips.find(x => x.id === j.recutOf);
         if (old) delete old.recutting;
-        if (parent && j.clips[0]) { if (old) old.status = 'rejected'; parent.clips.push({ ...j.clips[0], recutNote: j.note }); }
+        if (parent && j.clips[0]) { if (old && ['review', 'editing'].includes(old.status)) old.status = 'rejected'; parent.clips.push({ ...j.clips[0], recutNote: j.note }); }
         j.clips = [];         // the clip now lives in the parent; an empty re-cut job can be pruned like any other
       }
       live.delete(j.id);
