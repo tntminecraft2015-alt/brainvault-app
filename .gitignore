@@ -1,6 +1,7 @@
 node_modules/
 config.json
 .env
+worker/data/
 
 # Vault data — lives in brainvault-vault repo, not here
 wiki/

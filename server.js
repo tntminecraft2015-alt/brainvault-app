@@ -2032,6 +2032,9 @@ async function edDailyResearch() {
 // ── FOOTBALL COACH (Farm helper job: live NFL + fantasy trade calculator) ──
 const coach = require('./football')(app, { getApiKey, makeClient, runChatTurn, getAppData, saveAppData, brain, today });
 
+// ── CLIP STUDIO (Clips tab: trending streamer videos → clip worker → review + post) ──
+require('./clipper')(app, { getApiKey, makeClient, getAppData, saveAppData, webpush, pushEnabled: PUSH_ENABLED });
+
 // All daily/weekly learning jobs; each runs at most once per day (or week), so calling
 // this often is cheap. Render's free tier sleeps, so chats also call it to catch up.
 let brainJobsRunning = false;

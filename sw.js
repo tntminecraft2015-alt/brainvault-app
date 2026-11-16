@@ -33,20 +33,25 @@ self.addEventListener('push', event => {
     self.registration.showNotification(data.title || 'BrainVault', {
       body: data.body || '',
       icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%231a2533'/><text y='72' x='50' text-anchor='middle' font-size='60'>%F0%9F%A7%A0</text></svg>",
-      tag: data.title,
-      data: { url: '/' },
+      tag: data.tag || data.title,
+      data: { url: data.url || '/' },
     })
   );
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
+  const url = event.notification.data?.url || '/';
+  const open = new URL(url, self.location.origin).searchParams.get('open');
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
-        if ('focus' in client) return client.focus();
+        if ('focus' in client) {
+          if (open) client.postMessage({ open });   // e.g. jump straight to the Clips tab
+          return client.focus();
+        }
       }
-      if (self.clients.openWindow) return self.clients.openWindow('/');
+      if (self.clients.openWindow) return self.clients.openWindow(url);
     })
   );
 });

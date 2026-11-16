@@ -1,0 +1,18 @@
+# Clip worker + Caddy (free automatic HTTPS). Run with:  docker compose up -d --build
+services:
+  worker:
+    build: .
+    restart: always
+    env_file: .env
+    volumes: ["clipdata:/data"]
+    ports: ["127.0.0.1:8080:8080"]   # localhost only (for the PC + cloudflared fallback); the internet goes through Caddy
+  caddy:
+    image: caddy:2
+    restart: always
+    ports: ["80:80", "443:443"]
+    environment: ["DOMAIN=${DOMAIN}"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile:ro", "caddydata:/data"]
+    depends_on: [worker]
+volumes:
+  clipdata: {}
+  caddydata: {}
