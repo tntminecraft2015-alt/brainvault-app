@@ -331,7 +331,8 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
         `SOURCE: "${job.source.title}" by ${job.source.channel || 'unknown'} (${Math.round(duration)}s)\nTRANSCRIPT:\n${tx || '(no speech detected)'}`, 2500);
       const max = duration || 864000;
       const moments = (Array.isArray(json) ? json : []).map(m => {
-        const s = num(m.start, 0, max, 0), e = num(m.end, 0, max, Math.min(max, s + 45));
+        // the model sometimes overshoots the 30–75s brief; nothing over 90s ships
+        const s = num(m.start, 0, max, 0), e = Math.min(num(m.end, 0, max, Math.min(max, s + 45)), s + 90);
         const context = segs.filter(x => x.e >= s - 20 && x.s <= e + 20).map(x => `[${Math.round(x.s)}] ${str(x.t, 300)}`).join('\n').slice(0, 3000);
         return { start: s, end: e, title: str(m.title, 100), hook: str(m.hook, 60), caption: str(m.caption, 600), hashtags: (Array.isArray(m.hashtags) ? m.hashtags : []).map(h => str(h, 40).replace(/^#/, '')).filter(Boolean).slice(0, 8), score: num(m.score, 1, 10, 5), why: str(m.why, 90), context };
       }).filter(m => m.end - m.start >= 5).sort((a, b) => b.score - a.score)

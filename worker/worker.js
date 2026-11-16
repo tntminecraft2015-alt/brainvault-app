@@ -91,22 +91,43 @@ async function duration(file) {
 const hash = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 16);
 
 // ── pipeline steps ──
-async function download(job) {
-  const key = hash(job.source.url + JSON.stringify(job.range || {}));
-  const file = path.join(dirs.src, `${key}.mp4`);
-  if (fs.existsSync(file)) { fs.utimesSync(file, new Date(), new Date()); return file; }
-  // leftovers from a run that died mid-merge (separate audio/video streams) must not be mistaken for the result
-  for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${key}.mp4.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
-  const h = MAX_HEIGHT;
-  const args = ['-f', `bv*[height<=${h}][ext=mp4]+ba[ext=m4a]/b[height<=${h}][ext=mp4]/bv*[height<=${h}]+ba/b`, '--merge-output-format', 'mp4', '--no-playlist', '--no-part', '--newline', '-o', file + '.dl.%(ext)s'];
-  if (job.range && (job.range.start != null || job.range.end != null)) args.push('--download-sections', `*${job.range.start ?? 0}-${job.range.end ?? 'inf'}`, '--force-keyframes-at-cuts');
+// A multi-hour VOD is several GB of video, so the source is fetched in two passes: the audio track
+// only (~70 MB/hour) to listen and pick moments, then just the picked moments' video sections.
+// All moment times are seconds from the start of the job's range (0 when there is no range).
+const rangeOf = job => ({ from: job.range?.start ?? 0, to: job.range?.end ?? null });
+
+async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label) {
+  // leftovers from a run that died mid-download must not be mistaken for the result
+  for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${base}.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
+  const args = ['-f', format, '--no-playlist', '--no-part', '--newline', ...extra, '-o', path.join(dirs.src, `${base}.dl.%(ext)s`)];
+  if (section) args.push('--download-sections', `*${section[0]}-${section[1] ?? 'inf'}`, '--force-keyframes-at-cuts');
   args.push(job.source.url);
-  await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', +m[1] * 0.25, `Downloading… ${Math.round(+m[1])}%`); } });
-  const outs = fs.readdirSync(dirs.src).filter(f => f.startsWith(`${key}.mp4.dl.`));
-  const got = outs.find(f => f === `${key}.mp4.dl.mp4`) || (outs.length === 1 ? outs[0] : null);
-  if (!got) throw new Error('Download finished but no video file appeared');
-  fs.renameSync(path.join(dirs.src, got), file);
+  await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', pctFrom + +m[1] / 100 * pctSpan, `${label}… ${Math.round(+m[1])}%`); } });
+  const outs = fs.readdirSync(dirs.src).filter(f => f.startsWith(`${base}.dl.`) && !/\.part$|\.ytdl$/.test(f));
+  if (outs.length !== 1) throw new Error(`Download finished but ${outs.length ? 'several' : 'no'} files appeared`);
+  return path.join(dirs.src, outs[0]);
+}
+
+async function downloadAudio(job) {
+  const { from, to } = rangeOf(job);
+  const key = hash(job.source.url + JSON.stringify(job.range || {}));
+  const done = fs.readdirSync(dirs.src).find(f => f.startsWith(`${key}.audio.`) && !f.endsWith('.json'));
+  if (done) { const p = path.join(dirs.src, done); fs.utimesSync(p, new Date(), new Date()); return p; }
+  const got = await ytdlp(job, `${key}.tmp`, 'ba/wa/b', from || to != null ? [from, to] : null, [], 0, 15, 'Downloading audio');
+  const file = path.join(dirs.src, `${key}.audio${path.extname(got)}`);
+  fs.renameSync(got, file);
   return file;
+}
+
+// Just one moment's video (+ a little padding so the cut lands cleanly); returns { file, pad }
+async function downloadSection(job, m, pctFrom) {
+  const { from } = rangeOf(job);
+  const pad = Math.min(2, m.start);
+  const h = MAX_HEIGHT;
+  const base = `${hash(job.source.url + `${from + m.start}-${from + m.end}`)}.sec`;
+  const file = await ytdlp(job, base, `bv*[height<=${h}][ext=mp4]+ba[ext=m4a]/b[height<=${h}][ext=mp4]/bv*[height<=${h}]+ba/b`,
+    [from + m.start - pad, from + m.end + 1], ['--merge-output-format', 'mp4'], pctFrom, 3, 'Downloading clip video');
+  return { file, pad };
 }
 
 // Transcribe [from, to) of the source (whole file when omitted); returns segments in source seconds.
@@ -183,17 +204,19 @@ function filterFor(layout, corner) {
   return `[0:v]split=2[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=24:2,eq=brightness=-0.08[bg];[b]scale=1080:-2,setsar=1[fg];[bg][fg]overlay=0:(H-h)/2,setsar=1,ass=sub.ass:fontsdir=${FONTS}[v]`;
 }
 
-async function render(job, src, m, i, segs) {
+async function render(job, m, i, segs, pctFrom) {
   const dir = path.join(dirs.work, job.id); fs.mkdirSync(dir, { recursive: true });
   const len = +(m.end - m.start).toFixed(2);
   const words = segs.flatMap(s => s.w).filter(([ws, we]) => we > m.start && ws < m.end).map(([ws, we, w]) => [Math.max(0, ws - m.start), Math.min(len, we - m.start), w]);
   fs.writeFileSync(path.join(dir, 'sub.ass'), buildAss({ words, hook: m.hook, layout: job.layout, duration: len }));
+  const { file: src, pad } = await downloadSection(job, m, pctFrom);
   const out = `clip${i}.mp4`;
-  await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(m.start), '-t', String(len), '-i', src,
+  await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(pad), '-t', String(len), '-i', src,
     '-filter_complex', filterFor(job.layout, job.corner), '-map', '[v]', '-map', '0:a?',
     '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', '-r', '30',
     '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-movflags', '+faststart', out], { cwd: dir });
   await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(Math.min(1, len / 2)), '-i', out, '-frames:v', '1', '-vf', 'scale=360:-2', `thumb${i}.jpg`], { cwd: dir });
+  fs.rmSync(src, { force: true });
   return { video: path.join(dir, out), thumb: path.join(dir, `thumb${i}.jpg`) };
 }
 
@@ -218,10 +241,10 @@ async function sendPush(job, n) {
 }
 
 async function processJob(job) {
-  progress(job, 'downloading', 1, 'Downloading…'); lastProg = 0;
-  const src = await download(job);
+  progress(job, 'downloading', 1, 'Downloading audio…'); lastProg = 0;
+  const src = await downloadAudio(job);
   const dur = await duration(src);
-  if (!dur) throw new Error('Could not read the downloaded video');
+  if (!dur) throw new Error('Could not read the downloaded audio');
   let moments, segs;
   if (job.type === 'render' && job.moments?.length) {
     // re-cut: only listen to the part being cut (cached if this source was done before)
@@ -241,7 +264,7 @@ async function processJob(job) {
     const m = { ...moments[i], start: Math.max(0, +moments[i].start), end: Math.min(dur, +moments[i].end) };
     if (m.end - m.start < 3) continue;
     lastProg = 0; progress(job, 'rendering', 68 + 30 * i / moments.length, `Editing clip ${i + 1} of ${moments.length}…`);
-    const { video, thumb } = await render(job, src, m, i, segs);
+    const { video, thumb } = await render(job, m, i, segs, 68 + 30 * i / moments.length);
     const [url, thumbUrl] = [await store(video, 'video/mp4'), await store(thumb, 'image/jpeg')];
     clips.push({ ...moments[i], start: m.start, end: m.end, url, thumb: thumbUrl });
   }
@@ -325,6 +348,8 @@ app.post('/jobs', (req, res) => {
 
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Clip worker on :${PORT} → reporting to ${SERVER} · storage ${R2 ? 'R2' : FILES_BASE} · transcribe ${GROQ ? 'Groq' : 'local whisper'} · push ${PUSH ? 'on' : 'off'} · ${queue.length} job(s) resumed`);
+  // half-finished downloads (and whole-video sources from older versions) only waste the disk
+  for (const f of fs.readdirSync(dirs.src)) if (f.includes('.dl.') || /^[a-f0-9]{16}\.mp4$/.test(f)) fs.rmSync(path.join(dirs.src, f), { force: true });
   sweep(); setInterval(sweep, 3600 * 1000);
   // keep yt-dlp current; sites change their players often (non-fatal)
   const updateYtDlp = () => run(PY, ['-m', 'pip', 'install', '-q', '-U', 'yt-dlp']).catch(e => console.error('yt-dlp update skipped:', e.message));
