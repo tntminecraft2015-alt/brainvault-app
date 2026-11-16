@@ -24,6 +24,7 @@ const LAYOUTS = ['blur', 'center', 'split'];
 const CORNERS = ['tl', 'tr', 'bl', 'br'];
 
 const str = (v, n) => String(v ?? '').trim().slice(0, n);
+const OPEN_STATUSES = ['review', 'approved', 'editing'];   // clips that still need you: their jobs are never pruned
 const strList = v => (Array.isArray(v) ? v : []).map(x => str(x, 80)).filter(Boolean).slice(0, 4);
 const num = (v, lo, hi, dflt) => { const x = Number(v); return Number.isFinite(x) ? Math.min(hi, Math.max(lo, x)) : dflt; };
 const newId = p => `${p}-${Date.now().toString(36)}${crypto.randomBytes(3).toString('hex')}`;
@@ -59,8 +60,13 @@ async function helix(pathQs, ttlMs = 10 * 60 * 1000) {
 const twDur = s => { const m = String(s || '').match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/) || []; return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0); };
 const twThumb = (u, w, h) => String(u || '').replace('%{width}', w).replace('%{height}', h).replace('{width}', w).replace('{height}', h);
 
-async function getTrending(streamers) {
+async function getTrending(streamers, topics = []) {
   const items = [];
+  // topics (e.g. "GTA 6"): that Twitch category's most-watched VODs this week, from any streamer (runs alongside the streamer lookups)
+  const topicsP = Promise.all(topics.filter(t => t.gameId).map(async t => {
+    const vods = await helix(`videos?game_id=${t.gameId}&type=archive&sort=views&period=week&first=8`, 30 * 60 * 1000).catch(() => []);
+    for (const v of vods) items.push({ id: `tv-${v.id}`, kind: 'vod', url: v.url, title: v.title, channel: v.user_name, login: v.user_login, views: v.view_count, duration: twDur(v.duration), date: v.created_at, thumb: twThumb(v.thumbnail_url, 480, 270), saved: streamers.includes(String(v.user_login).toLowerCase()), topic: t.q });
+  }));
   const users = streamers.length ? await helix(`users?${streamers.slice(0, 50).map(l => `login=${encodeURIComponent(l)}`).join('&')}`, 6 * 3600 * 1000) : [];
   // rounded to the hour so the URL (= cache key) stays the same between loads
   const since = new Date(Math.floor((Date.now() - 72 * 3600 * 1000) / 3.6e6) * 3.6e6).toISOString();
@@ -72,12 +78,15 @@ async function getTrending(streamers) {
     for (const v of vods) items.push({ id: `tv-${v.id}`, kind: 'vod', url: v.url, title: v.title, channel: u.display_name, login: u.login, views: v.view_count, duration: twDur(v.duration), date: v.created_at, thumb: twThumb(v.thumbnail_url, 480, 270), saved: true });
     for (const c of clips) items.push({ id: `tc-${c.id}`, kind: 'clip', url: c.url, title: c.title, channel: c.broadcaster_name, login: u.login, views: c.view_count, duration: Math.round(c.duration), date: c.created_at, thumb: c.thumbnail_url, saved: true });
   }));
+  await topicsP;
   // Top live streams right now (all of Twitch), for discovering who's hot
   const live = await helix('streams?first=20', 5 * 60 * 1000).catch(() => []);
   for (const s of live) items.push({ id: `tl-${s.id}`, kind: 'live', url: `https://www.twitch.tv/${s.user_login}`, title: s.title, channel: s.user_name, login: s.user_login, views: s.viewer_count, game: s.game_name, date: s.started_at, thumb: twThumb(s.thumbnail_url, 480, 270), saved: streamers.includes(s.user_login.toLowerCase()) });
   // views per hour since posting: what's moving right now
   for (const it of items) { const hrs = Math.max(1, (Date.now() - new Date(it.date)) / 3.6e6); it.velocity = it.kind === 'live' ? it.views : Math.round(it.views / hrs); }
-  return items;
+  // a saved streamer's VOD can also match a topic: keep one copy, with the topic tag
+  const seen = new Map(); for (const it of items) { const o = seen.get(it.id); if (!o) seen.set(it.id, it); else if (it.topic) o.topic = it.topic; }
+  return [...seen.values()];
 }
 
 module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, webpush, pushEnabled }) {
@@ -124,8 +133,8 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   app.get('/api/clips/trending', async (req, res) => {
     if (!TW_ID || !TW_SECRET) return res.json({ needsSetup: 'twitch', items: [] });
     try {
-      const streamers = clipsOf(getAppData()).streamers.map(s => s.login);
-      const items = await getTrending(streamers);
+      const c0 = clipsOf(getAppData()), streamers = c0.streamers.map(s => s.login);
+      const items = await getTrending(streamers, c0.autopilot?.topics || []);
       if (!scoring) scoring = scoreNew(items).catch(e => console.error('Clip scoring failed:', e.message)).finally(() => { scoring = null; });
       if (req.query.wait) await scoring;
       const scores = clipsOf(getAppData()).scores;
@@ -138,13 +147,13 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   app.get('/api/clips/state', (req, res) => {
     const c = clipsOf(getAppData());
     // newest 40, plus any older job still holding clips you haven't dealt with; live progress overlaid
-    const jobs = c.jobs.filter((j, i) => i < 40 || j.clips?.some(x => x.status === 'review' || x.status === 'approved'))
+    const jobs = c.jobs.filter((j, i) => i < 40 || j.clips?.some(x => OPEN_STATUSES.includes(x.status)))
       .map(j => live.has(j.id) && !['done', 'failed'].includes(j.status) ? { ...j, ...live.get(j.id) } : j);
     const y = c.youtube || {}, a = c.autopilot || {};
     res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET),
       youtube: { configured: !!(YT_ID && YT_SECRET), connected: !!y.tok && !y.error, channel: y.channel || null, error: y.error || null, today: (y.uploads || {})[new Date().toISOString().slice(0, 10)] || 0 },
       tiktok: { configured: !!(TT_KEY && TT_SECRET), connected: !!c.tiktok?.tok && !c.tiktok?.error, user: c.tiktok?.user || null, error: c.tiktok?.error || null },
-      autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
+      autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], topics: a.topics || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
   });
   app.post('/api/clips/streamers', (req, res) => {
     const login = str(req.body?.login, 80).toLowerCase().replace(/^.*twitch\.tv\//, '').replace(/[^a-z0-9_]/g, '').slice(0, 25);
@@ -228,12 +237,13 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
       range: b.start != null || b.end != null ? { start: b.start ?? null, end: b.end ?? null } : null,
       campaignId: str(b.campaignId, 40) || null,
       layout: LAYOUTS.includes(b.layout) ? b.layout : null, corner: CORNERS.includes(b.corner) ? b.corner : null,
+      topic: str(b.topic, 40) || null,
       progress: 0, msg: 'Queued', clips: [], costUsd: 0, ...extra,
     };
     mutate(c => {
       c.jobs.unshift(job);
       // keep the 60 newest, but never drop a job that still has clips waiting for review
-      c.jobs = c.jobs.filter((j, i) => i < 60 || j.clips?.some(x => x.status === 'review' || x.status === 'approved'));
+      c.jobs = c.jobs.filter((j, i) => i < 60 || j.clips?.some(x => OPEN_STATUSES.includes(x.status)));
     });
     const delivered = await sendToWorker(job.id);
     return { job: findJob(clipsOf(getAppData()), job.id), delivered };
@@ -243,15 +253,33 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   // The worker is the always-on part (Render's free web service sleeps), so it calls /worker/autopilot
   // every couple of hours. YouTube channels are listed by the worker (it has yt-dlp) and sent along.
   // data.clips.autopilot = { on, perDay, youtube:[{url,name}], seen:{sourceKey:date}, lastRun }
-  const apOf = c => { c.autopilot = c.autopilot || {}; const a = c.autopilot; a.perDay = a.perDay || 10; a.youtube = a.youtube || []; a.seen = a.seen || {}; return a; };
+  const apOf = c => { c.autopilot = c.autopilot || {}; const a = c.autopilot; a.perDay = a.perDay || 10; a.youtube = a.youtube || []; a.topics = a.topics || []; a.seen = a.seen || {}; return a; };
+  // "GTA 6" → Twitch's matching category, so topic search can list that game's VODs. Not every topic is a game:
+  // then it's a YouTube search only (and a hint for the picker).
+  async function resolveTopic(q) {
+    if (!TW_ID || !TW_SECRET) return { q };
+    const cats = await helix(`search/categories?query=${encodeURIComponent(q)}&first=5`, 24 * 3600 * 1000);   // throws if Twitch is down
+    // compare as words with Roman numerals turned into digits: "Grand Theft Auto VI" = "grandtheftauto6", initials "gta6"
+    const ROMAN = { ii: '2', iii: '3', iv: '4', v: '5', vi: '6', vii: '7', viii: '8', ix: '9', x: '10' };
+    const words = s => String(s).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).map(w => ROMAN[w] || w);
+    const full = s => words(s).join(''), initials = s => words(s).map(w => /^\d+$/.test(w) ? w : w[0]).join('');
+    const want = full(q);
+    // an exact name or initials match only: a near miss would quietly clip the wrong game (e.g. GTA V for "GTA 6")
+    const hit = cats.find(c => full(c.name) === want || initials(c.name) === want);
+    return hit ? { q, gameId: hit.id, gameName: hit.name } : { q };
+  }
   const day = 864e5;
 
   app.get('/api/clips/autopilot', (req, res) => {
     const c = clipsOf(getAppData()), a = apOf(c);
-    res.json({ on: !!a.on, perDay: a.perDay, youtube: a.youtube, lastRun: a.lastRun || null, lastPick: a.lastPick || null });
+    res.json({ on: !!a.on, perDay: a.perDay, youtube: a.youtube, topics: a.topics, lastRun: a.lastRun || null, lastPick: a.lastPick || null });
   });
-  app.post('/api/clips/autopilot', (req, res) => {
+  app.post('/api/clips/autopilot', async (req, res) => {
     const b = req.body || {};
+    const addTopic = str(b.addTopic, 40);
+    if (b.addTopic != null && !addTopic) return res.status(400).json({ error: 'Type a topic, like GTA 6' });
+    let topic = null;
+    if (addTopic) { try { topic = await resolveTopic(addTopic); } catch (e) { return res.status(502).json({ error: `Couldn't reach Twitch to match that topic (${e.message}). Try again in a minute.` }); } }
     const out = mutate(c => {
       const a = apOf(c);
       if (b.on != null) a.on = !!b.on;
@@ -262,7 +290,9 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
         if (!a.youtube.some(y => y.url === u)) a.youtube.push({ url: u, name: u.split('/').pop() });
       }
       if (b.removeYoutube) a.youtube = a.youtube.filter(y => y.url !== b.removeYoutube);
-      return { on: !!a.on, perDay: a.perDay, youtube: a.youtube };
+      if (topic && !a.topics.some(t => t.q.toLowerCase() === topic.q.toLowerCase())) { if (a.topics.length >= 8) return { error: 'Up to 8 topics' }; a.topics.push(topic); }
+      if (b.removeTopic) a.topics = a.topics.filter(t => t.q !== b.removeTopic);
+      return { on: !!a.on, perDay: a.perDay, youtube: a.youtube, topics: a.topics };
     });
     if (out.error) return res.status(400).json(out);
     res.json({ ok: true, ...out });
@@ -281,7 +311,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   }
   app.get('/api/clips/worker/autopilot', workerOnly, (req, res) => {
     const c = clipsOf(getAppData());
-    res.json({ ...apNeed(c), youtube: apOf(c).youtube.map(y => y.url) });
+    res.json({ ...apNeed(c), youtube: apOf(c).youtube.map(y => y.url), topics: apOf(c).topics.map(t => t.q) });
   });
 
   // The worker sends what it found on YouTube; this adds Twitch VODs + campaign links, picks one and queues it
@@ -292,13 +322,14 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const cands = [];
     for (const camp of c0.campaigns.filter(x => x.active && x.sourceUrl))
       cands.push({ key: `camp:${camp.id}:${camp.sourceUrl}`, url: camp.sourceUrl, title: `${camp.name} source`, login: camp.streamer, campaignId: camp.id, kind: 'link', rank: 1000 + camp.rate });
-    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 60)) {
+    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 100)) {
       if (!/^[\w-]{11}$/.test(v.id || '') || (v.duration && v.duration < 120)) continue;   // skip Shorts/trailers
-      cands.push({ key: `yt:${v.id}`, url: `https://www.youtube.com/watch?v=${v.id}`, title: str(v.title, 200), channel: str(v.channel, 60), kind: 'vod', views: +v.views || 0, duration: +v.duration || 0, date: v.date || null });
+      cands.push({ key: `yt:${v.id}`, url: `https://www.youtube.com/watch?v=${v.id}`, title: str(v.title, 200), channel: str(v.channel, 60), kind: 'vod', views: +v.views || 0, duration: +v.duration || 0, date: v.date || null, topic: str(v.topic, 40) || null });
     }
-    if (TW_ID && TW_SECRET && c0.streamers.length) {
-      try { for (const it of (await getTrending(c0.streamers.map(s => s.login))).filter(i => i.kind === 'vod' && Date.now() - new Date(i.date) < 7 * day))
-        cands.push({ key: it.id, url: it.url, title: it.title, channel: it.channel, login: it.login, thumb: it.thumb, kind: 'vod', views: it.views, duration: it.duration, date: it.date }); }
+    // Twitch: your streamers' recent VODs + each topic's most-watched VODs this week (one list, duplicates merged)
+    if (TW_ID && TW_SECRET && (c0.streamers.length || a0.topics.some(t => t.gameId))) {
+      try { for (const it of (await getTrending(c0.streamers.map(s => s.login), a0.topics)).filter(i => i.kind === 'vod' && Date.now() - new Date(i.date) < 7 * day))
+        cands.push({ key: it.id, url: it.url, title: it.title, channel: it.channel, login: it.login, thumb: it.thumb, kind: 'vod', views: it.views, duration: it.duration, date: it.date, topic: it.topic || null }); }
       catch (e) { console.error('Autopilot: Twitch lookup failed:', e.message); }
     }
     const fresh = cands.filter(x => !a0.seen[x.key]);
@@ -308,11 +339,11 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     if (vods.length > 1) {
       try {
         const { json } = await haiku('You rate stream VODs for how well they would clip into viral 15–30s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10}].',
-          vods.slice(0, 25).map((v, n) => `${n}. "${v.title}" by ${v.channel || '?'}, ${v.views || 0} views, ${Math.round((v.duration || 0) / 60)} min`).join('\n'), 600);
+          vods.slice(0, 60).map((v, n) => `${n}. "${v.title}" by ${v.channel || '?'}, ${v.views || 0} views, ${Math.round((v.duration || 0) / 60)} min${v.topic ? ` (topic: ${v.topic}; score low if the title looks unrelated to it)` : ''}`).join('\n'), 1500);
         for (const r of Array.isArray(json) ? json : []) if (vods[r.n]) vods[r.n].rank = num(r.score, 1, 10, 5) * 10;
       } catch (e) { console.error('Autopilot: scoring failed:', e.message); }
     }
-    for (const v of vods) v.rank = (v.rank || 50) + Math.min(5, Math.log10((v.views || 0) + 1)) - (v.date ? (Date.now() - new Date(v.date)) / day : 3);
+    for (const v of vods) v.rank = (v.rank || 35) + Math.min(5, Math.log10((v.views || 0) + 1)) - (v.date ? (Date.now() - new Date(v.date)) / day : 3);
     const pick = fresh.sort((x, y) => y.rank - x.rank)[0];
     const streamer = c0.streamers.find(s => s.login === pick.login);
     mutate(c => { const a = apOf(c); a.seen[pick.key] = new Date().toISOString().slice(0, 10); a.lastPick = { title: pick.title, at: new Date().toISOString() };
@@ -340,7 +371,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const b = req.body || {};
     const clip = mutate(c => {
       const cl = findJob(c, req.params.id)?.clips.find(x => x.id === req.params.cid); if (!cl) return null;
-      if (['review', 'approved', 'rejected', 'posted'].includes(b.status)) cl.status = b.status;
+      if (['review', 'approved', 'rejected', 'posted', 'editing'].includes(b.status)) cl.status = b.status;
       if (b.caption != null) cl.caption = str(b.caption, 2200);
       if (b.title != null) cl.title = str(b.title, 100);
       if (b.postLinks && typeof b.postLinks === 'object') for (const p of ['tiktok', 'youtube', 'instagram']) if (b.postLinks[p] !== undefined) cl.postLinks = { ...(cl.postLinks || {}), [p]: isUrl(b.postLinks[p]) ? str(b.postLinks[p], 500) : '' };
@@ -355,27 +386,36 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   // Re-cut: Haiku turns a plain-English note into new timings, then a render-only job goes to the worker.
   // { same: true } skips Haiku and re-renders the clip exactly as it is (e.g. after a caption style change).
   app.post('/api/clips/jobs/:id/clips/:cid/recut', async (req, res) => {
-    const same = req.body?.same === true, note = same ? 'Re-rendered with the current caption style' : str(req.body?.note, 300);
+    const e0 = req.body?.edit && typeof req.body.edit === 'object' ? req.body.edit : null;
+    const same = req.body?.same === true || !!e0, note = e0 ? 'Edited by hand' : same ? 'Re-rendered with the current caption style' : str(req.body?.note, 300);
     if (!note) return res.status(400).json({ error: 'Say what to change' });
     const c0 = clipsOf(getAppData()), job = findJob(c0, req.params.id), cl = job?.clips.find(x => x.id === req.params.cid);
     if (!cl) return res.status(404).json({ error: 'Clip not found' });
-    if (same && cl.status !== 'review') return res.status(409).json({ error: 'Only clips waiting for review can be re-rendered' });
+    if (e0 && !['review', 'editing'].includes(cl.status)) return res.status(409).json({ error: 'Only clips in Review or Editing can be edited' });
+    let manual = null;
+    if (e0) {
+      const max = job.duration || 864000, s = num(e0.start, 0, max, cl.start), e = num(e0.end, 0, max, cl.end);
+      if (e - s < 3) return res.status(400).json({ error: 'A clip has to be at least 3 seconds long' });
+      if (e - s > 180) return res.status(400).json({ error: 'Keep it under 3 minutes' });
+      manual = { start: s, end: e, layout: LAYOUTS.includes(e0.layout) ? e0.layout : null, corner: CORNERS.includes(e0.corner) ? e0.corner : null };
+    }
+    if (same && !e0 && cl.status !== 'review') return res.status(409).json({ error: 'Only clips waiting for review can be re-rendered' });
     if (same && cl.recutting) return res.status(409).json({ error: 'Already re-cutting this clip' });
     try {
       const { json, cost } = same ? { json: {}, cost: 0 } : await haiku(
         'You adjust one short-form video clip based on the editor\'s note. Times are seconds in the source video. Keep length 10–45s (ideally 15–30s) unless the note says otherwise. Reply ONLY with JSON: {"start":n,"end":n,"title":"…","hook":"…","caption":"…"}. Keep fields unchanged unless the note asks.',
         `CURRENT: ${JSON.stringify({ start: cl.start, end: cl.end, title: cl.title, hook: cl.hook, caption: cl.caption })}\nSOURCE LENGTH: ${job.duration || 'unknown'}s\nTRANSCRIPT NEAR CLIP:\n${cl.context || '(none)'}\nNOTE: ${note}`, 600);
       const max = job.duration || 864000;
-      const s = num(json.start, 0, max, cl.start), e = num(json.end, s + 5, max, cl.end);
+      const s = manual ? manual.start : num(json.start, 0, max, cl.start), e = manual ? manual.end : num(json.end, s + 5, max, cl.end);
       const moment = { start: s, end: e, title: str(json.title, 100) || cl.title, hook: str(json.hook, 60) || cl.hook, caption: str(json.caption, 2200) || cl.caption, hashtags: cl.hashtags, score: cl.score, why: cl.why, context: cl.context,
         // same footage: keep the AI's warnings (the worker re-checks music itself). New timing: the old warnings may not apply.
-        flags: same ? (cl.flags || []).filter(f => !/^Music in the audio/.test(f)) : [] };
+        flags: same && !(manual && (Math.abs(manual.start - cl.start) > 0.05 || Math.abs(manual.end - cl.end) > 0.05)) ? (cl.flags || []).filter(f => !/^Music in the audio/.test(f)) : [] };
       const now = new Date().toISOString();
       // The worker cuts from the full source, so the moment times stay in source seconds;
       // range-limited parents are re-downloaded with the same range so offsets still line up.
       const rj = {
         id: newId('job'), type: 'render', parentId: job.id, status: 'queued', createdAt: now, updatedAt: now,
-        source: job.source, range: job.range, duration: job.duration, campaignId: job.campaignId, layout: job.layout, corner: job.corner,
+        source: job.source, range: job.range, duration: job.duration, campaignId: job.campaignId, layout: manual?.layout || cl.layout || job.layout, corner: manual?.corner || cl.corner || job.corner,
         moments: [moment], recutOf: cl.id, note, progress: 0, msg: 'Queued re-cut', clips: [], costUsd: cost,
       };
       mutate(c => { c.jobs.unshift(rj); const p = findJob(c, job.id)?.clips.find(x => x.id === cl.id); if (p) p.recutting = rj.id; });
@@ -435,13 +475,14 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   }
   async function pickMoments(job, c0, segs, duration, chat = []) {
     const spikes = chatSpikes(chat);
+    const topicLine = job.topic ? ` This video was picked for the topic "${job.topic}": favor moments about it, and only fall back to other moments if nothing on-topic makes a good clip.` : '';
     const camp = c0.campaigns.find(x => x.id === job.campaignId);
     const short = duration > 0 && duration <= 95;
     // ~120k chars of transcript max: keeps one Haiku call to a few cents even on long VODs
     let tx = ''; for (const s of segs) { const line = `[${Math.round(s.s)}-${Math.round(s.e)}] ${str(s.t, 400)}\n`; if (tx.length + line.length > 120000) break; tx += line; }
     {
       const { json, cost } = await haiku(
-        `You are an expert short-form editor who clips Twitch streamers for TikTok and YouTube Shorts. ${short ? 'This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : 'Pick the 4–8 best self-contained moments that do not overlap each other. Keep them SHORT: aim for 15–30 seconds each (never under 10s or over 45s). Start a beat before the setup and cut right after the payoff, with no dead air at the start or end; one punchy reaction beats a long story. Gaming transcripts are often thin or repetitive: still return your best 3 picks, favoring the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that"). Only return [] if there is no speech at all.'}${spikes ? ' CHAT SPIKES show where live viewers reacted most: strongly favor moments that line up with a spike (the reaction usually lands a few seconds after the moment itself), but only if the transcript there makes a good self-contained clip.' : ''}
+        `You are an expert short-form editor who clips Twitch streamers for TikTok and YouTube Shorts. ${short ? 'This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : 'Pick the 4–8 best self-contained moments that do not overlap each other. Keep them SHORT: aim for 15–30 seconds each (never under 10s or over 45s). Start a beat before the setup and cut right after the payoff, with no dead air at the start or end; one punchy reaction beats a long story. Gaming transcripts are often thin or repetitive: still return your best 3 picks, favoring the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that"). Only return [] if there is no speech at all.'}${topicLine}${spikes ? ' CHAT SPIKES show where live viewers reacted most: strongly favor moments that line up with a spike (the reaction usually lands a few seconds after the moment itself), but only if the transcript there makes a good self-contained clip.' : ''}
 For each give: a "title" (≤70 chars, for YouTube), a "hook" (≤6 words, punchy on-screen text, ALL CAPS ok), a "caption" (1–2 lines for TikTok, no hashtags), 3–6 "hashtags" (no #), a "score" 1–10 for viral potential, "why" (≤12 words), and "flags": a list (usually empty) of short warnings for anything in the moment that could get it muted or removed on TikTok/YouTube: audible copyrighted music or song lyrics, slurs or hate speech, sexual content, dangerous stunts, gambling, graphic violence, minors in risky situations.${camp?.rules ? `\nThis clip is for a paid campaign, "${camp.name}". Follow its rules exactly in the caption/hashtags:\n${camp.rules}` : ''}
 Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end":n,"title":"","hook":"","caption":"","hashtags":[""],"score":n,"why":"","flags":[]}]`,
         `SOURCE: "${job.source.title}" by ${job.source.channel || 'unknown'} (${Math.round(duration)}s)${spikes}\nTRANSCRIPT:\n${tx || '(no speech detected)'}`, 2500);
@@ -469,6 +510,7 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
       fresh = true;
       j.clips = (Array.isArray(b.clips) ? b.clips : []).filter(x => isUrl(x.url)).map(x => ({
         id: newId('clip'), url: str(x.url, 600), thumb: isUrl(x.thumb) ? str(x.thumb, 600) : '', start: num(x.start, 0, 864000, 0), end: num(x.end, 0, 864000, 0),
+        layout: j.layout || null, corner: j.corner || null,
         title: str(x.title, 100), hook: str(x.hook, 60), caption: str(x.caption, 2200), hashtags: (Array.isArray(x.hashtags) ? x.hashtags : []).map(h => str(h, 40)).slice(0, 8),
         score: num(x.score, 1, 10, 5), why: str(x.why, 90), flags: strList(x.flags), context: str(x.context, 3000), status: 'review', views: 0, postLinks: {},
       }));
@@ -488,7 +530,7 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     // Backup push: only when the worker isn't sending its own (it does so right after this call succeeds)
     if (fresh && !b.workerPushes && pushEnabled && job.status === 'done') {
       const n = (b.clips || []).length;
-      const payload = JSON.stringify({ title: '🎬 Clips ready', body: `${n} clip${n > 1 ? 's' : ''} from "${job.source.title}". Tap to review.`, tag: `clips-${job.id}`, url: '/?open=clips' });
+      const payload = JSON.stringify({ title: '🎬 Cled: clips ready', body: `${n} clip${n > 1 ? 's' : ''} from "${job.source.title}". Tap to review.`, tag: `clips-${job.id}`, url: '/?open=clips' });
       for (const sub of (getAppData().pushSubscriptions || [])) webpush.sendNotification(sub, payload).catch(() => {});
     }
     res.json({ ok: true });
@@ -746,7 +788,7 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     }
     res.json({
       spendUsd: +c.spendUsd.toFixed(4), estUsd: +estUsd.toFixed(2),
-      counts: { review: all.filter(x => x.status === 'review').length, approved: all.filter(x => x.status === 'approved').length, posted: all.filter(x => x.status === 'posted').length },
+      counts: { review: all.filter(x => x.status === 'review' || x.status === 'editing').length, approved: all.filter(x => x.status === 'approved').length, posted: all.filter(x => x.status === 'posted').length },
       views: all.filter(x => x.status === 'posted').reduce((n, x) => n + (x.views || 0), 0),
     });
   });
