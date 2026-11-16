@@ -109,7 +109,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     if (!fresh.length) return;
     const list = fresh.map((i, n) => `${n}. [${i.kind}] "${i.title}" by ${i.channel}, ${i.views} views, ${Math.round((i.duration || 0) / 60)} min, ${i.velocity}/hr`).join('\n');
     const { json } = await haiku(
-      'You rate Twitch videos for how well they would clip into viral 30–75s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10,"why":"under 12 words"}].',
+      'You rate Twitch videos for how well they would clip into viral 15–30s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10,"why":"under 12 words"}].',
       list, 1500);
     mutate(c => {
       for (const r of Array.isArray(json) ? json : []) { const it = fresh[r.n]; if (it) c.scores[it.id] = { score: num(r.score, 1, 10, 5), why: str(r.why, 90), date: new Date().toISOString().slice(0, 10) }; }
@@ -303,7 +303,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const vods = fresh.filter(x => !x.campaignId);
     if (vods.length > 1) {
       try {
-        const { json } = await haiku('You rate stream VODs for how well they would clip into viral 30–75s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10}].',
+        const { json } = await haiku('You rate stream VODs for how well they would clip into viral 15–30s TikTok/YouTube Shorts. Big reactions, funny moments, rage, clutch plays, drama and hot takes score high; quiet grinding, music streams and AFK score low. Reply ONLY with JSON: [{"n":0,"score":1-10}].',
           vods.slice(0, 25).map((v, n) => `${n}. "${v.title}" by ${v.channel || '?'}, ${v.views || 0} views, ${Math.round((v.duration || 0) / 60)} min`).join('\n'), 600);
         for (const r of Array.isArray(json) ? json : []) if (vods[r.n]) vods[r.n].rank = num(r.score, 1, 10, 5) * 10;
       } catch (e) { console.error('Autopilot: scoring failed:', e.message); }
@@ -356,7 +356,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     if (!cl) return res.status(404).json({ error: 'Clip not found' });
     try {
       const { json, cost } = await haiku(
-        'You adjust one short-form video clip based on the editor\'s note. Times are seconds in the source video. Keep length 15–90s unless the note says otherwise. Reply ONLY with JSON: {"start":n,"end":n,"title":"…","hook":"…","caption":"…"}. Keep fields unchanged unless the note asks.',
+        'You adjust one short-form video clip based on the editor\'s note. Times are seconds in the source video. Keep length 10–45s (ideally 15–30s) unless the note says otherwise. Reply ONLY with JSON: {"start":n,"end":n,"title":"…","hook":"…","caption":"…"}. Keep fields unchanged unless the note asks.',
         `CURRENT: ${JSON.stringify({ start: cl.start, end: cl.end, title: cl.title, hook: cl.hook, caption: cl.caption })}\nSOURCE LENGTH: ${job.duration || 'unknown'}s\nTRANSCRIPT NEAR CLIP:\n${cl.context || '(none)'}\nNOTE: ${note}`, 600);
       const max = job.duration || 864000;
       const s = num(json.start, 0, max, cl.start), e = num(json.end, s + 5, max, cl.end);
@@ -420,20 +420,20 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     let tx = ''; for (const s of segs) { const line = `[${Math.round(s.s)}-${Math.round(s.e)}] ${str(s.t, 400)}\n`; if (tx.length + line.length > 120000) break; tx += line; }
     {
       const { json, cost } = await haiku(
-        `You are an expert short-form editor who clips Twitch streamers for TikTok and YouTube Shorts. ${short ? 'This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : 'Pick the 3–6 best self-contained moments that do not overlap each other. Each must be 30–75s (make at least one 61–75s for TikTok Creator Rewards), start right before the setup, and end on the payoff, with no dead air at the start. Gaming transcripts are often thin or repetitive: still return your best 3 picks, favoring the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that"). Only return [] if there is no speech at all.'}
+        `You are an expert short-form editor who clips Twitch streamers for TikTok and YouTube Shorts. ${short ? 'This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : 'Pick the 4–8 best self-contained moments that do not overlap each other. Keep them SHORT: aim for 15–30 seconds each (never under 10s or over 45s). Start a beat before the setup and cut right after the payoff, with no dead air at the start or end; one punchy reaction beats a long story. Gaming transcripts are often thin or repetitive: still return your best 3 picks, favoring the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that"). Only return [] if there is no speech at all.'}
 For each give: a "title" (≤70 chars, for YouTube), a "hook" (≤6 words, punchy on-screen text, ALL CAPS ok), a "caption" (1–2 lines for TikTok, no hashtags), 3–6 "hashtags" (no #), a "score" 1–10 for viral potential, and "why" (≤12 words).${camp?.rules ? `\nThis clip is for a paid campaign, "${camp.name}". Follow its rules exactly in the caption/hashtags:\n${camp.rules}` : ''}
 Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end":n,"title":"","hook":"","caption":"","hashtags":[""],"score":n,"why":""}]`,
         `SOURCE: "${job.source.title}" by ${job.source.channel || 'unknown'} (${Math.round(duration)}s)\nTRANSCRIPT:\n${tx || '(no speech detected)'}`, 2500);
       const max = duration || 864000;
       const moments = (Array.isArray(json) ? json : []).map(m => {
-        // the model sometimes overshoots the 30–75s brief; nothing over 90s ships
-        const s = num(m.start, 0, max, 0), e = Math.min(num(m.end, 0, max, Math.min(max, s + 45)), s + 90);
+        // the model sometimes overshoots the 15–30s brief; nothing over 45s ships
+        const s = num(m.start, 0, max, 0), e = Math.min(num(m.end, 0, max, Math.min(max, s + 25)), s + 45);
         const context = segs.filter(x => x.e >= s - 20 && x.s <= e + 20).map(x => `[${Math.round(x.s)}] ${str(x.t, 300)}`).join('\n').slice(0, 3000);
         return { start: s, end: e, title: str(m.title, 100), hook: str(m.hook, 60), caption: str(m.caption, 600), hashtags: (Array.isArray(m.hashtags) ? m.hashtags : []).map(h => str(h, 40).replace(/^#/, '')).filter(Boolean).slice(0, 8), score: num(m.score, 1, 10, 5), why: str(m.why, 90), context };
-      }).filter(m => m.end - m.start >= 5).sort((a, b) => b.score - a.score)
+      }).filter(m => m.end - m.start >= 8).sort((a, b) => b.score - a.score)
         // drop picks that are mostly the same footage as a better one
         .filter((m, i, all) => !all.slice(0, i).some(k => Math.min(k.end, m.end) - Math.max(k.start, m.start) > 0.5 * Math.min(k.end - k.start, m.end - m.start)))
-        .slice(0, 6);
+        .slice(0, 8);
       mutate(c => { const j = findJob(c, job.id); if (j) { j.costUsd = +((j.costUsd || 0) + cost).toFixed(5); j.duration = duration || j.duration; } });
       return moments;
     }
