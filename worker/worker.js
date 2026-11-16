@@ -193,15 +193,23 @@ async function groqChunk(job, file) {
 }
 
 const CROP_XY = { tl: ['0', '0'], tr: ['iw-ow', '0'], bl: ['0', 'ih-oh'], br: ['iw-ow', 'ih-oh'] };
+// Output size: 1080×1920 by default; OUT_WIDTH=720 renders 720×1280 (fine for Shorts/TikTok, ~2.3× less work).
+// Captions are laid out on a 1080×1920 canvas and libass scales them to whatever size this is.
+const W = Math.round((+process.env.OUT_WIDTH || 1080) / 2) * 2, H = Math.round(W * 16 / 9 / 2) * 2;
+const PRESET = process.env.X264_PRESET || 'veryfast';
 function filterFor(layout, corner) {
-  if (layout === 'center') return '[0:v]scale=-2:1920,crop=1080:1920,setsar=1,ass=sub.ass:fontsdir=' + FONTS + '[v]';
+  const ass = `ass=sub.ass:fontsdir=${FONTS}`;
+  if (layout === 'center') return `[0:v]scale=-2:${H},crop=${W}:${H},setsar=1,${ass}[v]`;
   if (layout === 'split') {
     const [x, y] = CROP_XY[corner] || CROP_XY.br;
+    const camH = Math.round(H * 0.4 / 2) * 2, gameH = H - camH;
     // facecam corner (30% of the width) on top, center of the gameplay below
-    return `[0:v]split=2[a][b];[a]crop=iw*0.3:iw*0.3*768/1080:${x}:${y},scale=1080:768,setsar=1[cam];[b]crop=ih*1080/1152:ih,scale=1080:1152,setsar=1[game];[cam][game]vstack,ass=sub.ass:fontsdir=${FONTS}[v]`;
+    return `[0:v]split=2[a][b];[a]crop=iw*0.3:iw*0.3*${camH}/${W}:${x}:${y},scale=${W}:${camH},setsar=1[cam];[b]crop=ih*${W}/${gameH}:ih,scale=${W}:${gameH},setsar=1[game];[cam][game]vstack,${ass}[v]`;
   }
-  // blur: the full frame centered on a blurred, zoomed copy of itself
-  return `[0:v]split=2[a][b];[a]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=24:2,eq=brightness=-0.08[bg];[b]scale=1080:-2,setsar=1[fg];[bg][fg]overlay=0:(H-h)/2,setsar=1,ass=sub.ass:fontsdir=${FONTS}[v]`;
+  // blur: the full frame centered on a blurred, zoomed copy of itself. The blur runs at 1/4 size
+  // and is scaled back up, which looks the same and is far cheaper than blurring full-size frames.
+  const bw = Math.round(W / 8) * 2, bh = Math.round(H / 8) * 2;
+  return `[0:v]split=2[a][b];[a]scale=${bw}:${bh}:force_original_aspect_ratio=increase,crop=${bw}:${bh},boxblur=6:1,scale=${W}:${H},eq=brightness=-0.08[bg];[b]scale=${W}:-2,setsar=1[fg];[bg][fg]overlay=0:(H-h)/2,setsar=1,${ass}[v]`;
 }
 
 async function render(job, m, i, segs, pctFrom) {
@@ -213,7 +221,7 @@ async function render(job, m, i, segs, pctFrom) {
   const out = `clip${i}.mp4`;
   await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(pad), '-t', String(len), '-i', src,
     '-filter_complex', filterFor(job.layout, job.corner), '-map', '[v]', '-map', '0:a?',
-    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p', '-r', '30',
+    '-c:v', 'libx264', '-preset', PRESET, '-crf', '21', '-pix_fmt', 'yuv420p', '-r', '30',
     '-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-movflags', '+faststart', out], { cwd: dir });
   await run('ffmpeg', ['-y', '-v', 'error', '-ss', String(Math.min(1, len / 2)), '-i', out, '-frames:v', '1', '-vf', 'scale=360:-2', `thumb${i}.jpg`], { cwd: dir });
   fs.rmSync(src, { force: true });

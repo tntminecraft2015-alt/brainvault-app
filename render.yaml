@@ -23,6 +23,10 @@ services:
         value: /data
       - key: MAX_HEIGHT
         value: "720"
+      - key: OUT_WIDTH          # 720×1280 output: half a CPU can't push 1080×1920 in reasonable time
+        value: "720"
+      - key: X264_PRESET
+        value: superfast
       - key: KEEP_DAYS
         value: "7"
       - key: LOCAL_WHISPER
