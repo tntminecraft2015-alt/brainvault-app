@@ -120,10 +120,12 @@ const isYoutube = u => /^(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//.test(St
 // cookies on a cloud server), these other players usually still work. Switched on after the first such failure.
 const ALT_CLIENTS = 'youtube:player_client=tv,web_safari,mweb,default';
 let altClients = false;
+// YouTube "proof of origin" tokens from the bgutil generator baked into the image (see Dockerfile)
+const POT = process.env.BGUTIL_SERVER_HOME && fs.existsSync(process.env.BGUTIL_SERVER_HOME) ? ['--extractor-args', `youtubepot-bgutilscript:server_home=${process.env.BGUTIL_SERVER_HOME}`] : [];
 const FORMAT_ERR = /Requested format is not available|n challenge|Signature extraction failed|Only images are available/i;
 function ytArgs(url, tag) {
   if (!isYoutube(url)) return [];
-  const args = ['--js-runtimes', 'node', ...(altClients ? ['--extractor-args', ALT_CLIENTS] : [])];
+  const args = ['--js-runtimes', 'node', ...POT, ...(altClients ? ['--extractor-args', ALT_CLIENTS] : [])];
   if (fs.existsSync(COOKIES)) { const mine = path.join(dirs.work, `cookies-${tag || crypto.randomBytes(4).toString('hex')}.txt`); fs.copyFileSync(COOKIES, mine); fs.chmodSync(mine, 0o600); args.push('--cookies', mine); }
   return args;
 }
@@ -151,7 +153,7 @@ async function testCookies(text) {
   const f = path.join(dirs.work, `cookies-test-${crypto.randomBytes(4).toString('hex')}.txt`);
   try {
     if (text) fs.writeFileSync(f, text, { mode: 0o600 }); else if (fs.existsSync(COOKIES)) fs.copyFileSync(COOKIES, f); else return { ok: null, error: 'no cookies' };
-    const test = alt => run('yt-dlp', ['--simulate', '--no-playlist', '-f', 'ba/b', '--js-runtimes', 'node', ...(alt ? ['--extractor-args', ALT_CLIENTS] : []), '--cookies', f, TEST_VIDEO], { timeoutMs: 70000 });
+    const test = alt => run('yt-dlp', ['--simulate', '--no-playlist', '-f', 'ba/b', '--js-runtimes', 'node', ...POT, ...(alt ? ['--extractor-args', ALT_CLIENTS] : []), '--cookies', f, TEST_VIDEO], { timeoutMs: 70000 });
     try { await test(altClients); }
     catch (e) { if (altClients || !FORMAT_ERR.test(String(e.message))) throw e; await test(true); altClients = true; console.log('YouTube: default players gave no formats, switched to the alternate players'); }
     return { ok: true };
@@ -653,6 +655,7 @@ app.post('/jobs', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', async () => {
+  console.log(`YouTube PO tokens: ${POT.length ? 'bgutil ready' : 'not installed'}`);
   console.log(`Clip worker on :${PORT} → reporting to ${SERVER} · storage ${R2 ? 'R2' : FILES_BASE} · transcribe ${GROQ ? 'Groq' : 'local whisper'} · push ${PUSH ? 'on' : 'off'} · ${queue.length} job(s) resumed`);
   // half-finished downloads (and whole-video sources from older versions) only waste the disk
   for (const f of fs.readdirSync(dirs.src)) if (f.includes('.dl.') || /^[a-f0-9]{16}\.mp4$/.test(f)) fs.rmSync(path.join(dirs.src, f), { force: true });

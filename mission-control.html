@@ -8545,7 +8545,7 @@ function clipsRenderReview(force){
       ${c.recutting?'<div class="clp-note" style="padding:8px 12px">Re-cutting this one. The new version shows up here when it\'s done.</div>':''}
     </div>
     <div class="clp-big"><button type="button" class="farm-btn reject" onclick="clipsReject('${esc(id)}')">Reject</button><button type="button" class="farm-btn primary" onclick="clipsApprove('${esc(id)}',this)">${canPost?'Post':'Approve'}</button></div>
-    <div class="clp-links"><button type="button" class="clp-link" onclick="clipsToEditing('${esc(id)}')">Edit</button><button type="button" class="clp-link" onclick="clipsRecut('${esc(id)}')">Re-cut</button>${i<q.length-1?`<button type="button" class="clp-link" onclick="clipsGo(1)">Skip</button>`:''}</div>
+    <div class="clp-links"><button type="button" class="clp-link" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Share to TikTok'}</button><button type="button" class="clp-link" onclick="clipsToEditing('${esc(id)}')">Edit</button><button type="button" class="clp-link" onclick="clipsRecut('${esc(id)}')">Re-cut</button>${i<q.length-1?`<button type="button" class="clp-link" onclick="clipsGo(1)">Skip</button>`:''}</div>
   </div>`;
   const vid=el.querySelector('.clp-player video'), pl=vid.parentNode;
   clpFitPlayer();
@@ -8685,7 +8685,7 @@ async function clipsPrefetch(c){
   const f=new File([await r.blob()],`${(c.title||'clip').replace(/[^\w\- ]+/g,'').slice(0,40)||'clip'}.mp4`,{type:'video/mp4'});
   const keep=[...clipsKeep,clipsLastApproved,c.id];   // read at eviction time, so it's always the current window
   const old=Object.keys(clipsBlobs).filter(k=>!keep.includes(k));
-  while(Object.keys(clipsBlobs).length>=CLP_KEEP&&old.length){ const k=old.shift(); if(clipsBlobUrls[k]) URL.revokeObjectURL(clipsBlobUrls[k]); delete clipsBlobs[k]; delete clipsBlobUrls[k]; document.querySelectorAll(`[data-share="${k}"]`).forEach(b=>b.textContent='Save / Share'); }
+  while(Object.keys(clipsBlobs).length>=CLP_KEEP&&old.length){ const k=old.shift(); if(clipsBlobUrls[k]) URL.revokeObjectURL(clipsBlobUrls[k]); delete clipsBlobs[k]; delete clipsBlobUrls[k]; document.querySelectorAll(`[data-share="${k}"]`).forEach(b=>b.textContent='Share to TikTok'); }
   clipsBlobs[c.id]=f; clipsBlobUrls[c.id]=URL.createObjectURL(f);
   document.querySelectorAll(`[data-share="${c.id}"]`).forEach(b=>b.textContent='Share now');
   return f;
@@ -8702,8 +8702,8 @@ async function clipsShare(id,btn){
   const {c}=clpFind(id); if(!c) return;
   try{ await navigator.clipboard.writeText(clpCaption(c)); }catch{}
   const f=clipsBlobs[c.id];
-  if(f&&navigator.canShare?.({files:[f]})){ try{ await navigator.share({files:[f]}); }catch(e){ if(e.name!=='AbortError') showToast(e.message); } return; }
-  if(!f&&navigator.canShare){ btn.textContent='Getting it…'; try{ await clipsPrefetch(c); showToast('Ready. Tap Share now'); }catch(e){ btn.textContent='Save / Share'; showToast(e.message); } return; }
+  if(f&&navigator.canShare?.({files:[f]})){ showToast('Caption copied. Pick TikTok, then paste the caption'); try{ await navigator.share({files:[f]}); }catch(e){ if(e.name!=='AbortError') showToast(e.message); } return; }
+  if(!f&&navigator.canShare){ btn.textContent='Getting it…'; try{ await clipsPrefetch(c); showToast('Ready. Tap Share now'); }catch(e){ btn.textContent='Share to TikTok'; showToast(e.message); } return; }
   window.open(c.url,'_blank'); showToast('Caption copied. Save the video from the page that opened.');
 }
 function openClipPosted(id){
@@ -8785,7 +8785,7 @@ function clipDoneHTML(j,c){
       <div class="clp-title" style="-webkit-line-clamp:1">${esc(c.title||'Untitled')}</div>
       <div class="clp-row"><span class="clp-status ${c.status}">${clpPosting(c)?'Posting…':c.status==='posted'?'Posted':'Approved'}</span><span class="clp-s">${clpDur(c.end-c.start)}${c.status==='posted'?` · ${clpNum(c.views)} views`:''}</span></div>
       ${clpPostLine(id,c)}
-      ${clpPosting(c)?'':`<div class="clp-row">${c.status==='approved'?`<button type="button" class="farm-btn sm" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Save / Share'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button>`:''}<button type="button" class="farm-btn sm ghost" onclick="openClipPosted('${esc(id)}')">${c.status==='posted'?'Update views':'Mark posted'}</button>${camp?.link&&c.status==='posted'?`<button type="button" class="farm-btn sm primary" onclick="clipsWhop('${esc(id)}')">Submit to Whop</button>`:''}</div>`}
+      ${clpPosting(c)?'':`<div class="clp-row">${c.status==='approved'||!c.postLinks?.tiktok?`<button type="button" class="farm-btn sm" data-share="${esc(c.id)}" onclick="clipsShare('${esc(id)}',this)">${clipsBlobs[c.id]?'Share now':'Share to TikTok'}</button><button type="button" class="farm-btn sm" onclick="clipsCopy('${esc(id)}')">Copy caption</button>`:''}<button type="button" class="farm-btn sm ghost" onclick="openClipPosted('${esc(id)}')">${c.status==='posted'?'Update views':'Mark posted'}</button>${camp?.link&&c.status==='posted'?`<button type="button" class="farm-btn sm primary" onclick="clipsWhop('${esc(id)}')">Submit to Whop</button>`:''}</div>`}
     </div></div>`;
 }
 
