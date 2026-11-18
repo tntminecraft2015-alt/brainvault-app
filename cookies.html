@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cled · YouTube cookies</title>
+<link rel="icon" href="data:,">
+<style>
+  /* A one-job page for the computer: copy cookies with the extension, paste anywhere here, done. Same look as Mission Control. */
+  :root { --bg:#0b1624; --card:#122236; --fg:#e6eef8; --dim:#93a3b8; --line:#26405e; --accent:#ff8a5c; --good:#8fe3a6; --bad:#ffb0b0; color-scheme:dark; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 Inter,system-ui,-apple-system,Segoe UI,sans-serif; min-height:100vh; }
+  main { max-width:620px; margin:0 auto; padding:40px max(18px,env(safe-area-inset-left)) 48px max(18px,env(safe-area-inset-right)); display:flex; flex-direction:column; gap:22px; }
+  h1 { font-size:28px; line-height:1.15; margin:0; letter-spacing:-.01em; }
+  .sub { color:var(--dim); margin:6px 0 0; }
+  .need { background:rgba(255,120,120,.1); color:var(--bad); border-radius:14px; padding:10px 14px; font-weight:600; }
+  ol { margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+  li { display:flex; gap:12px; align-items:flex-start; color:var(--dim); }
+  li b.n { flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--card); color:var(--fg); display:inline-flex; align-items:center; justify-content:center; font-size:13px; }
+  li strong { color:var(--fg); }
+  a { color:#8fc8ff; font-weight:700; }
+  #drop { position:relative; border:2px dashed var(--line); border-radius:22px; background:var(--card); min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:24px; cursor:text; transition:border-color .15s, background .15s; }
+  #drop.over, #drop:focus-within { border-color:var(--accent); }
+  #drop.over { background:#1a2d45; }
+  #drop .big { font-size:20px; font-weight:800; }
+  #drop .small { color:var(--dim); font-size:13.5px; }
+  #txt { position:absolute; inset:0; opacity:0; resize:none; cursor:text; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; position:relative; z-index:1; }
+  button, label.btn { border:none; border-radius:999px; font:700 15px Inter,system-ui,sans-serif; min-height:46px; padding:0 20px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+  .primary { background:var(--accent); color:#1a0e08; }
+  .ghost { background:rgba(223,238,255,.08); color:var(--fg); }
+  button:focus-visible, label.btn:focus-within { outline:2px solid #8fc8ff; outline-offset:2px; }
+  #status { min-height:24px; font-size:15px; text-align:center; }
+  #status.good { color:var(--good); font-weight:800; font-size:17px; } #status.bad { color:var(--bad); } #status.wait { color:var(--dim); }
+  .spin { display:inline-block; width:13px; height:13px; border-radius:50%; border:2px solid currentColor; border-right-color:transparent; vertical-align:-2px; animation:s .8s linear infinite; }
+  @keyframes s { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce) { .spin { animation:none; } }
+  .foot { color:var(--dim); font-size:12.5px; }
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <h1>YouTube cookies for Cled</h1>
+    <p class="sub">YouTube blocks the clip server. Cookies from a signed-in account let it download again.</p>
+  </div>
+  <div class="need" id="need" hidden></div>
+  <ol>
+    <li><b class="n">1</b><div>In Chrome, sign in to YouTube with a <strong>spare</strong> Google account (not your main one).</div></li>
+    <li><b class="n">2</b><div>Add <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank" rel="noopener">Get cookies.txt LOCALLY</a> to Chrome. You only do this once.</div></li>
+    <li><b class="n">3</b><div>Open <a href="https://www.youtube.com" target="_blank" rel="noopener">youtube.com</a>, click the extension, and click <strong>Copy</strong> (or <strong>Export</strong> to save a file).</div></li>
+    <li><b class="n">4</b><div>Come back here and press <strong>Ctrl+V</strong> (<strong>⌘V</strong> on a Mac), or drop the file in the box. It saves and checks itself.</div></li>
+  </ol>
+  <div id="drop">
+    <textarea id="txt" aria-label="Paste YouTube cookies here" autocomplete="off" spellcheck="false"></textarea>
+    <div class="big">Paste or drop your cookies here</div>
+    <div class="small">Ctrl+V / ⌘V anywhere on this page works too</div>
+    <div class="row">
+      <button type="button" class="primary" id="pasteBtn">📋 Paste from clipboard</button>
+      <label class="btn ghost">Choose file<input type="file" id="file" accept=".txt,.json,text/plain,application/json" hidden></label>
+    </div>
+  </div>
+  <div id="status" role="status" aria-live="polite"></div>
+  <p class="foot">Only YouTube and Google cookies are kept, encrypted. Nothing is shown back on this page. Cled checks them once a day and tells you in the app when they need replacing.</p>
+</main>
+<script>
+const st = document.getElementById('status'), drop = document.getElementById('drop'), txt = document.getElementById('txt');
+let busy = false;
+const show = (cls, html) => { st.className = cls; st.innerHTML = html; };
+async function save(text) {
+  text = String(text || '').trim();
+  if (busy) return;
+  if (!text) return show('bad', 'Nothing to paste yet. Click Copy in the extension first (step 3).');
+  busy = true; show('wait', '<span class="spin"></span> Checking with YouTube… (up to a minute)');
+  try {
+    const r = await fetch('/api/clips/youtube/cookies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cookies: text }), signal: AbortSignal.timeout(100000) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || `The server said ${r.status}`);
+    show('good', `✓ ${d.verified ? 'Working. YouTube accepted them.' : 'Saved.'}${d.retrying ? ` Retrying ${d.retrying} blocked job${d.retrying > 1 ? 's' : ''} now.` : ''} You can close this page.`);
+    document.getElementById('need').hidden = true;
+  } catch (e) { show('bad', String(e.message || e).replace(/</g, '&lt;')); }
+  busy = false; txt.value = '';
+}
+// paste anywhere on the page
+document.addEventListener('paste', e => { const t = e.clipboardData?.getData('text'); if (t) { e.preventDefault(); save(t); } });
+document.getElementById('pasteBtn').onclick = async () => {
+  try { save(await navigator.clipboard.readText()); }
+  catch { txt.focus(); show('wait', 'Press Ctrl+V (⌘V on a Mac) to paste.'); }
+};
+const readFile = f => { if (!f) return; if (f.size > 2e6) return show('bad', 'That file is too big to be a cookies file.'); const r = new FileReader(); r.onload = () => save(r.result); r.readAsText(f); };
+document.getElementById('file').onchange = e => readFile(e.target.files[0]);
+['dragenter', 'dragover'].forEach(t => document.addEventListener(t, e => { e.preventDefault(); drop.classList.add('over'); }));
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) drop.classList.remove('over'); });
+document.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); const f = e.dataTransfer?.files?.[0]; if (f) readFile(f); else save(e.dataTransfer?.getData('text')); });
+// say why you're here, if the app thinks they need replacing
+fetch('/api/clips/youtube/cookies').then(r => r.json()).then(k => {
+  const n = document.getElementById('need');
+  const why = { expired: 'Your saved cookies stopped working.', expiring: 'Your saved cookies expire in the next few days.', missing: 'YouTube is blocking the clip server right now.' }[k.need];
+  if (why) { n.textContent = why; n.hidden = false; }
+  else if (k.set) show('wait', `Cookies already saved${k.savedAt ? ' ' + new Date(k.savedAt).toLocaleDateString() : ''}. Paste new ones any time.`);
+}).catch(() => {});
+</script>
+</body>
+</html>

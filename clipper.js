@@ -191,7 +191,7 @@ function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, web
     res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET),
       youtube: { configured: !!(YT_ID && YT_SECRET), connected: !!y.tok && !y.error, channel: y.channel || null, error: y.error || null, today: (y.uploads || {})[new Date().toISOString().slice(0, 10)] || 0 },
       tiktok: { configured: !!(TT_KEY && TT_SECRET), connected: !!c.tiktok?.tok && !c.tiktok?.error, user: c.tiktok?.user || null, error: c.tiktok?.error || null, mode: ttMode(c) },
-      ytCookies: { set: !!c.ytCookies?.tok, savedAt: c.ytCookies?.savedAt || null, count: c.ytCookies?.count || 0, blocked: c.ytBlocked || null },
+      ytCookies: { set: !!c.ytCookies?.tok, savedAt: c.ytCookies?.savedAt || null, count: c.ytCookies?.count || 0, blocked: c.ytBlocked || null, expiresAt: c.ytCookies?.expiresAt || null, verifiedAt: c.ytCookies?.verifiedAt || null, need: cookieNeed(c) },
       autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], topics: a.topics || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
   });
   app.post('/api/clips/streamers', (req, res) => {
@@ -599,11 +599,18 @@ Timestamps in the transcript are seconds.${tx.full ? '' : ' The transcript is lo
     res.json({ ok: true });
   });
 
+  // The worker tries the saved cookies once a day, so you're told before a job fails
+  app.post('/api/clips/worker/cookie-status', workerOnly, (req, res) => {
+    const b = req.body || {};
+    mutate(c => { if (b.ok === false && b.blocked) cookiesBlocked(c); else if (b.ok === true && c.ytCookies) { c.ytCookies.verifiedAt = new Date().toISOString(); if (c.ytBlocked && new Date(c.ytBlocked) < new Date()) delete c.ytBlocked; } });
+    res.json({ ok: true });
+  });
+
   app.post('/api/clips/worker/:id/fail', workerOnly, (req, res) => {
     mutate(c => {
       const j = findJob(c, req.params.id); if (!j || j.status === 'done' || staleAttempt(j, req.body || {})) return;
       let error = str(req.body?.error, 300) || 'Worker error';
-      if (error.startsWith('[yt-blocked]')) { error = error.replace('[yt-blocked]', '').trim(); c.ytBlocked = new Date().toISOString(); j.needs = 'ytCookies'; }
+      if (error.startsWith('[yt-blocked]')) { error = error.replace('[yt-blocked]', '').trim(); cookiesBlocked(c); j.needs = 'ytCookies'; }
       Object.assign(j, { status: 'failed', error, msg: 'Failed', updatedAt: new Date().toISOString() }); live.delete(j.id);
       if (j.recutOf) { const old = findJob(c, j.parentId)?.clips.find(x => x.id === j.recutOf); if (old) delete old.recutting; }
     });
@@ -640,6 +647,33 @@ Timestamps in the transcript are seconds.${tx.full ? '' : ' The transcript is lo
   // YouTube blocks downloads from cloud servers. Cookies from a signed-in spare Google account get the worker past that.
   // Stored encrypted with a key from WORKER_SECRET (only in Render's environment), sent to the worker with each job.
   const COOKIE_SALT = () => 'clips-ytc:' + WORKER_SECRET;
+  const AUTH_COOKIES = ['SAPISID', '__Secure-3PSID', '__Secure-1PSID', 'SID', 'LOGIN_INFO'];
+  // Do the saved cookies need replacing? YouTube blocked a download after they were saved (or with none saved),
+  // or the sign-in cookies expire within 3 days.
+  function cookieNeed(c) {
+    const k = c.ytCookies || {}, now = Date.now();
+    if (c.ytBlocked && (!k.savedAt || new Date(c.ytBlocked) > new Date(k.savedAt))) return k.tok ? 'expired' : 'missing';
+    if (k.tok && k.expiresAt && new Date(k.expiresAt) - now < 3 * 864e5) return 'expiring';
+    return null;
+  }
+  // YouTube started blocking: remember it, and send one push per episode so you hear about it even with the app closed
+  function cookiesBlocked(c) {
+    const fresh = !c.ytBlocked || (c.ytCookies?.savedAt && new Date(c.ytBlocked) < new Date(c.ytCookies.savedAt));
+    c.ytBlocked = new Date().toISOString();
+    if (fresh && pushEnabled) {
+      const payload = JSON.stringify({ title: '🎬 Cled: YouTube needs fresh cookies', body: c.ytCookies?.tok ? 'Your YouTube cookies stopped working. Tap to paste new ones (takes a minute).' : 'YouTube is blocking the clip server. Tap to add cookies.', tag: 'cled-cookies', url: '/?open=cookies' });
+      setTimeout(() => { for (const sub of (getAppData().pushSubscriptions || [])) webpush.sendNotification(sub, payload).catch(() => {}); }, 0);
+    }
+  }
+  // Ask the worker to try the cookies on a real YouTube video (no download). true / false / null (couldn't tell)
+  async function checkCookies(text) {
+    if (!WORKER_URL || !WORKER_SECRET) return { ok: null };
+    try {
+      const r = await fetch(`${WORKER_URL}/check-cookies`, { method: 'POST', signal: AbortSignal.timeout(80000), headers: { 'Content-Type': 'application/json', 'x-worker-secret': WORKER_SECRET }, body: JSON.stringify({ cookies: text }) });
+      if (!r.ok) return { ok: null };
+      return await r.json();
+    } catch { return { ok: null }; }
+  }
   function ytCookiesText(c) {
     if (!c.ytCookies?.tok || !WORKER_SECRET) return null;
     try { return unseal(c.ytCookies.tok, COOKIE_SALT()).text; } catch { return null; }
@@ -651,7 +685,12 @@ Timestamps in the transcript are seconds.${tx.full ? '' : ' The transcript is lo
     if (!raw) return { error: 'Paste the cookies first' };
     const keepDomain = d => /(^|\.)(youtube\.com|google\.com)$/i.test(String(d || '').replace(/^\./, ''));
     let rows = [];
-    if (raw.startsWith('[') || raw.startsWith('{')) {
+    // a "Cookie:" request header copied from the browser's developer tools: name=value; name2=value2
+    const header = raw.replace(/^cookie:\s*/i, '');
+    if (!/\t/.test(raw) && !/^[[{]/.test(raw) && /^[^=\s;]+=[^;]*(;\s*[^=\s;]+=[^;]*)+;?$/.test(header.replace(/\s*\n\s*/g, ' ').trim())) {
+      const far = String(Math.round(Date.now() / 1000) + 180 * 86400);
+      for (const kv of header.replace(/\s*\n\s*/g, ' ').split(/;\s*/)) { const i = kv.indexOf('='); if (i > 0) rows.push(['.youtube.com', 'TRUE', '/', 'TRUE', far, kv.slice(0, i).trim(), kv.slice(i + 1).trim()]); }
+    } else if (raw.startsWith('[') || raw.startsWith('{')) {
       let arr; try { arr = JSON.parse(raw); } catch { return { error: 'That looks like JSON but it didn\'t parse. Export again and paste all of it.' }; }
       arr = Array.isArray(arr) ? arr : Array.isArray(arr.cookies) ? arr.cookies : [];
       for (const k of arr) {
@@ -670,24 +709,32 @@ Timestamps in the transcript are seconds.${tx.full ? '' : ' The transcript is lo
     }
     if (!rows.length) return { error: 'No YouTube cookies in that. Export while on youtube.com and signed in, then paste the whole file.' };
     const names = new Set(rows.map(r => r[5]));
-    if (!['SAPISID', '__Secure-3PSID', '__Secure-1PSID', 'SID', 'LOGIN_INFO'].some(n => names.has(n)))
+    if (!AUTH_COOKIES.some(n => names.has(n)))
       return { error: 'These cookies aren\'t from a signed-in session. Sign in to YouTube in that browser first, then export again.' };
     const now = Date.now() / 1000, expired = rows.filter(r => +r[4] > 0 && +r[4] < now).length;
     if (expired === rows.length) return { error: 'All of these cookies have expired. Export fresh ones.' };
-    return { text: '# Netscape HTTP Cookie File\n' + rows.map(r => r.join('\t')).join('\n') + '\n', count: rows.length };
+    // when the sign-in cookies themselves run out (Google can also end the session sooner; the worker's daily check catches that)
+    const authExp = rows.filter(r => AUTH_COOKIES.includes(r[5]) && +r[4] > now).map(r => +r[4]);
+    return { text: '# Netscape HTTP Cookie File\n' + rows.map(r => r.join('\t')).join('\n') + '\n', count: rows.length, expiresAt: authExp.length ? new Date(Math.min(...authExp) * 1000).toISOString() : null };
   }
-  app.post('/api/clips/youtube/cookies', (req, res) => {
+  // a one-job page for the computer: paste or drop the cookies, they save and get checked
+  app.get('/cookies', (req, res) => res.sendFile(require('path').join(__dirname, 'cookies.html')));
+  app.get('/api/clips/youtube/cookies', (req, res) => { const c = clipsOf(getAppData()); res.json({ set: !!c.ytCookies?.tok, savedAt: c.ytCookies?.savedAt || null, expiresAt: c.ytCookies?.expiresAt || null, need: cookieNeed(c) }); });
+  app.post('/api/clips/youtube/cookies', async (req, res) => {
     if (!WORKER_SECRET) return res.status(400).json({ error: 'Set WORKER_SECRET on Render first (the cookies are encrypted with it).' });
     if (req.body?.remove) { mutate(c => { delete c.ytCookies; }); return res.json({ ok: true, set: false }); }
     const p = parseCookies(req.body?.cookies);
     if (p.error) return res.status(400).json({ error: p.error });
+    // try them on YouTube first: if YouTube refuses them, say so now instead of after the next job fails
+    const check = await checkCookies(p.text);
+    if (check.ok === false) return res.status(400).json({ error: check.blocked ? 'YouTube refused these cookies (it still asks to sign in). Sign in to YouTube in that browser, refresh youtube.com, then copy them again.' : `These cookies didn't work on YouTube: ${String(check.error || 'unknown error').slice(0, 160)}`, checked: true });
     const savedAt = new Date().toISOString();
-    mutate(c => { c.ytCookies = { tok: seal({ text: p.text }, COOKIE_SALT()), savedAt, count: p.count }; delete c.ytBlocked;
+    mutate(c => { c.ytCookies = { tok: seal({ text: p.text }, COOKIE_SALT()), savedAt, count: p.count, expiresAt: p.expiresAt, verifiedAt: check.ok ? savedAt : null }; delete c.ytBlocked;
       // jobs that failed only because YouTube blocked them can go again right away
       for (const j of c.jobs) if (j.status === 'failed' && j.needs === 'ytCookies') Object.assign(j, { status: 'queued', error: null, needs: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: savedAt });
     });
     const retry = clipsOf(getAppData()).jobs.filter(j => j.status === 'queued').map(j => j.id);
-    res.json({ ok: true, set: true, count: p.count, retrying: retry.length });
+    res.json({ ok: true, set: true, count: p.count, verified: check.ok, retrying: retry.length });
     (async () => { for (const id of retry) await sendToWorker(id); })().catch(e => console.error('cookie retry send failed:', e.message));
   });
 

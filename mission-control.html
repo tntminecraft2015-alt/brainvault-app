@@ -8189,8 +8189,29 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-fails[aria-expanded="true"] .chev { transform:rotate(90deg); }
   .clp-ev { font-size:12.5px; color:#ffcf8a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .clp-done a.pl { display:inline-block; padding:6px 0; min-height:32px; color:#8fc8ff; }
-  .clp-cookie textarea.as-inp { min-height:90px; font-size:12px; font-family:ui-monospace,Menlo,monospace; resize:vertical; }
-  .clp-steps { margin:6px 0 10px 18px; padding:0; font-size:12.5px; color:var(--fg-dim); line-height:1.5; }
+  .clp-cookie { display:flex; flex-direction:column; gap:10px; }
+  .clp-cookie textarea.as-inp { min-height:64px; font-size:12px; font-family:ui-monospace,Menlo,monospace; resize:vertical; width:100%; }
+  .ck-steps { display:flex; flex-direction:column; gap:8px; margin:4px 0; }
+  .ck-step { display:flex; gap:10px; font-size:13px; line-height:1.45; color:var(--fg-dim); align-items:flex-start; }
+  .ck-step b { color:var(--fg); }
+  .ck-step .ck-n { flex-shrink:0; width:22px; height:22px; border-radius:50%; background:rgba(223,238,255,.1); color:var(--fg); display:inline-flex; align-items:center; justify-content:center; font-size:12px; }
+  .ck-step a { color:#8fc8ff; font-weight:700; }
+  .ck-step .clp-chip { min-height:30px; font-size:12px; padding:0 10px; vertical-align:middle; }
+  .ck-link { color:var(--fg); font-weight:700; word-break:break-all; }
+  .ck-paste { min-height:56px; font-size:16.5px; }
+  .ck-drop { position:relative; border-radius:16px; border:1.5px dashed rgba(223,238,255,.18); padding:6px; transition:border-color .15s, background .15s; }
+  .ck-drop.over { border-color:var(--accent); background:rgba(255,138,92,.08); }
+  .ck-drop textarea.as-inp { border:none; background:transparent; }
+  .ck-file { position:absolute; right:10px; bottom:10px; min-height:30px; font-size:12px; }
+  .ck-status { font-size:13.5px; line-height:1.45; min-height:20px; }
+  .ck-status.good { color:#8fe3a6; font-weight:700; } .ck-status.bad { color:#ffb0b0; } .ck-status.wait { color:var(--fg-dim); }
+  .ck-spin { display:inline-block; width:12px; height:12px; border-radius:50%; border:2px solid currentColor; border-right-color:transparent; vertical-align:-1px; animation:ckspin .8s linear infinite; }
+  @keyframes ckspin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce){ .ck-spin { animation:none; } }
+  .ck-banner { display:flex; flex-wrap:wrap; align-items:center; gap:2px 8px; width:100%; border:none; text-align:left; cursor:pointer; font-family:inherit; min-height:52px; }
+  .ck-banner b { flex-basis:100%; } .ck-banner span { font-size:12.5px; opacity:.9; } .ck-banner .chev { margin-left:auto; font-size:18px; opacity:.7; }
+  .mob-nav-btn.needs { position:relative; }
+  .mob-nav-btn.needs::after { content:''; position:absolute; top:8px; right:calc(50% - 16px); width:9px; height:9px; border-radius:50%; background:#ff6b6b; box-shadow:0 0 0 2px var(--bg,#0b1624); }
 </style>
 <script>
 // Clip Studio front end. Server side: clipper.js (/api/clips/*). Heavy lifting: worker/ on Render.
@@ -8237,7 +8258,8 @@ function setClipsView(v){ clipsView=v; renderClips(); }
 function clipsRefresh(){ clipsSegCounts(); if(clipsView==='review') clipsRenderReview(); else if(clipsView==='editing') clipsRenderEditing(); else if(clipsView==='stats') clipsRenderStats(); }
 async function clipsLoadState(){
   try{ clipsState=await clipsApi('/api/clips/state'); }catch(e){ clipsState=clipsState||{streamers:[],campaigns:[],jobs:[],err:e.message}; }
-  clipsSegCounts();
+  clipsSegCounts(); clipsCookieDot(clipsState.ytCookies||{});
+  if(document.getElementById('mobTabClips')?.classList.contains('active')) setTimeout(clipsCookieAutoPrompt,300);
   return clipsState;
 }
 // While a job runs and you're looking at the tab, refresh every 8s. Nothing polls when the tab is hidden,
@@ -8253,7 +8275,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden && docume
 // ── FIND: autopilot line, paste-a-link, my streamers, trending ──
 function clipsSetupNote(){
   if(!clipsState||clipsState.err) return clipsState?.err?`<div class="clp-note">Couldn't reach the server: ${esc(clipsState.err)}</div>`:'';
-  const miss=[]; if(clipsState.ytCookies?.blocked&&!clipsState.ytCookies?.set) miss.push('<b>YouTube</b> is blocking the clip server. <button type="button" class="farm-btn sm primary" style="margin-top:6px" onclick="openClipsCookies()">Add YouTube cookies</button>'); if(!clipsState.worker) miss.push('<b>Clip worker</b>: set WORKER_URL and WORKER_SECRET on Render (see worker/README.md)'); if(!clipsState.twitch) miss.push('<b>Twitch</b>: set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET on Render to see trending videos');
+  const miss=[]; if(!clipsState.worker) miss.push('<b>Clip worker</b>: set WORKER_URL and WORKER_SECRET on Render (see worker/README.md)'); if(!clipsState.twitch) miss.push('<b>Twitch</b>: set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET on Render to see trending videos');
   return miss.length?`<div class="clp-note">Setup left:<br>${miss.join('<br>')}</div>`:'';
 }
 function clipsAutoLine(){
@@ -8267,7 +8289,7 @@ function clipsAutoLine(){
 function clipsRenderFind(){
   const el=clpView('find'); if(!el) return;
   const st=clipsState||{streamers:[]}, typed=document.getElementById('clpLink')?.value||'';
-  el.innerHTML=`${clipsSetupNote()}${clipsAutoLine()}
+  el.innerHTML=`${clipsCookieBanner()}${clipsSetupNote()}${clipsAutoLine()}
     <div class="clp-row"><input id="clpLink" class="as-inp" type="url" inputmode="url" placeholder="Paste a Twitch or YouTube link" autocomplete="off" aria-label="Video link" value="${esc(typed)}" onkeydown="if(event.key==='Enter')openClipSheet({url:this.value.trim()})"><button type="button" class="farm-btn sm primary" onclick="openClipSheet({url:document.getElementById('clpLink').value.trim()})">Clip</button></div>
     <div><div class="clp-lbl" style="margin:2px 0 8px">My streamers</div>
       <div class="clp-chips scroll">${st.streamers.map(s=>`<button type="button" class="clp-chip" onclick="openStreamerSheet('${esc(s.login)}')">${esc(s.login)}</button>`).join('')}<button type="button" class="clp-chip" onclick="openStreamerSheet()">+ Add</button></div></div>
@@ -8332,25 +8354,76 @@ function clipsSettingsHTML(){
 function clipsCookieRow(){
   const k=clipsState?.ytCookies||{};
   return `<div class="as-label">YouTube downloads</div>
-    <div class="clp-sw"><div class="clp-s">${k.set?`Cookies saved ${clpAgo(k.savedAt)}${k.blocked&&new Date(k.blocked)>new Date(k.savedAt)?` · <span style="color:#ff9b9b">YouTube blocked a download since: they've likely expired</span>`:''}`:k.blocked?'<span style="color:#ff9b9b">YouTube is blocking the clip server.</span> Add cookies to clip YouTube videos.':'Needed to clip YouTube videos (YouTube blocks cloud servers).'}</div>
-      <button type="button" class="farm-btn sm${k.set?' ghost':' primary'}" onclick="openClipsCookies()">${k.set?'Update':'Add cookies'}</button></div>`;
+    <div class="clp-sw"><div class="clp-s">${k.need?`<span style="color:#ff9b9b">${esc(clpCookieWhy(k.need))}</span>`:k.set?`Cookies saved ${clpAgo(k.savedAt)}${k.verifiedAt?` · working (checked ${clpAgo(k.verifiedAt)})`:''}`:'Needed to clip YouTube videos (YouTube blocks cloud servers).'}</div>
+      <button type="button" class="farm-btn sm${k.set&&!k.need?' ghost':' primary'}" onclick="openClipsCookies()">${k.set?(k.need?'Fix':'Update'):'Add cookies'}</button></div>`;
 }
+// ── YouTube cookies: as few steps as possible ──
+// Saving checks them on YouTube right away (through the worker), so you know they work before you leave the screen.
+const CLP_EXT='https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc';
+const clpCookieWhy=n=>n==='expired'?'Your YouTube cookies stopped working, so YouTube videos can\'t be clipped.':n==='expiring'?'Your YouTube cookies expire in the next few days.':n==='missing'?'YouTube is blocking the clip server. Cookies from a signed-in account fix that.':'';
 function openClipsCookies(){
-  const k=clipsState?.ytCookies||{};
-  const ov=farmSheet('clpCookieOv',`<div class="clp-cookie"><div class="clp-card-t" style="font-size:18px">YouTube cookies</div>
-    <div class="clp-s" style="margin-top:4px">YouTube blocks downloads from cloud servers like the clip worker's. Cookies from a signed-in account get past it. Use a <b>spare Google account</b>, not your main one, since heavy downloading can get an account flagged.</div>
-    <ol class="clp-steps"><li>On a computer, open Chrome or Firefox and sign in to YouTube with the spare account.</li><li>Install the extension <b>Get cookies.txt LOCALLY</b> (or <b>Cookie-Editor</b>).</li><li>On youtube.com, open it and export / copy the cookies.</li><li>Paste everything below. They usually last a few weeks; Cled tells you when they stop working.</li></ol>
-    <textarea id="clpCookieTxt" class="as-inp" placeholder="# Netscape HTTP Cookie File&#10;.youtube.com&#9;TRUE&#9;/&#9;TRUE&#9;…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="YouTube cookies"></textarea>
-    <div class="clp-s" style="margin-top:6px">Stored encrypted. Only YouTube and Google cookies are kept; everything else in the paste is dropped.</div>
-    <div class="clp-row" style="margin-top:14px"><button type="button" class="farm-btn primary" id="clpCookieGo">Save</button>${k.set?'<button type="button" class="farm-btn ghost" id="clpCookieDel">Remove saved cookies</button>':''}</div></div>`);
-  ov.querySelector('#clpCookieGo').onclick=async e=>{
-    const v=ov.querySelector('#clpCookieTxt').value; if(!v.trim()) return showToast('Paste the cookies first');
-    e.target.disabled=true; e.target.textContent='Checking…';
-    try{ const d=await clipsApi('/api/clips/youtube/cookies',{method:'POST',body:{cookies:v}}); ov.remove(); showToast(`Saved ${d.count} YouTube cookies${d.retrying?`. Retrying ${d.retrying} blocked job${d.retrying>1?'s':''}`:''}`); await clipsLoadState(); clipsSettingsRedraw(); clipsRefresh(); clipsSchedulePoll(); }
-    catch(err){ showToast(err.message); e.target.disabled=false; e.target.textContent='Save'; }
+  const k=clipsState?.ytCookies||{}, link=`${location.origin}/cookies`;
+  const ov=farmSheet('clpCookieOv',`<div class="clp-cookie" id="clpCookieBox"><div class="clp-card-t" style="font-size:18px">${k.need?'Fix YouTube':'YouTube cookies'}</div>
+    <div class="clp-s" style="margin-top:4px">${clpCookieWhy(k.need)||(k.set?`Saved ${clpAgo(k.savedAt)}${k.verifiedAt?' and working':''}. Paste new ones any time.`:'YouTube blocks cloud servers; cookies from a signed-in account get past it.')}</div>
+    <div class="ck-steps">
+      <div class="ck-step"><b class="ck-n">1</b><div>On a computer, sign in to YouTube with a <b>spare</b> Google account and add <a href="${CLP_EXT}" target="_blank" rel="noopener">Get cookies.txt LOCALLY</a> to Chrome (once).</div></div>
+      <div class="ck-step"><b class="ck-n">2</b><div>On youtube.com, click the extension, then <b>Copy</b>.</div></div>
+      <div class="ck-step"><b class="ck-n">3</b><div>Paste it. Easiest on that computer: open <span class="ck-link">${esc(link.replace(/^https?:\/\//,''))}</span> <button type="button" class="clp-chip" id="clpCkCopy">Copy link</button>. Or paste right here.</div></div>
+    </div>
+    <button type="button" class="farm-btn primary ck-paste" id="clpCkPaste">📋 Paste cookies</button>
+    <div class="ck-drop" id="clpCkDrop"><textarea id="clpCookieTxt" class="as-inp" placeholder="…or long-press here and Paste, or drop the cookies.txt file" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="YouTube cookies"></textarea>
+      <label class="clp-chip ck-file">Choose file<input type="file" id="clpCkFile" accept=".txt,.json,text/plain,application/json" hidden></label></div>
+    <div class="ck-status" id="clpCkStatus" role="status" aria-live="polite"></div>
+    ${k.set?'<button type="button" class="clp-link" id="clpCookieDel" style="align-self:center;margin-top:6px">Remove saved cookies</button>':''}</div>`);
+  const st=ov.querySelector('#clpCkStatus'), ta=ov.querySelector('#clpCookieTxt');
+  let busy=false;
+  const show=(cls,html)=>{ st.className='ck-status '+cls; st.innerHTML=html; };
+  const save=async text=>{
+    if(busy) return; text=String(text||'').trim(); if(!text) return show('bad','Nothing to paste yet. Copy the cookies first (step 2).');
+    busy=true; show('wait','<span class="ck-spin"></span> Checking with YouTube… (up to a minute)');
+    try{
+      const d=await clipsApi('/api/clips/youtube/cookies',{method:'POST',body:{cookies:text},timeout:100000});
+      show('good',`✓ ${d.verified?'Working: YouTube accepted them':'Saved'}${d.retrying?`. Retrying ${d.retrying} blocked job${d.retrying>1?'s':''} now`:''}.`);
+      try{ localStorage.removeItem('cledCookiePrompt'); }catch{}
+      await clipsLoadState(); clipsSettingsRedraw(); clipsRefresh(); clipsSchedulePoll(); clipsCookieDot();
+      setTimeout(()=>ov.remove(),1800);
+    }catch(e){ show('bad',esc(e.message)); }
+    busy=false;
   };
+  ov.querySelector('#clpCkPaste').onclick=async()=>{
+    try{ const t=await navigator.clipboard.readText(); if(t?.trim()) return save(t); show('bad','Your clipboard is empty. Copy the cookies first (step 2).'); }
+    catch{ ta.focus(); show('wait','Long-press the box above and tap <b>Paste</b>.'); }
+  };
+  ta.addEventListener('paste',e=>{ const t=e.clipboardData?.getData('text'); if(t){ e.preventDefault(); ta.value=t.slice(0,300)+(t.length>300?'…':''); save(t); } });
+  ta.addEventListener('input',()=>{ if(/\t|=.*;|^\s*[\[{]/.test(ta.value)&&ta.value.length>200) save(ta.value); });   // pasted some other way
+  const readFile=f=>{ if(!f) return; if(f.size>2e6) return show('bad','That file is too big to be a cookies file.'); const r=new FileReader(); r.onload=()=>save(r.result); r.readAsText(f); };
+  ov.querySelector('#clpCkFile').onchange=e=>readFile(e.target.files[0]);
+  const drop=ov.querySelector('#clpCkDrop');
+  drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+  drop.addEventListener('drop',e=>{ e.preventDefault(); drop.classList.remove('over'); const f=e.dataTransfer?.files?.[0]; if(f) readFile(f); else save(e.dataTransfer?.getData('text')); });
+  ov.querySelector('#clpCkCopy').onclick=async e=>{ try{ await navigator.clipboard.writeText(link); e.target.textContent='Copied'; }catch{ showToast(link); } };
   ov.querySelector('#clpCookieDel')?.addEventListener('click',async()=>{ try{ await clipsApi('/api/clips/youtube/cookies',{method:'POST',body:{remove:true}}); ov.remove(); showToast('Cookies removed'); await clipsLoadState(); clipsSettingsRedraw(); }catch(err){ showToast(err.message); } });
 }
+// When cookies need replacing: a dot on the Cled tab (from any tab), a banner in Clips, and the sheet opens by itself
+// the first time you open Clips after it happens (once per episode, so "Later" sticks until the next one).
+async function clipsCookieDot(info){
+  try{ info=info||clipsState?.ytCookies||await (await fetch(`${SERVER}/api/clips/youtube/cookies`,{signal:AbortSignal.timeout(15000)})).json(); }catch{ return; }
+  document.querySelector('.mob-nav-btn[data-tab="clips"]')?.classList.toggle('needs',!!info?.need);
+  return info;
+}
+function clipsCookieAutoPrompt(){
+  const k=clipsState?.ytCookies; if(!k?.need) return;
+  const key=`${k.need}:${k.blocked||k.expiresAt||''}`;
+  try{ if(localStorage.getItem('cledCookiePrompt')===key) return; localStorage.setItem('cledCookiePrompt',key); }catch{}
+  if(!document.getElementById('clpCookieOv')) openClipsCookies();
+}
+function clipsCookieBanner(){
+  const k=clipsState?.ytCookies; if(!k?.need) return '';
+  return `<button type="button" class="clp-note ck-banner" onclick="openClipsCookies()"><b>${k.need==='expiring'?'YouTube cookies expire soon':'YouTube needs fresh cookies'}</b><span>${k.need==='expiring'?'Replace them now so clipping doesn\'t stop.':'Tap to paste new ones. Takes a minute.'}</span><span class="chev">›</span></button>`;
+}
+setTimeout(()=>clipsCookieDot(),3000);
+
 function clipsSettingsRedraw(){ const sh=document.querySelector('#clpSetOv .mc-sheet'); if(sh) sh.innerHTML='<div class="as-grab"></div>'+clipsSettingsHTML(); if(clipsView==='find') clipsRenderFind(); }
 async function clipsAutopilot(patch){
   if(patch.addYoutube===''){ return showToast('Paste a YouTube channel link first'); }
@@ -8450,13 +8523,13 @@ function clipsRenderReview(force){
   const jobsHTML=clipsJobsHTML();
   if(!q.length){
     const done=clpAll().filter(({c})=>c.status==='approved'||c.status==='posted'||clpPosting(c)).length;
-    el.innerHTML=jobsHTML+(jobsHTML?'':`<div class="clp-empty">${done?`All caught up. Posted clips are in <b>Stats</b>.`:'No clips yet. Pick a video in <b>Find</b> and the clips land here.'}</div>`);
+    el.innerHTML=clipsCookieBanner()+jobsHTML+(jobsHTML?'':`<div class="clp-empty">${done?`All caught up. Posted clips are in <b>Stats</b>.`:'No clips yet. Pick a video in <b>Find</b> and the clips land here.'}</div>`);
     return;
   }
   const {j,c}=q[i], id=`${j.id}|${c.id}`, camp=j.campaignId&&(clipsState.campaigns||[]).find(x=>x.id===j.campaignId);
   const canPost=clipsState?.youtube?.connected||clipsState?.tiktok?.connected;
   const src=clipsBlobUrls[c.id]||c.url;
-  el.innerHTML=`${jobsHTML}<div class="clp-rv" data-clip="${esc(id)}">
+  el.innerHTML=`${clipsCookieBanner()}${jobsHTML}<div class="clp-rv" data-clip="${esc(id)}">
     <div class="clp-rv-hd"><button type="button" class="clp-iconbtn" aria-label="Previous clip" ${i?'':'disabled'} onclick="clipsGo(-1)">${CLP_IC.prev}</button>
       <div class="c" style="text-align:center">${i+1} <span>of ${q.length} to review</span></div>
       <button type="button" class="clp-iconbtn" aria-label="Next clip" ${i<q.length-1?'':'disabled'} onclick="clipsGo(1)">${CLP_IC.next}</button></div>
@@ -8793,8 +8866,9 @@ async function clipsPost(id,body){
 
 function openClipsFromPush(){ clipsView='review'; clipsState=null; goToMobTab('clips'); }
 { const q=new URLSearchParams(location.search);
+  if(q.get('open')==='cookies'){ history.replaceState(null,'',location.pathname); setTimeout(()=>{ clipsView='find'; clipsState=null; goToMobTab('clips'); clipsLoadState().then(()=>{ renderClips(); openClipsCookies(); }); },400); }
   if(q.get('open')==='clips'){ const yt=q.get('yt'), tt=q.get('tt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt||tt){ clipsView='find'; clipsState=null; goToMobTab('clips'); const why=q.get('why'); showToast(why?`TikTok said: ${why}. If it mentions a scope, turn on video.upload for your app at developers.tiktok.com.`:`${yt?'YouTube':'TikTok'} ${(yt||tt)==='connected'?'connected':'connection cancelled'}`); } else openClipsFromPush(); },400); } }
-navigator.serviceWorker?.addEventListener('message',e=>{ if(e.data?.open==='clips') openClipsFromPush(); });
+navigator.serviceWorker?.addEventListener('message',e=>{ if(e.data?.open==='clips') openClipsFromPush(); if(e.data?.open==='cookies'){ clipsView='find'; goToMobTab('clips'); clipsLoadState().then(()=>{ renderClips(); openClipsCookies(); }); } });
 </script>
 </body>
 </html>

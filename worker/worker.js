@@ -139,6 +139,32 @@ function friendlyError(msg, url) {
   return (err ? err[1] : m).replace(/\s+/g, ' ').slice(0, 280);
 }
 
+// Do these cookies get past YouTube? Asks for one known public video's formats (nothing is downloaded).
+// { ok: true } | { ok: false, blocked: true } (YouTube wants a sign-in) | { ok: false, error } | { ok: null, error } (couldn't tell)
+const TEST_VIDEO = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';   // "Me at the zoo", YouTube's first video
+async function testCookies(text) {
+  const f = path.join(dirs.work, `cookies-test-${crypto.randomBytes(4).toString('hex')}.txt`);
+  try {
+    if (text) fs.writeFileSync(f, text, { mode: 0o600 }); else if (fs.existsSync(COOKIES)) fs.copyFileSync(COOKIES, f); else return { ok: null, error: 'no cookies' };
+    await run('yt-dlp', ['--simulate', '--no-playlist', '-f', 'ba/b', '--js-runtimes', 'node', '--cookies', f, TEST_VIDEO], { timeoutMs: 70000 });
+    return { ok: true };
+  } catch (e) {
+    const m = String(e.message || '');
+    if (/confirm you.?re not a bot|Sign in to confirm|cookies are no longer valid|LOGIN_REQUIRED/i.test(m)) return { ok: false, blocked: true };
+    if (/took over|ETIMEDOUT|Unable to download webpage|HTTP Error 5\d\d|getaddrinfo/i.test(m)) return { ok: null, error: friendlyError(m) };
+    return { ok: false, error: friendlyError(m) };
+  } finally { fs.rmSync(f, { force: true }); }
+}
+// once a day, while cookies are set: tell Mission Control if YouTube stopped accepting them (it prompts you)
+let lastCookieCheck = 0;
+async function dailyCookieCheck() {
+  if (!fs.existsSync(COOKIES) || Date.now() - lastCookieCheck < 864e5 || busy) return;
+  lastCookieCheck = Date.now();
+  const r = await testCookies(null);
+  console.log(`cookie check: ${r.ok ? 'working' : r.blocked ? 'YouTube refused them' : `unclear (${r.error})`}`);
+  if (r.ok !== null) await callServer('/api/clips/worker/cookie-status', r, { tries: 3 }).catch(e => console.error('cookie status report failed:', e.message));
+}
+
 // ── disk ──
 // The worker's disk is small (2 GB on Render). Before a big download, make room; if there still isn't enough, fail clearly.
 function freeBytes() { try { const s = fs.statfsSync(DATA); return s.bavail * s.bsize; } catch { return Infinity; } }
@@ -526,6 +552,7 @@ async function autopilotTick() {
   try {
     const r = await fetch(`${SERVER}/api/clips/worker/autopilot`, { headers: { 'x-worker-secret': SECRET }, signal: AbortSignal.timeout(90000) }).then(x => x.json());
     setCookies(r.ytCookies); setKeep(r.keep);
+    await dailyCookieCheck().catch(e => console.error('cookie check failed:', e.message));
     if (!r.need) { if (r.why && r.why !== 'off') console.log(`autopilot: resting (${r.why})`); return; }
     const youtube = [];
     for (const url of r.youtube || []) youtube.push(...await listYoutube(url));
@@ -567,6 +594,15 @@ const app = express();
 app.use(express.json({ limit: '2mb' }));
 app.get('/health', (req, res) => res.json({ ok: true, busy, queued: queue.length, freeMB: Math.round(freeBytes() / MB) }));
 app.use('/files', (req, res, next) => { res.set('Access-Control-Allow-Origin', '*'); next(); }, express.static(dirs.out, { maxAge: '7d', index: false }));
+app.post('/check-cookies', async (req, res) => {
+  if (!secretOk(req.get('x-worker-secret'))) return res.status(401).json({ error: 'bad secret' });
+  const text = String(req.body?.cookies || '');
+  if (!text.trim()) return res.status(400).json({ error: 'no cookies' });
+  const r = await testCookies(text);
+  if (r.ok) { setCookies(text); lastCookieCheck = Date.now(); }   // known good: use them right away
+  console.log(`cookie test on save: ${r.ok ? 'working' : r.blocked ? 'YouTube refused them' : `unclear (${r.error})`}`);
+  res.json(r);
+});
 app.post('/jobs', (req, res) => {
   if (!secretOk(req.get('x-worker-secret'))) return res.status(401).json({ error: 'bad secret' });
   const job = req.body || {};
