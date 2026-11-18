@@ -2680,7 +2680,13 @@ function spawnMissingNo(){
 // ── WANDERING POKEMON ──
 const WANDER_POOL=[25,39,52,54,56,74,79,81,92,113,120,122,129,132,133,143,147,175,196,202,213,225,238,239,240,241,242,246,252,255,258,282,330,359,390,393,448,495,498,571,650,653,722,725];
 let wanderActive=0;
+// Wanderers float above everything and catch any tap on them, so they stay off the Clips tab: there they sat on top of
+// the Clip / Post buttons and swallowed the tap.
+const wanderPaused=()=>document.getElementById('mobTabClips')?.classList.contains('active');
+// (each wanderer's own timer still runs and counts it down, so wanderActive stays right)
+function clearWanderers(){ document.querySelectorAll('.wander-poke,.missingno-wrap').forEach(el=>el.remove()); }
 function spawnWanderPoke(forceId, forceSize){
+  if(wanderPaused()&&!forceId)return;
   if(wanderActive>=3&&!forceId)return;
   if(!forceId&&Math.random()<1/150){spawnMissingNo();return;}
   wanderActive++;
@@ -5155,7 +5161,7 @@ function switchMobTab(tab, btn){
   if(tab==='cal')     { renderMobMonthGrid(); renderMobTimeline(); renderMobCalQuests(); }
   if(tab==='home')    { renderMobHomeTeasers(); }
   if(tab==='farm')    { renderFarm(); }
-  if(tab==='clips')   { renderClips(); }
+  if(tab==='clips')   { clearWanderers(); renderClips(); }
 }
 
 function toggleMobCalGrid(){
@@ -8071,12 +8077,13 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
 </script>
 <!-- ══════════════ CLIPS TAB (find streamer moments → worker cuts them → review + post) ══════════════ -->
 <style>
-  .clp-seg { align-self:flex-start; margin:10px 0 14px; }
-  .clp-seg { max-width:100%; overflow-x:auto; scrollbar-width:none; }
+  /* The tab bar never shrinks (in the pane's flex column a long Review page used to crush it to 4px), stays pinned while
+     you scroll, and fits all five tabs on a phone; on very narrow screens it scrolls sideways instead of hiding Stats */
+  .clp-seg { align-self:stretch; margin:10px 0 14px; flex-shrink:0; position:sticky; top:0; z-index:5; overflow-x:auto; scrollbar-width:none; background:rgba(16,30,46,.96); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); box-shadow:0 6px 14px -8px rgba(0,0,0,.6); }
   .clp-seg::-webkit-scrollbar { display:none; }
-  .clp-seg button { font-size:13px; padding:7px 12px; min-height:36px; white-space:nowrap; flex-shrink:0; }
+  .clp-seg button { font-size:13px; padding:7px 6px; min-height:40px; white-space:nowrap; flex:1 0 auto; }
   .clp-seg .n { display:inline-block; min-width:18px; margin-left:5px; padding:0 5px; border-radius:999px; background:var(--accent); color:#1a0e08; font-size:11px; font-weight:800; line-height:18px; text-align:center; }
-  .clp-view { display:none; flex-direction:column; gap:12px; }
+  .clp-view { display:none; flex-direction:column; gap:12px; flex-shrink:0; padding-bottom:12px; }
   .clp-view.on { display:flex; }
   .clp-card { background:rgba(223,238,255,.045); border-radius:22px; padding:14px 16px; }
   .clp-card-t { font-size:15px; font-weight:800; }
@@ -8124,7 +8131,8 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-rv-hd { display:flex; align-items:center; gap:8px; }
   .clp-rv-hd .c { flex:1; font-size:14px; font-weight:700; }
   .clp-rv-hd .c span { color:var(--fg-dim); font-weight:600; }
-  .clp-player { position:relative; align-self:center; height:min(50vh,520px); max-width:100%; aspect-ratio:9/16; border-radius:18px; overflow:hidden; background:#000 center/cover no-repeat; cursor:pointer; }
+  /* sized so Post / Reject stay on screen under the player, even on a small phone */
+  .clp-player { position:relative; align-self:center; height:clamp(240px, calc(100dvh - 460px), 520px); max-width:100%; aspect-ratio:9/16; border-radius:18px; overflow:hidden; background:#000 center/cover no-repeat; cursor:pointer; flex-shrink:0; }
   .clp-player video { width:100%; height:100%; object-fit:cover; display:block; background:transparent; }
   .clp-play { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
   .clp-play i { width:64px; height:64px; border-radius:50%; background:rgba(10,20,32,.6); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
@@ -8140,7 +8148,7 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-big .farm-btn { min-height:52px; font-size:15.5px; }
   .clp-big .farm-btn.reject { flex:0 0 38%; }
   .clp-links { display:flex; justify-content:center; gap:4px; flex-wrap:wrap; }
-  .clp-link { border:none; background:none; color:var(--fg-dim); font-family:inherit; font-size:13.5px; font-weight:700; padding:8px 12px; border-radius:999px; cursor:pointer; }
+  .clp-link { border:none; background:none; color:var(--fg-dim); font-family:inherit; font-size:13.5px; font-weight:700; padding:10px 14px; min-height:40px; border-radius:999px; cursor:pointer; }
   .clp-link:hover, .clp-link.on { color:var(--fg); background:rgba(223,238,255,.06); }
   .clp-flag { font-size:12.5px; color:#ffd59a; background:rgba(255,181,71,.1); border-radius:10px; padding:5px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
   .clp-flag.open { white-space:normal; }
@@ -8167,6 +8175,22 @@ try{ if(typeof APP!=='undefined'&&APP&&APP.farm) renderBuddy(); }catch{}
   .clp-done .th { width:54px; aspect-ratio:9/16; border-radius:10px; flex-shrink:0; background:#0c1a2a center/cover no-repeat; display:block; }
   .clp-empty { text-align:center; color:var(--fg-dim); font-size:13.5px; padding:26px 12px; line-height:1.5; }
   .clp-sw { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  /* running / failed jobs: one compact line each, above the clip, so the clip and its buttons come first */
+  .clp-jobs { display:flex; flex-direction:column; gap:6px; }
+  .clp-jline { display:flex; align-items:center; gap:10px; background:rgba(223,238,255,.045); border-radius:14px; padding:8px 10px 8px 12px; min-height:44px; }
+  .clp-jline .t { flex:1; min-width:0; font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clp-jline .s { font-size:12px; color:var(--fg-dim); font-weight:600; }
+  .clp-jline .clp-bar { margin-top:5px; }
+  .clp-jline.fail { background:rgba(255,120,120,.07); }
+  .clp-jline.fail .s { color:#ffb0b0; white-space:normal; }
+  .clp-jline .farm-btn { flex-shrink:0; }
+  .clp-fails { border:none; background:rgba(255,120,120,.08); color:#ffb0b0; border-radius:14px; min-height:44px; padding:0 14px; font-family:inherit; font-size:13px; font-weight:700; text-align:left; cursor:pointer; display:flex; align-items:center; gap:8px; width:100%; }
+  .clp-fails .chev { margin-left:auto; transition:transform .2s; }
+  .clp-fails[aria-expanded="true"] .chev { transform:rotate(90deg); }
+  .clp-ev { font-size:12.5px; color:#ffcf8a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .clp-done a.pl { display:inline-block; padding:6px 0; min-height:32px; color:#8fc8ff; }
+  .clp-cookie textarea.as-inp { min-height:90px; font-size:12px; font-family:ui-monospace,Menlo,monospace; resize:vertical; }
+  .clp-steps { margin:6px 0 10px 18px; padding:0; font-size:12.5px; color:var(--fg-dim); line-height:1.5; }
 </style>
 <script>
 // Clip Studio front end. Server side: clipper.js (/api/clips/*). Heavy lifting: worker/ on Render.
@@ -8229,7 +8253,7 @@ document.addEventListener('visibilitychange',()=>{ if(!document.hidden && docume
 // ── FIND: autopilot line, paste-a-link, my streamers, trending ──
 function clipsSetupNote(){
   if(!clipsState||clipsState.err) return clipsState?.err?`<div class="clp-note">Couldn't reach the server: ${esc(clipsState.err)}</div>`:'';
-  const miss=[]; if(!clipsState.worker) miss.push('<b>Clip worker</b>: set WORKER_URL and WORKER_SECRET on Render (see worker/README.md)'); if(!clipsState.twitch) miss.push('<b>Twitch</b>: set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET on Render to see trending videos');
+  const miss=[]; if(clipsState.ytCookies?.blocked&&!clipsState.ytCookies?.set) miss.push('<b>YouTube</b> is blocking the clip server. <button type="button" class="farm-btn sm primary" style="margin-top:6px" onclick="openClipsCookies()">Add YouTube cookies</button>'); if(!clipsState.worker) miss.push('<b>Clip worker</b>: set WORKER_URL and WORKER_SECRET on Render (see worker/README.md)'); if(!clipsState.twitch) miss.push('<b>Twitch</b>: set TWITCH_CLIENT_ID and TWITCH_CLIENT_SECRET on Render to see trending videos');
   return miss.length?`<div class="clp-note">Setup left:<br>${miss.join('<br>')}</div>`:'';
 }
 function clipsAutoLine(){
@@ -8295,11 +8319,37 @@ function clipsSettingsHTML(){
     <div class="clp-s" style="margin:-4px 0 8px">Only creators who allow clipping.</div>
     <div class="clp-chips" style="margin-bottom:8px">${(a.youtube||[]).map(y=>`<button type="button" class="clp-chip" aria-label="Remove ${esc(y.name)}" onclick="clipsAutopilot({removeYoutube:'${esc(y.url)}'})">${esc(y.name)} <span class="x">×</span></button>`).join('')||'<span class="clp-s">None yet</span>'}</div>
     <div class="clp-row"><input id="clpYtChan" class="as-inp" type="url" placeholder="https://www.youtube.com/@channel" autocomplete="off" aria-label="YouTube channel link"><button type="button" class="farm-btn sm" onclick="clipsAutopilot({addYoutube:document.getElementById('clpYtChan').value.trim()})">Add</button></div>
+    ${clipsCookieRow()}
     <div class="as-label">Posting accounts</div>
     <div class="clp-sw"><div class="clp-s">${yt.connected?`YouTube: <b>${esc(yt.channel?.title||'your channel')}</b>${yt.today?` · ${yt.today} today (limit ~6)`:''}`:yt.error?`<span style="color:#ff9b9b">YouTube: ${esc(yt.error)}</span>`:yt.configured?'YouTube not connected.':'YouTube posting needs setup (YT_CLIENT_ID / YT_CLIENT_SECRET on Render).'}</div>
       ${yt.configured?(yt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('youtube')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/youtube/connect">Connect</a>`):''}</div>
-    <div class="clp-sw" style="margin-top:10px"><div class="clp-s">${tt.connected?`TikTok: <b>${esc(tt.user?.name||'your account')}</b>`:tt.error?`<span style="color:#ff9b9b">TikTok: ${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
-      ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect</a>`):''}</div>`;
+    <div class="clp-sw" style="margin-top:10px"><div class="clp-s">${tt.connected?`TikTok: <b>${esc(tt.user?.name||'your account')}</b>${tt.mode==='drafts'?' · sends drafts to your TikTok inbox':tt.mode==='direct'?' · Direct Post (private until TikTok audits the app)':''}`:tt.error?`<span style="color:#ff9b9b">TikTok: ${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
+      ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect</a>`):''}</div>
+    ${tt.connected&&tt.mode!=='drafts'?`<div class="clp-note" style="margin-top:10px">TikTok only lets apps it hasn't audited post to <b>private</b> accounts, so direct posting fails on yours. Drafts get around that: the clip lands in your TikTok inbox and you tap Post there.<div class="clp-row" style="margin-top:8px"><a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Reconnect for drafts</a></div><div style="margin-top:6px;font-size:12px;opacity:.85">If TikTok shows an error, turn on the <b>video.upload</b> scope for your app at developers.tiktok.com first.</div></div>`:''}
+    ${tt.connected&&tt.mode==='drafts'?'<div class="clp-s" style="margin-top:6px">TikTok holds at most 5 unposted drafts a day, so post them from your inbox as they arrive.</div>':''}`;
+}
+// YouTube download cookies: YouTube blocks the clip server's cloud address without them
+function clipsCookieRow(){
+  const k=clipsState?.ytCookies||{};
+  return `<div class="as-label">YouTube downloads</div>
+    <div class="clp-sw"><div class="clp-s">${k.set?`Cookies saved ${clpAgo(k.savedAt)}${k.blocked&&new Date(k.blocked)>new Date(k.savedAt)?` · <span style="color:#ff9b9b">YouTube blocked a download since: they've likely expired</span>`:''}`:k.blocked?'<span style="color:#ff9b9b">YouTube is blocking the clip server.</span> Add cookies to clip YouTube videos.':'Needed to clip YouTube videos (YouTube blocks cloud servers).'}</div>
+      <button type="button" class="farm-btn sm${k.set?' ghost':' primary'}" onclick="openClipsCookies()">${k.set?'Update':'Add cookies'}</button></div>`;
+}
+function openClipsCookies(){
+  const k=clipsState?.ytCookies||{};
+  const ov=farmSheet('clpCookieOv',`<div class="clp-cookie"><div class="clp-card-t" style="font-size:18px">YouTube cookies</div>
+    <div class="clp-s" style="margin-top:4px">YouTube blocks downloads from cloud servers like the clip worker's. Cookies from a signed-in account get past it. Use a <b>spare Google account</b>, not your main one, since heavy downloading can get an account flagged.</div>
+    <ol class="clp-steps"><li>On a computer, open Chrome or Firefox and sign in to YouTube with the spare account.</li><li>Install the extension <b>Get cookies.txt LOCALLY</b> (or <b>Cookie-Editor</b>).</li><li>On youtube.com, open it and export / copy the cookies.</li><li>Paste everything below. They usually last a few weeks; Cled tells you when they stop working.</li></ol>
+    <textarea id="clpCookieTxt" class="as-inp" placeholder="# Netscape HTTP Cookie File&#10;.youtube.com&#9;TRUE&#9;/&#9;TRUE&#9;…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="YouTube cookies"></textarea>
+    <div class="clp-s" style="margin-top:6px">Stored encrypted. Only YouTube and Google cookies are kept; everything else in the paste is dropped.</div>
+    <div class="clp-row" style="margin-top:14px"><button type="button" class="farm-btn primary" id="clpCookieGo">Save</button>${k.set?'<button type="button" class="farm-btn ghost" id="clpCookieDel">Remove saved cookies</button>':''}</div></div>`);
+  ov.querySelector('#clpCookieGo').onclick=async e=>{
+    const v=ov.querySelector('#clpCookieTxt').value; if(!v.trim()) return showToast('Paste the cookies first');
+    e.target.disabled=true; e.target.textContent='Checking…';
+    try{ const d=await clipsApi('/api/clips/youtube/cookies',{method:'POST',body:{cookies:v}}); ov.remove(); showToast(`Saved ${d.count} YouTube cookies${d.retrying?`. Retrying ${d.retrying} blocked job${d.retrying>1?'s':''}`:''}`); await clipsLoadState(); clipsSettingsRedraw(); clipsRefresh(); clipsSchedulePoll(); }
+    catch(err){ showToast(err.message); e.target.disabled=false; e.target.textContent='Save'; }
+  };
+  ov.querySelector('#clpCookieDel')?.addEventListener('click',async()=>{ try{ await clipsApi('/api/clips/youtube/cookies',{method:'POST',body:{remove:true}}); ov.remove(); showToast('Cookies removed'); await clipsLoadState(); clipsSettingsRedraw(); }catch(err){ showToast(err.message); } });
 }
 function clipsSettingsRedraw(){ const sh=document.querySelector('#clpSetOv .mc-sheet'); if(sh) sh.innerHTML='<div class="as-grab"></div>'+clipsSettingsHTML(); if(clipsView==='find') clipsRenderFind(); }
 async function clipsAutopilot(patch){
@@ -8359,14 +8409,29 @@ function openClipSheet(item){
   };
 }
 
-// ── REVIEW: running jobs, then one clip at a time ──
+// ── REVIEW: one clip at a time, with running jobs as one-line strips above it ──
+// Older jobs stored yt-dlp's raw output as the error; this turns the common ones into plain English
+function clpErr(j){
+  const m=String(j.error||'Failed');
+  if(j.needs==='ytCookies'||/confirm you.?re not a bot|Sign in to confirm/i.test(m)) return {text:clipsState?.ytCookies?.set?'YouTube blocked it even with your cookies. Paste fresh ones in settings.':'YouTube blocks the clip server. Add YouTube cookies in settings, then try again.',cookies:true};
+  if(/No space left|ENOSPC|Errno 28|disk space/i.test(m)) return {text:'The clip server ran out of space. It cleans up on its own now: tap Try again.'};
+  if(/Private video|Video unavailable|members|subscriber/i.test(m)) return {text:'This video is private, deleted, or for subscribers only.'};
+  const e=m.match(/ERROR: ([^|]*)/); return {text:(e?e[1]:m).replace(/^yt-dlp exited \d+: /,'').slice(0,160)};
+}
+let clipsFailsOpen=false;
 function clipsJobsHTML(){
-  const running=(clipsState?.jobs||[]).filter(j=>clpActive(j)||j.status==='failed');
-  return running.map(j=>`<div class="clp-card clp-job"><div class="clp-job-th" style="background-image:url('${esc(j.source?.thumb||'')}')"></div><div style="flex:1;min-width:0">
-      <div class="clp-title" style="-webkit-line-clamp:1;font-size:13.5px">${j.type==='render'?'Re-cut: ':''}${esc(j.source?.title||'')}</div>
-      ${j.status==='failed'?`<div class="clp-s" style="color:#ff9b9b">${esc(j.error||'Failed')}</div><div class="clp-row" style="margin-top:6px"><button type="button" class="farm-btn sm" onclick="clipsJobAct('${j.id}','retry')">Try again</button><button type="button" class="farm-btn sm ghost" onclick="clipsJobAct('${j.id}','delete')">Remove</button></div>`
-        :`<div class="clp-bar" data-job-prog="${j.id}" style="margin:6px 0 4px"><i style="width:${j.progress||2}%"></i></div><div class="clp-s">${esc(j.msg||j.status)}</div>`}
-    </div></div>`).join('');
+  const jobs=clipsState?.jobs||[], running=jobs.filter(clpActive), failed=jobs.filter(j=>j.status==='failed');
+  const runHTML=running.map(j=>`<div class="clp-jline"><div style="flex:1;min-width:0"><div class="t">${j.type==='render'?'Re-cut: ':''}${esc(j.source?.title||'')}</div>
+      <div class="clp-bar" data-job-prog="${j.id}"><i style="width:${j.progress||2}%"></i></div><div class="s" style="margin-top:3px">${esc(j.msg||j.status)}</div></div></div>`).join('');
+  if(!failed.length) return runHTML?`<div class="clp-jobs">${runHTML}</div>`:'';
+  const failHTML=failed.map(j=>{ const e=clpErr(j); return `<div class="clp-jline fail"><div style="flex:1;min-width:0"><div class="t">${j.type==='render'?'Re-cut: ':''}${esc(j.source?.title||'')}</div><div class="s">${esc(e.text)}</div></div>
+      ${e.cookies?`<button type="button" class="farm-btn sm primary" onclick="openClipsCookies()">Add cookies</button>`:`<button type="button" class="farm-btn sm" onclick="clipsJobAct('${j.id}','retry')">Try again</button>`}<button type="button" class="clp-iconbtn" aria-label="Remove" onclick="clipsJobAct('${j.id}','delete')">✕</button></div>`; }).join('');
+  return `<div class="clp-jobs">${runHTML}<button type="button" class="clp-fails" aria-expanded="${clipsFailsOpen}" onclick="clipsFailsOpen=!clipsFailsOpen;clipsRenderReview(true)">${failed.length} job${failed.length>1?'s':''} failed<span class="clp-s" style="color:inherit;opacity:.8">${clipsFailsOpen?'':' · tap to see why'}</span><span class="chev">›</span></button>${clipsFailsOpen?failHTML+(failed.length>1?`<button type="button" class="farm-btn sm ghost" style="align-self:flex-end" onclick="clipsClearFailed()">Remove all failed</button>`:''):''}</div>`;
+}
+async function clipsClearFailed(){
+  const ids=(clipsState?.jobs||[]).filter(j=>j.status==='failed').map(j=>j.id);
+  for(const id of ids){ try{ await clipsApi(`/api/clips/jobs/${id}`,{method:'DELETE'}); }catch{} }
+  clipsState.jobs=clipsState.jobs.filter(j=>!ids.includes(j.id)); clipsFailsOpen=false; clipsRefresh();
 }
 function clipsRenderReview(force){
   const el=clpView('review'); if(!el) return;
@@ -8400,6 +8465,7 @@ function clipsRenderReview(force){
       <div class="clp-play"><i>${CLP_IC.play}</i></div><span class="clp-load">Loading…</span></div>
     <div class="clp-meta">
       <div class="clp-s one">${clpDur(c.end-c.start)} · <b style="color:var(--fg)">${c.score}/10</b> · ${esc(j.source?.channel||'')}${camp?` · <b style="color:#ffd59a">${esc(camp.name)}</b>`:''}${c.why?` · <span title="${esc(c.why)}">${esc(c.why)}</span>`:''}</div>
+      ${c.evidence?`<div class="clp-ev" title="${esc(c.evidence)}">🔥 ${esc(c.evidence)}</div>`:''}
       <div class="t">${esc(c.title||'Untitled')}</div>
       ${c.caption?`<div class="cap">${esc(c.caption)}</div>`:''}
       ${(c.flags||[]).length?`<div class="clp-flag" title="${esc(c.flags.join(' · '))}" onclick="this.classList.toggle('open')"><b>⚠ Check:</b> ${c.flags.map(esc).join(' · ')}</div>`:''}
@@ -8409,11 +8475,21 @@ function clipsRenderReview(force){
     <div class="clp-links"><button type="button" class="clp-link" onclick="clipsToEditing('${esc(id)}')">Edit</button><button type="button" class="clp-link" onclick="clipsRecut('${esc(id)}')">Re-cut</button>${i<q.length-1?`<button type="button" class="clp-link" onclick="clipsGo(1)">Skip</button>`:''}</div>
   </div>`;
   const vid=el.querySelector('.clp-player video'), pl=vid.parentNode;
+  clpFitPlayer();
   vid.addEventListener('canplay',()=>pl.classList.add('ready'),{once:true});
   vid.addEventListener('pause',()=>pl.classList.remove('playing'));
   vid.addEventListener('play',()=>pl.classList.add('playing'));
   clipsPrefetchAround(q,i);
 }
+// Shrink the player just enough that Post / Reject sit above the bottom nav without scrolling (job strips above it vary)
+function clpFitPlayer(){
+  const el=clpView('review'), pl=el?.querySelector('.clp-player'), btns=el?.querySelector('.clp-big'), nav=document.querySelector('.mob-nav');
+  if(!pl||!btns) return; pl.style.height='';
+  const navTop=nav&&getComputedStyle(nav).display!=='none'?nav.getBoundingClientRect().top:innerHeight;
+  const over=btns.getBoundingClientRect().bottom+10-navTop;
+  if(over>0) pl.style.height=Math.max(220,pl.getBoundingClientRect().height-over)+'px';
+}
+addEventListener('resize',()=>{ if(clipsView==='review') clpFitPlayer(); });
 function clipsTogglePlay(pl){ const v=pl.querySelector('video'); if(v.controls) return; if(v.paused){ v.play().catch(e=>showToast(e.message)); v.controls=true; } else v.pause(); }
 function clipsGo(d){ const q=clpQueue(), i=Math.max(0,Math.min(q.length-1,clipsCur.idx+d)); clipsCur={id:q[i]?.c.id||null,idx:i}; document.querySelector('#mobTabClips .clp-player video')?.pause(); clipsRenderReview(true); }
 document.addEventListener('keydown',e=>{
@@ -8625,7 +8701,7 @@ async function clipsRenderStats(){
       <div class="clp-tile"><div class="v">${s.spendUsd>0&&s.spendUsd<0.01?'&lt;1¢':'$'+s.spendUsd.toFixed(2)}</div><div class="l">AI spend so far</div></div></div>`}
     <div class="clp-lbl" style="margin-top:6px">Your clips</div>
     ${done.length?done.map(({j,c})=>clipDoneHTML(j,c)).join(''):'<div class="clp-empty" style="padding:12px">Clips you post or approve show up here.</div>'}
-    <div class="clp-card"><div class="clp-card-t">Own-channel payouts unlock at</div><div class="clp-s" style="margin-top:6px">TikTok Creator Rewards: 10K followers + 100K views in 30 days, on videos over 1 minute. Your clips are 15–30s, which suits Whop campaigns and Shorts; ask for a longer re-cut on standout moments if you want them to count.<br>YouTube Partner Program: 1K subscribers + 10M Shorts views in 90 days.</div></div>
+    <div class="clp-card"><div class="clp-card-t">Own-channel payouts unlock at</div><div class="clp-s" style="margin-top:6px">TikTok Creator Rewards: 10K followers + 100K views in 30 days, on videos over 1 minute. Your clips are 10–45s, which suits Whop campaigns and Shorts; ask for a longer re-cut on standout moments if you want them to count.<br>YouTube Partner Program: 1K subscribers + 10M Shorts views in 90 days.</div></div>
     <div class="clp-s">Earnings are an estimate from the views you enter under Mark posted. Whop's own dashboard is the real number.</div>`;
 }
 function clipDoneHTML(j,c){
@@ -8645,19 +8721,21 @@ function clipDoneHTML(j,c){
 function clpPostLine(id,c){
   const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, out=[];
   if(clpPosting(c)) return '';
-  if(c.postLinks?.youtube) out.push(`YouTube: <a href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener" style="color:#8fc8ff">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
-  if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener" style="color:#8fc8ff">posted</a>`:esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
+  if(c.postLinks?.youtube) out.push(`YouTube: <a class="pl" href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
+  if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a class="pl" href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener">posted</a>`:c.ttMode==='draft'?(c.ttStatus==='inbox'?'draft is in your TikTok inbox, tap it there to post':/^failed/.test(c.ttStatus||'')?`<span style="color:#ff9b9b">draft ${esc(c.ttStatus)}</span>`:c.ttStatus==='posted'?'posted from your draft':'sending the draft…'):esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
   if(c.ttError&&!c.ttPublishId) out.push(`<span style="color:#ff9b9b">${esc(c.ttError)}</span>`);
   const missing=(yt.connected&&!c.postLinks?.youtube)||(tt.connected&&!c.ttPublishId);
   return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
 }
-// Approve & post. YouTube only: posts straight away. TikTok connected: a short sheet first, because
-// TikTok requires the poster to choose privacy and interaction settings on each post themselves.
+// Approve & post: one tap. YouTube uploads straight away; TikTok gets a draft in your inbox (you tap Post in the
+// TikTok app, where you also pick who can see it). Only a Direct Post connection needs the settings sheet first,
+// because TikTok makes the poster choose privacy and interaction settings on each post.
 async function clipsApprove(id,btn){
   const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, {c}=clpFind(id); if(!c) return;
   const needYt=yt.connected&&!c.postLinks?.youtube, needTt=tt.connected&&!c.ttPublishId;
   if(!needYt&&!needTt) return clipsSave(id,{status:'approved'},true);
   if(!needTt) return clipsPost(id,{youtube:true});
+  if(tt.mode!=='direct') return clipsPost(id,{youtube:needYt,tiktok:true});
   openTikTokSheet(id,needYt);
 }
 async function openTikTokSheet(id,withYt){
@@ -8703,18 +8781,19 @@ async function openTikTokSheet(id,withYt){
 async function clipsPost(id,body){
   const {jid,cid,c}=clpFind(id); if(!c) return;
   c.posting=new Date().toISOString(); clipsRefresh();
-  showToast(body.tiktok&&body.youtube?'Posting to YouTube and TikTok…':body.tiktok?'Posting to TikTok…':'Uploading to YouTube…');
+  const draft=body.tiktok===true;
+  showToast(body.tiktok&&body.youtube?(draft?'Uploading to YouTube + sending a TikTok draft…':'Posting to YouTube and TikTok…'):body.tiktok?(draft?'Sending to your TikTok inbox…':'Posting to TikTok…'):'Uploading to YouTube…');
   try{
     const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',body,timeout:330000});
     const now=clpFind(id).c||c; Object.assign(now,d.clip); delete now.posting; if(now!==c){ Object.assign(c,d.clip); delete c.posting; }
-    showToast(d.errors?.length?d.errors.join(' · '):`Posted "${(now.title||'clip').slice(0,40)}". Links are in Stats.`);
+    showToast(d.errors?.length?d.errors.join(' · '):draft?`Done. Open TikTok and tap the draft in your inbox to post it${body.youtube?'; YouTube link is in Stats':''}.`:`Posted "${(now.title||'clip').slice(0,40)}". Links are in Stats.`);
   }catch(e){ delete c.posting; await clipsLoadState(); const now=clpFind(id).c; showToast(`Posting failed: ${e.message}. ${now?.status==='review'?'It is back in Review.':'It is in Stats to try again.'}`); }
   clipsStats=null; clipsRefresh(); clipsSchedulePoll();
 }
 
 function openClipsFromPush(){ clipsView='review'; clipsState=null; goToMobTab('clips'); }
 { const q=new URLSearchParams(location.search);
-  if(q.get('open')==='clips'){ const yt=q.get('yt'), tt=q.get('tt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt||tt){ clipsView='find'; clipsState=null; goToMobTab('clips'); showToast(`${yt?'YouTube':'TikTok'} ${(yt||tt)==='connected'?'connected':'connection cancelled'}`); } else openClipsFromPush(); },400); } }
+  if(q.get('open')==='clips'){ const yt=q.get('yt'), tt=q.get('tt'); history.replaceState(null,'',location.pathname); setTimeout(()=>{ if(yt||tt){ clipsView='find'; clipsState=null; goToMobTab('clips'); const why=q.get('why'); showToast(why?`TikTok said: ${why}. If it mentions a scope, turn on video.upload for your app at developers.tiktok.com.`:`${yt?'YouTube':'TikTok'} ${(yt||tt)==='connected'?'connected':'connection cancelled'}`); } else openClipsFromPush(); },400); } }
 navigator.serviceWorker?.addEventListener('message',e=>{ if(e.data?.open==='clips') openClipsFromPush(); });
 </script>
 </body>

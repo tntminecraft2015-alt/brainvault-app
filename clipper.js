@@ -8,6 +8,7 @@
 // on this server being awake. Job state lives in app-data (data.clips), persisted like everything else.
 
 const crypto = require('crypto');
+const { hotSpots, transcriptFor } = require('./clip-signals');
 const { Readable } = require('stream');
 
 const HAIKU = 'claude-haiku-4-5-20251001';
@@ -56,6 +57,41 @@ async function helix(pathQs, ttlMs = 10 * 60 * 1000) {
     return data;
   } catch (e) { if (hit) return hit.data; throw e; }
 }
+// Viewer-made clips on a VOD: where chat went wild. Twitch's clips API gives each clip's position in the VOD
+// (vod_offset), its length and views, so this is the most reliable "people reacted here" signal for Twitch.
+// Returns [{ t, d, views, title }] in VOD seconds, most-viewed first. Empty if Twitch isn't set up or has none.
+async function twitchHotClips(vodId) {
+  if (!TW_ID || !TW_SECRET || !/^\d+$/.test(String(vodId || ''))) return [];
+  const [v] = await helix(`videos?id=${vodId}`, 60 * 60 * 1000);
+  if (!v) return [];
+  const start = new Date(v.created_at), end = new Date(start.getTime() + (twDur(v.duration) + 3600) * 1000);
+  const out = [];
+  let after = '';
+  for (let page = 0; page < 3; page++) {
+    const r = await fetch(`https://api.twitch.tv/helix/clips?broadcaster_id=${v.user_id}&started_at=${encodeURIComponent(start.toISOString())}&ended_at=${encodeURIComponent(end.toISOString())}&first=100${after ? `&after=${after}` : ''}`,
+      { headers: { 'Client-Id': TW_ID, Authorization: `Bearer ${await twitchToken()}` }, signal: AbortSignal.timeout(9000) });
+    if (!r.ok) break;
+    const d = await r.json();
+    for (const c of d.data || []) if (String(c.video_id) === String(vodId) && c.vod_offset != null) out.push({ t: +c.vod_offset, d: Math.round(+c.duration || 30), views: +c.view_count || 0, title: String(c.title || '').slice(0, 90) });
+    after = d.pagination?.cursor; if (!after) break;
+  }
+  return out.sort((a, b) => b.views - a.views);
+}
+const twitchVodId = url => String(url || '').match(/twitch\.tv\/videos\/(\d+)/)?.[1] || null;
+// The best `len`-second stretch of a long VOD: where viewer clips cluster (weighted by their views).
+// Skips the first 10 minutes (intros). Falls back to 20 min in when there are no clips.
+function bestWindow(hot, duration, len = 3 * 3600) {
+  if (duration && duration <= len + 1200) return null;
+  const weight = c => 1 + Math.log10(1 + c.views);
+  let best = null;
+  for (const c of hot) {
+    const start = Math.max(600, Math.min(c.t - 15 * 60, (duration || Infinity) - len));
+    const sc = hot.filter(x => x.t >= start && x.t + x.d <= start + len).reduce((n, x) => n + weight(x), 0);
+    if (!best || sc > best.score) best = { start: Math.round(start), end: Math.round(start + len), score: sc };
+  }
+  return best && best.score > 0 ? { start: best.start, end: best.end, clips: hot.filter(x => x.t >= best.start && x.t < best.end).length } : { start: 20 * 60, end: 20 * 60 + len, clips: 0 };
+}
+
 // "1h2m3s" → seconds
 const twDur = s => { const m = String(s || '').match(/(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/) || []; return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0); };
 const twThumb = (u, w, h) => String(u || '').replace('%{width}', w).replace('%{height}', h).replace('{width}', w).replace('{height}', h);
@@ -89,7 +125,9 @@ async function getTrending(streamers, topics = []) {
   return [...seen.values()];
 }
 
-module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, webpush, pushEnabled }) {
+module.exports = mountClipper;
+module.exports._test = { twitchHotClips, bestWindow, twitchVodId };   // for the unit tests only
+function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, webpush, pushEnabled }) {
   // data.clips = { streamers:[{login,layout,corner}], campaigns:[…], jobs:[…], spendUsd, scores:{id:{score,why,date}} }
   const clipsOf = d => { d.clips = d.clips || {}; const c = d.clips; c.streamers = c.streamers || []; c.campaigns = c.campaigns || []; c.jobs = c.jobs || []; c.scores = c.scores || {}; c.spendUsd = c.spendUsd || 0; return c; };
   const mutate = fn => { const d = getAppData(), c = clipsOf(d); const out = fn(c, d); saveAppData(d); return out; };
@@ -152,7 +190,8 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const y = c.youtube || {}, a = c.autopilot || {};
     res.json({ streamers: c.streamers, campaigns: c.campaigns, jobs, spendUsd: c.spendUsd, worker: !!(WORKER_URL && WORKER_SECRET), twitch: !!(TW_ID && TW_SECRET),
       youtube: { configured: !!(YT_ID && YT_SECRET), connected: !!y.tok && !y.error, channel: y.channel || null, error: y.error || null, today: (y.uploads || {})[new Date().toISOString().slice(0, 10)] || 0 },
-      tiktok: { configured: !!(TT_KEY && TT_SECRET), connected: !!c.tiktok?.tok && !c.tiktok?.error, user: c.tiktok?.user || null, error: c.tiktok?.error || null },
+      tiktok: { configured: !!(TT_KEY && TT_SECRET), connected: !!c.tiktok?.tok && !c.tiktok?.error, user: c.tiktok?.user || null, error: c.tiktok?.error || null, mode: ttMode(c) },
+      ytCookies: { set: !!c.ytCookies?.tok, savedAt: c.ytCookies?.savedAt || null, count: c.ytCookies?.count || 0, blocked: c.ytBlocked || null },
       autopilot: { on: !!a.on, perDay: a.perDay || 10, youtube: a.youtube || [], topics: a.topics || [], lastRun: a.lastRun || null, lastPick: a.lastPick || null } });
   });
   app.post('/api/clips/streamers', (req, res) => {
@@ -198,6 +237,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
           id: job.id, attempt: job.attempt || 1, type: job.type, source: job.source, range: job.range, moments: job.moments,
           layout: job.layout || streamer?.layout || 'blur', corner: job.corner || streamer?.corner || 'br',
           pushSubscriptions: d.pushSubscriptions || [],
+          ytCookies: ytCookiesText(c), keep: keepFiles(c),
         }),
       });
       if (!r.ok) throw new Error(`worker HTTP ${r.status}`);
@@ -316,7 +356,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
   }
   app.get('/api/clips/worker/autopilot', workerOnly, (req, res) => {
     const c = clipsOf(getAppData());
-    res.json({ ...apNeed(c), youtube: apOf(c).youtube.map(y => y.url), topics: apOf(c).topics.map(t => t.q) });
+    res.json({ ...apNeed(c), youtube: apOf(c).youtube.map(y => y.url), topics: apOf(c).topics.map(t => t.q), ytCookies: ytCookiesText(c), keep: keepFiles(c) });
   });
 
   // The worker sends what it found on YouTube; this adds Twitch VODs + campaign links, picks one and queues it
@@ -327,7 +367,8 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const cands = [];
     for (const camp of c0.campaigns.filter(x => x.active && x.sourceUrl))
       cands.push({ key: `camp:${camp.id}:${camp.sourceUrl}`, url: camp.sourceUrl, title: `${camp.name} source`, login: camp.streamer, campaignId: camp.id, kind: 'link', rank: 1000 + camp.rate });
-    for (const v of (Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 250)) {
+    const ytUsable = !!c0.ytCookies?.tok || !c0.ytBlocked;   // blocked with no cookies: don't keep queueing YouTube jobs that will fail
+    for (const v of (ytUsable && Array.isArray(req.body?.youtube) ? req.body.youtube : []).slice(0, 250)) {
       if (!/^[\w-]{11}$/.test(v.id || '') || (v.duration && v.duration < 120)) continue;   // skip Shorts/trailers
       cands.push({ key: `yt:${v.id}`, url: `https://www.youtube.com/watch?v=${v.id}`, title: str(v.title, 200), channel: str(v.channel, 60), kind: 'vod', views: +v.views || 0, duration: +v.duration || 0, date: v.date || null, topic: str(v.topic, 40) || null });
     }
@@ -356,8 +397,14 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     const streamer = c0.streamers.find(s => s.login === pick.login);
     mutate(c => { const a = apOf(c); a.seen[pick.key] = new Date().toISOString().slice(0, 10); a.lastPick = { title: pick.title, at: new Date().toISOString() };
       const cut = new Date(Date.now() - 45 * day).toISOString().slice(0, 10); for (const [k, d] of Object.entries(a.seen)) if (d < cut) delete a.seen[k]; });
-    // long streams: a 3-hour window past the intro, so one VOD stays within Groq's free daily audio
-    const win = pick.campaignId || (pick.duration && pick.duration <= 3.5 * 3600) ? {} : { start: 20 * 60, end: 20 * 60 + 3 * 3600 };
+    // long streams: the 3 hours where viewers clipped the most (Twitch), so one VOD stays within Groq's free daily audio
+    let win = {};
+    if (!pick.campaignId && !(pick.duration && pick.duration <= 3.5 * 3600)) {
+      const hot = await twitchHotClips(twitchVodId(pick.url)).catch(e => { console.error('Autopilot: viewer clips lookup failed:', e.message); return []; });
+      const w = bestWindow(hot, pick.duration) || { start: 20 * 60, end: 20 * 60 + 3 * 3600, clips: 0 };
+      win = { start: w.start, end: w.end };
+      console.log(`  Autopilot: window ${Math.round(w.start / 60)}–${Math.round(w.end / 60)} min (${w.clips} viewer clips in it)`);
+    }
     const { job, delivered } = await createJob({ ...pick, ...win, layout: streamer?.layout, corner: streamer?.corner }, { autopilot: true });
     console.log(`  Autopilot: queued "${pick.title}" (${pick.key})`);
     res.json({ queued: true, jobId: job.id, delivered, title: pick.title });
@@ -365,7 +412,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
 
   app.post('/api/clips/jobs/:id/retry', async (req, res) => {
     // not for jobs the worker already has ('sent' and later): it would still be running the old attempt
-    const ok = mutate(c => { const j = findJob(c, req.params.id); if (!j || !['failed', 'queued'].includes(j.status)) return false; Object.assign(j, { status: 'queued', error: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: new Date().toISOString() });
+    const ok = mutate(c => { const j = findJob(c, req.params.id); if (!j || !['failed', 'queued'].includes(j.status)) return false; Object.assign(j, { status: 'queued', error: null, needs: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: new Date().toISOString() });
       if (j.recutOf) { const old = findJob(c, j.parentId)?.clips.find(x => x.id === j.recutOf); if (old) old.recutting = j.id; }
       return true; });
     if (!ok) return res.status(404).json({ error: 'No retryable job' });
@@ -417,7 +464,7 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
         `CURRENT: ${JSON.stringify({ start: cl.start, end: cl.end, title: cl.title, hook: cl.hook, caption: cl.caption })}\nSOURCE LENGTH: ${job.duration || 'unknown'}s\nTRANSCRIPT NEAR CLIP:\n${cl.context || '(none)'}\nNOTE: ${note}`, 600);
       const max = job.duration || 864000;
       const s = manual ? manual.start : num(json.start, 0, max, cl.start), e = manual ? manual.end : num(json.end, s + 5, max, cl.end);
-      const moment = { start: s, end: e, title: str(json.title, 100) || cl.title, hook: str(json.hook, 60) || cl.hook, caption: str(json.caption, 2200) || cl.caption, hashtags: cl.hashtags, score: cl.score, why: cl.why, context: cl.context,
+      const moment = { start: s, end: e, title: str(json.title, 100) || cl.title, hook: str(json.hook, 60) || cl.hook, caption: str(json.caption, 2200) || cl.caption, hashtags: cl.hashtags, score: cl.score, why: cl.why, evidence: cl.evidence, kind: cl.kind, context: cl.context,
         // same footage: keep the AI's warnings (the worker re-checks music itself). New timing: the old warnings may not apply.
         flags: same && (!manual || Math.max(0, Math.min(manual.end, cl.end) - Math.max(manual.start, cl.start)) >= 0.5 * (cl.end - cl.start)) ? (cl.flags || []).filter(f => !/^Music in the audio/.test(f)) : [] };
       const now = new Date().toISOString();
@@ -441,7 +488,8 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     // anything unfinished the worker doesn't have (e.g. its disk was wiped mid-job) gets sent again
     const ids = clipsOf(getAppData()).jobs.filter(j => !['done', 'failed'].includes(j.status) && !have.has(j.id)).map(j => j.id);
     mutate(c => { for (const id of ids) { const j = findJob(c, id); if (j) j.status = 'queued'; } });
-    res.json({ ok: true, resending: ids.length });
+    const c1 = clipsOf(getAppData());
+    res.json({ ok: true, resending: ids.length, ytCookies: ytCookiesText(c1), keep: keepFiles(c1) });
     for (const id of ids) await sendToWorker(id);
   });
 
@@ -467,48 +515,52 @@ module.exports = function mountClipper(app, { getApiKey, makeClient, getAppData,
     if (!picks.has(key)) {
       // chat: [[second, messages], ...] in 30s windows, from the VOD's chat replay when the worker could get one
       const chat = (Array.isArray(req.body?.chat) ? req.body.chat : []).filter(x => Array.isArray(x) && Number.isFinite(+x[0]) && Number.isFinite(+x[1])).slice(0, 5000);
-      picks.set(key, pickMoments(job, c0, segs, duration, chat));
+      // loud: [[start, dB above typical, length], ...] measured by the worker on the audio
+      const loud = (Array.isArray(req.body?.loud) ? req.body.loud : []).filter(x => Array.isArray(x) && x.every(Number.isFinite)).slice(0, 60);
+      picks.set(key, pickMoments(job, c0, segs, duration, chat, loud));
       setTimeout(() => picks.delete(key), 3600 * 1000);
     }
     try { res.json({ moments: await picks.get(key) }); }
     catch (e) { picks.delete(key); res.status(502).json({ error: e.message }); }
   });
 
-  // the busiest 30s windows of chat, vs. a typical window: tells the picker where viewers reacted
-  function chatSpikes(chat) {
-    if (chat.length < 10) return '';
-    const counts = chat.map(x => +x[1]).sort((a, b) => a - b), median = counts[Math.floor(counts.length / 2)] || 1;
-    const top = chat.filter(x => +x[1] >= median * 2).sort((a, b) => b[1] - a[1]).slice(0, 25).sort((a, b) => a[0] - b[0]);
-    if (!top.length) return '';
-    const rows = top.map(([t, n]) => `[${Math.round(t)}-${Math.round(t) + 30}] ${n} msgs (${(n / median).toFixed(1)}×)`);
-    return `\nCHAT SPIKES (30s windows where chat was busiest; a typical window has ~${median} messages):\n${rows.join('\n')}`;
-  }
-  async function pickMoments(job, c0, segs, duration, chat = []) {
-    const spikes = chatSpikes(chat);
-    const topicLine = job.topic ? ` This video was picked for the topic "${job.topic}": favor moments about it, and only fall back to other moments if nothing on-topic makes a good clip.` : '';
+  async function pickMoments(job, c0, segs, duration, chat = [], loud = []) {
     const camp = c0.campaigns.find(x => x.id === job.campaignId);
     const short = duration > 0 && duration <= 95;
-    // ~120k chars of transcript max: keeps one Haiku call to a few cents even on long VODs
-    let tx = ''; for (const s of segs) { const line = `[${Math.round(s.s)}-${Math.round(s.e)}] ${str(s.t, 400)}\n`; if (tx.length + line.length > 120000) break; tx += line; }
-    {
-      const { json, cost } = await haiku(
-        `You are an expert short-form editor who clips Twitch streamers for TikTok and YouTube Shorts. ${short ? 'This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : 'Pick the 4–8 best self-contained moments that do not overlap each other. Keep them SHORT: aim for 15–30 seconds each (never under 10s or over 45s). Start a beat before the setup and cut right after the payoff, with no dead air at the start or end; one punchy reaction beats a long story. Gaming transcripts are often thin or repetitive: still return your best 3 picks, favoring the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that"). Only return [] if there is no speech at all.'}${topicLine}${spikes ? ' CHAT SPIKES show where live viewers reacted most: strongly favor moments that line up with a spike (the reaction usually lands a few seconds after the moment itself), but only if the transcript there makes a good self-contained clip.' : ''}
-For each give: a "title" (≤70 chars, for YouTube), a "hook" (≤6 words, punchy on-screen text, ALL CAPS ok), a "caption" (1–2 lines for TikTok, no hashtags), 3–6 "hashtags" (no #), a "score" 1–10 for viral potential, "why" (≤12 words), and "flags": a list (usually empty) of short warnings for anything in the moment that could get it muted or removed on TikTok/YouTube: audible copyrighted music or song lyrics, slurs or hate speech, sexual content, dangerous stunts, gambling, graphic violence, minors in risky situations.${camp?.rules ? `\nThis clip is for a paid campaign, "${camp.name}". Follow its rules exactly in the caption/hashtags:\n${camp.rules}` : ''}
-Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end":n,"title":"","hook":"","caption":"","hashtags":[""],"score":n,"why":"","flags":[]}]`,
-        `SOURCE: "${job.source.title}" by ${job.source.channel || 'unknown'} (${Math.round(duration)}s)${spikes}\nTRANSCRIPT:\n${tx || '(no speech detected)'}`, 2500);
-      const max = duration || 864000;
-      const moments = (Array.isArray(json) ? json : []).map(m => {
-        // the model sometimes overshoots the 15–30s brief; nothing over 45s ships
-        const s = num(m.start, 0, max, 0), e = Math.min(num(m.end, 0, max, Math.min(max, s + 25)), s + 45);
-        const context = segs.filter(x => x.e >= s - 20 && x.s <= e + 20).map(x => `[${Math.round(x.s)}] ${str(x.t, 300)}`).join('\n').slice(0, 3000);
-        return { start: s, end: e, title: str(m.title, 100), hook: str(m.hook, 60), caption: str(m.caption, 600), hashtags: (Array.isArray(m.hashtags) ? m.hashtags : []).map(h => str(h, 40).replace(/^#/, '')).filter(Boolean).slice(0, 8), score: num(m.score, 1, 10, 5), why: str(m.why, 90), flags: strList(m.flags), context };
-      }).filter(m => m.end - m.start >= 8).sort((a, b) => b.score - a.score)
-        // drop picks that are mostly the same footage as a better one
-        .filter((m, i, all) => !all.slice(0, i).some(k => Math.min(k.end, m.end) - Math.max(k.start, m.start) > 0.5 * Math.min(k.end - k.start, m.end - m.start)))
-        .slice(0, 8);
-      mutate(c => { const j = findJob(c, job.id); if (j) { j.costUsd = +((j.costUsd || 0) + cost).toFixed(5); j.duration = duration || j.duration; } });
-      return moments;
-    }
+    // Twitch VODs: where viewers made clips, shifted to this job's clock (it may cover only part of the VOD)
+    const from = job.range?.start || 0;
+    const viewerClips = short ? [] : (await twitchHotClips(twitchVodId(job.source.url)).catch(e => { console.error('Viewer clips lookup failed:', e.message); return []; }))
+      .map(c => ({ ...c, t: c.t - from })).filter(c => c.t >= -20 && c.t < (duration || Infinity));
+    const { spots, heatOf, signals } = hotSpots({ duration, chat, loud, viewerClips, segs });
+    // ~120k chars of transcript max: keeps one Haiku call to a few cents even on long VODs (hot spots always included)
+    const tx = transcriptFor(segs, spots, 120000);
+    const spotLines = spots.map((sp, i) => `${i + 1}. [${sp.start}-${sp.end}] heat ${sp.heat}: ${sp.reasons.join(' · ')}`).join('\n');
+    const topicLine = job.topic ? ` This video was picked for the topic "${job.topic}": favor moments about it, and only fall back to other moments if nothing on-topic makes a good clip.` : '';
+    const { json, cost } = await haiku(
+      `You are an expert short-form editor who clips streamers for TikTok and YouTube Shorts.${short ? ' This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : `
+Pick the 4–8 best self-contained moments that do not overlap. Quality over quantity: a weak pick wastes the reviewer's time, so return fewer if the rest are weak (but at least 3 unless there is no speech at all).
+${spots.length ? 'HOT SPOTS list where viewers reacted, strongest evidence first. Viewer clips are the strongest signal (real viewers clipped it), then chat spikes, then loud audio and hype words. Build most picks around hot spots, starting a little before the spot (the reaction lands after the moment itself). Only pick something outside a hot spot when the transcript shows it is clearly great.' : 'No viewer or chat data for this video: judge from the transcript. Favor the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that").'}
+LENGTH: decide each clip's length by what it needs, then cut tight. A single reaction or one-liner: 10–18s. A joke, bit or exchange: 15–30s. A play, fight or story that needs its setup: 30–45s. Never under 10s or over 45s. Start one line before the setup; end right after the payoff or the reaction to it, with no trailing chatter or dead air.`}${topicLine}
+For each give: "start" and "end" (seconds, from the transcript), "kind" (reaction | joke | play | story | drama | hot-take), a "title" (≤70 chars, for YouTube), a "hook" (≤6 words, punchy on-screen text, ALL CAPS ok), a "caption" (1–2 lines for TikTok, no hashtags), 3–6 "hashtags" (no #), a "score" 1–10 for viral potential (would a stranger scrolling stop and watch to the end?), "why" (≤12 words), "spot" (the hot spot number it matches, or 0), and "flags": a list (usually empty) of short warnings for anything that could get it muted or removed on TikTok/YouTube: audible copyrighted music or song lyrics, slurs or hate speech, sexual content, dangerous stunts, gambling, graphic violence, minors in risky situations.${camp?.rules ? `\nThis clip is for a paid campaign, "${camp.name}". Follow its rules exactly in the caption/hashtags:\n${camp.rules}` : ''}
+Timestamps in the transcript are seconds.${tx.full ? '' : ' The transcript is long, so it shows every hot spot in full plus samples of the rest; "[… not shown …]" marks skipped parts.'} Reply ONLY with JSON: [{"start":n,"end":n,"kind":"","title":"","hook":"","caption":"","hashtags":[""],"score":n,"why":"","spot":n,"flags":[]}]`,
+      `SOURCE: "${job.source.title}" by ${job.source.channel || 'unknown'} (${Math.round(duration)}s)${spots.length ? `\nHOT SPOTS (seconds):\n${spotLines}` : ''}\nTRANSCRIPT:\n${tx.text || '(no speech detected)'}`, 3000);
+    const max = duration || 864000;
+    const moments = (Array.isArray(json) ? json : []).map(m => {
+      // the worker tightens the edges on the word timings and enforces 10–45s at a pause; here only absurd picks are capped
+      const s = num(m.start, 0, max, 0), e = Math.min(num(m.end, 0, max, Math.min(max, s + 25)), s + 60);
+      const context = segs.filter(x => x.e >= s - 20 && x.s <= e + 20).map(x => `[${Math.round(x.s)}] ${str(x.t, 300)}`).join('\n').slice(0, 3000);
+      const ev = heatOf(s, e), ai = num(m.score, 1, 10, 5);
+      // the AI's read of the moment, nudged by what viewers actually did there (only when there was data to go on)
+      const score = spots.length ? Math.max(1, Math.min(10, Math.round(0.7 * ai + 0.3 * ev.pct))) : ai;
+      return { start: s, end: e, kind: str(m.kind, 20), title: str(m.title, 100), hook: str(m.hook, 60), caption: str(m.caption, 600), hashtags: (Array.isArray(m.hashtags) ? m.hashtags : []).map(h => str(h, 40).replace(/^#/, '')).filter(Boolean).slice(0, 8),
+        score, aiScore: ai, why: str(m.why, 90), evidence: str(ev.reasons.join(' · '), 200), flags: strList(m.flags), context };
+    }).filter(m => m.end - m.start >= 5).sort((a, b) => b.score - a.score)
+      // drop picks that are mostly the same footage as a better one
+      .filter((m, i, all) => !all.slice(0, i).some(k => Math.min(k.end, m.end) - Math.max(k.start, m.start) > 0.5 * Math.min(k.end - k.start, m.end - m.start)))
+      .slice(0, 8);
+    console.log(`  Picker: job ${job.id} · ${Math.round(duration / 60)} min · signals: ${signals.join(', ') || 'transcript only'} · ${spots.length} hot spots · ${tx.full ? 'full' : 'focused'} transcript · ${moments.length} picks`);
+    mutate(c => { const j = findJob(c, job.id); if (j) { j.costUsd = +((j.costUsd || 0) + cost).toFixed(5); j.duration = duration || j.duration; j.signals = signals; } });
+    return moments;
   }
 
   app.post('/api/clips/worker/:id/done', workerOnly, (req, res) => {
@@ -522,9 +574,10 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
         id: newId('clip'), url: str(x.url, 600), thumb: isUrl(x.thumb) ? str(x.thumb, 600) : '', start: num(x.start, 0, 864000, 0), end: num(x.end, 0, 864000, 0),
         layout: j.layout || null, corner: j.corner || null,
         title: str(x.title, 100), hook: str(x.hook, 60), caption: str(x.caption, 2200), hashtags: (Array.isArray(x.hashtags) ? x.hashtags : []).map(h => str(h, 40)).slice(0, 8),
-        score: num(x.score, 1, 10, 5), why: str(x.why, 90), flags: strList(x.flags), context: str(x.context, 3000), status: 'review', views: 0, postLinks: {},
+        score: num(x.score, 1, 10, 5), why: str(x.why, 90), evidence: str(x.evidence, 200), kind: str(x.kind, 20), flags: strList(x.flags), context: str(x.context, 3000), status: 'review', views: 0, postLinks: {},
       }));
       j.status = j.clips.length ? 'done' : 'failed'; j.error = j.clips.length ? null : 'No clips came back';
+      if (j.clips.length && /youtube\.com|youtu\.be/.test(j.source?.url || '')) delete c.ytBlocked;
       j.progress = 100; j.msg = j.clips.length ? `${j.clips.length} clip${j.clips.length > 1 ? 's' : ''} ready` : 'Failed';
       j.finishedAt = j.updatedAt = new Date().toISOString();
       if (j.recutOf) {        // a re-cut replaces the old clip inside its original job
@@ -549,7 +602,9 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
   app.post('/api/clips/worker/:id/fail', workerOnly, (req, res) => {
     mutate(c => {
       const j = findJob(c, req.params.id); if (!j || j.status === 'done' || staleAttempt(j, req.body || {})) return;
-      Object.assign(j, { status: 'failed', error: str(req.body?.error, 300) || 'Worker error', msg: 'Failed', updatedAt: new Date().toISOString() }); live.delete(j.id);
+      let error = str(req.body?.error, 300) || 'Worker error';
+      if (error.startsWith('[yt-blocked]')) { error = error.replace('[yt-blocked]', '').trim(); c.ytBlocked = new Date().toISOString(); j.needs = 'ytCookies'; }
+      Object.assign(j, { status: 'failed', error, msg: 'Failed', updatedAt: new Date().toISOString() }); live.delete(j.id);
       if (j.recutOf) { const old = findJob(c, j.parentId)?.clips.find(x => x.id === j.recutOf); if (old) delete old.recutting; }
     });
     res.json({ ok: true });
@@ -580,6 +635,69 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
   const seal = (obj, salt = 'clips-yt:' + YT_SECRET) => { const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', tokKey(salt), iv); const d = Buffer.concat([c.update(JSON.stringify(obj)), c.final()]); return [iv, c.getAuthTag(), d].map(b => b.toString('base64')).join('.'); };
   const unseal = (s, salt = 'clips-yt:' + YT_SECRET) => { const [iv, tag, d] = String(s).split('.').map(b => Buffer.from(b, 'base64')); const c = crypto.createDecipheriv('aes-256-gcm', tokKey(salt), iv); c.setAuthTag(tag); return JSON.parse(Buffer.concat([c.update(d), c.final()]).toString()); };
   const ytOf = c => (c.youtube = c.youtube || {});
+
+  // ── YouTube download cookies (for the clip worker; separate from the posting connection above) ──
+  // YouTube blocks downloads from cloud servers. Cookies from a signed-in spare Google account get the worker past that.
+  // Stored encrypted with a key from WORKER_SECRET (only in Render's environment), sent to the worker with each job.
+  const COOKIE_SALT = () => 'clips-ytc:' + WORKER_SECRET;
+  function ytCookiesText(c) {
+    if (!c.ytCookies?.tok || !WORKER_SECRET) return null;
+    try { return unseal(c.ytCookies.tok, COOKIE_SALT()).text; } catch { return null; }
+  }
+  // Accepts a Netscape cookies.txt (what "Get cookies.txt LOCALLY" exports) or the JSON array Cookie-Editor exports.
+  // Keeps only YouTube/Google cookies. Returns { text, count } or { error }.
+  function parseCookies(raw) {
+    raw = String(raw || '').trim();
+    if (!raw) return { error: 'Paste the cookies first' };
+    const keepDomain = d => /(^|\.)(youtube\.com|google\.com)$/i.test(String(d || '').replace(/^\./, ''));
+    let rows = [];
+    if (raw.startsWith('[') || raw.startsWith('{')) {
+      let arr; try { arr = JSON.parse(raw); } catch { return { error: 'That looks like JSON but it didn\'t parse. Export again and paste all of it.' }; }
+      arr = Array.isArray(arr) ? arr : Array.isArray(arr.cookies) ? arr.cookies : [];
+      for (const k of arr) {
+        if (!k?.name || k.value == null || !keepDomain(k.domain)) continue;
+        const dom = String(k.domain), exp = Math.round(+k.expirationDate || +k.expires || 0);
+        rows.push([(k.hostOnly ? dom.replace(/^\./, '') : (dom.startsWith('.') ? dom : '.' + dom)), k.hostOnly ? 'FALSE' : 'TRUE', k.path || '/', k.secure ? 'TRUE' : 'FALSE', String(exp > 0 ? exp : 0), k.name, String(k.value)]);
+      }
+    } else {
+      for (const line of raw.split(/\r?\n/)) {
+        const l = line.replace(/^#HttpOnly_/, '');
+        if (!l || l.startsWith('#')) continue;
+        const f = l.split('\t');
+        if (f.length < 7 || !keepDomain(f[0])) continue;
+        rows.push([f[0], f[1], f[2], f[3], f[4], f[5], f.slice(6).join('\t')]);
+      }
+    }
+    if (!rows.length) return { error: 'No YouTube cookies in that. Export while on youtube.com and signed in, then paste the whole file.' };
+    const names = new Set(rows.map(r => r[5]));
+    if (!['SAPISID', '__Secure-3PSID', '__Secure-1PSID', 'SID', 'LOGIN_INFO'].some(n => names.has(n)))
+      return { error: 'These cookies aren\'t from a signed-in session. Sign in to YouTube in that browser first, then export again.' };
+    const now = Date.now() / 1000, expired = rows.filter(r => +r[4] > 0 && +r[4] < now).length;
+    if (expired === rows.length) return { error: 'All of these cookies have expired. Export fresh ones.' };
+    return { text: '# Netscape HTTP Cookie File\n' + rows.map(r => r.join('\t')).join('\n') + '\n', count: rows.length };
+  }
+  app.post('/api/clips/youtube/cookies', (req, res) => {
+    if (!WORKER_SECRET) return res.status(400).json({ error: 'Set WORKER_SECRET on Render first (the cookies are encrypted with it).' });
+    if (req.body?.remove) { mutate(c => { delete c.ytCookies; }); return res.json({ ok: true, set: false }); }
+    const p = parseCookies(req.body?.cookies);
+    if (p.error) return res.status(400).json({ error: p.error });
+    const savedAt = new Date().toISOString();
+    mutate(c => { c.ytCookies = { tok: seal({ text: p.text }, COOKIE_SALT()), savedAt, count: p.count }; delete c.ytBlocked;
+      // jobs that failed only because YouTube blocked them can go again right away
+      for (const j of c.jobs) if (j.status === 'failed' && j.needs === 'ytCookies') Object.assign(j, { status: 'queued', error: null, needs: null, msg: 'Queued', progress: 0, attempt: (j.attempt || 1) + 1, updatedAt: savedAt });
+    });
+    const retry = clipsOf(getAppData()).jobs.filter(j => j.status === 'queued').map(j => j.id);
+    res.json({ ok: true, set: true, count: p.count, retrying: retry.length });
+    (async () => { for (const id of retry) await sendToWorker(id); })().catch(e => console.error('cookie retry send failed:', e.message));
+  });
+
+  // Clip files the worker must keep: anything you haven't finished with (review, approved, editing, posting)
+  function keepFiles(c) {
+    const names = new Set();
+    for (const j of c.jobs) for (const x of j.clips || []) if (OPEN_STATUSES.includes(x.status) || x.posting)
+      for (const u of [x.url, x.thumb]) { const m = String(u || '').match(/\/(?:clipfiles|files|clips)\/([a-f0-9]{24}\.(?:mp4|jpg))$/); if (m) names.add(m[1]); }
+    return [...names];
+  }
   const oauthStates = new Map();   // state → expiry
   let ytAccessTok = { v: '', exp: 0 };
 
@@ -646,19 +764,28 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     return { id: v.id, privacy: v.status?.privacyStatus || 'public' };
   }
 
-  // ── TIKTOK POSTING (Content Posting API, Direct Post) ──
-  // Same pattern as YouTube: connect once (Login Kit OAuth), token sealed in app-data. TikTok's rules:
-  // until the app passes TikTok's review every post is forced to "Only me", and the person posting
-  // must pick the privacy level themselves on each post (no pre-filled default), so the app asks.
+  // ── TIKTOK POSTING (Content Posting API) ──
+  // Connect once (Login Kit OAuth), token sealed in app-data.
+  // Drafts (video.upload scope, the default): the clip lands in your TikTok inbox and you tap Post in the TikTok app.
+  //   This avoids Direct Post's rule that an app TikTok hasn't audited can only post to private accounts
+  //   (the "unaudited_client_can_only_post_to_private_accounts" error every post was getting). TikTok holds at most
+  //   5 unposted drafts per 24 hours.
+  // Direct Post (video.publish): only used when the connection didn't grant video.upload. Posts are forced private
+  //   until TikTok audits the app, and the poster must pick privacy on each post, so the app asks.
   const TT_SALT = () => 'clips-tt:' + TT_SECRET;
   const ttOf = c => (c.tiktok = c.tiktok || {});
+  // 'drafts' when the connection allows uploads, 'direct' when it only allows publishing, 'reconnect' for a connection
+  // made before drafts existed (it was only granted Direct Post: reconnecting asks for uploads), null when not connected
+  const ttMode = c => { const x = c.tiktok || {}; if (!x.tok) return null; const sc = x.scopes || []; return !sc.length ? 'reconnect' : sc.includes('video.upload') ? 'drafts' : 'direct'; };
   let ttAccessTok = { v: '', exp: 0 };
   const TT_API = process.env.TIKTOK_API_BASE || 'https://open.tiktokapis.com/v2';
 
   app.get('/api/clips/tiktok/connect', (req, res) => {
     if (!TT_KEY || !TT_SECRET) return res.status(400).send('Set TIKTOK_CLIENT_KEY and TIKTOK_CLIENT_SECRET on Render first.');
     const state = crypto.randomBytes(16).toString('hex'); oauthStates.set(state, Date.now() + 15 * 60 * 1000);
-    const q = new URLSearchParams({ client_key: TT_KEY, response_type: 'code', scope: 'user.info.basic,video.publish', redirect_uri: TT_REDIRECT, state });
+    // video.upload = drafts (the default); ?direct=1 asks for Direct Post only, for an app that doesn't have Upload turned on
+    const scope = req.query.direct ? 'user.info.basic,video.publish' : 'user.info.basic,video.upload,video.publish';
+    const q = new URLSearchParams({ client_key: TT_KEY, response_type: 'code', scope, redirect_uri: TT_REDIRECT, state });
     res.redirect(`https://www.tiktok.com/v2/auth/authorize/?${q}`);
   });
   async function ttToken(params) {
@@ -671,11 +798,18 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
   app.get('/api/clips/tiktok/callback', async (req, res) => {
     const exp = oauthStates.get(String(req.query.state || '')); oauthStates.delete(String(req.query.state || ''));
     if (!exp || exp < Date.now()) return res.status(400).send('This sign-in link expired. Go back to the Clips tab and tap Connect TikTok again.');
-    if (!req.query.code) return res.redirect('/?open=clips&tt=cancelled');
+    if (!req.query.code) {
+      // TikTok says why it refused (e.g. a scope the app isn't approved for) in error/error_description
+      const why = str(req.query.error_description || req.query.error, 200);
+      if (why) console.error('TikTok connect refused:', why);
+      return res.redirect(`/?open=clips&tt=${why ? 'error' : 'cancelled'}${why ? `&why=${encodeURIComponent(why)}` : ''}`);
+    }
     try {
       const t = await ttToken({ code: String(req.query.code), grant_type: 'authorization_code', redirect_uri: TT_REDIRECT });
       const u = await (await fetch(`${TT_API}/user/info/?fields=open_id,display_name,avatar_url`, { headers: { Authorization: `Bearer ${t.access_token}` } })).json().catch(() => ({}));
-      mutate(c => { const x = ttOf(c); x.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); x.user = { name: u.data?.user?.display_name || '', avatar: u.data?.user?.avatar_url || '' }; x.connectedAt = new Date().toISOString(); x.error = null; });
+      const scopes = String(t.scope || '').split(/[,\s]+/).filter(Boolean);
+      mutate(c => { const x = ttOf(c); x.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); x.user = { name: u.data?.user?.display_name || '', avatar: u.data?.user?.avatar_url || '' }; x.scopes = scopes; x.connectedAt = new Date().toISOString(); x.error = null; });
+      console.log(`TikTok connected with scopes: ${scopes.join(', ') || '(none reported)'}`);
       res.redirect('/?open=clips&tt=connected');
     } catch (e) { console.error('TikTok connect failed:', e.message); res.status(502).send(`TikTok connection failed: ${String(e.message).replace(/[<>&]/g, '')}`); }
   });
@@ -687,7 +821,7 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     if (!x.tok) throw new Error('TikTok isn\'t connected');
     try {
       const t = await ttToken({ grant_type: 'refresh_token', refresh_token: unseal(x.tok, TT_SALT()).refresh_token });
-      if (t.refresh_token) mutate(c => { const y = ttOf(c); y.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); });   // TikTok rotates it
+      if (t.refresh_token) mutate(c => { const y = ttOf(c); y.tok = seal({ refresh_token: t.refresh_token, open_id: t.open_id }, TT_SALT()); if (t.scope) y.scopes = String(t.scope).split(/[,\s]+/).filter(Boolean); });   // TikTok rotates it
       return t.access_token;
     } catch (e) {
       if (e.code === 'invalid_grant') mutate(c => { ttOf(c).error = 'TikTok sign-in expired. Connect again.'; });
@@ -699,7 +833,12 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     const d = await r.json().catch(() => ({}));
     if (!r.ok || (d.error?.code && d.error.code !== 'ok')) {
       const code = d.error?.code || String(r.status);
-      const msg = /unaudited/.test(code) ? 'only "Only me" posts work until TikTok approves the app' : d.error?.message || code;
+      const msg = /unaudited/.test(code) ? 'only "Only me" posts work until TikTok approves the app'
+        : code === 'spam_risk_too_many_pending_share' ? 'TikTok holds at most 5 drafts at a time. Open TikTok, post (or delete) the drafts in your inbox, then tap Post again'
+        : code === 'scope_not_authorized' ? 'your TikTok connection doesn\'t allow uploads. Reconnect TikTok in Cled settings'
+        : code === 'access_token_invalid' ? 'TikTok sign-in expired. Reconnect TikTok in Cled settings'
+        : code === 'rate_limit_exceeded' ? 'too many TikTok requests in a minute. Try again shortly'
+        : /spam_risk/.test(code) ? `TikTok flagged this upload (${code})` : d.error?.message || code;
       throw Object.assign(new Error(`TikTok: ${msg}`), { code });
     }
     return d.data || {};
@@ -709,6 +848,14 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     try { res.json(await ttCall('/post/publish/creator_info/query/')); } catch (e) { res.status(502).json({ error: e.message }); }
   });
 
+  // Draft: send the clip to the TikTok inbox. Only the file goes; caption and privacy are set in the TikTok app.
+  async function ttDraft(cl) {
+    const buf = await clipBytes(cl.url);
+    const init = await ttCall('/post/publish/inbox/video/init/', { source_info: { source: 'FILE_UPLOAD', video_size: buf.length, chunk_size: buf.length, total_chunk_count: 1 } });
+    const up = await fetch(init.upload_url, { method: 'PUT', headers: { 'Content-Type': 'video/mp4', 'Content-Length': String(buf.length), 'Content-Range': `bytes 0-${buf.length - 1}/${buf.length}` }, body: buf, signal: AbortSignal.timeout(300000) });
+    if (!up.ok) throw new Error(`TikTok upload failed (HTTP ${up.status})`);
+    return { publishId: init.publish_id, mode: 'draft' };
+  }
   async function ttUpload(job, cl, o) {
     const buf = await clipBytes(cl.url);
     const tags = (cl.hashtags || []).filter(Boolean).map(h => '#' + h).join(' ');
@@ -744,15 +891,17 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     setTimeout(async () => {
       try {
         const d = await ttCall('/post/publish/status/fetch/', { publish_id: publishId });
-        const done = d.status === 'PUBLISH_COMPLETE', failed = d.status === 'FAILED';
-        if (!done && !failed && tries < 40) return ttWatch(jobId, clipId, publishId, tries + 1);
+        const done = d.status === 'PUBLISH_COMPLETE', failed = d.status === 'FAILED', inbox = d.status === 'SEND_TO_USER_INBOX';
+        // a draft waits in the inbox until you post it in the app: note that, then check back now and then (2h at most)
+        if (inbox) mutate(c => { const x = findJob(c, jobId)?.clips.find(y => y.id === clipId); if (x && x.ttStatus !== 'inbox') x.ttStatus = 'inbox'; });
+        if (!done && !failed && tries < (inbox ? 60 : 40)) return ttWatch(jobId, clipId, publishId, tries + 1);
         mutate(c => { const x = findJob(c, jobId)?.clips.find(y => y.id === clipId); if (!x) return;
-          x.ttStatus = done ? 'posted' : failed ? `failed: ${d.fail_reason || 'unknown'}` : 'processing';
+          x.ttStatus = done ? 'posted' : failed ? `failed: ${d.fail_reason || 'unknown'}` : inbox ? 'inbox' : 'processing';
           const id = (d.publicaly_available_post_id || d.publicly_available_post_id || [])[0];
           if (id) x.postLinks = { ...(x.postLinks || {}), tiktok: `https://m.tiktok.com/v/${id}.html` };
           else if (done) x.postLinks = { ...(x.postLinks || {}), tiktok: x.postLinks?.tiktok || 'https://www.tiktok.com/tiktokstudio/content' }; });
       } catch (e) { if (tries < 40) ttWatch(jobId, clipId, publishId, tries + 1); else console.error('TikTok status check failed:', e.message); }
-    }, tries < 6 ? 10000 : 30000);
+    }, tries < 6 ? 10000 : tries < 40 ? 30000 : 120000);
   }
 
   // Approve + post: one call sends the clip to every connected platform.
@@ -763,19 +912,20 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
     if (!cl) return res.status(404).json({ error: 'Clip not found' });
     const wantYt = b.youtube !== false && !!ytOf(c0).tok && !cl.postLinks?.youtube;
     const wantTt = !!b.tiktok && !!ttOf(c0).tok && !cl.ttPublishId;
-    if (wantTt && !['PUBLIC_TO_EVERYONE', 'MUTUAL_FOLLOW_FRIENDS', 'FOLLOWER_OF_CREATOR', 'SELF_ONLY'].includes(b.tiktok.privacy)) return res.status(400).json({ error: 'Pick who can see it on TikTok' });
+    const ttDrafts = ttMode(c0) !== 'direct';   // 'reconnect' tries a draft too: TikTok's answer says whether reconnecting is needed
+    if (wantTt && !ttDrafts && !['PUBLIC_TO_EVERYONE', 'MUTUAL_FOLLOW_FRIENDS', 'FOLLOWER_OF_CREATOR', 'SELF_ONLY'].includes(b.tiktok?.privacy)) return res.status(400).json({ error: 'Pick who can see it on TikTok' });
     if (!wantYt && !wantTt) return res.json({ ok: true, clip: cl, already: true });
     if (cl.posting && Date.now() - new Date(cl.posting) < 10 * 60 * 1000) return res.status(409).json({ error: 'Already posting this one' });
     mutate(c => { const x = findJob(c, job.id)?.clips.find(y => y.id === cl.id); if (x) { x.posting = new Date().toISOString(); if (x.status === 'review') x.status = 'approved'; } });
     const errors = [];
-    const [yt, tt] = await Promise.allSettled([wantYt ? ytUpload(job, cl) : null, wantTt ? ttUpload(job, cl, b.tiktok) : null]);
+    const [yt, tt] = await Promise.allSettled([wantYt ? ytUpload(job, cl) : null, wantTt ? (ttDrafts ? ttDraft(cl) : ttUpload(job, cl, b.tiktok)) : null]);
     if (yt.status === 'rejected') errors.push(`YouTube: ${yt.reason.message}`);
     if (yt.status === 'rejected') console.error(`YouTube post failed for ${cl.id}: ${yt.reason.message}`);
     if (tt.status === 'rejected') { errors.push(tt.reason.message.startsWith('TikTok') ? tt.reason.message : `TikTok: ${tt.reason.message}`); console.error(`TikTok post failed for ${cl.id} (${tt.reason.code || 'no code'}): ${tt.reason.message}`); }
     const clip = mutate(c => {
       const x = findJob(c, job.id).clips.find(y => y.id === cl.id); delete x.posting;
       if (yt.value) { x.postLinks = { ...(x.postLinks || {}), youtube: `https://youtube.com/shorts/${yt.value.id}` }; x.ytId = yt.value.id; x.ytPrivacy = yt.value.privacy; const y = ytOf(c); const d = new Date().toISOString().slice(0, 10); y.uploads = { [d]: ((y.uploads || {})[d] || 0) + 1 }; }
-      if (tt.value) { x.ttPublishId = tt.value.publishId; x.ttStatus = 'processing'; x.ttPrivacy = tt.value.privacy; delete x.ttError; }
+      if (tt.value) { x.ttPublishId = tt.value.publishId; x.ttStatus = 'processing'; x.ttMode = tt.value.mode || 'direct'; x.ttPrivacy = tt.value.privacy || null; delete x.ttError; }
       if (tt.status === 'rejected') x.ttError = str(errors[errors.length - 1], 300);
       if (yt.value || tt.value) { x.postedAt = x.postedAt || new Date().toISOString(); if ((x.postLinks?.youtube || !ytOf(c).tok) && (x.ttPublishId || !ttOf(c).tok)) x.status = 'posted'; }
       return x;
@@ -806,4 +956,4 @@ Timestamps in the transcript are seconds. Reply ONLY with JSON: [{"start":n,"end
   setTimeout(() => resendStuck().catch(console.error), 20 * 1000);
   setInterval(() => resendStuck().catch(console.error), 15 * 60 * 1000);
   console.log(`  Clips  : worker ${WORKER_URL ? '✅ ' + WORKER_URL : '❌ not set (WORKER_URL / WORKER_SECRET)'} · Twitch ${TW_ID ? '✅' : '❌ (TWITCH_CLIENT_ID / TWITCH_CLIENT_SECRET)'}`);
-};
+}

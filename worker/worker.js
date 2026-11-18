@@ -14,6 +14,7 @@ const crypto = require('crypto');
 const { spawn } = require('child_process');
 const webpush = require('web-push');
 const { buildAss } = require('./captions');
+const { fitMoment, loudPeaks } = require('./moments');
 
 const PORT = +process.env.PORT || 8080;
 const SECRET = process.env.WORKER_SECRET || '';
@@ -40,7 +41,13 @@ const QUEUE_FILE = path.join(DATA, 'queue.json');
 // queue entries: { job, state: 'queued' | 'running' | 'reporting', result?, failed?, at }
 let queue = [];
 try { queue = JSON.parse(fs.readFileSync(QUEUE_FILE, 'utf8')); } catch {}
-const saveQueue = () => { fs.writeFileSync(QUEUE_FILE + '.tmp', JSON.stringify(queue)); fs.renameSync(QUEUE_FILE + '.tmp', QUEUE_FILE); };
+// A full disk must never crash the worker: a crash mid-job used to restart it on the same job forever.
+// If the save fails the queue stays correct in memory, and the next save (after a cleanup) catches up.
+const saveQueue = () => {
+  try { fs.writeFileSync(QUEUE_FILE + '.tmp', JSON.stringify(queue)); fs.renameSync(QUEUE_FILE + '.tmp', QUEUE_FILE); }
+  catch (e) { console.error('could not save the queue:', e.message); if (e.code === 'ENOSPC') sweep(true); }
+};
+process.on('unhandledRejection', e => console.error('unhandled:', e?.stack || e));
 // "id:attempt" of jobs finished this process lifetime, so a duplicate send isn't redone
 // (a user's "Try again" bumps the attempt, so it does run)
 const recent = new Set();
@@ -92,6 +99,57 @@ async function duration(file) {
 }
 const hash = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 16);
 
+// ── YouTube: cookies + JavaScript runtime ──
+// YouTube blocks downloads from cloud servers ("Sign in to confirm you're not a bot"). Cookies from a signed-in
+// (spare) Google account get past that; Mission Control keeps them encrypted and sends them with each job.
+// yt-dlp also needs a JavaScript runtime to solve YouTube's player challenges: Node (already here) is used.
+const COOKIES = path.join(DATA, 'yt-cookies.txt');
+let cookiesHash = '';
+function setCookies(text) {
+  if (text === undefined) return;                       // not sent: keep whatever is there
+  try {
+    if (!text) { if (fs.existsSync(COOKIES)) { fs.rmSync(COOKIES, { force: true }); console.log('YouTube cookies removed'); } cookiesHash = ''; return; }
+    const h = hash(text); if (h === cookiesHash && fs.existsSync(COOKIES)) return;
+    fs.writeFileSync(COOKIES, text.endsWith('\n') ? text : text + '\n', { mode: 0o600 }); cookiesHash = h;
+    console.log('YouTube cookies updated');
+  } catch (e) { console.error('could not save YouTube cookies:', e.message); }
+}
+const isYoutube = u => /^(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//.test(String(u || '').replace(/^https?:\/\//, '')) || /^ytsearch/.test(String(u || ''));
+// yt-dlp rewrites the cookie file when it exits, so each call gets its own copy (two at once would clobber it)
+function ytArgs(url, tag) {
+  if (!isYoutube(url)) return [];
+  const args = ['--js-runtimes', 'node'];
+  if (fs.existsSync(COOKIES)) { const mine = path.join(dirs.work, `cookies-${tag || crypto.randomBytes(4).toString('hex')}.txt`); fs.copyFileSync(COOKIES, mine); fs.chmodSync(mine, 0o600); args.push('--cookies', mine); }
+  return args;
+}
+const dropCookieCopies = tag => { try { for (const f of fs.readdirSync(dirs.work)) if (f.startsWith(`cookies-${tag}`)) fs.rmSync(path.join(dirs.work, f), { force: true }); } catch {} };
+
+// Plain-English reasons for the common failures (the raw yt-dlp tail goes to the logs).
+// "[yt-blocked]" tells Mission Control to show the cookie prompt.
+function friendlyError(msg, url) {
+  const m = String(msg || '');
+  if (/No space left|ENOSPC|Errno 28/i.test(m)) return 'The clip server ran out of disk space. It has cleaned up; tap Try again.';
+  if (isYoutube(url) && /confirm you.?re not a bot|Sign in to confirm|cookies are no longer valid|LOGIN_REQUIRED/i.test(m))
+    return fs.existsSync(COOKIES) ? '[yt-blocked] YouTube blocked the download even with your cookies. They have probably expired: paste fresh ones in Cled settings, then tap Try again.'
+      : '[yt-blocked] YouTube blocks downloads from cloud servers. Add YouTube cookies in Cled settings, then tap Try again.';
+  if (/Private video|Video unavailable|members[- ]only|subscriber-only|This video has been removed|vod_manifest_restricted/i.test(m)) return 'This video is private, deleted, or for subscribers/members only.';
+  if (/HTTP Error 429|Too Many Requests/i.test(m)) return 'The video site is rate-limiting the clip server. Tap Try again in a few minutes.';
+  if (/Requested format is not available|n challenge|Signature extraction failed/i.test(m)) return 'yt-dlp couldn\'t read this video\'s formats (the site changed something). It updates itself daily; try again later.';
+  const err = m.match(/ERROR: (.*)$/m);
+  return (err ? err[1] : m).replace(/\s+/g, ' ').slice(0, 280);
+}
+
+// ── disk ──
+// The worker's disk is small (2 GB on Render). Before a big download, make room; if there still isn't enough, fail clearly.
+function freeBytes() { try { const s = fs.statfsSync(DATA); return s.bavail * s.bsize; } catch { return Infinity; } }
+const MB = 1024 * 1024;
+function ensureSpace(needBytes, label) {
+  if (freeBytes() >= needBytes) return;
+  sweep(true);
+  const free = freeBytes();
+  if (free < needBytes) throw new Error(`No space left: ${label} needs about ${Math.round(needBytes / MB)} MB, only ${Math.round(free / MB)} MB free`);
+}
+
 // ── pipeline steps ──
 // A multi-hour VOD is several GB of video, so the source is fetched in two passes: the audio track
 // only (~70 MB/hour) to listen and pick moments, then just the picked moments' video sections.
@@ -101,11 +159,13 @@ const rangeOf = job => ({ from: job.range?.start ?? 0, to: job.range?.end ?? nul
 async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label, exactCuts = true) {
   // leftovers from a run that died mid-download must not be mistaken for the result
   for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${base}.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
-  const args = ['-f', format, '--no-playlist', '--no-part', '--newline', ...extra, '-o', path.join(dirs.src, `${base}.dl.%(ext)s`)];
+  const args = ['-f', format, '--no-playlist', '--no-part', '--newline', ...ytArgs(job.source.url, base), ...extra, '-o', path.join(dirs.src, `${base}.dl.%(ext)s`)];
   // exact cuts make yt-dlp re-encode the section, which takes ~10 min on half a CPU for video
   if (section) args.push('--download-sections', `*${section[0]}-${section[1] ?? 'inf'}`, ...(exactCuts ? ['--force-keyframes-at-cuts'] : []));
   args.push(job.source.url);
-  await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', pctFrom + +m[1] / 100 * pctSpan, `${label}… ${Math.round(+m[1])}%`); } });
+  try { await run('yt-dlp', args, { onLine: l => { const m = l.match(/\[download\]\s+([\d.]+)%/); if (m) progress(job, 'downloading', pctFrom + +m[1] / 100 * pctSpan, `${label}… ${Math.round(+m[1])}%`); } }); }
+  catch (e) { for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${base}.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true }); throw e; }
+  finally { dropCookieCopies(base); }
   const outs = fs.readdirSync(dirs.src).filter(f => f.startsWith(`${base}.dl.`) && !/\.part$|\.ytdl$/.test(f));
   if (outs.length !== 1) throw new Error(`Download finished but ${outs.length ? 'several' : 'no'} files appeared`);
   return path.join(dirs.src, outs[0]);
@@ -114,9 +174,15 @@ async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label,
 async function downloadAudio(job) {
   const { from, to } = rangeOf(job);
   const key = hash(job.source.url + JSON.stringify(job.range || {}));
+  currentSrcKey = key;
   const done = fs.readdirSync(dirs.src).find(f => f.startsWith(`${key}.audio.`) && !f.endsWith('.json'));
   if (done) { const p = path.join(dirs.src, done); fs.utimesSync(p, new Date(), new Date()); return p; }
-  const got = await ytdlp(job, `${key}.tmp`, 'ba/wa/b', from || to != null ? [from, to] : null, [], 0, 15, 'Downloading audio');
+  // Twitch audio is ~95 MB an hour; YouTube's is smaller. Room for the span asked for (8 h at most) plus working space.
+  const hrs = Math.min(8, to != null ? (to - from) / 3600 : 8);
+  ensureSpace((hrs * 100 + 150) * MB, 'the audio download');
+  // --hls-use-mpegts: keep Twitch's stream as-is. Without it yt-dlp remuxes the whole file into a second full-size copy
+  // when it finishes (FixupM3u8), which is what filled the disk on long VODs.
+  const got = await ytdlp(job, `${key}.tmp`, 'ba/wa/b', from || to != null ? [from, to] : null, ['--hls-use-mpegts'], 0, 15, 'Downloading audio');
   const file = path.join(dirs.src, `${key}.audio${path.extname(got)}`);
   fs.renameSync(got, file);
   return file;
@@ -147,6 +213,29 @@ async function transcribe(job, src, dur, from = 0, to = null) {
   return segs;
 }
 const cutArgs = (from, span) => ['-y', '-v', 'error', ...(from ? ['-ss', String(from)] : []), '-t', String(span)];
+
+// Once transcribed, the big source audio is only needed for its length and re-cuts (which reuse the cached transcript).
+// A 32 kbps mono copy is ~6x smaller; the transcript caches move with it.
+async function shrinkAudio(src) {
+  if (/\.small\.mp3$/.test(src)) return src;
+  const small = src.replace(/\.[^.]+$/, '.small.mp3');
+  try {
+    await run('ffmpeg', ['-y', '-v', 'error', '-i', src, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'libmp3lame', '-b:a', '32k', small]);
+    for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(path.basename(src) + '.') && f.endsWith('.json')) fs.renameSync(path.join(dirs.src, f), path.join(dirs.src, path.basename(small) + f.slice(path.basename(src).length)));
+    fs.rmSync(src, { force: true });
+    return small;
+  } catch (e) { fs.rmSync(small, { force: true }); console.error('audio shrink skipped:', e.message.slice(0, 150)); return src; }
+}
+
+// Loud stretches (yelling, big reactions): one RMS reading every 2s of the audio, compared with the stream's usual level
+async function loudness(job, src) {
+  const out = path.join(dirs.work, `${job.id}.loud.txt`);
+  try {
+    await run('ffmpeg', ['-y', '-v', 'error', '-i', src, '-vn', '-af', `aresample=8000,asetnsamples=n=16000:p=0,astats=metadata=1:reset=1,ametadata=mode=print:key=lavfi.astats.Overall.RMS_level:file=${out}`, '-f', 'null', '-'], { timeoutMs: 20 * 60 * 1000 });
+    return loudPeaks(fs.readFileSync(out, 'utf8'));
+  } catch (e) { console.error(`job ${job.id}: loudness skipped: ${e.message.slice(0, 150)}`); return []; }
+  finally { fs.rmSync(out, { force: true }); }
+}
 
 async function transcribeLocal(job, src, from, span) {
   const wav = path.join(dirs.work, `${job.id}.wav`), json = path.join(dirs.work, `${job.id}.tx.json`);
@@ -279,8 +368,9 @@ async function chatActivity(job) {
   if (!/^(www\.|m\.)?(youtube\.com|youtu\.be)\//.test(String(job.source.url || '').replace(/^https?:\/\//, ''))) return [];
   const dir = path.join(dirs.work, job.id, 'chat'); fs.mkdirSync(dir, { recursive: true });
   // a busy multi-hour replay downloads slowly: give up (and stop yt-dlp) after 6 minutes
-  try { await run('yt-dlp', ['--skip-download', '--write-subs', '--sub-langs', 'live_chat', '--no-playlist', '-o', path.join(dir, 'c.%(ext)s'), job.source.url], { timeoutMs: 6 * 60 * 1000 }); }
+  try { await run('yt-dlp', ['--skip-download', '--write-subs', '--sub-langs', 'live_chat', '--no-playlist', ...ytArgs(job.source.url, `chat-${job.id}`), '-o', path.join(dir, 'c.%(ext)s'), job.source.url], { timeoutMs: 6 * 60 * 1000 }); }
   catch (e) { console.log(`job ${job.id}: no chat replay (${e.message.slice(0, 150)})`); fs.rmSync(dir, { recursive: true, force: true }); return []; }
+  finally { dropCookieCopies(`chat-${job.id}`); }
   const f = fs.readdirSync(dir).find(x => x.endsWith('.json'));
   if (!f) { console.log(`job ${job.id}: this video has no chat replay`); fs.rmSync(dir, { recursive: true, force: true }); return []; }
   const { from, to } = rangeOf(job), buckets = new Map();
@@ -301,8 +391,9 @@ async function chatActivity(job) {
 }
 
 async function processJob(job) {
+  setCookies(job.ytCookies);
   progress(job, 'downloading', 1, 'Downloading audio…'); lastProg = 0;
-  const src = await downloadAudio(job);
+  let src = await downloadAudio(job);
   const dur = await duration(src);
   if (!dur) throw new Error('Could not read the downloaded audio');
   let moments, segs;
@@ -313,13 +404,20 @@ async function processJob(job) {
     segs = fs.existsSync(`${src}.0-end.json`) ? JSON.parse(fs.readFileSync(`${src}.0-end.json`, 'utf8')) : await transcribe(job, src, dur, from, to);
   } else {
     const tt = Date.now();
-    const chatP = chatActivity(job).catch(() => []);   // runs alongside transcription (capped at 6 min), so it rarely adds time
+    // these run alongside transcription (which mostly waits on Groq), so they rarely add time
+    const chatP = chatActivity(job).catch(() => []);
+    const loudP = loudness(job, src);
     segs = await transcribe(job, src, dur);
     console.log(`job ${job.id}: ${Math.round(dur / 60)} min of audio transcribed in ${Math.round((Date.now() - tt) / 1000)}s`);
+    const [chat, loud] = await Promise.all([chatP, loudP]);
+    src = await shrinkAudio(src);
     lastProg = 0; progress(job, 'picking', 66, 'Picking the best moments…', { duration: dur });
     // generous timeout: Render may be waking up AND Haiku reading a long transcript (a retry reuses the server's same call)
-    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })), chat: await chatP }, { tries: 6, timeout: 240000 });
-    moments = r.moments || [];
+    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })), chat, loud }, { tries: 6, timeout: 240000 });
+    // tighten the AI's rough times to clean 10–45s cuts on the word timings
+    moments = (r.moments || []).map(m => { const f = fitMoment(m, segs, dur); console.log(`job ${job.id}: "${String(m.title).slice(0, 40)}" ${Math.round(m.start)}-${Math.round(m.end)}s → ${f.start}-${f.end}s (${(f.end - f.start).toFixed(1)}s; ${f.fit})`); return { ...m, start: f.start, end: f.end }; });
+    // two picks can land on the same stretch after tightening: keep the better one
+    moments = moments.filter((m, i) => !moments.slice(0, i).some(k => Math.min(k.end, m.end) - Math.max(k.start, m.start) > 0.5 * Math.min(k.end - k.start, m.end - m.start)));
     if (!moments.length) throw new Error('No good moments found in this video');
   }
   const clips = [];
@@ -379,9 +477,15 @@ async function pump() {
       }
       const e = queue.find(x => x.state === 'running') || queue.find(x => x.state === 'queued');
       if (!e) break;
+      // a job that keeps taking the worker down with it (it restarted mid-job 3 times) is failed instead of retried forever
+      e.runs = (e.state === 'running' ? (e.runs || 1) + 1 : 1);
       e.state = 'running'; saveQueue();
-      try { e.result = { clips: await processJob(e.job) }; }
-      catch (err) { console.error(`job ${e.job.id} failed:`, err.message); e.failed = String(err.message || err).slice(0, 300); }
+      if (e.runs > 3) { e.failed = 'This job stopped the clip server 3 times in a row, so it was dropped. Tap Try again to give it one more go.'; console.error(`job ${e.job.id}: dropped after ${e.runs - 1} crashed runs`); }
+      else {
+        try { e.result = { clips: await processJob(e.job) }; }
+        catch (err) { console.error(`job ${e.job.id} failed:`, err.message); e.failed = friendlyError(err.message || err, e.job.source?.url).slice(0, 300); }
+        finally { fs.rmSync(path.join(dirs.work, e.job.id), { recursive: true, force: true }); currentSrcKey = null; }
+      }
       e.state = 'reporting'; e.finishedAt = new Date().toISOString(); saveQueue();
     }
   } finally { busy = false; }
@@ -398,15 +502,17 @@ function scheduleTick(ms) { clearTimeout(tickTimer); tickTimer = setTimeout(auto
 // newest long videos (streams, VODs) about a topic, from anyone
 async function searchYoutube(q) {
   try {
-    const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', `ytsearchdate15:${q} stream`], { timeoutMs: 2 * 60 * 1000 }));
-    // ytsearchdate lists newest first; flat results often have no exact date, so the first 10 long ones are taken as recent
-    return (d.entries || []).filter(e => e?.id && e.duration >= 600 && !['is_live', 'is_upcoming'].includes(e.live_status)).slice(0, 10).map(e => { const ts = e.timestamp || e.release_timestamp; return { id: e.id, title: e.title, channel: e.channel || e.uploader || '', views: e.view_count || 0, duration: e.duration || 0, date: ts ? new Date(ts * 1000).toISOString() : null }; });
+    // yt-dlp dropped the "ytsearchdate" (newest first) search, so this uses the normal one and lets Mission Control
+    // weigh views and freshness. Long videos only: streams and VODs, not Shorts or trailers.
+    const term = `ytsearch20:${q} stream`;
+    const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', ...ytArgs(term, 'search'), term], { timeoutMs: 2 * 60 * 1000 }).finally(() => dropCookieCopies('search')));
+    return (d.entries || []).filter(e => e?.id && e.duration >= 600 && !['is_live', 'is_upcoming'].includes(e.live_status)).slice(0, 12).map(e => { const ts = e.timestamp || e.release_timestamp; return { id: e.id, title: e.title, channel: e.channel || e.uploader || '', views: e.view_count || 0, duration: e.duration || 0, date: ts ? new Date(ts * 1000).toISOString() : null }; });
   } catch (e) { console.error(`autopilot: YouTube search for "${q}" failed:`, e.message.slice(0, 200)); return []; }
 }
 async function listYoutube(url) {
   for (const tab of ['/streams', '/videos']) {
     try {
-      const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', '--playlist-end', '8', '--extractor-args', 'youtubetab:approximate_date', url + tab]));
+      const d = JSON.parse(await run('yt-dlp', ['--flat-playlist', '-J', '--playlist-end', '8', '--extractor-args', 'youtubetab:approximate_date', ...ytArgs(url, 'list'), url + tab]).finally(() => dropCookieCopies('list')));
       const items = (d.entries || []).filter(e => e?.id).map(e => ({ id: e.id, title: e.title, channel: d.channel || d.uploader || d.title, views: e.view_count || 0, duration: e.duration || 0, date: e.timestamp ? new Date(e.timestamp * 1000).toISOString() : null }));
       if (items.length) return items;
     } catch (e) { console.error(`autopilot: couldn't list ${url}${tab}:`, e.message.slice(0, 200)); }
@@ -419,6 +525,7 @@ async function autopilotTick() {
   ticking = true;
   try {
     const r = await fetch(`${SERVER}/api/clips/worker/autopilot`, { headers: { 'x-worker-secret': SECRET }, signal: AbortSignal.timeout(90000) }).then(x => x.json());
+    setCookies(r.ytCookies); setKeep(r.keep);
     if (!r.need) { if (r.why && r.why !== 'off') console.log(`autopilot: resting (${r.why})`); return; }
     const youtube = [];
     for (const url of r.youtube || []) youtube.push(...await listYoutube(url));
@@ -430,23 +537,42 @@ async function autopilotTick() {
 }
 
 // ── housekeeping: old clips, cached sources, leftovers ──
-function sweep() {
+// Mission Control sends the names of finished clips that still matter (waiting for review, approved, being edited):
+// those are kept however old they get (up to 30 days). Everything else expires after KEEP_DAYS as before, or after
+// an hour when the disk is nearly full.
+const KEEP_FILE = path.join(DATA, 'keep.json');
+let keep = null;
+try { keep = new Set(JSON.parse(fs.readFileSync(KEEP_FILE, 'utf8'))); } catch {}
+function setKeep(list) {
+  if (!Array.isArray(list)) return;
+  keep = new Set(list.filter(n => /^[a-f0-9]{24}\.(mp4|jpg)$/.test(n)));
+  try { fs.writeFileSync(KEEP_FILE, JSON.stringify([...keep])); } catch {}
+}
+let currentSrcKey = null;   // the source the running job is using: never swept
+function sweep(aggressive = false) {
   const now = Date.now();
-  const clean = (dir, maxAgeMs) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); try { if (now - fs.statSync(p).mtimeMs > maxAgeMs) fs.rmSync(p, { recursive: true, force: true }); } catch {} } };
-  clean(dirs.out, KEEP_DAYS * 864e5);
-  clean(dirs.src, 2 * 864e5);
-  if (!busy) clean(dirs.work, 864e5);
+  const each = (dir, fn) => { for (const f of fs.readdirSync(dir)) { const p = path.join(dir, f); try { fn(f, p, now - fs.statSync(p).mtimeMs); } catch {} } };
+  each(dirs.out, (f, p, age) => {
+    if (keep?.has(f)) { if (age > 30 * 864e5) fs.rmSync(p, { force: true }); return; }
+    if (age > (aggressive ? 3600e3 : KEEP_DAYS * 864e5)) fs.rmSync(p, { force: true });
+  });
+  // cached sources speed up re-cuts; under pressure only the running job's is kept
+  each(dirs.src, (f, p, age) => { if (currentSrcKey && f.startsWith(currentSrcKey)) return; if (aggressive || age > 2 * 864e5) fs.rmSync(p, { recursive: true, force: true }); });
+  each(dirs.work, (f, p, age) => { const live = f.startsWith('cookies-') || queue.some(x => x.state === 'running' && f.startsWith(x.job.id)); if (!live && (aggressive || (!busy && age > 864e5))) fs.rmSync(p, { recursive: true, force: true }); });
+  if (aggressive) console.log(`disk cleanup: ${Math.round(freeBytes() / MB)} MB free`);
 }
 
 // ── HTTP ──
 const app = express();
 app.use(express.json({ limit: '2mb' }));
-app.get('/health', (req, res) => res.json({ ok: true, busy, queued: queue.length }));
+app.get('/health', (req, res) => res.json({ ok: true, busy, queued: queue.length, freeMB: Math.round(freeBytes() / MB) }));
 app.use('/files', (req, res, next) => { res.set('Access-Control-Allow-Origin', '*'); next(); }, express.static(dirs.out, { maxAge: '7d', index: false }));
 app.post('/jobs', (req, res) => {
   if (!secretOk(req.get('x-worker-secret'))) return res.status(401).json({ error: 'bad secret' });
   const job = req.body || {};
   if (!/^job-[a-z0-9]+$/.test(job.id || '') || !/^https?:\/\//.test(job.source?.url || '')) return res.status(400).json({ error: 'bad job' });
+  // cookies go straight to their own file, never into queue.json
+  setCookies(job.ytCookies); setKeep(job.keep); delete job.keep; delete job.ytCookies;
   const ex = queue.find(x => x.job.id === job.id);
   if (ex) { if (ex.state === 'queued') { ex.job = job; saveQueue(); } return res.status(202).json({ ok: true, dup: true }); }
   if (recent.has(runKey(job))) return res.status(202).json({ ok: true, dup: true });
@@ -459,12 +585,15 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Clip worker on :${PORT} → reporting to ${SERVER} · storage ${R2 ? 'R2' : FILES_BASE} · transcribe ${GROQ ? 'Groq' : 'local whisper'} · push ${PUSH ? 'on' : 'off'} · ${queue.length} job(s) resumed`);
   // half-finished downloads (and whole-video sources from older versions) only waste the disk
   for (const f of fs.readdirSync(dirs.src)) if (f.includes('.dl.') || /^[a-f0-9]{16}\.mp4$/.test(f)) fs.rmSync(path.join(dirs.src, f), { force: true });
-  sweep(); setInterval(sweep, 3600 * 1000);
+  dropCookieCopies('');
+  sweep(freeBytes() < 400 * MB); setInterval(() => sweep(freeBytes() < 400 * MB), 3600 * 1000);
+  console.log(`disk: ${Math.round(freeBytes() / MB)} MB free · YouTube cookies ${fs.existsSync(COOKIES) ? 'set' : 'not set'}`);
   // keep yt-dlp current; sites change their players often (non-fatal)
-  const updateYtDlp = () => run(PY, ['-m', 'pip', 'install', '-q', '-U', 'yt-dlp']).catch(e => console.error('yt-dlp update skipped:', e.message));
+  // [default] brings yt-dlp-ejs, the YouTube challenge solver that runs on Node; it must match yt-dlp's version
+  const updateYtDlp = () => run(PY, ['-m', 'pip', 'install', '-q', '-U', 'yt-dlp[default]']).catch(e => console.error('yt-dlp update skipped:', e.message));
   updateYtDlp(); setInterval(updateYtDlp, 864e5);
   pump();
   scheduleTick(+process.env.AUTOPILOT_FIRST_MS || 3 * 60 * 1000);
   // catch up on anything sent while this worker was down
-  callServer('/api/clips/worker/hello', { have: queue.map(x => x.job.id) }, { tries: 10 }).then(r => r.resending && console.log(`Mission Control is re-sending ${r.resending} job(s)`)).catch(e => console.error('hello failed:', e.message));
+  callServer('/api/clips/worker/hello', { have: queue.map(x => x.job.id) }, { tries: 10 }).then(r => { setCookies(r.ytCookies); setKeep(r.keep); if (r.resending) console.log(`Mission Control is re-sending ${r.resending} job(s)`); }).catch(e => console.error('hello failed:', e.message));
 });
