@@ -48,6 +48,8 @@ const saveQueue = () => {
   catch (e) { console.error('could not save the queue:', e.message); if (e.code === 'ENOSPC') sweep(true); }
 };
 process.on('unhandledRejection', e => console.error('unhandled:', e?.stack || e));
+// Render stops the worker with SIGTERM on every deploy: that isn't a crash, so it doesn't count toward the 3-strikes rule
+process.on('SIGTERM', () => { for (const e of queue) if (e.state === 'running' && e.runs) e.runs--; saveQueue(); process.exit(0); });
 // "id:attempt" of jobs finished this process lifetime, so a duplicate send isn't redone
 // (a user's "Try again" bumps the attempt, so it does run)
 const recent = new Set();
