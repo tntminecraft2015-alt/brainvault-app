@@ -309,6 +309,8 @@ async function groqChunk(job, file) {
     if ((r.status === 429 || r.status >= 500 || r.status === 0) && i < 12) {
       const wait = Math.min(15 * 60, +(r.headers?.get?.('retry-after')) || 30 * 2 ** Math.min(i, 4));
       if (r.status === 429) progress(job, 'transcribing', 30, `Free transcription limit hit, waiting ${Math.ceil(wait / 60)} min…`);
+      // logged so a long wait is visible in Render's logs (the progress message only lives in Mission Control's memory)
+      console.log(`job ${job.id}: Groq ${r.status || 'unreachable'} on ${path.basename(file)}, try ${i + 1}/12, waiting ${Math.ceil(wait / 60)} min${r.headers?.get?.('retry-after') ? ` (Groq asked for ${r.headers.get('retry-after')}s)` : ''}`);
       await sleep(wait * 1000); continue;
     }
     throw new Error(`Transcription failed (Groq HTTP ${r.status}${r.status === 401 ? ': check GROQ_API_KEY' : ''})`);
