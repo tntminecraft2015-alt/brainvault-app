@@ -427,19 +427,37 @@ async function processJob(job) {
     // re-cut: only listen to the part being cut (cached if this source was done before)
     moments = job.moments;
     const from = Math.max(0, Math.floor(Math.min(...moments.map(m => m.start)))), to = Math.min(dur, Math.ceil(Math.max(...moments.map(m => m.end))));
-    segs = fs.existsSync(`${src}.0-end.json`) ? JSON.parse(fs.readFileSync(`${src}.0-end.json`, 'utf8')) : await transcribe(job, src, dur, from, to);
+    // reuse any cached transcript that covers the cut (the whole file, or the hot-spot window it came from)
+    const base = path.basename(src), covering = fs.readdirSync(path.dirname(src)).map(f => {
+      const m = f.startsWith(base + '.') && f.slice(base.length + 1).match(/^(\d+(?:\.\d+)?)-(end|\d+(?:\.\d+)?)\.json$/);
+      return m && +m[1] <= from && (m[2] === 'end' || +m[2] >= to) ? f : null;
+    }).find(Boolean);
+    segs = covering ? JSON.parse(fs.readFileSync(path.join(path.dirname(src), covering), 'utf8')) : await transcribe(job, src, dur, from, to);
   } else {
     const tt = Date.now();
-    // these run alongside transcription (which mostly waits on Groq), so they rarely add time
-    const chatP = chatActivity(job).catch(() => []);
-    const loudP = loudness(job, src);
-    segs = await transcribe(job, src, dur);
-    console.log(`job ${job.id}: ${Math.round(dur / 60)} min of audio transcribed in ${Math.round((Date.now() - tt) / 1000)}s`);
-    const [chat, loud] = await Promise.all([chatP, loudP]);
+    // Free transcription is the scarce thing (Groq's free tier is ~8h of audio a day), so listen first for where
+    // people reacted (loud audio, chat, viewer clips: all free), then transcribe only the stretches around those.
+    progress(job, 'transcribing', 20, 'Finding the hot spots…');
+    const [chat, loud] = await Promise.all([chatActivity(job).catch(() => []), loudness(job, src)]);
+    let windows = null;
+    try { windows = (await callServer(`/api/clips/worker/${job.id}/windows`, { duration: dur, chat, loud }, { tries: 4, timeout: 60000 })).windows || null; }
+    catch (e) { console.error(`job ${job.id}: no listening plan from the server (${e.message.slice(0, 120)}), transcribing it all`); }
+    if (windows?.length) {
+      segs = [];
+      let doneSec = 0; const total = windows.reduce((n, [a, b]) => n + b - a, 0);
+      for (const [a, b] of windows) {
+        progress(job, 'transcribing', 25 + 40 * doneSec / total, `Listening to the hot spots… ${Math.round(doneSec / 60)} of ${Math.round(total / 60)} min`);
+        segs.push(...await transcribe(job, src, dur, a, b));
+        doneSec += b - a;
+      }
+      segs.sort((x, y) => x.s - y.s);
+    } else segs = await transcribe(job, src, dur);
+    const heard = windows?.length ? windows.reduce((n, [a, b]) => n + b - a, 0) : dur;
+    console.log(`job ${job.id}: transcribed ${Math.round(heard / 60)} of ${Math.round(dur / 60)} min (${windows?.length || 'no'} hot-spot windows) in ${Math.round((Date.now() - tt) / 1000)}s`);
     src = await shrinkAudio(src);
     lastProg = 0; progress(job, 'picking', 66, 'Picking the best moments…', { duration: dur });
     // generous timeout: Render may be waking up AND Haiku reading a long transcript (a retry reuses the server's same call)
-    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })), chat, loud }, { tries: 6, timeout: 240000 });
+    const r = await callServer(`/api/clips/worker/${job.id}/pick`, { duration: dur, segments: segs.map(({ s, e, t }) => ({ s, e, t })), chat, loud, partial: !!windows?.length }, { tries: 6, timeout: 240000 });
     // tighten the AI's rough times to clean 10–45s cuts on the word timings
     moments = (r.moments || []).map(m => { const f = fitMoment(m, segs, dur); console.log(`job ${job.id}: "${String(m.title).slice(0, 40)}" ${Math.round(m.start)}-${Math.round(m.end)}s → ${f.start}-${f.end}s (${(f.end - f.start).toFixed(1)}s; ${f.fit})`); return { ...m, start: f.start, end: f.end }; });
     // two picks can land on the same stretch after tightening: keep the better one

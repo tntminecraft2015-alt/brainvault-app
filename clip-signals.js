@@ -116,7 +116,8 @@ const fmt = s => `[${Math.round(s.s)}-${Math.round(s.e)}] ${String(s.t || '').sl
  */
 function transcriptFor(segs, spots, budget = 120000) {
   const all = segs.map(fmt), total = all.reduce((n, l) => n + l.length, 0);
-  if (total <= budget) return { text: all.join(''), full: true };
+  // fits: all of it, with a marker wherever there's a long gap (silence, or a stretch that wasn't transcribed)
+  if (total <= budget) return { text: all.map((l, i) => (i && segs[i].s - segs[i - 1].e > 60 ? `[… ${Math.round((segs[i].s - segs[i - 1].e) / 60)} min skipped …]\n` : '') + l).join(''), full: true };
   const take = new Set();
   let used = 0;
   const addRange = (a, b, cap) => { for (let i = 0; i < segs.length; i++) { if (segs[i].e < a || segs[i].s > b || take.has(i)) continue; if (used + all[i].length > cap) return false; take.add(i); used += all[i].length; } return true; };
@@ -133,4 +134,32 @@ function transcriptFor(segs, spots, budget = 120000) {
   return { text, full: false };
 }
 
-module.exports = { hotSpots, transcriptFor, speechEnergy, BUCKET };
+/**
+ * Which stretches of a long video to transcribe: the hot spots (hottest first), each with 90s before (the setup)
+ * and 60s after (the reaction), merged where they touch, until `budget` seconds are used. When the signals cover
+ * less than half the budget, evenly spaced 2-minute samples fill the rest so quiet-but-good moments still have a shot.
+ * Returns [[start, end], ...] in time order (seconds, whole numbers).
+ */
+function listenWindows(spots, duration, budget = 1500) {
+  const wins = [];
+  const used = () => wins.reduce((n, [a, b]) => n + b - a, 0);
+  const add = (a, b) => {
+    a = Math.max(0, Math.floor(a)); b = Math.min(Math.ceil(duration), Math.ceil(b));
+    if (b - a < 20) return;
+    // merge with anything it overlaps or nearly touches
+    for (let i = wins.length - 1; i >= 0; i--) if (a <= wins[i][1] + 30 && b >= wins[i][0] - 30) { a = Math.min(a, wins[i][0]); b = Math.max(b, wins[i][1]); wins.splice(i, 1); }
+    wins.push([a, b]);
+  };
+  for (const sp of spots) {
+    if (used() >= budget) break;
+    // a long merged spot: keep the window from swallowing the whole budget
+    add(sp.start - 90, Math.min(sp.end, sp.start + 240) + 60);
+  }
+  if (used() < budget / 2) {
+    const n = Math.max(1, Math.floor((budget - used()) / 120));
+    for (let k = 0; k < n && used() < budget; k++) { const t = (k + 0.5) * duration / n; add(t - 60, t + 60); }
+  }
+  return wins.sort((x, y) => x[0] - y[0]);
+}
+
+module.exports = { hotSpots, transcriptFor, speechEnergy, listenWindows, BUCKET };

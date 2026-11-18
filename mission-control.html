@@ -8348,7 +8348,7 @@ function clipsSettingsHTML(){
     <div class="clp-sw" style="margin-top:10px"><div class="clp-s">${tt.connected?`TikTok: <b>${esc(tt.user?.name||'your account')}</b>${tt.mode==='drafts'?' · sends drafts to your TikTok inbox':tt.mode==='direct'?' · Direct Post (private until TikTok audits the app)':''}`:tt.error?`<span style="color:#ff9b9b">TikTok: ${esc(tt.error)}</span>`:tt.configured?'TikTok not connected.':'TikTok posting needs setup (TIKTOK_CLIENT_KEY / TIKTOK_CLIENT_SECRET on Render).'}</div>
       ${tt.configured?(tt.connected?`<button type="button" class="farm-btn sm ghost" onclick="clipsDisconnect('tiktok')">Disconnect</button>`:`<a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Connect</a>`):''}</div>
     ${tt.connected&&tt.mode!=='drafts'?`<div class="clp-note" style="margin-top:10px">TikTok only lets apps it hasn't audited post to <b>private</b> accounts, so direct posting fails on yours. Drafts get around that: the clip lands in your TikTok inbox and you tap Post there.<div class="clp-row" style="margin-top:8px"><a class="farm-btn sm primary" style="text-decoration:none" href="/api/clips/tiktok/connect">Reconnect for drafts</a></div><div style="margin-top:6px;font-size:12px;opacity:.85">If TikTok shows an error, turn on the <b>video.upload</b> scope for your app at developers.tiktok.com first.</div></div>`:''}
-    ${tt.connected&&tt.mode==='drafts'?'<div class="clp-s" style="margin-top:6px">TikTok holds at most 5 unposted drafts a day, so post them from your inbox as they arrive.</div>':''}`;
+    ${tt.connected&&tt.mode==='drafts'?`<div class="clp-s" style="margin-top:6px">Where drafts show up: in the TikTok <b>phone app</b>, signed in as <b>${esc(tt.user?.name||'the connected account')}</b> → <b>Inbox</b> tab → <b>System notifications</b> → tap “Your video is ready”. They aren't in your profile's Drafts folder until you open one, and they don't appear on tiktok.com. TikTok holds at most 5 unposted ones a day.</div>`:''}`;
 }
 // YouTube download cookies: YouTube blocks the clip server's cloud address without them
 function clipsCookieRow(){
@@ -8795,7 +8795,7 @@ function clpPostLine(id,c){
   const yt=clipsState?.youtube||{}, tt=clipsState?.tiktok||{}, out=[];
   if(clpPosting(c)) return '';
   if(c.postLinks?.youtube) out.push(`YouTube: <a class="pl" href="${esc(c.postLinks.youtube)}" target="_blank" rel="noopener">${esc(c.postLinks.youtube.replace('https://',''))}</a>${c.ytPrivacy==='private'?' (private until Google verifies the app)':''}`);
-  if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a class="pl" href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener">posted</a>`:c.ttMode==='draft'?(c.ttStatus==='inbox'?'draft is in your TikTok inbox, tap it there to post':/^failed/.test(c.ttStatus||'')?`<span style="color:#ff9b9b">draft ${esc(c.ttStatus)}</span>`:c.ttStatus==='posted'?'posted from your draft':'sending the draft…'):esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
+  if(c.ttPublishId) out.push(`TikTok: ${c.postLinks?.tiktok?`<a class="pl" href="${esc(c.postLinks.tiktok)}" target="_blank" rel="noopener">posted</a>`:c.ttMode==='draft'?(c.ttStatus==='inbox'?'sent to your TikTok app (Inbox → System notifications), tap it there to post':/^failed/.test(c.ttStatus||'')?`<span style="color:#ff9b9b">draft ${esc(c.ttStatus)}</span>`:c.ttStatus==='posted'?'posted from your draft':'sending the draft…'):esc(c.ttStatus||'processing')}${c.ttPrivacy==='SELF_ONLY'?' (Only me until TikTok approves the app)':''}`);
   if(c.ttError&&!c.ttPublishId) out.push(`<span style="color:#ff9b9b">${esc(c.ttError)}</span>`);
   const missing=(yt.connected&&!c.postLinks?.youtube)||(tt.connected&&!c.ttPublishId);
   return `${out.length?`<div class="clp-s">${out.join('<br>')}</div>`:''}${missing?`<div class="clp-row"><button type="button" class="farm-btn sm primary" onclick="clipsApprove('${esc(id)}',this)">Post${out.length?' to the rest':''}</button></div>`:''}`;
@@ -8859,7 +8859,7 @@ async function clipsPost(id,body){
   try{
     const d=await clipsApi(`/api/clips/jobs/${jid}/clips/${cid}/post`,{method:'POST',body,timeout:330000});
     const now=clpFind(id).c||c; Object.assign(now,d.clip); delete now.posting; if(now!==c){ Object.assign(c,d.clip); delete c.posting; }
-    showToast(d.errors?.length?d.errors.join(' · '):draft?`Done. Open TikTok and tap the draft in your inbox to post it${body.youtube?'; YouTube link is in Stats':''}.`:`Posted "${(now.title||'clip').slice(0,40)}". Links are in Stats.`);
+    showToast(d.errors?.length?d.errors.join(' · '):draft?`Done. In the TikTok app: Inbox → System notifications → tap the video to post it${body.youtube?'; YouTube link is in Stats':''}.`:`Posted "${(now.title||'clip').slice(0,40)}". Links are in Stats.`);
   }catch(e){ delete c.posting; await clipsLoadState(); const now=clpFind(id).c; showToast(`Posting failed: ${e.message}. ${now?.status==='review'?'It is back in Review.':'It is in Stats to try again.'}`); }
   clipsStats=null; clipsRefresh(); clipsSchedulePoll();
 }

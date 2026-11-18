@@ -8,7 +8,7 @@
 // on this server being awake. Job state lives in app-data (data.clips), persisted like everything else.
 
 const crypto = require('crypto');
-const { hotSpots, transcriptFor } = require('./clip-signals');
+const { hotSpots, transcriptFor, listenWindows } = require('./clip-signals');
 const { Readable } = require('stream');
 
 const HAIKU = 'claude-haiku-4-5-20251001';
@@ -505,6 +505,22 @@ function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, web
     res.json({ ok: true });
   });
 
+  // Before transcribing, the worker sends the free signals (loudness, chat) and gets back which stretches to listen to:
+  // [[start, end], ...] around the hot spots, ~25 min in all, instead of the whole (often 3-hour) audio. null = all of it.
+  const TX_BUDGET = +process.env.TX_BUDGET_SEC || 1500;
+  app.post('/api/clips/worker/:id/windows', workerOnly, async (req, res) => {
+    const job = findJob(clipsOf(getAppData()), req.params.id);
+    if (!job) return res.status(404).json({ error: 'unknown job' });
+    const duration = num(req.body?.duration, 0, 864000, 0);
+    if (!duration || duration <= TX_BUDGET * 1.3) return res.json({ windows: null });
+    const chat = (Array.isArray(req.body?.chat) ? req.body.chat : []).filter(x => Array.isArray(x) && Number.isFinite(+x[0]) && Number.isFinite(+x[1])).slice(0, 5000);
+    const loud = (Array.isArray(req.body?.loud) ? req.body.loud : []).filter(x => Array.isArray(x) && x.every(Number.isFinite)).slice(0, 60);
+    const from = job.range?.start || 0;
+    const viewerClips = (await twitchHotClips(twitchVodId(job.source.url)).catch(() => []))
+      .map(c => ({ ...c, t: c.t - from })).filter(c => c.t >= -20 && c.t < duration);
+    res.json({ windows: listenWindows(hotSpots({ duration, chat, loud, viewerClips }).spots, duration, TX_BUDGET) });
+  });
+
   // Worker sends the transcript; Haiku picks the moments (the API key never leaves this server)
   app.post('/api/clips/worker/:id/pick', workerOnly, async (req, res) => {
     const segs = (Array.isArray(req.body?.segments) ? req.body.segments : []).filter(s => s && Number.isFinite(+s.s) && Number.isFinite(+s.e));
@@ -517,14 +533,14 @@ function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, web
       const chat = (Array.isArray(req.body?.chat) ? req.body.chat : []).filter(x => Array.isArray(x) && Number.isFinite(+x[0]) && Number.isFinite(+x[1])).slice(0, 5000);
       // loud: [[start, dB above typical, length], ...] measured by the worker on the audio
       const loud = (Array.isArray(req.body?.loud) ? req.body.loud : []).filter(x => Array.isArray(x) && x.every(Number.isFinite)).slice(0, 60);
-      picks.set(key, pickMoments(job, c0, segs, duration, chat, loud));
+      picks.set(key, pickMoments(job, c0, segs, duration, chat, loud, !!req.body?.partial));
       setTimeout(() => picks.delete(key), 3600 * 1000);
     }
     try { res.json({ moments: await picks.get(key) }); }
     catch (e) { picks.delete(key); res.status(502).json({ error: e.message }); }
   });
 
-  async function pickMoments(job, c0, segs, duration, chat = [], loud = []) {
+  async function pickMoments(job, c0, segs, duration, chat = [], loud = [], partial = false) {
     const camp = c0.campaigns.find(x => x.id === job.campaignId);
     const short = duration > 0 && duration <= 95;
     // Twitch VODs: where viewers made clips, shifted to this job's clock (it may cover only part of the VOD)
@@ -538,7 +554,7 @@ function mountClipper(app, { getApiKey, makeClient, getAppData, saveAppData, web
     const topicLine = job.topic ? ` This video was picked for the topic "${job.topic}": favor moments about it, and only fall back to other moments if nothing on-topic makes a good clip.` : '';
     const { json, cost } = await haiku(
       `You are an expert short-form editor who clips streamers for TikTok and YouTube Shorts.${short ? ' This source is already a short clip: return exactly ONE moment covering the whole thing (start 0, end = its length), with your best title, hook and caption.' : `
-Pick the 4–8 best self-contained moments that do not overlap. Quality over quantity: a weak pick wastes the reviewer's time, so return fewer if the rest are weak (but at least 3 unless there is no speech at all).
+Pick the 5–8 best self-contained moments that do not overlap. Always return at least 4 (unless there is no speech at all): the reviewer wants several clips from every video, and picks are scored separately, so include the decent ones too.${partial ? ' Only the stretches around the hot spots were transcribed (gaps are marked); pick only from what is shown.' : ''}
 ${spots.length ? 'HOT SPOTS list where viewers reacted, strongest evidence first. Viewer clips are the strongest signal (real viewers clipped it), then chat spikes, then loud audio and hype words. Build most picks around hot spots, starting a little before the spot (the reaction lands after the moment itself). Only pick something outside a hot spot when the transcript shows it is clearly great.' : 'No viewer or chat data for this video: judge from the transcript. Favor the most energetic stretches (yelling, ALL CAPS, laughter, "no way", "clip that").'}
 LENGTH: decide each clip's length by what it needs, then cut tight. A single reaction or one-liner: 10–18s. A joke, bit or exchange: 15–30s. A play, fight or story that needs its setup: 30–45s. Never under 10s or over 45s. Start one line before the setup; end right after the payoff or the reaction to it, with no trailing chatter or dead air.`}${topicLine}
 For each give: "start" and "end" (seconds, from the transcript), "kind" (reaction | joke | play | story | drama | hot-take), a "title" (≤70 chars, for YouTube), a "hook" (≤6 words, punchy on-screen text, ALL CAPS ok), a "caption" (1–2 lines for TikTok, no hashtags), 3–6 "hashtags" (no #), a "score" 1–10 for viral potential (would a stranger scrolling stop and watch to the end?), "why" (≤12 words), "spot" (the hot spot number it matches, or 0), and "flags": a list (usually empty) of short warnings for anything that could get it muted or removed on TikTok/YouTube: audible copyrighted music or song lyrics, slurs or hate speech, sexual content, dangerous stunts, gambling, graphic violence, minors in risky situations.${camp?.rules ? `\nThis clip is for a paid campaign, "${camp.name}". Follow its rules exactly in the caption/hashtags:\n${camp.rules}` : ''}
