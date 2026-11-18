@@ -116,9 +116,14 @@ function setCookies(text) {
 }
 const isYoutube = u => /^(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//.test(String(u || '').replace(/^https?:\/\//, '')) || /^ytsearch/.test(String(u || ''));
 // yt-dlp rewrites the cookie file when it exits, so each call gets its own copy (two at once would clobber it)
+// When YouTube hands yt-dlp's default players no usable formats ("Requested format is not available", common with
+// cookies on a cloud server), these other players usually still work. Switched on after the first such failure.
+const ALT_CLIENTS = 'youtube:player_client=tv,web_safari,mweb,default';
+let altClients = false;
+const FORMAT_ERR = /Requested format is not available|n challenge|Signature extraction failed|Only images are available/i;
 function ytArgs(url, tag) {
   if (!isYoutube(url)) return [];
-  const args = ['--js-runtimes', 'node'];
+  const args = ['--js-runtimes', 'node', ...(altClients ? ['--extractor-args', ALT_CLIENTS] : [])];
   if (fs.existsSync(COOKIES)) { const mine = path.join(dirs.work, `cookies-${tag || crypto.randomBytes(4).toString('hex')}.txt`); fs.copyFileSync(COOKIES, mine); fs.chmodSync(mine, 0o600); args.push('--cookies', mine); }
   return args;
 }
@@ -146,10 +151,14 @@ async function testCookies(text) {
   const f = path.join(dirs.work, `cookies-test-${crypto.randomBytes(4).toString('hex')}.txt`);
   try {
     if (text) fs.writeFileSync(f, text, { mode: 0o600 }); else if (fs.existsSync(COOKIES)) fs.copyFileSync(COOKIES, f); else return { ok: null, error: 'no cookies' };
-    await run('yt-dlp', ['--simulate', '--no-playlist', '-f', 'ba/b', '--js-runtimes', 'node', '--cookies', f, TEST_VIDEO], { timeoutMs: 70000 });
+    const test = alt => run('yt-dlp', ['--simulate', '--no-playlist', '-f', 'ba/b', '--js-runtimes', 'node', ...(alt ? ['--extractor-args', ALT_CLIENTS] : []), '--cookies', f, TEST_VIDEO], { timeoutMs: 70000 });
+    try { await test(altClients); }
+    catch (e) { if (altClients || !FORMAT_ERR.test(String(e.message))) throw e; await test(true); altClients = true; console.log('YouTube: default players gave no formats, switched to the alternate players'); }
     return { ok: true };
   } catch (e) {
     const m = String(e.message || '');
+    // YouTube didn't ask for a sign-in, so the cookies themselves may be fine: keep them and let a real download tell
+    if (FORMAT_ERR.test(m)) return { ok: null, error: friendlyError(m) };
     if (/confirm you.?re not a bot|Sign in to confirm|cookies are no longer valid|LOGIN_REQUIRED/i.test(m)) return { ok: false, blocked: true };
     if (/took over|ETIMEDOUT|Unable to download webpage|HTTP Error 5\d\d|getaddrinfo/i.test(m)) return { ok: null, error: friendlyError(m) };
     return { ok: false, error: friendlyError(m) };
@@ -182,7 +191,15 @@ function ensureSpace(needBytes, label) {
 // All moment times are seconds from the start of the job's range (0 when there is no range).
 const rangeOf = job => ({ from: job.range?.start ?? 0, to: job.range?.end ?? null });
 
-async function ytdlp(job, base, format, section, extra, pctFrom, pctSpan, label, exactCuts = true) {
+async function ytdlp(job, ...rest) {
+  try { return await ytdlpOnce(job, ...rest); }
+  catch (e) {
+    if (altClients || !isYoutube(job.source.url) || !FORMAT_ERR.test(String(e.message))) throw e;
+    altClients = true; console.log(`job ${job.id}: no formats from YouTube's default players, retrying with the alternate ones`);
+    return ytdlpOnce(job, ...rest);
+  }
+}
+async function ytdlpOnce(job, base, format, section, extra, pctFrom, pctSpan, label, exactCuts = true) {
   // leftovers from a run that died mid-download must not be mistaken for the result
   for (const f of fs.readdirSync(dirs.src)) if (f.startsWith(`${base}.dl.`)) fs.rmSync(path.join(dirs.src, f), { force: true });
   const args = ['-f', format, '--no-playlist', '--no-part', '--newline', ...ytArgs(job.source.url, base), ...extra, '-o', path.join(dirs.src, `${base}.dl.%(ext)s`)];
